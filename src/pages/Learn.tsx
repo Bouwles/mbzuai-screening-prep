@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { SUBTOPICS, SYLLABUS, hasSubtopic, subtopicInfo } from '../syllabus';
 import { LESSON_BY_SUBTOPIC, generatorsForSubtopic, staticForSubtopic } from '../engine/bank';
@@ -6,7 +6,7 @@ import { accuracyBySub, markRead, useStore } from '../store/progress';
 import { Rich, Tex } from '../components/Rich';
 import { QuestionSession } from '../components/QuestionSession';
 import { Rng, freshSeed } from '../lib/rng';
-import type { QRef } from '../types';
+import type { QRef, WorkedExample } from '../types';
 
 export function LearnIndex() {
   const read = useStore((s) => s.read);
@@ -105,6 +105,102 @@ function CheckYourself({ sub }: { sub: string }) {
   );
 }
 
+
+/** Split the lesson text at its ### headings into short chunks. */
+function chunksOf(text: string): { title: string; body: string }[] {
+  const parts = text.split(/^###\s+/m);
+  const out: { title: string; body: string }[] = [];
+  if (parts[0].trim()) out.push({ title: 'The big idea', body: parts[0].trim() });
+  for (const p of parts.slice(1)) {
+    const nl = p.indexOf('\n');
+    out.push({ title: (nl < 0 ? p : p.slice(0, nl)).trim(), body: nl < 0 ? '' : p.slice(nl + 1).trim() });
+  }
+  return out;
+}
+
+/** "What you need to know", one chunk at a time (like Brilliant), with an option to show everything. */
+function SteppedKnow({ text, children }: { text: string; children: ReactNode }) {
+  const chunks = chunksOf(text);
+  const [shown, setShown] = useState(1);
+  const all = shown >= chunks.length;
+  const last = useRef<HTMLDivElement>(null);
+  const more = () => {
+    setShown((n) => n + 1);
+    setTimeout(() => last.current?.scrollIntoView({ block: 'start' }), 0);
+  };
+  return (
+    <section className="lesson-section">
+      <div className="know-head">
+        <h2>What you need to know</h2>
+        {!all && (
+          <button type="button" className="btn-text" onClick={() => setShown(chunks.length)}>
+            Show it all
+          </button>
+        )}
+      </div>
+      <div className="know-progress" aria-hidden>
+        {chunks.map((_, i) => (
+          <span key={i} className={i < shown ? 'on' : ''} />
+        ))}
+      </div>
+      {chunks.slice(0, shown).map((c, i) => (
+        <div key={i} className="know-card" ref={i === shown - 1 ? last : undefined}>
+          <p className="know-step">
+            {i + 1} of {chunks.length}
+          </p>
+          <h3>{c.title}</h3>
+          <Rich text={c.body} className="reading" />
+        </div>
+      ))}
+      {!all && (
+        <button type="button" className="btn-primary btn-lg know-next" onClick={more}>
+          Continue
+        </button>
+      )}
+      {/* formulas, examples, traps and tip appear once every chunk has been read */}
+      {all && children}
+    </section>
+  );
+}
+
+/** Worked example: try it first, then reveal the steps one by one. */
+function Example({ n, ex }: { n: number; ex: WorkedExample }) {
+  const [step, setStep] = useState(0);
+  const done = step >= ex.steps.length;
+  return (
+    <div className="example">
+      <h3>
+        Example {n}: <Rich text={ex.title} className="inline-rich" />
+      </h3>
+      <Rich text={ex.problem} className="example-problem" />
+      {step > 0 && (
+        <ol className="steps">
+          {ex.steps.slice(0, step).map((st, j) => (
+            <li key={j}>
+              <Rich text={st} />
+            </li>
+          ))}
+        </ol>
+      )}
+      {done ? (
+        <div className="example-answer">
+          <span className="ms-label">Answer</span>
+          <Rich text={ex.answer} />
+        </div>
+      ) : (
+        <div className="example-actions">
+          <button type="button" className="btn-secondary" onClick={() => setStep((x) => x + 1)}>
+            {step === 0 ? 'Show the first step' : `Next step (${step + 1} of ${ex.steps.length})`}
+          </button>
+          <button type="button" className="btn-text" onClick={() => setStep(ex.steps.length)}>
+            Show full solution
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function LessonPage() {
   const { sub = '' } = useParams();
   const read = useStore((s) => s.read.includes(sub));
@@ -137,10 +233,7 @@ export function LessonPage() {
         <p className="empty">This lesson hasn't been written yet.</p>
       ) : (
         <>
-          <section className="lesson-section">
-            <h2>What you need to know</h2>
-            <Rich text={lesson.know} className="reading" />
-          </section>
+          <SteppedKnow text={lesson.know}>
           <section className="lesson-section">
             <h2>Key formulas and rules</h2>
             <dl className="formula-list">
@@ -159,24 +252,9 @@ export function LessonPage() {
           </section>
           <section className="lesson-section">
             <h2>Worked examples</h2>
+            <p className="muted">Try each one yourself first, then reveal the steps one at a time.</p>
             {lesson.examples.map((ex, k) => (
-              <div key={k} className="example">
-                <h3>
-                  Example {k + 1}: <Rich text={ex.title} className="inline-rich" />
-                </h3>
-                <Rich text={ex.problem} className="example-problem" />
-                <ol className="steps">
-                  {ex.steps.map((st, j) => (
-                    <li key={j}>
-                      <Rich text={st} />
-                    </li>
-                  ))}
-                </ol>
-                <div className="example-answer">
-                  <span className="ms-label">Answer</span>
-                  <Rich text={ex.answer} />
-                </div>
-              </div>
+              <Example key={k} n={k + 1} ex={ex} />
             ))}
           </section>
           <section className="lesson-section">
@@ -193,6 +271,7 @@ export function LessonPage() {
             <h2>Exam tip</h2>
             <Rich text={lesson.examTip} className="reading" />
           </section>
+          </SteppedKnow>
         </>
       )}
 

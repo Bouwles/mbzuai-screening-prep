@@ -2124,3 +2124,56 @@ input[type='checkbox'] {
 .inline-rich p {
   line-height: inherit;
 }
+
+/* ---------------------------------------------------------------- stepped lessons */
+.know-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.know-progress {
+  display: flex;
+  gap: 6px;
+  margin: 4px 0 20px;
+}
+.know-progress span {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+.know-progress span.on {
+  background: var(--accent);
+}
+.know-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.know-card h3 {
+  font-size: 1.3rem;
+  margin: 0 0 12px;
+}
+.know-step {
+  color: var(--accent);
+  font-weight: 650;
+  font-size: 0.85rem;
+  margin: 0 0 4px;
+}
+.know-card .reading {
+  font-size: 1.08rem;
+}
+.know-next {
+  margin-top: 4px;
+}
+.example-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+}
