@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'variance-sd',
+  simple:
+    'The **standard deviation** (SD) measures how far values typically sit from the mean. Two classes can both average 60%, but if one class all scored 55 to 65 and the other scored 20 to 100, the second has a much bigger SD. To get it: find each value\'s distance from the mean, square those distances, average them (that average is the **variance**), then take the square root.',
+  methods: [
+    { cue: 'A small **list of values**: find the variance or SD', method: 'Mean, deviations $x - \\bar{x}$, square, add, divide by $n$ (population) for the variance, then square-root for the SD.' },
+    { cue: 'Given $\\sum x$ and $\\sum x^2$ (or asked for $\\sum x^2$)', method: 'Computational formula $\\sigma^2 = \\frac{\\sum x^2}{n} - \\bar{x}^2$; rearranged, $\\sum x^2 = n(\\sigma^2 + \\bar{x}^2)$.' },
+    { cue: '**Frequency table** of values', method: 'Multiply each squared deviation by its frequency and divide by the total frequency $\\sum f$.' },
+    { cue: 'Every value is **multiplied and/or shifted** ($y = ax + b$, unit conversion)', method: 'SD $\\times |a|$, variance $\\times a^2$; the $+b$ never changes spread (but it does shift the mean).' },
+    { cue: 'The word **sample** ("estimate for all students") or $n - 1$', method: 'Sample variance $s^2 = \\frac{\\sum (x - \\bar{x})^2}{n - 1}$; population variance divides by $n$.' },
+    { cue: 'A value is **added**, or two groups are **combined**', method: 'Rebuild totals: $\\sum (x - \\bar{x})^2 = n\\sigma^2$ or $\\sum x^2 = n(\\sigma^2 + \\bar{x}^2)$, add the new parts, then divide by the new $n$.' },
+  ],
   know:
     '### Why we need a measure of spread\n\n' +
     'Two classes can both average $60\\%$ on a test. In one class everybody scored between $55\\%$ and $65\\%$; in the other, scores ran from $20\\%$ to $100\\%$. The **mean** tells you where the centre is, but not how **spread out** the values are. The range (largest minus smallest) uses only two values, so one odd value can ruin it. The **variance** and **standard deviation** (SD) use every value.\n\n' +

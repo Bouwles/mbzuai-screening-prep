@@ -57,6 +57,17 @@ const know = [
 
 export const lesson: Lesson = {
   subtopic: 'logs-exponentials',
+  simple:
+    'A logarithm answers the question "what power?". Since $2^5 = 32$, we write $\\log_2 32 = 5$: the power you raise 2 to in order to get 32. Logs are the tool for bringing an unknown down from a power, which is why they solve growth and decay problems. $\\ln$ is the log to base $e \\approx 2.718$, and it undoes $e^x$.',
+  methods: [
+    { cue: '**Evaluate** a log, e.g. $\\log_2 32$ or $\\log_9 3$', method: 'Ask "the base to what power gives this number?", using $\\log_b x = y \\iff b^y = x$. Roots give fractional powers: $3 = 9^{\\frac{1}{2}}$.' },
+    { cue: '**Simplify** or combine several logs', method: 'Use the power law first ($k\\log a = \\log a^k$), then the product law (adding logs multiplies the numbers) and the quotient law (subtracting logs divides them).' },
+    { cue: 'Unknown in the power and the bases **match**, e.g. $3^{2x-1} = 27^{x-2}$', method: 'Write both sides as powers of the same base, then set the powers equal.' },
+    { cue: 'Unknown in the power and the bases **do not match**, e.g. $5^x = 3^{x+1}$ or $e^x = 5$', method: 'Take $\\ln$ (or $\\log$) of both sides to bring the powers down, then collect the $x$ terms. Use $\\ln$ to undo $e$.' },
+    { cue: 'Several logs of the unknown, e.g. $\\log_2 x + \\log_2(x - 2) = 3$', method: 'Combine into a single log, turn $\\log_b A = c$ into $A = b^c$, solve, then reject any root that makes a log argument zero or negative.' },
+    { cue: 'A **growth or decay model** like $P = P_0e^{kt}$: find a time or a rate', method: 'Substitute the known values, divide to get the exponential on its own, take $\\ln$ of both sides, then divide.' },
+    { cue: '$e^{2x}$ and $e^x$ together, or $(\\log_2 x)^2$ and $\\log_2 x$ together', method: 'It is a hidden quadratic: let $u = e^x$ (or $u = \\log_2 x$), solve for $u$, then convert back.' },
+  ],
   know,
   formulas: [
     { label: 'Definition of a logarithm', tex: '\\log_b x = y \\iff b^y = x', note: 'Only for $b > 0$, $b \\ne 1$ and $x > 0$.' },

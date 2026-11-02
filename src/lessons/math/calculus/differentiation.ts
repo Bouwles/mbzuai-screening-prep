@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'differentiation',
+  simple:
+    "The **derivative** $f'(x)$ measures how steep a curve is at each point: how fast $y$ changes when $x$ changes a tiny bit, like a car's speedometer reading. " +
+    'For powers of $x$ there is one main rule: bring the power down in front and reduce the power by one, so $x^{3}$ becomes $3x^{2}$. ' +
+    'A few standard results ($e^{x}$, $\\ln x$, $\\sin x$, $\\cos x$) and three rules for combining functions (product, quotient and chain) handle everything else.',
+  methods: [
+    { cue: 'A sum of powers of $x$, including $\\sqrt{x}$ or $\\frac{4}{x^{2}}$', method: 'Rewrite every term as a power ($x^{\\frac{1}{2}}$, $4x^{-2}$), then use the power rule term by term: multiply by the power, subtract 1. Constants vanish.' },
+    { cue: 'Two functions **multiplied**, such as $x^{2}e^{x}$', method: "Product rule: $(uv)' = u'v + uv'$ (a plus sign and two terms)." },
+    { cue: 'One function **divided** by another', method: "Quotient rule: $\\frac{u'v - uv'}{v^{2}}$. Keep the order of the top and square the bottom." },
+    { cue: 'A function **inside** another: a bracket to a power, $e^{-2x}$, $\\cos(4x)$, $\\ln(x^{2} + 1)$', method: "Chain rule: differentiate the outside (inside unchanged), then multiply by the derivative of the inside. Shortcuts: $e^{kx} \\to ke^{kx}$ and $\\ln(g) \\to \\frac{g'}{g}$." },
+    { cue: "\"Find the **gradient** at $x = 2$\" or \"find $f'(2)$\"", method: 'Differentiate first, then substitute. Substituting into $f(x)$ gives the height of the curve, not its gradient.' },
+    { cue: "The **second derivative** $f''$, or unknown coefficients from given derivative values", method: 'Differentiate twice (constants vanish each time). For unknowns, differentiate the general form, then turn each condition into an equation.' },
+  ],
   know:
     '### What a derivative is\n\n' +
     'The **derivative** of a function tells you its **gradient** (steepness, or rate of change) at every point. For a straight line the gradient is the same everywhere, but a curve like $y = x^{2}$ gets steeper as $x$ grows. The derivative is a new function that gives the gradient at each $x$.\n\n' +

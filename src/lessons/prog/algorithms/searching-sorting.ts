@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'searching-sorting',
+  simple:
+    '**Searching** means finding an item; **sorting** means putting items in order. A **linear search** checks items one by one, like flipping through a messy pile of papers. A **binary search** is how you look up a word in a dictionary: open it in the middle, decide which half the word must be in, and repeat, which only works because the dictionary is already sorted. The sorting methods (bubble, selection, insertion, merge) are just different routines for tidying a list, and exam questions ask you to follow a few of their steps.',
+  methods: [
+    { cue: 'Linear search: how many comparisons, target present or missing', method: 'It stops at the first match (position $k$ costs $k$ comparisons). A missing target costs all $n$ comparisons.' },
+    { cue: 'A binary search **trace**: which values are compared?', method: 'Keep a table of low, high, mid. Use mid $= \\lfloor \\frac{\\text{low} + \\text{high}}{2} \\rfloor$, then set low $=$ mid $+ 1$ or high $=$ mid $- 1$. The loop still runs when low $=$ high.' },
+    { cue: 'Binary search **worst case** for $n$ items, or the largest $n$ for $k$ comparisons', method: 'Worst case is $\\lfloor \\log_2 n \\rfloor + 1$ comparisons; $k$ comparisons can handle at most $2^k - 1$ items.' },
+    { cue: 'The list after $k$ **passes** of bubble, selection or insertion sort', method: 'Bubble: swap neighbours left to right, the largest moves to the end each pass. Selection: swap the smallest remaining item to the front. Insertion: slide the next item left into the sorted front part. Rewrite the list after every pass.' },
+    { cue: 'Comparisons in a **merge**, or in a whole merge sort', method: 'Each comparison moves one item to the output; once one list is empty the rest is copied for free. For merge sort, add up the merges level by level.' },
+    { cue: 'Number of **swaps** in bubble sort, or the best case on a sorted list', method: 'Bubble-sort swaps = number of pairs in the wrong order. With an early-exit flag, a sorted list takes one pass of $n - 1$ comparisons; insertion sort also needs only $n - 1$; selection sort always does $\\frac{n(n - 1)}{2}$.' },
+    { cue: '"Stable" sort, items with equal keys', method: 'A stable sort keeps items with equal keys in their original relative order.' },
+  ],
   know:
     '### Why this topic matters\n\n' +
     'Searching (finding an item) and sorting (putting items in order) are the classic first algorithms. Exam questions here are mostly **tracing**: you are given a small list and asked what happens after a few steps, or how many comparisons are made. You do not need clever maths, just a careful, step-by-step method. Always write the list out again after every step.\n\n' +

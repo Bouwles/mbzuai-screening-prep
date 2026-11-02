@@ -499,7 +499,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'sequences-series-018',
     subtopic: 'sequences-series',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Evaluate $\\displaystyle\\sum_{k=11}^{30} (3k - 2)$.',
     options: ['$1335$', '$1130.5$', '$1159$', '$1190$'],
     correctIndex: 3,

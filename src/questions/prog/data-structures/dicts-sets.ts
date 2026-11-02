@@ -460,6 +460,7 @@ print(inv, removed)`,
     correctIndex: 1,
     markScheme: {
       solution:
+        'Trace the dictionary line by line. Watch what `update` does to a key that already exists, and what `pop` returns.\n\n' +
         "1. Start: `{'pen': 3, 'ink': 2}`.\n" +
         "2. `update({'ink': 5, 'pad': 1})` copies each pair in: `'ink'` already exists, so its value is **replaced** by 5; `'pad'` is new, so it is added. Now `{'pen': 3, 'ink': 5, 'pad': 1}`.\n" +
         "3. `inv['pen'] = inv['pen'] - 1` sets `'pen'` to $3 - 1 = 2$: `{'pen': 2, 'ink': 5, 'pad': 1}`.\n" +
@@ -495,6 +496,7 @@ print(sorted(a & b), sorted(a ^ b))`,
     correctIndex: 0,
     markScheme: {
       solution:
+        'First turn each word into the set of its distinct letters, then apply `&` (in both) and `^` (in exactly one).\n\n' +
         "1. `set('hello')` takes the letters h, e, l, l, o and keeps one of each: `a` = {h, e, l, o}.\n" +
         "2. `set('world')` gives `b` = {w, o, r, l, d}.\n" +
         '3. `a & b` (intersection: in both) = {l, o}. Sorted: `[\'l\', \'o\']`.\n' +
@@ -594,7 +596,7 @@ print(best, groups[best])`,
   {
     id: 'dicts-sets-017',
     subtopic: 'dicts-sets',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'What happens when this Python code runs?',
     code: {
       lang: 'python',
@@ -609,6 +611,7 @@ print(len(seen))`,
     correctIndex: 2,
     markScheme: {
       solution:
+        'Check every object that is put into the set: can it be hashed (is it immutable)?\n\n' +
         '1. The loop adds three tuples. Tuples are immutable and hashable, so they can go in a set. `(1, 2)` appears twice but is stored once, so `seen = {(1, 2), (2, 1)}`.\n' +
         '2. `seen.add([3, 4])` tries to add a **list**. Lists are mutable, so they are not hashable, and set elements must be hashable.\n' +
         "3. Python raises `TypeError: unhashable type: 'list'` at this line, so the `print` is never reached.\n\n" +
@@ -626,7 +629,7 @@ print(len(seen))`,
   {
     id: 'dicts-sets-018',
     subtopic: 'dicts-sets',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       'A hash table uses **chaining**: each of its buckets holds a list of the keys that hash to it. The hash function spreads keys evenly over the buckets.\n\n' +
       'The table starts with 200 buckets and 600 keys. Then 400 more keys are inserted and the table is resized to 500 buckets (all keys are re-hashed into the new buckets).\n\n' +

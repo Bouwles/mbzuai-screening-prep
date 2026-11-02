@@ -561,7 +561,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'function-families-016',
     subtopic: 'function-families',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A parabola crosses the $x$-axis at $x = 1$ and $x = 5$, and passes through the point $(3, 8)$. Where does it cross the $y$-axis?',
     options: ['$y = 10$', '$y = -10$', '$y = \\frac{5}{4}$', '$y = 5$'],
     correctIndex: 1,
@@ -629,7 +629,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'function-families-018',
     subtopic: 'function-families',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Where does the graph of $y = \\log_2(x - 3) + 1$ cross the $x$-axis?',
     options: ['$x = 4$', '$x = \\frac{7}{2}$', '$x = 5$', '$x = 1$'],
     correctIndex: 1,
@@ -658,7 +658,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'function-families-019',
     subtopic: 'function-families',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The graph shows a function of the form $y = a \\cdot b^x + c$, plotted for $x$ from $0$ to $6$. As $x$ increases, the values level off towards a horizontal asymptote. Which equation matches the graph?',
     chart: {
       kind: 'line',
@@ -672,6 +672,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Find the three constants one at a time: the level the graph flattens towards gives $c$, the value at $x = 0$ gives $a + c$, and one more point gives $b$.\n\n' +
         '1. **Asymptote.** The values $4, 3, 2.5, 2.25$ get closer and closer to $2$, and the gap to 2 halves each time ($2, 1, 0.5, 0.25$). So $c = 2$.\n' +
         '2. **Starting value.** At $x = 0$, $b^0 = 1$, so $y = a + c = 18$, giving $a = 16$.\n' +
         '3. **Multiplier.** At $x = 1$: $16b + 2 = 10$, so $16b = 8$ and $b = 0.5$. The graph is falling, so $0 < b < 1$ (decay) makes sense.\n' +
@@ -709,6 +710,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'You need a point and a gradient: the line goes through the **midpoint** of $AB$ and its gradient is the **negative reciprocal** of the gradient of $AB$.\n\n' +
         '1. **Midpoint** of $AB$: $\\left(\\frac{1 + 5}{2}, \\frac{2 + 10}{2}\\right) = (3, 6)$.\n' +
         '2. **Gradient** of $AB$: $\\frac{10 - 2}{5 - 1} = \\frac{8}{4} = 2$.\n' +
         '3. **Perpendicular gradient**: negative reciprocal of 2, which is $-\\frac{1}{2}$.\n' +

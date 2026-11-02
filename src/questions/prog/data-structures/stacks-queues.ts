@@ -749,7 +749,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'stacks-queues-021',
     subtopic: 'stacks-queues',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'In a singly linked list, `P` points to an existing node and `N` is a new node. Which pair of pseudocode statements, carried out **in the order shown**, correctly inserts `N` straight after `P` without losing any nodes?',
     options: [
       '`P.next ← N`, then `N.next ← P.next`',

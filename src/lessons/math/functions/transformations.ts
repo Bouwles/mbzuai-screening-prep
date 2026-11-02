@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'transformations',
+  simple:
+    'A transformation picks up the whole graph of $y = f(x)$ and slides it, stretches it or flips it, like moving a picture around on a screen. ' +
+    'A change written **outside** the function, as in $f(x) + 3$, moves points up or down and does exactly what it looks like. ' +
+    'A change written **inside** the bracket, as in $f(x + 3)$, moves points left or right and does the **opposite** of what it looks like (here: 3 to the left).',
+  methods: [
+    { cue: 'A point $(p, q)$ is on $y = f(x)$; which point is on the new graph?', method: 'Do the coordinates separately: new $x$ solves "inside of the bracket $= p$"; new $y$ applies the outside operations to $q$ (multiply first, then add).' },
+    { cue: 'Describe the transformation from $f(x)$ to $f(x - a)$, $af(x)$, $f(ax)$, $-f(x)$, $f(-x)$', method: 'Outside = vertical, as written; inside = horizontal, opposite. $f(ax)$ is a horizontal stretch with factor $\\frac{1}{a}$; $-f(x)$ reflects in the $x$-axis, $f(-x)$ in the $y$-axis.' },
+    { cue: 'Steps given **in words**, asked for the new equation', method: 'Build the equation one step at a time in the order given. A horizontal step replaces **every** $x$ (e.g. $f(-x)$ moved 2 right is $f(2 - x)$).' },
+    { cue: 'New **vertex** of a moved quadratic', method: 'Complete the square to get the old vertex $(h, k)$, then move that one point by the same amounts.' },
+    { cue: 'New **asymptotes** or new **roots**', method: '$\\frac{a}{x - h} + k$ has asymptotes $x = h$, $y = k$. Vertical stretches and $x$-axis reflections keep roots fixed; $f(ax)$ divides every root by $a$.' },
+    { cue: '$f(bx + c)$ with a number in front of $x$', method: 'Solve $bx + c = $ old $x$ directly, or factor as $f\\big(b(x + \\frac{c}{b})\\big)$: the shift is $\\frac{c}{b}$, not $c$.' },
+  ],
   know:
     '### What is a transformation?\n\n' +
     'A transformation takes the graph of $y = f(x)$ and moves it, stretches it or flips it. You do not need to know what $f$ is: every point $(x, y)$ on the old graph moves to a new point by a simple rule, and the new graph is just all the moved points.\n\n' +

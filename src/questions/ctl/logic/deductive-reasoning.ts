@@ -821,7 +821,7 @@ None of the other statements puts Layla inside the managers group, so with any o
   {
     id: 'deductive-reasoning-016',
     subtopic: 'deductive-reasoning',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: `Each of the statements $P$, $Q$, $R$ and $S$ is either true or false. You are told:
 
 - If $P$ is true, then $Q$ is true.

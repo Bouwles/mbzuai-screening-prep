@@ -462,7 +462,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'pigeonhole-counting-016',
     subtopic: 'pigeonhole-counting',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'You walk on a grid from $A = (0, 0)$ to $B = (6, 4)$, one unit at a time, moving only right or up. How many shortest routes **pass through** the point $C = (2, 2)$?',
     options: ['$210$', '$21$', '$90$', '$120$'],
     correctIndex: 2,

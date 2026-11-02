@@ -11,6 +11,7 @@ import { MockHome, MockRun, MockResults } from './pages/Mock';
 import { Mistakes } from './pages/Mistakes';
 import { Settings } from './pages/Settings';
 import { STATIC, GENERATORS } from './engine/bank';
+import { hasSubtopic, subtopicInfo } from './syllabus';
 
 const NAV = [
   { to: '/', label: 'Home', end: true },
@@ -39,7 +40,9 @@ function TrackLast() {
   const { pathname } = useLocation();
   useEffect(() => {
     const hit = LABELS.find(([re]) => re.test(pathname));
-    if (hit) setLast(pathname, hit[1]);
+    const sub = pathname.match(/^\/learn\/(.+)$/)?.[1];
+    if (sub && hasSubtopic(sub)) setLast(pathname, `${subtopicInfo(sub).name} lesson`);
+    else if (hit) setLast(pathname, hit[1]);
   }, [pathname]);
   return null;
 }
@@ -63,12 +66,6 @@ function Shell() {
       {!inExam && (
         <header className="topbar">
           <div className="topbar-inner">
-            <NavLink to="/" className="brand" aria-label="Screening Prep home">
-              <span className="brand-mark" aria-hidden>
-                SP
-              </span>
-              <span className="brand-name">Screening Prep</span>
-            </NavLink>
             <nav className="topnav" aria-label="Main">
               {NAV.map((n) => (
                 <NavLink key={n.to} to={n.to} end={n.end} className="nav-link">

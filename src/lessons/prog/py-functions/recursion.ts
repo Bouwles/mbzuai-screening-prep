@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'recursion',
+  simple:
+    'A **recursive** function solves a problem by calling itself on a smaller version of the same problem, like a set of Russian dolls where each doll holds a slightly smaller one. The smallest doll is the **base case**: an input simple enough to answer straight away, which stops the calls. For example, $5!$ is $5 \\times 4!$, and $4!$ is $4 \\times 3!$, and so on down to $0! = 1$. Without a base case the function would call itself forever.',
+  methods: [
+    { cue: '"What does this print?" for a function such as `return n * f(n - 1)` or `3 * F(n - 1) - 1`', method: 'Build a table from the base case upwards, applying the rule once per row until you reach the input asked about.' },
+    { cue: 'A function with two recursive calls, such as `f(n - 1) + f(n - 2)`', method: 'Still tabulate bottom-up from **both** base cases; never expand the full call tree for the value.' },
+    { cue: 'A `print` placed before or after the recursive call', method: 'Print before the call runs on the way down (largest first); print after the call runs as the calls return (smallest first).' },
+    { cue: '"How many calls in total?" or "how deep does the call stack get?"', method: 'One call per level: count the inputs from the start down to the base case, including both. Two calls per level: use $C(n) = 1 + C(n-1) + C(n-2)$ or doubling. Halving: count the chain $e, e//2, \\dots, 0$.' },
+    { cue: 'Code with no base case, or a step that can jump over it (e.g. `n - 2` from an odd number to `n == 0`)', method: 'The calls never stop, so Python raises a `RecursionError`.' },
+    { cue: '"What does `mystery(a, b)` compute?" or "which loop gives the same result?"', method: 'Trace one small example, spot the pattern (repeated adding is multiplication, etc.), then test each option with that example.' },
+  ],
   know:
     '### What is recursion?\n\n' +
     'A function is **recursive** when it calls **itself**. The idea is to solve a big problem by solving a slightly smaller copy of the same problem, then using that answer. For example, $5! = 5 \\times 4!$: to find $5!$ you only need $4!$, and to find $4!$ you only need $3!$, and so on.\n\n' +

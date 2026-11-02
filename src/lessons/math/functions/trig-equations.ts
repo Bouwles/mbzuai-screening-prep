@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'trig-equations',
+  simple:
+    'Solving a trig equation means finding every angle that gives a certain value, for example every $x$ with $\\sin x = \\frac{1}{2}$. ' +
+    'Because the sine and cosine waves repeat, there is usually **more than one** answer in a full turn, so the calculator answer is only the start. ' +
+    'An **identity** such as $\\sin^2 x + \\cos^2 x = 1$ is a fact that is true for every angle; you use it to swap one ratio for another.',
+  methods: [
+    { cue: 'Solve $\\sin x = k$, $\\cos x = k$ or $\\tan x = k$ in an interval', method: 'Find the reference angle, then use CAST: $\\sin$ partners are $x$ and $180^\\circ - x$, $\\cos$ partners $x$ and $360^\\circ - x$, $\\tan$ solutions are $180^\\circ$ apart.' },
+    { cue: 'Given one ratio and the quadrant, find another (or $\\sin 2\\theta$, $\\cos 2\\theta$)', method: 'Use $\\sin^2\\theta + \\cos^2\\theta = 1$, pick the sign from the quadrant, then $\\tan = \\frac{\\sin}{\\cos}$, $\\sin 2\\theta = 2\\sin\\theta\\cos\\theta$, $\\cos 2\\theta = 2\\cos^2\\theta - 1$.' },
+    { cue: 'A multiple angle such as $\\sin 2x = k$', method: 'Let $u = 2x$, double the interval, solve for $u$, then divide every solution by $2$.' },
+    { cue: 'A **quadratic** in $\\sin x$ or $\\cos x$, or a mix of $\\cos^2 x$ and $\\sin x$', method: 'Replace $\\cos^2 x = 1 - \\sin^2 x$ (or the reverse) so only one ratio is left, factorise, then solve each factor; reject values outside $[-1, 1]$.' },
+    { cue: '$\\sin 2x = \\sin x$, $\\cos 2x = \\cos x$, or $\\sin x = k\\cos x$', method: 'Expand the double angle, move everything to one side and factorise (never divide by something that can be $0$). $\\sin x = k\\cos x$ becomes $\\tan x = k$.' },
+    { cue: '**Simultaneous** equations in $\\sin$, $\\cos$, $\\tan$ of different angles', method: 'Rename each trig expression ($u = \\sin\\alpha$, ...), solve the linear system by elimination, then turn each value back into an angle in its range.' },
+  ],
   know:
     '### Start here: what sin, cos and tan really are\n\n' +
     'Picture a point moving round a circle of radius 1 centred at the origin. After turning through an angle $\\theta$ (measured anticlockwise from the positive $x$-axis), the point is at $(\\cos\\theta, \\sin\\theta)$. So **cos is the $x$-coordinate** and **sin is the $y$-coordinate**. That one picture explains almost everything in this topic.\n\n' +

@@ -1,14 +1,18 @@
 // Engine tests: mock exam assembly, serving every question, apportioning.
 import { describe, expect, it } from 'vitest';
-import { apportion, buildMock } from '../src/engine/select';
+import { apportion, buildMock, stepLevel } from '../src/engine/select';
+import { levelFor } from '../src/engine/mastery';
+import { hintsFor } from '../src/lib/hints';
+import { VIDEOS } from '../src/config/videos';
+import { hasSubtopic, SUBTOPICS } from '../src/syllabus';
 import { GENERATORS, STATIC, serve } from '../src/engine/bank';
 import { EXAM } from '../src/config/exam';
 import { subtopicInfo } from '../src/syllabus';
 
 describe('config', () => {
   it('weights and difficulty mix add up to 1', () => {
-    expect(Object.values(EXAM.areaWeights).reduce((x, y) => x + y, 0)).toBeCloseTo(1);
-    expect(Object.values(EXAM.difficultyMix).reduce((x, y) => x + y, 0)).toBeCloseTo(1);
+    expect(Object.values(EXAM.areaWeights).reduce((x: number, y) => x + y, 0)).toBeCloseTo(1);
+    expect(Object.values(EXAM.difficultyMix).reduce((x: number, y) => x + y, 0)).toBeCloseTo(1);
   });
 });
 
@@ -81,5 +85,50 @@ describe('mistakes deck (spaced repetition)', () => {
     expect(getState().mistakes['tpl:gen-a'].level).toBe(1);
     recordAttempt({ ...base, key: 'gen:gen-a:11', sourceId: 'gen-a', seed: 11, correct: false, at: t, mode: 'mistakes' }, true);
     expect(getState().mistakes['tpl:gen-a'].level).toBe(0);
+  });
+});
+
+describe('learning flow', () => {
+  it('hints never include the final paragraph, and drop the last calculation before a short answer line', () => {
+    expect(hintsFor('Set up.\n\nWork.\n\nPutting it together, the answer is 7, which matches the check above.', 'key')).toEqual(['Set up.', 'Work.']);
+    expect(hintsFor('Set up.\n\nRule.\n\n$$x = 3$$\n\nAnswer: $3$', 'key')).toEqual(['Set up.']);
+    expect(hintsFor('All in one paragraph.', 'Use the key idea.')).toEqual(['Use the key idea.']);
+  });
+
+  it('every served question has at least one hint that is not the whole solution', () => {
+    for (const q of STATIC) {
+      const h = hintsFor(q.markScheme.solution, q.markScheme.keyIdea);
+      expect(h.length, q.id).toBeGreaterThan(0);
+      expect(h.join('\n\n'), q.id).not.toBe(q.markScheme.solution.trim());
+    }
+  });
+
+  it('mastery needs accuracy and exam-level answers', () => {
+    const f = (correct: boolean) => ({ correct, diff: 'foundation' as const });
+    const e = (correct: boolean) => ({ correct, diff: 'exam' as const });
+    expect(levelFor([]).level).toBe('new');
+    expect(levelFor([e(true), e(true)]).level).toBe('started');
+    expect(levelFor([f(true), f(true), f(true), f(true), f(true)]).level).toBe('developing'); // no exam-level evidence
+    expect(levelFor([e(true), e(true), e(true), f(true), f(false)]).level).toBe('mastered');
+    expect(levelFor([e(false), e(false), f(true), f(false)]).level).toBe('weak');
+  });
+
+  it('Build up moves to Exam after two hint-free rights and back after two wrongs', () => {
+    expect(stepLevel([])).toBe('foundation');
+    expect(stepLevel([{ correct: true }, { correct: true, hints: 1 }])).toBe('foundation');
+    expect(stepLevel([{ correct: true }, { correct: true }])).toBe('exam');
+    expect(stepLevel([{ correct: true }, { correct: true }, { correct: false }, { correct: false }])).toBe('foundation');
+  });
+
+  it('every subtopic has recommended videos with valid ids', () => {
+    for (const s of SUBTOPICS) expect(VIDEOS[s.id]?.length, s.id).toBeGreaterThan(0);
+    for (const [sub, vs] of Object.entries(VIDEOS)) {
+      expect(hasSubtopic(sub), sub).toBe(true);
+      for (const v of vs) expect(v.id, `${sub}: ${v.title}`).toMatch(/^[\w-]{11}$/);
+    }
+  });
+
+  it('mock exams contain no Challenge questions', () => {
+    for (let seed = 1; seed <= 10; seed++) expect(buildMock(53, seed).map((r) => serve(r)!).filter((q) => q.difficulty === 'challenge')).toEqual([]);
   });
 });

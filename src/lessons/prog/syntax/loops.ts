@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'loops',
+  simple:
+    'A **loop** tells the computer to repeat the same lines several times, like walking laps of a track. A `for` loop does one lap for each item in a list or each number from `range`; a `while` loop keeps doing laps as long as a yes/no condition stays `True`. `range(1, 5)` gives 1, 2, 3, 4: it starts at the first number and stops **just before** the second. To predict the output, write down the variables after each lap.',
+  methods: [
+    { cue: '`range(start, stop, step)` appears, or "how many times does it run?"', method: 'List the values: begin at `start`, add `step`, stop **before** `stop`. With step 1, `range(a, b)` has $b - a$ values.' },
+    { cue: 'A total or counter is updated inside a `for` loop', method: 'Trace table, one row per pass: current item, then the new total. A `print` that is not indented runs once at the end.' },
+    { cue: 'A `while` loop with a condition such as `x < 20` or `total <= 20`', method: 'Check the condition at the **top** of every pass, then run the body lines in order; stop at the first failed check. The variable may overshoot the limit.' },
+    { cue: '`break` or `continue` inside the loop', method: '`break` ends the whole (innermost) loop at once; `continue` skips only the rest of this pass and moves to the next value.' },
+    { cue: 'A loop inside a loop, "how many times does the inner line run?"', method: 'For each outer value write how many times the inner loop runs, then add them. It is a simple product only when the inner `range` does not depend on `i`.' },
+    { cue: 'A `while` condition using `!=`, or a loop that changes a variable in jumps', method: 'Check whether the variable can ever hit the target exactly; if it jumps over it, the loop never ends (infinite loop).' },
+    { cue: 'Asked which `while` loop matches a given `for` loop', method: 'Compare start value, condition (inclusive `<=` for an inclusive range) and whether the counter is updated after the work, tracing each option quickly.' },
+  ],
   know:
     '### What a loop is\n\n' +
     'A **loop** repeats a block of code. Each repeat is called a **pass** (or **iteration**). In Python the repeated block is everything **indented** under the loop line. Lines that are not indented run only once, after the loop has finished. Most exam loop questions ask one of three things: *what is printed*, *how many times does the body run*, or *which loop does the same job*.\n\n' +

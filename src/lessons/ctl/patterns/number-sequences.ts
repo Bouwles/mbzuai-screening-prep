@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'number-sequences',
+  simple:
+    "A number sequence is a list of numbers built by a rule, and your job is to find the rule. Start with the **gaps** between neighbouring terms: equal gaps mean you add the same amount each time. If the gaps are not equal, try dividing (a fixed multiplier), the gaps between the gaps, or famous lists such as the square numbers $1, 4, 9, 16, \\dots$ Always check your rule on every term before using it.",
+  methods: [
+    {
+      cue: "The **differences between terms are all the same**",
+      method: "Linear: keep adding the difference $d$. The $n$th term is $a + (n - 1)d$, which is the same as $dn + (a - d)$.",
+    },
+    {
+      cue: "Each term is a **fixed multiple** of the one before (the ratio can be negative or a fraction)",
+      method: "Geometric: the ratio $r$ is a term divided by the one before, and the $n$th term is $ar^{n-1}$. A negative ratio makes the signs alternate.",
+    },
+    {
+      cue: "The differences change, but the **second differences are constant**",
+      method: "Quadratic: the coefficient of $n^2$ is half the second difference. Subtract it from each term and find the linear rule that is left.",
+    },
+    {
+      cue: "The terms are close to **squares, cubes, primes or triangular numbers**",
+      method: "Compare term by term with the famous list (for example $n^3 + 1$): a constant gap from it gives the rule straight away.",
+    },
+    {
+      cue: "Neighbouring terms seem **unrelated**, or the sequence jumps up and down",
+      method: "Split it into two interleaved sequences, odd positions and even positions. Position $2k$ is the $k$th term of the even-position sequence.",
+    },
+    {
+      cue: "Each term is the **sum of the two before**, or a rule like $u_{n+1} = 2u_n - 3$",
+      method: "Generate the terms one at a time. If early terms are unknown, call the first two $a$ and $b$, write later terms in $a$ and $b$, and solve.",
+    },
+    {
+      cue: "Asked **how many terms** a list has, from its first term to its last",
+      method: "Number of terms $= \\frac{\\text{last} - \\text{first}}{d} + 1$: count the jumps, then add one for the first term.",
+    },
+  ],
   know:
     '### What a sequence question is really asking\n\n' +
     'A **sequence** is a list of numbers that follows a rule, such as $3, 7, 11, 15, \\dots$ Each number is a **term**; $u_1$ is the 1st term, $u_2$ the 2nd, and $u_n$ the $n$th. The exam gives you some terms and asks for the **next term**, a **missing term**, a **later term** (like the 50th), or a **formula** for the $n$th term. Your job is to find the rule, then use it.\n\n' +

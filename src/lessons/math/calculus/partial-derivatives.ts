@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'partial-derivatives',
+  simple:
+    'Many functions depend on two inputs, like a hill whose height depends on how far east ($x$) and how far north ($y$) you stand. ' +
+    'A **partial derivative** is the slope in one direction only: for $\\frac{\\partial f}{\\partial x}$ you treat $y$ as a fixed number and differentiate as usual. ' +
+    'The **gradient** $\\nabla f$ puts both slopes into one vector that points straight uphill, and **gradient descent** trains AI models by stepping the opposite way, downhill, to make the loss smaller.',
+  methods: [
+    { cue: 'Find $\\frac{\\partial f}{\\partial x}$ or $\\frac{\\partial f}{\\partial y}$, possibly at a point', method: 'Treat the other variable as a constant: terms without the variable vanish, and factors of the other variable stay as multipliers. Differentiate first, then substitute.' },
+    { cue: 'A **mixed** or second partial derivative', method: 'Differentiate one variable at a time, in the order asked ($\\frac{\\partial^{2} f}{\\partial y \\, \\partial x}$: first $x$, then $y$). For smooth functions the order does not change the answer.' },
+    { cue: 'The **gradient** $\\nabla f$, the direction of steepest ascent or descent, or the greatest rate of increase', method: '$\\nabla f = (f_x, f_y)$, $x$-component first. Steepest ascent is along $\\nabla f$, steepest descent along $-\\nabla f$, and the greatest rate of increase is the length $|\\nabla f|$.' },
+    { cue: 'One or more **gradient descent** steps with learning rate $\\eta$', method: 'Find each partial derivative at the current point, then update $w_i := w_i - \\eta \\frac{\\partial L}{\\partial w_i}$. For a second step, recompute the gradient at the new point.' },
+    { cue: 'A model loss such as $L = (wx + b - y)^{2}$', method: 'Chain rule: $\\frac{\\partial L}{\\partial w} = 2(\\text{error}) \\times x$ and $\\frac{\\partial L}{\\partial b} = 2(\\text{error})$, where the error is $wx + b - y$.' },
+    { cue: 'Where is $\\nabla f = (0, 0)$, or find unknown constants from given partial derivatives', method: 'Write both partial derivatives, set them to the given values (or $0$), and solve the simultaneous equations.' },
+  ],
   know:
     '### Functions of two variables\n\n' +
     'So far most functions you have met take **one** input, like $f(x) = x^2$. A function of two variables takes a **pair** of inputs and gives one output, for example $f(x, y) = x^2y + 3y$. To evaluate it, substitute both numbers in order: $f(2, -1) = 2^2 \\times (-1) + 3 \\times (-1) = -7$.\n\n' +

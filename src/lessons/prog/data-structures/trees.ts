@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'trees',
+  simple:
+    'A **tree** is like a family tree drawn upside down: one item at the top (the **root**), each item linking down to its **children**, and items with no children called **leaves**. In a **binary** tree every item has at most 2 children, a left one and a right one. In a **binary search tree** (BST) everything on the left of an item is smaller and everything on the right is bigger, so you find a value by going left or right at each step, like a guessing game.',
+  methods: [
+    { cue: 'A drawn tree and "pre-order", "in-order" or "post-order"', method: 'Pre-order = node, left, right (root first); in-order = left, node, right (root in the middle); post-order = left, right, node (root last). Finish each subtree completely before moving on.' },
+    { cue: '"Level-order" or "breadth-first"', method: 'Read the tree row by row from the top, left to right within each row (this is what a queue does).' },
+    { cue: 'Keys inserted **in that order** into an empty BST, then parent, height or number of comparisons', method: 'Build the tree key by key: from the root go left if smaller, right if larger, attach at the first empty spot. A search for a key at depth $d$ makes $d + 1$ comparisons.' },
+    { cue: '**Maximum** nodes at level $k$ or in a tree of height $h$, or **smallest height** for $n$ nodes', method: 'Level $k$ holds at most $2^k$ nodes; height $h$ holds at most $2^{h+1} - 1$. The minimum height for $n$ nodes is $\\lfloor \\log_2 n \\rfloor$. Check whether height counts edges or levels.' },
+    { cue: 'A recursive function on a tree (`1 + max(left, right)`, sum of leaves, ...)', method: 'Work bottom-up: evaluate the base case at empty children and leaves first, then combine the results of the two subtrees at each parent.' },
+    { cue: 'A **heap** stored in a list', method: 'The maximum (max-heap) is at index 0. With 0-based indices the children of $i$ are at $2i + 1$ and $2i + 2$, and the parent is at $\\lfloor \\frac{i - 1}{2} \\rfloor$. Insert = add at the end, then swap upwards while larger than the parent.' },
+  ],
   know:
     '### What is a tree?\n\n' +
     'A **tree** stores data in a hierarchy, like a family tree or the folders on your computer. Each item is a **node**, and nodes are joined by **edges** (links). Computer scientists draw trees upside down: the **root** is at the top and the tree grows downwards.\n\n' +

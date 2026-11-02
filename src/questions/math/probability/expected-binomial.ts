@@ -523,7 +523,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'expected-binomial-016',
     subtopic: 'expected-binomial',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Each item made by a machine is defective with probability $0.1$, independently of the others. A random sample of 5 items is checked. What is the exact probability that **at least two** of them are defective?',
     options: ['$0.40951$', '$0.0729$', '$0.08146$', '$0.67195$'],
     correctIndex: 2,

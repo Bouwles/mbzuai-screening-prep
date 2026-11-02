@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'tracing-pseudocode',
+  simple:
+    '**Pseudocode** is a recipe for a computer written in plain, language-free steps. **Tracing** means pretending to be the computer: you run the steps one at a time with pencil and paper and write down every variable in a table each time it changes. You never guess the output; you just follow the recipe exactly, always using the newest value of each variable.',
+  methods: [
+    { cue: '"What is printed?" for a few assignments or a short loop', method: 'Draw a trace table with one column per variable and update it line by line, always using the newest values on the right of `=`.' },
+    { cue: '"How many times does the loop run?" or "how many stars?"', method: '`for i = a to b` (both ends included) runs $b - a + 1$ times. For a step or a `while`, list the values of the counter until the condition fails.' },
+    { cue: 'Nested loops where the inner loop depends on `i` (e.g. `for j = i to n`)', method: 'Count the inner passes for each value of `i` and add them; $1 + 2 + \\dots + n = \\frac{n(n + 1)}{2}$.' },
+    { cue: '`mod` and `div` inside a loop (digits, binary, Euclid)', method: '`n mod 10` is the last digit and `n div 10` removes it; `mod 2` / `div 2` give binary digits from right to left. Trace until the `while` condition is false at the top.' },
+    { cue: '"What does this algorithm compute?" or "which formula does it return?"', method: 'Trace a small example (include a tie or an edge case), note whether variables hold values or positions, then test each option with your example.' },
+    { cue: 'A buggy loop: "which change fixes it?" or "which WHILE loop matches this FOR loop?"', method: 'Check the three parts of a counted loop: start value, condition (`<` vs `<=`) and update (present, and at the end of the body). Missing updates cause infinite loops.' },
+  ],
   know:
     '### What pseudocode is\n\n' +
     '**Pseudocode** is a way of writing an algorithm that is not tied to any real programming language. The exam uses it so that everyone can read the same code, whatever language they learned. It looks a lot like Python, but with words such as `then`, `end if`, `end while` and `end for` to show where blocks finish.\n\n' +

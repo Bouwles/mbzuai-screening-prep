@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'data-calculations',
+  simple:
+    'Almost every data calculation is one of a few moves: a percentage change, a share of a total, an average or a rate. The arithmetic is easy; marks are lost by dividing by the wrong number. So before every division ask "out of what?": a change is divided by the **starting** value, a share by the **whole** total, and a mean by **how many values** there are.',
+  methods: [
+    {
+      cue: 'Asked for the **percentage increase or decrease** from one value to another',
+      method: 'Work out $\\frac{\\text{new} - \\text{old}}{\\text{old}} \\times 100$, always dividing by the starting value. A difference between two percentages is in percentage points; the percentage change still divides by the old one.',
+    },
+    {
+      cue: 'Given the value **after** a percentage change and asked for the value **before** it',
+      method: 'Divide by the multiplier: after a $20\\%$ rise, original $= \\frac{\\text{new}}{1.2}$. Do not take $20\\%$ off the new value.',
+    },
+    {
+      cue: '**Two percentage changes in a row**, or growth by the **same percentage** every year',
+      method: 'Multiply the multipliers, for example $1.5 \\times 0.7 = 1.05$ (a $5\\%$ rise overall). Never add the percentages. For constant growth, find the factor by dividing consecutive values and multiply once more.',
+    },
+    {
+      cue: 'A **frequency table** (or classes like $10 \\le t < 20$) and asked for the mean or median',
+      method: 'Mean $= \\frac{\\sum fx}{\\sum f}$, using class midpoints as $x$ for grouped data. For the median find position $\\frac{n + 1}{2}$ and count along the frequencies.',
+    },
+    {
+      cue: '**Weights** (such as $40\\%$ coursework, $60\\%$ exam), or two groups with their own means to combine',
+      method: 'Use a weighted average: multiply each value by its weight or group size, add, and divide by the total weight. For a missing score or group mean, convert means to totals (or write the weighted average as an equation) and solve.',
+    },
+    {
+      cue: 'Comparing groups of **different sizes**: "pass rate", "per 1000 people", "of **all** the students"',
+      method: 'Turn everything into counts or rates: rate $= \\frac{\\text{count}}{\\text{group size}}$. Compare rates, not raw counts, and combine groups by adding counts, not by averaging percentages.',
+    },
+    {
+      cue: 'Asked for a **ratio**, or for a share after part of the data has changed',
+      method: 'Find the totals first, write them in the order asked and divide by the highest common factor. If one part changes, recompute the new whole before finding the share.',
+    },
+  ],
   know:
     '### What this topic is about\n\n' +
     'In data questions you are given a bar chart, line graph, pie chart or table, and asked to *calculate* something from it: a percentage change, a share of a total, an average, a ratio or a rate. The maths is never hard on its own. Marks are lost by dividing by the wrong number, so the whole topic comes down to one habit: **always ask "out of what?"** before you divide.\n\n' +

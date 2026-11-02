@@ -520,7 +520,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'reading-charts-011',
     subtopic: 'reading-charts',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'The scatter plot shows hours studied, $x$, and test score, $y$, for nine students. The dashed line of best fit has equation $y = 5x + 40$. Use the line to estimate the score of a student who studies for 7 hours.',
     chart: {
       kind: 'scatter',
@@ -670,7 +670,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'reading-charts-015',
     subtopic: 'reading-charts',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The table shows the populations of four towns in 2015 and in 2025. What was the **largest percentage increase** in population among the four towns? (Where needed, percentages are given to 1 decimal place.)',
     table: {
       headers: ['Town', '2015', '2025'],
@@ -752,7 +752,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'reading-charts-017',
     subtopic: 'reading-charts',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: '240 students were asked how they travel to school. The pie chart shows the **angle** (in degrees) of each sector. How many more students walk than cycle?',
     chart: { kind: 'pie', title: 'Travel to school: sector angles (degrees)', slices: TRAVEL_ANGLES },
     options: ['$50$', '$75$', '$112.5$', '$80$'],

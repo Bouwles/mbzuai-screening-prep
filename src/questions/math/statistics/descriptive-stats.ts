@@ -172,9 +172,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
-        '1. Mean $= \\frac{\\text{total}}{n}$, so total $=$ mean $\\times n = 12 \\times 5 = 60$.\n' +
-        '2. The four known numbers add up to $8 + 15 + 10 + 14 = 47$.\n' +
-        '3. The fifth number is $60 - 47 = 13$.\n\n' +
+        '**Step 1:** Mean $= \\frac{\\text{total}}{n}$, so total $=$ mean $\\times n = 12 \\times 5 = 60$.\n\n' +
+        '**Step 2:** The four known numbers add up to $8 + 15 + 10 + 14 = 47$.\n\n' +
+        '**Step 3:** The fifth number is $60 - 47 = 13$.\n\n' +
         'Check: $\\frac{8 + 15 + 10 + 14 + 13}{5} = \\frac{60}{5} = 12$.',
       whyWrong: [
         null,
@@ -247,9 +247,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. There are $n = 25$ students, so the median is the $\\frac{25 + 1}{2} = 13$th value in order.\n' +
-        '2. Running (cumulative) totals: the value $0$ covers positions 1 to 8; the value $1$ covers positions 9 to $8 + 7 = 15$.\n' +
-        '3. Position 13 lies between 9 and 15, so the 13th student has $1$ sibling.\n\n' +
+        '**Step 1:** There are $n = 25$ students, so the median is the $\\frac{25 + 1}{2} = 13$th value in order.\n\n' +
+        '**Step 2:** Running (cumulative) totals: the value $0$ covers positions 1 to 8; the value $1$ covers positions 9 to $8 + 7 = 15$.\n\n' +
+        '**Step 3:** Position 13 lies between 9 and 15, so the 13th student has $1$ sibling.\n\n' +
         'Median $= 1$.',
       whyWrong: [
         'This is the middle **row** of the table, ignoring the frequencies. Many more students have 0 or 1 sibling than 3 or 4.',
@@ -341,9 +341,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
-        '1. Old total $= 70 \\times 8 = 560$.\n' +
-        '2. New total $= 560 + 88 = 648$.\n' +
-        '3. New mean $= \\frac{648}{9} = 72$.\n\n' +
+        '**Step 1:** Turn the old mean into a total: old total $= 70 \\times 8 = 560$.\n\n' +
+        '**Step 2:** Add the new score: new total $= 560 + 88 = 648$.\n\n' +
+        '**Step 3:** Divide by the new count: new mean $= \\frac{648}{9} = 72$.\n\n' +
         'Quick check: the new score is $18$ above the old mean, and that extra $18$ is shared among all $9$ students: $70 + \\frac{18}{9} = 72$.',
       whyWrong: [
         'This averages the old mean and the new score, $\\frac{70 + 88}{2} = 79$, as if the new student counted as much as all 8 others together.',
@@ -367,9 +367,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
-        '1. Total of all 10 numbers $= 15 \\times 10 = 150$.\n' +
-        '2. Remove $33$: new total $= 150 - 33 = 117$.\n' +
-        '3. There are now $9$ numbers, so the new mean is $\\frac{117}{9} = 13$.\n\n' +
+        '**Step 1:** Total of all 10 numbers $= 15 \\times 10 = 150$.\n\n' +
+        '**Step 2:** Remove $33$: new total $= 150 - 33 = 117$.\n\n' +
+        '**Step 3:** There are now $9$ numbers, so the new mean is $\\frac{117}{9} = 13$.\n\n' +
         'Sense check: $33$ is bigger than the mean, so removing it must make the mean **smaller**.',
       whyWrong: [
         'This divides the new total $117$ by $10$; after removing a number only $9$ are left.',
@@ -428,10 +428,10 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Total of all 50 marks $= 70 \\times 50 = 3500$.\n' +
-        '2. Total of Class A $= 64 \\times 20 = 1280$.\n' +
-        '3. Total of Class B $= 3500 - 1280 = 2220$.\n' +
-        '4. Mean of Class B $= \\frac{2220}{30} = 74$.\n\n' +
+        '**Step 1:** Work with totals. Total of all 50 marks $= 70 \\times 50 = 3500$.\n\n' +
+        '**Step 2:** Total of Class A $= 64 \\times 20 = 1280$.\n\n' +
+        '**Step 3:** Total of Class B $= 3500 - 1280 = 2220$.\n\n' +
+        '**Step 4:** Mean of Class B $= \\frac{2220}{30} = 74$.\n\n' +
         'Sense check: the overall mean $70$ is closer to Class B\'s mean than to Class A\'s, because Class B is bigger.',
       whyWrong: [
         'This assumes both classes are the same size, so that $70$ is exactly halfway between $64$ and Class B\'s mean ($2 \\times 70 - 64 = 76$). Class B is larger, so it must be weighted more.',
@@ -500,11 +500,11 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Order the 11 values: 3, 7, 19, 21, 22, **25**, 27, 28, 30, 43, 50. The median is the 6th value, $25$.\n' +
-        '2. Lower half: 3, 7, 19, 21, 22, so $Q_1 = 19$. Upper half: 27, 28, 30, 43, 50, so $Q_3 = 30$.\n' +
-        '3. $\\text{IQR} = 30 - 19 = 11$ and $1.5 \\times 11 = 16.5$.\n' +
-        '4. Lower fence: $19 - 16.5 = 2.5$. Upper fence: $30 + 16.5 = 46.5$.\n' +
-        '5. Values below $2.5$: none ($3 > 2.5$). Values above $46.5$: only $50$.\n\n' +
+        '**Step 1:** Order the 11 values: 3, 7, 19, 21, 22, **25**, 27, 28, 30, 43, 50. The median is the 6th value, $25$.\n\n' +
+        '**Step 2:** Lower half: 3, 7, 19, 21, 22, so $Q_1 = 19$. Upper half: 27, 28, 30, 43, 50, so $Q_3 = 30$.\n\n' +
+        '**Step 3:** $\\text{IQR} = 30 - 19 = 11$ and $1.5 \\times 11 = 16.5$.\n\n' +
+        '**Step 4:** Lower fence: $19 - 16.5 = 2.5$. Upper fence: $30 + 16.5 = 46.5$.\n\n' +
+        '**Step 5:** Values below $2.5$: none ($3 > 2.5$). Values above $46.5$: only $50$.\n\n' +
         'So $50$ is the only outlier.',
       whyWrong: [
         'This uses fences $Q_1 - \\text{IQR} = 8$ and $Q_3 + \\text{IQR} = 41$, forgetting to multiply the IQR by $1.5$.',
@@ -522,7 +522,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'descriptive-stats-017',
     subtopic: 'descriptive-stats',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The mean of four numbers is $9$. When a fifth number $x$ is added, the mean rises to $10$. When a sixth number $y$ is then added, the mean of all six numbers falls back to $9$. What is $y$?',
     options: ['$14$', '$4$', '$-5$', '$9$'],
     correctIndex: 1,

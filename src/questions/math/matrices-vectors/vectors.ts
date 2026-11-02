@@ -287,11 +287,10 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Dot product: $\\mathbf{a} \\cdot \\mathbf{b} = (1)(2) + (2)(-1) + (-2)(2) = 2 - 2 - 4 = -4$.\n' +
-        '2. Magnitudes: $|\\mathbf{a}| = \\sqrt{1 + 4 + 4} = 3$ and $|\\mathbf{b}| = \\sqrt{4 + 1 + 4} = 3$.\n' +
-        '3. $\\cos\\theta = \\frac{-4}{3 \\times 3} = -\\frac{4}{9} \\approx -0.4444$.\n' +
-        '4. $\\theta = \\cos^{-1}\\left(-\\frac{4}{9}\\right) \\approx 116.4^\\circ$ (calculator in **degree** mode).\n\n' +
-        'The dot product is negative, so the angle must be obtuse (between $90^\\circ$ and $180^\\circ$).',
+        'Use $\\cos\\theta = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{|\\mathbf{a}|\\,|\\mathbf{b}|}$. **Step 1: dot product.** $\\mathbf{a} \\cdot \\mathbf{b} = (1)(2) + (2)(-1) + (-2)(2) = 2 - 2 - 4 = -4$.\n\n' +
+        '**Step 2: magnitudes.** $|\\mathbf{a}| = \\sqrt{1 + 4 + 4} = 3$ and $|\\mathbf{b}| = \\sqrt{4 + 1 + 4} = 3$.\n\n' +
+        '**Step 3: cosine.** $\\cos\\theta = \\frac{-4}{3 \\times 3} = -\\frac{4}{9} \\approx -0.4444$. It is negative, so the angle must be obtuse (between $90^\\circ$ and $180^\\circ$).\n\n' +
+        '**Step 4: angle.** $\\theta = \\cos^{-1}\\left(-\\frac{4}{9}\\right) \\approx 116.4^\\circ$ (calculator in **degree** mode).',
       whyWrong: [
         'This is $\\cos^{-1}\\left(\\frac{4}{9}\\right)$: the minus sign of the dot product was lost. It is the supplement of the right answer ($180^\\circ - 116.4^\\circ$).',
         null,
@@ -641,7 +640,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'vectors-019',
     subtopic: 'vectors',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: '$ABCD$ is a parallelogram (vertices in that order) with $A(1, 2, 0)$, $B(4, 3, 1)$ and $C(6, 0, 2)$. Find the coordinates of $D$.',
     options: ['$(-1, 5, -1)$', '$(3, -1, 1)$', '$(9, 1, 3)$', '$(3.5, 1, 1)$'],
     correctIndex: 1,

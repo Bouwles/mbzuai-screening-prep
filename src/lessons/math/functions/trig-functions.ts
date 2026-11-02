@@ -2,6 +2,19 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'trig-functions',
+  simple:
+    "Trigonometry links angles to lengths. In a right-angled triangle, $\\sin$, $\\cos$ and $\\tan$ are just fixed ratios of two sides for a given angle, so knowing one angle and one side lets you find the others. " +
+    "For bigger angles, picture a point going round a circle of radius $1$: its across-position is $\\cos\\theta$ and its up-position is $\\sin\\theta$, which is why the graphs of $\\sin$ and $\\cos$ are repeating waves. " +
+    "A **radian** is just another unit for angles: half a turn ($180^\\circ$) is $\\pi$ radians.",
+  methods: [
+    { cue: 'Right-angled triangle, or an **angle of elevation**', method: 'Label opp / adj / hyp from the given angle, then pick SOH, CAH or TOA from the two sides involved.' },
+    { cue: 'Exact value such as $\\cos\\frac{4\\pi}{3}$ or $\\tan 30^\\circ$', method: 'Convert to degrees if needed; the quadrant gives the sign (CAST), the reference angle gives the size from the $30^\\circ$/$45^\\circ$/$60^\\circ$ table.' },
+    { cue: 'Given $\\sin\\theta$ (or $\\cos\\theta$) and the quadrant, find another ratio', method: 'Draw a right-angled triangle with those sides, use Pythagoras for the third side, then fix the sign from the quadrant.' },
+    { cue: '**Arc length**, **sector area** or sector perimeter', method: 'Convert the angle to radians, then $s = r\\theta$ and $A = \\frac{1}{2}r^2\\theta$. Perimeter $= 2r + r\\theta$.' },
+    { cue: 'Non-right triangle: two angles and a side, or a side opposite a known angle', method: 'Sine rule $\\frac{a}{\\sin A} = \\frac{b}{\\sin B}$. If you find an angle, also test $180^\\circ$ minus it (two triangles may fit).' },
+    { cue: 'Non-right triangle: two sides and the angle **between** them, or all three sides', method: 'Cosine rule $a^2 = b^2 + c^2 - 2bc\\cos A$, or $\\cos C = \\frac{a^2 + b^2 - c^2}{2ab}$ for an angle. Obtuse angle: $\\cos$ is negative.' },
+    { cue: '**Amplitude**, **period**, range, or match $y = a\\sin(bx) + d$ to a graph', method: 'Amplitude $|a| = \\frac{\\max - \\min}{2}$, middle line $d = \\frac{\\max + \\min}{2}$, period $\\frac{2\\pi}{b}$ (or $\\frac{360^\\circ}{b}$); for $\\tan(bx)$ the period is $\\frac{\\pi}{b}$.' },
+  ],
   know:
     "### 1. Right-angled triangles: SOH CAH TOA\n\n" +
     "In a right-angled triangle, pick one of the two acute angles and call it $\\theta$. Then name the sides **from that angle's point of view**:\n\n" +

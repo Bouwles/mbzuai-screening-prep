@@ -164,8 +164,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
-        'Only **which** books are chosen matters, not the order, so this is a combination.\n\n' +
-        '$$\\binom{9}{4} = \\frac{9!}{4!\\,5!} = \\frac{9 \\times 8 \\times 7 \\times 6}{4 \\times 3 \\times 2 \\times 1} = \\frac{3024}{24} = 126$$\n\n' +
+        'Only **which** books are chosen matters, not the order, so this is a combination: you need $\\binom{9}{4} = \\frac{9!}{4!\\,5!}$.\n\n' +
+        'Cancel the $5!$: $\\binom{9}{4} = \\frac{9 \\times 8 \\times 7 \\times 6}{4 \\times 3 \\times 2 \\times 1} = \\frac{3024}{24} = 126$.\n\n' +
         'Another way to see it: there are $9 \\times 8 \\times 7 \\times 6 = 3024$ ordered choices, and every group of 4 books appears $4! = 24$ times in that list, so divide by $24$.',
       whyWrong: [
         null,
@@ -455,7 +455,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'counting-014',
     subtopic: 'counting',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A team of 3 is chosen from 5 men and 4 women. In how many ways can the team be chosen if it must include **at least one woman**?',
     options: ['$112$', '$74$', '$84$', '$10$'],
     correctIndex: 1,
@@ -588,9 +588,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Choose 4 people for "the first group": $\\binom{8}{4} = \\frac{8 \\times 7 \\times 6 \\times 5}{4 \\times 3 \\times 2 \\times 1} = 70$. The other 4 automatically form the second group.\n' +
-        '2. But the groups have no names. Choosing {A, B, C, D} (leaving {E, F, G, H}) gives exactly the same split as choosing {E, F, G, H} (leaving {A, B, C, D}). So every split has been counted **twice**.\n' +
-        '3. Number of splits: $\\frac{70}{2} = 35$.\n\n' +
+        'Start by choosing 4 people for "the first group": $\\binom{8}{4} = \\frac{8 \\times 7 \\times 6 \\times 5}{4 \\times 3 \\times 2 \\times 1} = 70$. The other 4 automatically form the second group.\n\n' +
+        'But the groups have no names. Choosing {A, B, C, D} (leaving {E, F, G, H}) gives exactly the same split as choosing {E, F, G, H} (leaving {A, B, C, D}). So every split has been counted **twice**.\n\n' +
+        'Number of splits: $\\frac{70}{2} = 35$.\n\n' +
         'Quick check: just choose the 3 people who join person A in A\'s group: $\\binom{7}{3} = 35$.',
       whyWrong: [
         'This is $\\binom{8}{4} = 70$, which would be correct if the groups were named (for example "Room 1" and "Room 2"). With unnamed groups, each split is counted twice.',
@@ -609,7 +609,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'counting-019',
     subtopic: 'counting',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'How many four-digit numbers (from 1000 to 9999) have **four different digits**?',
     options: ['$5040$', '$3024$', '$4536$', '$9000$'],
     correctIndex: 2,

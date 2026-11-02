@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'knights-knaves',
+  simple:
+    "On the island, **knights** always tell the truth and **knaves** always lie. To solve a puzzle, guess what one person is, follow what that guess forces, and throw the guess away if it leads to a contradiction (something impossible). The case that survives is the answer. In \"exactly one statement is true\" puzzles, try each suspect in turn and count the true statements.",
+  methods: [
+    {
+      cue: "Someone says **\"I am a knave\"** or **\"we are both knaves\"**",
+      method: "A knight can never call himself a knave, so the speaker is a knave and the whole statement is false. Nobody at all can say just \"I am a knave\".",
+    },
+    {
+      cue: "**X says \"Y is a knight\"** (or \"Y is a knave\")",
+      method: "\"Y is a knight\" means X and Y are the same type; \"Y is a knave\" means they are different types.",
+    },
+    {
+      cue: "Two or three people make statements, asked **who is what**",
+      method: "Start with the person whose statement says the most. Assume they are a knight, follow the consequences, and switch to knave if you hit a contradiction. Recheck every statement at the end.",
+    },
+    {
+      cue: "Claims like **\"exactly one of us\"** and **\"exactly two of us\"**",
+      method: "Different \"exactly\" claims cannot both be true, so at most one of those speakers is a knight. Combine that with any impossible self-accusation.",
+    },
+    {
+      cue: "A statement shaped **\"If I am a knight, then ...\"**",
+      method: "A false \"if\" part makes an if-then statement true, so a knave can never say it. The speaker is a knight, and the \"then\" part is true.",
+    },
+    {
+      cue: "**Exactly one statement is true (or false)**: who did it?",
+      method: "Try each suspect as the culprit and count the true statements. Shortcuts: two identical claims stand or fall together, and \"X is lying\" means exactly one of those two statements is false.",
+    },
+    {
+      cue: "A **one-question** riddle with two guards and two doors",
+      method: "Ask about what the other guard would say, so exactly one lie always happens along the chain; then do the opposite of the reply.",
+    },
+  ],
   know:
     '### The set-up\n\n' +
     'These puzzles take place on an island where every inhabitant is one of two types:\n\n' +

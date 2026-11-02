@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'strings',
+  simple:
+    'A **string** is text in quotes, like `"PYTHON"`. Think of it as a row of numbered boxes with one character in each, numbered from **0** (not 1), so `s[0]` is the first letter and `s[-1]` the last. A **slice** `s[2:5]` cuts out a piece, from box 2 up to but not including box 5. Strings cannot be edited in place: methods such as `upper()` or `replace()` hand you back a new string and leave the original as it was.',
+  methods: [
+    { cue: 'A single index such as `s[0]`, `s[-1]` or `s[-3]`', method: 'Write the characters with their indices underneath (0, 1, 2, ... and -1 for the last). `s[-k]` is `s[len(s) - k]`.' },
+    { cue: 'A slice `s[a:b]` or `s[a:b:k]` with a positive step', method: 'List the indices `a`, `a + k`, `a + 2k`, ... while they are **below** `b` (the stop is excluded), then read off the characters.' },
+    { cue: 'A slice with a negative step, such as `s[::-1]` or `s[5:1:-1]`', method: 'Walk **backwards** from the start (the last character if none is given) towards the stop, still excluding the stop. `s[::-1]` is the reversed string.' },
+    { cue: 'A method call: `split`, `join`, `strip`, `replace`, `find`, `count`, `upper`', method: 'Apply the method rule from the table: `split(",")` keeps empty pieces, `join` puts the separator only between items, `find` gives the first index or `-1`, `count` is non-overlapping. The original string never changes.' },
+    { cue: 'Code that assigns to `s[i]`, or adds a string and a number', method: 'Both raise a `TypeError`: strings are immutable, and `+` needs two strings (use `str()` first).' },
+    { cue: 'An f-string such as `f"{x:.2f}"` or `f"{a / b}"`', method: 'Work out each `{...}` with full precision, then format: `:.2f` rounds for display only, and `/` always shows a float like `75.0`.' },
+    { cue: 'A `for ch in s` loop that builds or counts something', method: 'Trace one character per row; remember comparisons are case-sensitive (`"A" in "aeiou"` is `False`), and `ch + out` adds to the front while `out + ch` adds to the end.' },
+  ],
   know:
     '### What a string is\n\n' +
     'A **string** is a piece of text: a sequence of characters written between quotes, such as `"cat"` or `\'Data Science\'`. Single and double quotes do the same job. Every character counts, including **spaces**, digits and punctuation. The quotes themselves are **not** part of the string.\n\n' +

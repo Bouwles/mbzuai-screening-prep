@@ -82,6 +82,7 @@ export function MockHome() {
         <p className="lede">
           {chosen.questions} questions · {chosen.minutes} minutes · about {Math.round((chosen.minutes * 60) / chosen.questions)} seconds per question
         </p>
+        <p className="muted">{chosen.blurb}</p>
         <section className="panel rules">
           <h2>Before you start</h2>
           <ul>
@@ -123,6 +124,13 @@ export function MockHome() {
       <header className="page-head">
         <h1>Mock exams</h1>
         <p className="lede">Timed, exam-style papers drawn from all four areas. No feedback until you submit.</p>
+        <p className="muted small-print">
+          The real BSc exam lasts 60 minutes. MBZUAI does not publish the number of questions, the topic weights or the difficulty mix, so
+          the question counts here, the topic mix (about {Math.round(EXAM.areaWeights.math * 100)}% Math, {Math.round(EXAM.areaWeights.data * 100)}% Data & AI,{' '}
+          {Math.round(EXAM.areaWeights.prog * 100)}% Programming, {Math.round(EXAM.areaWeights.ctl * 100)}% CT & Logic) and the Foundation/Exam split are
+          estimates. Mocks use Foundation and Exam-level questions only; Challenge questions stay optional. {EXAM.targetPercent}% is the score that
+          waives the application fee, not an official pass mark.
+        </p>
       </header>
       {active && (
         <div className="panel live-panel">
@@ -420,15 +428,15 @@ export function MockResults() {
           </span>
         </div>
         <div className="score-bar-wrap">
-          <div className="score-bar" aria-label={`Score ${rec.score}%, target ${EXAM.targetPercent}%`}>
+          <div className="score-bar" aria-label={`Score ${rec.score}%, fee-waiver line ${EXAM.targetPercent}%`}>
             <span className="score-fill" style={{ width: `${rec.score}%` }} />
             <span className="score-target" style={{ left: `${EXAM.targetPercent}%` }}>
-              <span>{EXAM.targetPercent}% target</span>
+              <span>{EXAM.targetPercent}% fee-waiver line</span>
             </span>
           </div>
           <p>
             {pass
-              ? `At or above the ${EXAM.targetPercent}% line. Keep it there.`
+              ? `At or above the ${EXAM.targetPercent}% fee-waiver line. Keep it there.`
               : `${EXAM.targetPercent - rec.score!} percentage points below the ${EXAM.targetPercent}% line.`}{' '}
             Time used: {fmtTime(rec.timeUsedSec ?? 0)} of {fmtTime(rec.durationSec)}.
           </p>

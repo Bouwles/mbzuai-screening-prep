@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'sequences-series',
+  simple:
+    'A sequence is a list of numbers that follows a rule. In an arithmetic sequence you add the same number each time ($7, 11, 15, \\dots$ adds 4); in a geometric sequence you multiply by the same number each time ($3, 6, 12, \\dots$ doubles). A series is what you get when you add the terms up, and if the terms shrink fast enough the total settles at a finite "sum to infinity".',
+  methods: [
+    { cue: 'Asked for one particular **term**, e.g. the 20th term', method: 'Arithmetic: $u_n = a + (n-1)d$. Geometric: $u_n = ar^{n-1}$. It is $n - 1$ because you take $n - 1$ steps from the first term.' },
+    { cue: '**Two terms are given**; find $a$ and $d$ (or $r$)', method: 'Write each as an equation. Arithmetic: subtract to get $d$ (the number of gaps is the difference of the positions). Geometric: divide so $a$ cancels, then take the root.' },
+    { cue: 'The **sum** of the first $n$ terms', method: 'Arithmetic: $S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)$, or $\\frac{n}{2}(\\text{first} + \\text{last})$. Geometric: $S_n = \\frac{a(r^n - 1)}{r - 1}$.' },
+    { cue: '**Sum to infinity**, or "for which $x$ does it exist?"', method: 'It exists only when $|r| < 1$, and then $S_\\infty = \\frac{a}{1 - r}$. If $r$ contains $x$, solve $-1 < r < 1$.' },
+    { cue: '**Sigma notation**, e.g. $\\sum_{k=1}^{5} 3 \\cdot 2^k$', method: 'Substitute the bottom value of $k$ for the first term and the top value for the last, count terms as top $-$ bottom $+ 1$, then use the matching series formula (or just add).' },
+    { cue: '**How many terms**: in a list ending at a given number, or until a total passes a target', method: 'For a list, solve $a + (n-1)d = l$ where $l$ is the last term. For a running total, solve $S_n > T$ and round **up** to a whole number.' },
+    { cue: 'A **recurring decimal** or a **bouncing ball**', method: 'Spot the hidden geometric series: $0.0555\\dots = \\frac{0.05}{1 - 0.1}$, and a ball travels the first drop plus twice the sum of all the bounce heights.' },
+  ],
   know:
     '### Sequences and series: the words\n\n' +
     'A **sequence** is a list of numbers in order, like $5, 8, 11, 14, \\dots$ Each number is a **term**. We write the first term as $u_1$, the second as $u_2$, and the $n$th term as $u_n$.\n\n' +

@@ -79,6 +79,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Expand the bracket first, then collect the $x$ terms on one side and the numbers on the other.\n\n' +
         '1. Expand the bracket (the 5 multiplies **both** terms): $5x - 10 = 3x + 4$.\n' +
         '2. Subtract $3x$ from both sides: $2x - 10 = 4$.\n' +
         '3. Add 10 to both sides: $2x = 14$.\n' +
@@ -106,6 +107,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Solve it like an equation, but watch what happens to the inequality sign if you divide by a negative number.\n\n' +
         '1. Subtract 5 from both sides: $-2x > 6$.\n' +
         '2. Divide both sides by $-2$. Because you are dividing by a **negative** number, the inequality sign flips: $x < \\frac{6}{-2}$, so $x < -3$.\n\n' +
         'Check with numbers: $x = -4$ (less than $-3$) gives $-2(-4) + 5 = 13$, and $13 > 11$ is true. $x = 0$ gives $5 > 11$, which is false. So the solution is $x < -3$.',
@@ -225,6 +227,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Clear the fraction by multiplying both sides by 2, then solve as an equation, remembering to flip the sign if you divide by a negative number.\n\n' +
         '1. Multiply both sides by 2 (a positive number, so the sign stays the same): $4 - 3x \\le 2x + 14$.\n' +
         '2. Subtract $2x$ from both sides: $4 - 5x \\le 14$.\n' +
         '3. Subtract 4 from both sides: $-5x \\le 10$.\n' +
@@ -427,6 +430,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Expand both sides first, taking care with the $-3$ in front of the bracket: it multiplies both terms inside.\n\n' +
         '1. Expand the left side. The $-3$ multiplies both terms, and $-3 \\times (-5) = +15$: $4 - 6x + 15 = 19 - 6x$.\n' +
         '2. Expand the right side: $2x + 2 - 7 = 2x - 5$.\n' +
         '3. The equation is now $19 - 6x = 2x - 5$. Add $6x$ to both sides: $19 = 8x - 5$.\n' +
@@ -512,7 +516,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'linear-equations-016',
     subtopic: 'linear-equations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Make $x$ the subject of $y = \\frac{2x + 3}{x - 1}$.',
     options: ['$x = \\frac{3 - y}{y - 2}$', '$x = \\frac{4}{y - 2}$', '$x = \\frac{y + 3}{y - 2}$', '$x = \\frac{y + 3}{2 - y}$'],
     correctIndex: 2,
@@ -578,6 +582,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Rearrange into the form $ax = b$ (a number times $x$ equals a number) and ask when you cannot divide by $a$.\n\n' +
         '1. Expand: $kx - 2k = 3x + 4$.\n' +
         '2. Collect the $x$ terms on the left and the rest on the right: $kx - 3x = 2k + 4$, so $(k - 3)x = 2k + 4$.\n' +
         '3. Normally you would divide by $(k - 3)$ to get exactly one solution. That is impossible only when $k - 3 = 0$, i.e. $k = 3$.\n' +
@@ -612,6 +617,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'First get $\\frac{1}{v}$ on its own, then combine the other side into a single fraction before taking the reciprocal.\n\n' +
         '1. Subtract $\\frac{1}{u}$ from both sides: $\\frac{1}{v} = \\frac{1}{f} - \\frac{1}{u}$.\n' +
         '2. Use the common denominator $uf$: $\\frac{1}{v} = \\frac{u}{uf} - \\frac{f}{uf} = \\frac{u - f}{uf}$.\n' +
         '3. Take the reciprocal (flip) of both sides: $v = \\frac{uf}{u - f}$.\n\n' +

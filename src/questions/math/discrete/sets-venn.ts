@@ -183,10 +183,10 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Students who study **at least one** language: $40 - 7 = 33$.\n' +
-        '2. Inclusion-exclusion: $n(F \\cup S) = n(F) + n(S) - n(F \\cap S)$.\n' +
-        '3. Substitute: $33 = 25 + 18 - n(F \\cap S) = 43 - n(F \\cap S)$.\n' +
-        '4. So $n(F \\cap S) = 43 - 33 = 10$.\n\n' +
+        'The 7 who study neither are outside both circles, so remove them first. Students who study **at least one** language: $40 - 7 = 33$.\n\n' +
+        '1. Inclusion-exclusion: $n(F \\cup S) = n(F) + n(S) - n(F \\cap S)$.\n' +
+        '2. Substitute: $33 = 25 + 18 - n(F \\cap S) = 43 - n(F \\cap S)$.\n' +
+        '3. So $n(F \\cap S) = 43 - 33 = 10$.\n\n' +
         'Check with a Venn diagram: French only $= 15$, both $= 10$, Spanish only $= 8$, neither $= 7$. Total $15 + 10 + 8 + 7 = 40$.',
       whyWrong: [
         'This is $25 + 18 - 40$: it forgets that 7 students are outside both circles, so only 33 students are inside the circles.',
@@ -208,7 +208,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'sets-venn-008',
     subtopic: 'sets-venn',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'Let $A = \\{2, 3, 5, 7, 11\\}$ and $B = \\{1, 3, 5, 7, 9\\}$. What is the set difference $A \\setminus B$ (also written $A - B$)?',
     options: ['$\\{1, 9\\}$', '$\\{3, 5, 7\\}$', '$\\{2, 11\\}$', '$\\{1, 2, 9, 11\\}$'],
     correctIndex: 2,
@@ -605,7 +605,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'sets-venn-020',
     subtopic: 'sets-venn',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'In a universal set with $n(U) = 30$, sets $A$ and $B$ satisfy $n(A) = 3x$, $n(B) = 2x + 2$ and $n(A \\cap B) = x$. There are 8 elements in neither $A$ nor $B$. How many elements are in $B$ **only**?',
     options: ['$7$', '$6$', '$9$', '$12$'],
     correctIndex: 0,

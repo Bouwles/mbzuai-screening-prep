@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'indices-surds',
+  simple:
+    'A power (or index) is shorthand for repeated multiplication: $2^5$ means five 2s multiplied together, which is 32. Most rules come from counting those copies, so multiplying powers of the same base adds the indices and dividing subtracts them. A surd is a square root that is not a whole number, like $\\sqrt{2}$; we keep it exact instead of writing a rounded decimal.',
+  methods: [
+    { cue: '**Simplify** products or quotients of powers, e.g. $\\frac{(2x^3)^4}{4x^5}$', method: 'Same base: multiplying adds the indices, dividing subtracts them, and a power of a power multiplies them. A power outside a bracket applies to every factor inside, numbers included.' },
+    { cue: 'A **zero, negative or fractional** index, e.g. $27^{\\frac{2}{3}}$ or $4^{-2}$', method: '$a^0 = 1$; a minus sign means "one over" (flip it); in $a^{\\frac{m}{n}}$ take the $n$th root first, then raise to the power $m$.' },
+    { cue: 'Write a surd as $a\\sqrt{b}$, or **add and subtract** surds', method: 'Pull out the largest square factor, e.g. $\\sqrt{72} = \\sqrt{36}\\sqrt{2} = 6\\sqrt{2}$. Only like surds combine: $5\\sqrt{2} - 3\\sqrt{2} = 2\\sqrt{2}$.' },
+    { cue: '**Rationalise** the denominator', method: 'For $\\frac{k}{\\sqrt{b}}$ multiply top and bottom by $\\sqrt{b}$. For $\\frac{k}{a - \\sqrt{b}}$ multiply by the conjugate $a + \\sqrt{b}$, so the bottom becomes $a^2 - b$.' },
+    { cue: '**Standard form**, or multiplying and dividing very large or very small numbers', method: 'Write $a \\times 10^n$ with $1 \\le a < 10$. Multiply or divide the front numbers, add or subtract the powers of 10, then adjust so the front number is between 1 and 10.' },
+    { cue: 'The **unknown is in the index**, e.g. $2^x \\times 4^y = 32$', method: 'Rewrite every term as a power of one base ($4 = 2^2$, $32 = 2^5$), then set the indices equal.' },
+    { cue: 'A **sum or difference** of powers, e.g. $2^{n+3} - 2^{n+1}$', method: 'Factor out the common power: $2^{n+3} - 2^{n+1} = 2^n(2^3 - 2)$. Indices only combine when you multiply or divide, never when you add or subtract.' },
+  ],
   know:
     '### What an index means\n\n' +
     'An **index** (or power, or exponent) is shorthand for repeated multiplication. $2^{5}$ means $2 \\times 2 \\times 2 \\times 2 \\times 2 = 32$. The 2 is the **base** and the 5 is the **index**. Almost every rule below comes from just counting how many copies of the base are being multiplied.\n\n' +

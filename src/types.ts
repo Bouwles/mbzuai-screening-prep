@@ -173,6 +173,16 @@ export interface WorkedExample {
 
 export interface Lesson {
   subtopic: string;
+  /**
+   * "The simple version": 2-4 short sentences a complete beginner can follow, no jargon left undefined,
+   * ideally with an everyday picture. Shown before everything else (rich text).
+   */
+  simple: string;
+  /**
+   * "Which method when?": how to recognise each question type from its wording and what to do.
+   * 3-6 entries, e.g. { cue: 'Asked for the **minimum value** of a quadratic', method: 'Complete the square ...' }.
+   */
+  methods: { cue: string; method: string }[];
   /** "What you need to know": plain-English explanation from the basics up (rich text, can use ### headings). */
   know: string;
   formulas: Formula[];

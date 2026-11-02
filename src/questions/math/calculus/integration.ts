@@ -524,7 +524,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'integration-017',
     subtopic: 'integration',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Given that $k > 0$ and $\\int_{0}^{k} (2x + 3)\\,dx = 10$, find $k$.',
     options: ['$5$', '$2$', '$\\frac{7}{2}$', '$\\sqrt{10}$'],
     correctIndex: 1,

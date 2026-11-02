@@ -427,7 +427,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'percentages-ratio-016',
     subtopic: 'percentages-ratio',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A shop increases the price of a watch by 20%. Later it offers 10% off the new price, and the watch then costs AED 540. What was the price **before** the 20% increase? (Give the answer to 2 decimal places if needed.)',
     options: ['AED 490.91', 'AED 475.20', 'AED 500', 'AED 496.80'],
     correctIndex: 2,

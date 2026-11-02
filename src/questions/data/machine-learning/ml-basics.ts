@@ -358,7 +358,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'ml-basics-012',
     subtopic: 'ml-basics',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'A model reads small **grayscale** (black-and-white) images that are 28 pixels wide and 28 pixels tall. Each pixel\'s brightness is fed into the model as one input feature. How many features does each image have?',
     options: ['$56$', '$28$', '$2352$', '$784$'],
     correctIndex: 3,
@@ -555,7 +555,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'ml-basics-018',
     subtopic: 'ml-basics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A university admissions model is tested on two groups of applicants. A fairness rule called **equal opportunity** says that **qualified** applicants should be accepted at the same rate in every group. Using the table, by how many percentage points do the acceptance rates of **qualified** applicants differ between the two groups?',
     table: {
       headers: ['Group', 'Qualified applicants', 'Qualified and accepted', 'Unqualified applicants', 'Unqualified and accepted'],

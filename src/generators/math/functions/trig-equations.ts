@@ -162,7 +162,10 @@ export const generators: Generator[] = [
         answer,
         answerValue: ansVal,
         distractors,
-        solution: steps.map((s, i) => `${i + 1}. ${s}`).join('\n') + `\n\nAnswer: ${answer}`,
+        solution:
+          `Get ${m(`\\${fn} x`)} on its own, find the reference angle, then use the sign of ${m(`\\${fn} x`)} (CAST) to decide which two quadrants the solutions are in.\n\n` +
+          steps.map((s, i) => `${i + 1}. ${s}`).join('\n') +
+          `\n\nAnswer: ${answer}`,
         keyIdea: `Find the reference angle, then use the sign of ${m(`\\${fn} x`)} (CAST) to place the solutions in the right two quadrants.`,
       };
     },
@@ -273,7 +276,10 @@ export const generators: Generator[] = [
         answer,
         answerValue: ans.value(),
         distractors,
-        solution: lines.map((s, i) => `${i + 1}. ${s}`).join('\n') + `\n\nAnswer: ${answer}`,
+        solution:
+          `Start by finding the missing ratio ${m(`\\${other}\\theta`)} from ${m('\\sin^2\\theta + \\cos^2\\theta = 1')}, and choose its sign from the quadrant.\n\n` +
+          lines.map((s, i) => `${i + 1}. ${s}`).join('\n') +
+          `\n\nAnswer: ${answer}`,
         keyIdea: 'Get the missing ratio from $\\sin^2\\theta + \\cos^2\\theta = 1$, choose its sign from the quadrant, then apply the identity you need.',
       };
     },

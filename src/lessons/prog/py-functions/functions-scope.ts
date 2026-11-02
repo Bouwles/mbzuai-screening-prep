@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'functions-scope',
+  simple:
+    'A **function** is like a recipe card: you write it once with `def`, then "cook" it whenever you like by calling it with ingredients (the **arguments**). `return` hands the finished dish back to whoever asked for it, while `print` only shows it on the screen. Variables created inside a function are **local**: they live only while that call runs, like notes on a scrap of paper thrown away afterwards, so they do not change variables with the same name outside.',
+  methods: [
+    { cue: 'A function that `print`s but has no `return`, and its result is stored or printed', method: 'The print still happens during the call, but the call itself gives `None`, so printing the result shows `None`.' },
+    { cue: 'A call mixing positional, keyword (`c=10`) and default arguments', method: 'Match first: positional values left to right, keyword values by name, missing parameters take their defaults. Then evaluate the body (with `*` before `+`).' },
+    { cue: 'The same variable name inside and outside a function', method: 'Keep two columns, global and local. Assigning inside a function (or using a parameter) makes a separate local; only a `global` line lets the function change the outside variable.' },
+    { cue: '`map`, `filter`, `sorted(..., key=...)` with a `lambda`', method: 'Work from the inside out: `filter` keeps items where the test is `True`, `map` transforms every item, `key` only decides the order (the items themselves are unchanged).' },
+    { cue: 'A `return` inside a loop', method: 'The first `return` reached ends the whole function at once; later lines and later loop passes never run.' },
+    { cue: 'A function passed as an argument (`f(f(x))`) or a function that returns a function', method: 'Replace each name by the function it stands for and evaluate the innermost call first.' },
+    { cue: 'A list passed in and then changed with `append`, or a default like `bag=[]`', method: 'The function works on the **same** list, so `append` is visible outside, but `items = [...]` only rebinds the local name. A mutable default is shared between calls.' },
+  ],
   know:
     '### What a function is\n\n' +
     'A **function** is a named, reusable block of code. You **define** it once with `def`, then **call** it as many times as you like. The names in brackets on the `def` line are **parameters**; the values you put in the brackets when calling are **arguments**.\n\n' +

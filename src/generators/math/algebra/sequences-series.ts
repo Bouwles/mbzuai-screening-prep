@@ -73,7 +73,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-sequences-series-sum-to-infinity',
     subtopic: 'sequences-series',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     title: 'Sum to infinity of a geometric series',
     generate(rng) {
       const ratios: [number, number][] = [

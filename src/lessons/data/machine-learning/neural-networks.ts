@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'neural-networks',
+  simple:
+    'An artificial **neuron** multiplies each input by a **weight** (how much that input matters), adds them up together with a **bias**, then passes the total through an **activation function**, such as ReLU, which keeps positive numbers and turns negatives into 0. A **neural network** is layers of these neurons, each layer feeding the next. Training nudges the weights to reduce the error, and **backpropagation** works out which way to nudge each one.',
+  methods: [
+    { cue: 'Inputs, weights and a bias: find a **neuron\'s output**', method: 'Compute $z = \\sum w_i x_i + b$ first, then apply the activation: ReLU $\\max(0, z)$, sigmoid $\\frac{1}{1 + e^{-z}}$, tanh or step.' },
+    { cue: 'A small network with a table of weights: the **forward pass**', method: 'Work layer by layer: weighted sum, add the bias, apply the activation, then feed those outputs into the next layer.' },
+    { cue: '**How many parameters** a fully connected network has', method: 'For each pair of neighbouring layers add $n_{\\text{in}} \\times n_{\\text{out}}$ weights plus $n_{\\text{out}}$ biases. Inputs have no biases.' },
+    { cue: '**Which activation function** (from its range, its graph or a probability output)', method: 'Sigmoid: between $0$ and $1$, with $\\sigma(0) = 0.5$. Tanh: between $-1$ and $1$, through the origin. ReLU: $0$ for negatives, no upper limit.' },
+    { cue: 'A perceptron with **binary inputs**: which logic gate?', method: 'Compute $z$ for all four input pairs and read off the truth table. XOR needs a hidden layer.' },
+    { cue: '**Training**: backpropagation, gradients and weight updates', method: 'Backpropagation uses the chain rule to find $\\frac{\\partial L}{\\partial w}$ for every weight; gradient descent then sets $w \\leftarrow w - \\eta \\frac{\\partial L}{\\partial w}$.' },
+    { cue: 'A network with **no non-linear activation**', method: 'Linear layers collapse into one linear layer: substitute and simplify. Such a network cannot solve XOR.' },
+  ],
   know:
     '### The artificial neuron\n\n' +
     'A neural network is built from tiny calculators called **neurons**. Each neuron does just two things:\n\n' +

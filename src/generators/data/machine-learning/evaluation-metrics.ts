@@ -444,7 +444,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-evaluation-metrics-reverse',
     subtopic: 'evaluation-metrics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     title: 'Work backwards from precision and recall to the counts',
     generate: genReverse,
   },

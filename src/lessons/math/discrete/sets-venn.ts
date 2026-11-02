@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'sets-venn',
+  simple:
+    'A **set** is just a bag of different things, like the students in a class who play football. A **Venn diagram** draws each set as a circle, and where two circles overlap you find the things that belong to both. Most questions are about counting: add up the circles, but be careful not to count the people in the overlap twice.',
+  methods: [
+    {
+      cue: 'Symbols such as $A \\cup B$, $A \\cap B$, $A\'$ or $A \\setminus B$ with listed elements',
+      method: 'Read the symbol as a word: $\\cup$ = OR, $\\cap$ = AND, $\'$ = NOT (inside $U$), $\\setminus$ = BUT NOT. Go through the elements one by one and keep the ones that pass.',
+    },
+    {
+      cue: 'Two groups with totals and an overlap: "how many in **both** / **neither** / **exactly one**?"',
+      method: 'Use $n(A \\cup B) = n(A) + n(B) - n(A \\cap B)$, or fill a Venn diagram from the overlap outwards, then read off the region asked for. Remove the "neither" group first if it is given.',
+    },
+    {
+      cue: 'Three groups with all the pair counts and the "all three" count',
+      method: 'Three-set inclusion-exclusion: add the singles, subtract the pairs, add back the triple. For "only" or "exactly one" regions, fill the diagram from the centre outwards.',
+    },
+    {
+      cue: 'Region counts in a table, or an expression like $(A \\cup B) \\cap C\'$',
+      method: 'Check each of the 8 regions against every condition in the expression and add the regions that pass.',
+    },
+    {
+      cue: '"How many **subsets**?" (all, proper, non-empty, containing at least one ...)',
+      method: 'An $n$-element set has $2^{n}$ subsets. Subtract 1 for each excluded subset ($\\varnothing$ or the set itself); for "at least one" count the complement and subtract.',
+    },
+    {
+      cue: 'Unknown $x$ inside the Venn regions, or an unknown "all three" count',
+      method: 'Write every region in terms of $x$, make the regions add up to the total, solve for $x$, then read off the region asked for.',
+    },
+  ],
   know:
     '### What is a set?\n\n' +
     'A **set** is a collection of distinct objects, called its **elements**. We list them inside curly brackets: $A = \\{2, 4, 6, 8\\}$. Order does not matter and repeats are ignored, so $\\{1, 2, 3\\}$ and $\\{3, 1, 2, 2\\}$ are the same set.\n\n' +

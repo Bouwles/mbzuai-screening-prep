@@ -110,6 +110,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Find the reference angle first, then ask in which quadrants sine is positive: there is usually more than one solution per turn.\n\n' +
         '1. Calculator (or exact values): $\\sin^{-1}\\left(\\frac{1}{2}\\right) = 30^\\circ$. This is the reference angle.\n' +
         '2. Sine is **positive** in the first and second quadrants (think of the sine graph: it is above the axis from $0^\\circ$ to $180^\\circ$).\n' +
         '3. First quadrant: $x = 30^\\circ$.\n' +
@@ -171,6 +172,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Make $\\cos x$ the subject first, then use the reference angle and the quadrants where cosine has that sign.\n\n' +
         '1. Rearrange: $2\\cos x = -1$, so $\\cos x = -\\frac{1}{2}$.\n' +
         '2. Reference angle: $\\cos\\frac{\\pi}{3} = \\frac{1}{2}$, so the reference angle is $\\frac{\\pi}{3}$.\n' +
         '3. Cosine is **negative** in the second and third quadrants.\n' +
@@ -323,6 +325,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Expand $\\sin 2x$ with the double-angle formula, then bring everything to one side and **factorise** rather than dividing.\n\n' +
         '1. Use $\\sin 2x = 2\\sin x\\cos x$: $2\\sin x\\cos x = \\sin x$.\n' +
         '2. Bring everything to one side: $2\\sin x\\cos x - \\sin x = 0$.\n' +
         '3. Factorise (do **not** divide by $\\sin x$): $\\sin x\\,(2\\cos x - 1) = 0$.\n' +
@@ -351,6 +354,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'You need $\\sin\\theta$ before you can find $\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta}$: get it from $\\sin^2\\theta + \\cos^2\\theta = 1$ and choose its sign from the quadrant.\n\n' +
         '1. Find $\\sin\\theta$: $\\sin^2\\theta = 1 - \\left(-\\frac{5}{13}\\right)^2 = 1 - \\frac{25}{169} = \\frac{144}{169}$, so $\\sin\\theta = \\pm\\frac{12}{13}$.\n' +
         '2. In the second quadrant sine is positive: $\\sin\\theta = \\frac{12}{13}$.\n' +
         '3. $\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta} = \\frac{12}{13} \\div \\left(-\\frac{5}{13}\\right) = -\\frac{12}{5}$.\n\n' +
@@ -377,6 +381,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        '$\\sin 2\\theta = 2\\sin\\theta\\cos\\theta$, so first find $\\cos\\theta$, taking care with its sign for an obtuse angle.\n\n' +
         '1. Find $\\cos\\theta$: $\\cos^2\\theta = 1 - \\frac{9}{25} = \\frac{16}{25}$, so $\\cos\\theta = \\pm\\frac{4}{5}$.\n' +
         '2. $\\theta$ is obtuse (second quadrant), where cosine is negative: $\\cos\\theta = -\\frac{4}{5}$.\n' +
         '3. $\\sin 2\\theta = 2\\sin\\theta\\cos\\theta = 2 \\times \\frac{3}{5} \\times \\left(-\\frac{4}{5}\\right) = -\\frac{24}{25}$.\n\n' +
@@ -450,7 +455,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-equations-015',
     subtopic: 'trig-equations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Solve $\\cos 2x = \\cos x$ for $0^\\circ \\le x < 360^\\circ$.',
     options: [
       '$60^\\circ$, $180^\\circ$, $300^\\circ$',
@@ -483,7 +488,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-equations-016',
     subtopic: 'trig-equations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       'Find $x$ and $y$, with $0^\\circ \\le x \\le 180^\\circ$ and $0^\\circ \\le y \\le 180^\\circ$, such that\n\n' +
       '$$\\begin{aligned} \\sin x + 2\\cos y &= 2 \\\\ 3\\sin x - 2\\cos y &= 2 \\end{aligned}$$',
@@ -527,6 +532,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'The equation mixes $\\sin^2 x$ and $\\cos x$, so write everything in terms of $\\cos x$ to get a quadratic. Find **every** solution in the interval before adding.\n\n' +
         '1. Replace $\\sin^2 x$ with $1 - \\cos^2 x$: $2(1 - \\cos^2 x) = 1 + \\cos x$.\n' +
         '2. Expand and collect: $2 - 2\\cos^2 x - 1 - \\cos x = 0$, so $2\\cos^2 x + \\cos x - 1 = 0$.\n' +
         '3. Factorise with $c = \\cos x$: $(2c - 1)(c + 1) = 0$, so $\\cos x = \\frac{1}{2}$ or $\\cos x = -1$.\n' +

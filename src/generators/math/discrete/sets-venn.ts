@@ -475,7 +475,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-sets-venn-three-set',
     subtopic: 'sets-venn',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     title: 'Three-set Venn diagram: inclusion-exclusion',
     generate: threeSet,
   },

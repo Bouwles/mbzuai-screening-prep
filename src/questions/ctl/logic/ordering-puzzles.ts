@@ -713,7 +713,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Clue 1: the Python fan has (Ben\'s years) $+ 3$. The years only go up to 4, so Ben has 1 year and the Python fan has 4 years.\n' +
+        'Start with the most restrictive clue. Clue 1 says the Python fan has (Ben\'s years) $+ 3$, and the years only go up to 4.\n\n' +
+        '1. So Ben has 1 year and the Python fan has 4 years.\n' +
         '2. Clue 2: Divya has 4 years, so Divya is the Python fan.\n' +
         '3. Clue 4: the Rust fan has 1 year, and Ben has 1 year, so Ben likes Rust.\n' +
         '4. Clue 3: Carlos likes C. The only language left is Java, so Aisha likes Java.\n' +

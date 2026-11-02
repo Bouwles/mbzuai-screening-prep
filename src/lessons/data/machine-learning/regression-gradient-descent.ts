@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'regression-gradient-descent',
+  simple:
+    '**Linear regression** draws the best straight line through data to predict a number, like estimating a taxi fare from the distance. **Logistic regression** squashes a number into a probability between 0 and 1 to choose a class, such as spam or not spam. To find good weights we use **gradient descent**: like walking down a hill in fog, you feel which way is downhill (the gradient) and take a small step that way (the learning rate sets the step size).',
+  methods: [
+    { cue: 'Given $\\hat{y} = wx + b$; asked for a **prediction** or a **residual**', method: 'Substitute into $\\hat{y} = wx + b$ (multiply, then add the bias). Residual $= y - \\hat{y}$, actual minus predicted.' },
+    { cue: 'A table of actual and predicted values; asked for the **MSE**', method: 'Square each error $y - \\hat{y}$, add them, divide by $n$. Squaring stops positive and negative errors cancelling.' },
+    { cue: 'Asked for $w$ after **one gradient descent step**', method: 'Find the gradient at the current $w$ (for $(wx - y)^2$ it is $2(wx - y)x$ by the chain rule), then $w_{\\text{new}} = w - \\eta \\times \\text{gradient}$.' },
+    { cue: '**Logistic regression**: a probability or a predicted class', method: 'Compute $z = wx + b$, then $p = \\frac{1}{1 + e^{-z}}$. Predict class 1 when $p \\ge 0.5$, which happens exactly when $z \\ge 0$.' },
+    { cue: '**Cross-entropy** loss for a predicted probability', method: 'Take $-\\ln$ of the probability given to the **true** class ($p$ if $y = 1$, $1 - p$ if $y = 0$), then average over the examples.' },
+    { cue: 'A loss curve, or a question about the **learning rate**', method: 'Too small: slow, steady fall. About right: fast fall that levels off. Too large: the loss zig-zags and grows (diverges).' },
+  ],
   know:
     '### The big picture\n\n' +
     'A machine learning model is a formula with adjustable numbers inside it, called **parameters** (or **weights**). **Training** means finding the values of those numbers that make the model\'s predictions as good as possible. To do that we need three things: a **model** (how predictions are made), a **loss** (one number that measures how bad the predictions are) and an **optimiser** (a method that changes the weights to make the loss smaller). In this topic the models are linear and logistic regression, the losses are MSE and cross-entropy, and the optimiser is gradient descent.\n\n' +

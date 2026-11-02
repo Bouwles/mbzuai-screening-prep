@@ -2,6 +2,19 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'composite-inverse',
+  simple:
+    'A **composite** function is two machines in a row: the output of the first machine becomes the input of the second, so $f(g(x))$ means "do $g$ first, then $f$". ' +
+    'An **inverse** function $f^{-1}$ is the undo button: if $f$ turns $2$ into $5$, then $f^{-1}$ turns $5$ back into $2$. ' +
+    'The $-1$ is not a power, so $f^{-1}(x)$ is not $\\frac{1}{f(x)}$.',
+  methods: [
+    { cue: 'Find $f(g(3))$ or $(f \\circ g)(x)$', method: 'Work from the inside out: apply the function next to $x$ first. For a formula, substitute the whole of $g(x)$, in brackets, for every $x$ in $f$.' },
+    { cue: 'Find a single value such as $f^{-1}(7)$', method: 'No formula needed: solve $f(x) = 7$ (try small whole numbers if it is a cubic).' },
+    { cue: 'Find the formula $f^{-1}(x)$', method: 'Write $y = f(x)$, swap $x$ and $y$, make $y$ the subject. For a fraction: multiply out, collect the $y$ terms, factorise out $y$, divide. Check with one number.' },
+    { cue: '$f(f^{-1}(6))$, or a point / graph of the inverse', method: '$f$ and $f^{-1}$ cancel, so $f(f^{-1}(6)) = 6$. $(a, b)$ on $f$ means $(b, a)$ on $f^{-1}$: a reflection in $y = x$.' },
+    { cue: '**Domain** of $f^{-1}$ / inverse of a quadratic on a restricted domain', method: 'Domain of $f^{-1}$ = range of $f$. For a quadratic, complete the square first and use the original domain to choose the sign of the square root.' },
+    { cue: 'Given $g$ and $f \\circ g$ (or $g \\circ f$), find $f$', method: 'Rewrite the composite in terms of the inner expression, e.g. $2x^2 + 5 = 2(x^2 + 1) + 3$, so $f(x) = 2x + 3$.' },
+    { cue: '**Self-inverse**, or applying $f$ many times', method: 'Self-inverse means $f(f(x)) = x$; $\\frac{ax + b}{cx + d}$ is self-inverse when $d = -a$. For repeated application, compute a few terms, find the cycle, use the remainder.' },
+  ],
   know:
     '### Functions as machines\n\n' +
     'A function is a rule that takes an input and gives exactly one output. Think of it as a machine: $f(x) = 2x + 3$ means "double the input, then add $3$". So $f(4) = 2 \\times 4 + 3 = 11$.\n\n' +

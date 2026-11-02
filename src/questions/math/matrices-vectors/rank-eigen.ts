@@ -463,7 +463,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'rank-eigen-016',
     subtopic: 'rank-eigen',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A $2 \\times 2$ matrix $A$ has eigenvalues $2$ and $-3$. What are the eigenvalues of $A^2 + I$?',
     options: ['$4$ and $9$', '$5$ and $10$', '$5$ and $-8$', '$3$ and $-2$'],
     correctIndex: 1,

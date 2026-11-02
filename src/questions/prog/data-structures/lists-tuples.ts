@@ -70,6 +70,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'First ask: what kind of object is `t`, and can that kind of object be changed after it is created?\n\n' +
         '1. `t = (1, 2, 3)` creates a **tuple** (round brackets).\n' +
         '2. Tuples are **immutable**: once created, their items cannot be replaced, added or removed.\n' +
         '3. So the line `t[0] = 9` fails with `TypeError: \'tuple\' object does not support item assignment`.\n' +
@@ -95,6 +96,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'The key question is how many items `append` adds when its argument is itself a list.\n\n' +
         '1. `a.append(x)` adds **one** item, `x`, to the end of the list, whatever `x` is.\n' +
         '2. Here `x` is the list `[3, 4]`, so the whole list is added as a single item: `a` becomes `[1, 2, [3, 4]]`.\n' +
         '3. `len(a)` counts the top-level items: `1`, `2` and `[3, 4]`, which is 3 items.\n\n' +
@@ -157,6 +159,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Two things to work out: what `sort()` does to `nums` itself, and what value it hands back to be stored in `result`.\n\n' +
         '1. `nums.sort()` sorts the list **in place**: the list `nums` itself is changed to `[1, 3, 4]`.\n' +
         '2. Methods that change a list in place (`sort`, `append`, `reverse`, ...) return `None`. So `result` is `None`.\n' +
         '3. `print(nums, result)` shows `[1, 3, 4] None`.\n\n' +
@@ -209,6 +212,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Trace the list one line at a time, remembering that `remove` works by **value**, while `insert` and `pop` work by **index**.\n\n' +
         '| Line | Rule | `a` afterwards |\n| --- | --- | --- |\n' +
         '| `a = [5, 3, 8, 3, 1]` | start | `[5, 3, 8, 3, 1]` |\n' +
         '| `a.remove(3)` | removes the **first** item equal to 3 (by value) | `[5, 8, 3, 1]` |\n' +
@@ -356,6 +360,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Ask what `t[1]` actually is, and whether `append` changes the tuple itself or the object stored inside it.\n\n' +
         '1. The tuple `t` holds two things: the number 1 and a **list** `[2, 3]`.\n' +
         '2. Tuple immutability means you cannot replace which objects the tuple holds (for example `t[1] = [9]` would fail).\n' +
         '3. But `t[1].append(4)` does not replace anything in the tuple. It reaches the list stored at `t[1]` and changes **that list**, which is mutable.\n' +
@@ -444,6 +449,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Focus on what `* 2` does to the row: does it make two separate rows, or repeat the same row object?\n\n' +
         '1. `[0] * 3` builds one row: `[0, 0, 0]`.\n' +
         '2. `[row] * 2` builds an outer list containing that **same row object twice**. It does not copy the row. So `grid[0]` and `grid[1]` are two names for one list.\n' +
         '3. `grid[0][1] = 5` changes index 1 of that one shared row.\n' +
@@ -558,7 +564,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'lists-tuples-020',
     subtopic: 'lists-tuples',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A student wants to reverse an array in place. Arrays are indexed from 0, and `for i = 0 to k` includes both 0 and $k$. What is printed by this pseudocode?',
     code: {
       lang: 'pseudocode',

@@ -67,6 +67,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'To find an inverse, write $y = f(x)$, swap $x$ and $y$, then make $y$ the subject.\n\n' +
         '1. Write $y = 3x - 6$.\n' +
         '2. Swap $x$ and $y$: $x = 3y - 6$.\n' +
         '3. Make $y$ the subject: add $6$ to both sides, $x + 6 = 3y$.\n' +
@@ -236,6 +237,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Swap $x$ and $y$, then clear the fraction by multiplying both sides by the denominator, and gather every $y$ term on one side.\n\n' +
         '1. Write $y = \\frac{2x+1}{x-3}$ and swap $x$ and $y$: $x = \\frac{2y+1}{y-3}$.\n' +
         '2. Multiply both sides by $(y - 3)$: $xy - 3x = 2y + 1$.\n' +
         '3. Collect the $y$ terms on one side: $xy - 2y = 3x + 1$.\n' +
@@ -326,6 +328,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Write $g(f(x))$ as one expression, then solve for the inner bracket $2x + 1$ before solving for $x$.\n\n' +
         '1. Build the composite (inner function $f$ first): $g(f(x)) = (2x+1)^2 - 3$.\n' +
         '2. Set it equal to $6$: $(2x+1)^2 - 3 = 6$, so $(2x+1)^2 = 9$.\n' +
         '3. Square root, keeping **both** signs: $2x + 1 = 3$ or $2x + 1 = -3$.\n' +
@@ -427,6 +430,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Find a formula for $f^{-1}(x)$ first, then set $f(x) = f^{-1}(x)$ and solve.\n\n' +
         '1. Find the inverse: $y = 2x - 3$, swap to $x = 2y - 3$, so $f^{-1}(x) = \\frac{x+3}{2}$.\n' +
         '2. Set the two equal: $2x - 3 = \\frac{x+3}{2}$.\n' +
         '3. Multiply by $2$: $4x - 6 = x + 3$, so $3x = 9$ and $x = 3$.\n' +
@@ -460,6 +464,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        '$f$ does three things in order: subtract $1$, take $\\ln$, add $2$. The inverse undoes them in the reverse order.\n\n' +
         '1. Write $y = \\ln(x-1) + 2$ and swap: $x = \\ln(y-1) + 2$.\n' +
         '2. Subtract $2$: $x - 2 = \\ln(y-1)$.\n' +
         '3. Undo $\\ln$ by taking $e$ to the power of both sides: $e^{x-2} = y - 1$.\n' +
@@ -485,7 +490,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'composite-inverse-016',
     subtopic: 'composite-inverse',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The one-to-one functions $f$ and $g$ are defined on $\\{1, 2, 3, 4, 5\\}$ by the table below. Find $(f \\circ g)^{-1}(5)$.',
     table: {
       headers: ['$x$', '1', '2', '3', '4', '5'],
@@ -596,12 +601,13 @@ export const questions: StaticQuestion[] = [
   {
     id: 'composite-inverse-019',
     subtopic: 'composite-inverse',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Given $g(x) = 2x - 1$ and $(g \\circ f)(x) = 6x + 5$, find $f^{-1}(x)$.',
     options: ['$\\frac{x+1}{2}$', '$3x + 3$', '$\\frac{x-5}{6}$', '$\\frac{x-3}{3}$'],
     correctIndex: 3,
     markScheme: {
       solution:
+        'First find $f(x)$ itself: $g$ is applied to $f(x)$, so write $g(f(x))$ in terms of $f(x)$. Only then invert.\n\n' +
         '1. $(g \\circ f)(x) = g(f(x)) = 2f(x) - 1$.\n' +
         '2. Set equal: $2f(x) - 1 = 6x + 5$, so $2f(x) = 6x + 6$ and $f(x) = 3x + 3$.\n' +
         '3. Invert: $y = 3x + 3$, swap to $x = 3y + 3$, so $3y = x - 3$ and $y = \\frac{x-3}{3}$.\n\n' +
@@ -638,6 +644,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Complete the square so that $x$ appears only once, then swap $x$ and $y$. The restricted domain $x \\ge 2$ will decide the sign of the square root.\n\n' +
         '1. Complete the square: $x^2 - 4x + 7 = (x-2)^2 - 4 + 7 = (x-2)^2 + 3$.\n' +
         '2. So the range of $f$ (for $x \\ge 2$) is $y \\ge 3$; this will be the domain of $f^{-1}$.\n' +
         '3. Swap: $x = (y-2)^2 + 3$, so $(y-2)^2 = x - 3$.\n' +

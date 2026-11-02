@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'modular-arithmetic',
+  simple:
+    'Modular arithmetic is "clock maths": on a 12-hour clock, 5 hours after 9 o\'clock is 2 o\'clock, because you only keep the **remainder** after dividing by 12. $a \\bmod n$ means the remainder when $a$ is divided by $n$. This subtopic also covers factors, primes, the highest common factor (HCF, the biggest number that divides both) and the lowest common multiple (LCM, the smallest number both divide into).',
+  methods: [
+    {
+      cue: '"What is $a \\bmod n$?" or "the remainder when $a$ is divided by $n$"',
+      method: 'Find the largest multiple of $n$ not above $a$ and subtract it: $a = nq + r$ with $0 \\le r < n$.',
+    },
+    {
+      cue: '**Last digit** of a huge power, or the remainder of $a^{k}$ for a big $k$',
+      method: 'List the first few powers (mod 10 for a last digit) until they repeat, then use the remainder of the exponent divided by the cycle length. Remainder 0 means the last entry of the cycle.',
+    },
+    {
+      cue: 'Remainders of $a$ and $b$ are given; asked for the remainder of $a^{2}b$, $a + b$, ...',
+      method: 'Replace each number by its remainder, do the arithmetic, and reduce again at the end.',
+    },
+    {
+      cue: '**HCF/GCD** or **LCM**, "when do they next coincide?", or HCF and LCM given with one number missing',
+      method: 'Prime-factorise: HCF takes shared primes with the lower power, LCM takes every prime with the higher power (or use the Euclidean algorithm). Use $\\gcd(a, b) \\times \\operatorname{lcm}(a, b) = ab$ to find a missing number.',
+    },
+    {
+      cue: '"How many **divisors**?" or a divisibility test (by 3, 9, 11) with a missing digit',
+      method: 'If $n = p^{a} q^{b}$ it has $(a + 1)(b + 1)$ divisors. Digit sum for 3 and 9; alternating sum (plus, minus, plus, minus, ...) for 11.',
+    },
+    {
+      cue: 'Solve $ax \\equiv b \\pmod{m}$, or Python `%` and `//` with negative numbers',
+      method: 'For a small modulus, test each value or each option (you cannot just divide). In Python `//` rounds down and `%` has the sign of the divisor.',
+    },
+  ],
   know:
     '### Remainders and the mod operation\n\n' +
     'When you divide a whole number $a$ by $n$ you get a **quotient** $q$ and a **remainder** $r$:\n\n' +

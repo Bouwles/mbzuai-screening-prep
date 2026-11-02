@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'boolean-logic',
+  simple:
+    "Boolean logic works with only two values, 1 (true) and 0 (false). **AND** gives 1 only when both inputs are 1, **OR** gives 1 when at least one input is 1, and **NOT** flips 1 and 0. A **truth table** lists the output for every possible combination of inputs, like testing every setting of the switches in a light circuit. Python uses the same ideas with `and`, `or` and `not`.",
+  methods: [
+    {
+      cue: "Asked which **gate** behaves in a certain way, or for a gate's outputs",
+      method: "Write the four-row truth table: AND, OR, NOT, NAND (NOT of AND), NOR (NOT of OR), and XOR (1 exactly when the two inputs differ).",
+    },
+    {
+      cue: "A **circuit** or expression, asked **how many rows** give 1",
+      method: "Turn the circuit into an expression gate by gate, then count rows. It is often quicker to count the rows that give 0 and subtract from $2^n$.",
+    },
+    {
+      cue: "Asked for an **equivalent** expression, or a NOT in front of a bracket",
+      method: "Use De Morgan: $\\neg(A \\land B) = \\neg A \\lor \\neg B$ and $\\neg(A \\lor B) = \\neg A \\land \\neg B$. Confirm by testing one or two rows.",
+    },
+    {
+      cue: "Asked to **simplify** an expression",
+      method: "Factor out a common variable, then use $B \\lor \\neg B = 1$, $B \\land \\neg B = 0$, $A \\land 1 = A$ and $A \\lor 0 = A$. Check the result on a row.",
+    },
+    {
+      cue: "A **truth table is given**, asked which expression produces it",
+      method: "If the table has a single 0, write NOT of that row and simplify with De Morgan (a single 1: describe that row). Otherwise test each option row by row.",
+    },
+    {
+      cue: "Python code with **`and` / `or` / `not`**, asked what it prints",
+      method: "`and` stops at the first falsy value and `or` at the first truthy one, returning that operand (not always `True` or `False`). Precedence is `not`, then `and`, then `or`, and skipped calls never run.",
+    },
+  ],
   know:
     '### True and false as 1 and 0\n\n' +
     'Boolean logic works with only two values: TRUE and FALSE, usually written **1** and **0**. A Boolean expression combines inputs (like $A$, $B$, $C$) with a few operators, and its output is always 1 or 0. This is exactly how computer chips and `if` conditions work.\n\n' +

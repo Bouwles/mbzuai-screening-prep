@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'variables-operators',
+  simple:
+    'A **variable** is a labelled box that holds a value: `x = 5` puts 5 in the box called `x`, and a later line can replace it. The computer runs the lines from top to bottom, so to predict what code prints you just keep track of what is in each box after every line. Operators are the calculator buttons: `+`, `-`, `*`, `/` work as usual, `//` divides and throws away the decimals, `%` gives the remainder, and `**` means "to the power of".',
+  methods: [
+    { cue: 'Code uses `//` and `%` (often written as `print(a // b, a % b)`)', method: '`//` is the division rounded **down** and `%` is the remainder. Check the pair with $a = b \\times q + r$; with a negative number, round down on the number line (`-7 // 2` is $-4$).' },
+    { cue: 'One long line with several operators and no brackets', method: 'Apply precedence: `**` first (right to left), then `* / // %` left to right, then `+ -`. Rewrite the expression after each step.' },
+    { cue: 'Several lines such as `x += 3`, `x *= 2`, `x //= 5`', method: 'Make a trace table: `x op= e` means `x = x op (e)`, always using the latest value of `x`.' },
+    { cue: '`a, b = b, a + b` or a chained `x = y = ...`', method: 'Work out the whole right-hand side with the **old** values first, then assign. A chain gives the same value to every name.' },
+    { cue: 'Values in quotes mixed with numbers, or `int()`, `str()`, `type()`', method: 'Track the type as well as the value: `+` joins strings, `str * int` repeats, `str + int` is a `TypeError`, `int("3.5")` is a `ValueError`, and `/` always gives a float.' },
+    { cue: 'Asked which variable name is **valid**', method: 'Letters, digits and `_` only, no digit at the start, and not a keyword such as `for` or `class`.' },
+  ],
   know:
     '### Variables and assignment\n\n' +
     'A **variable** is a name that points to a value. The line `x = 5` means "make `x` refer to 5". It is an instruction, not an equation: `x = x + 1` is perfectly sensible and means "work out `x + 1` using the current `x`, then store the result back in `x`".\n\n' +

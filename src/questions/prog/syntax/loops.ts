@@ -319,7 +319,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'loops-010',
     subtopic: 'loops',
-    difficulty: 'exam',
+    difficulty: 'challenge',
     stem: 'What does this Python code print? (If more than one line is printed, the lines are shown separated by spaces.)',
     code: {
       lang: 'python',

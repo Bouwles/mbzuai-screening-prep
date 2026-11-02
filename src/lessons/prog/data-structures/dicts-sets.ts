@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'dicts-sets',
+  simple:
+    'A **dictionary** is like a real dictionary or a phone book: you look a value up by its name (the **key**), not by its position, and each key appears only once. A **set** is a bag of values with no repeats and no order, so it is perfect for asking "have I seen this before?". Both use a trick called **hashing** that jumps straight to the right place, so a lookup is fast however big they get.',
+  methods: [
+    { cue: '`d[k] = v`, `update`, `pop`, `get` on a dictionary, then `print(d)`', method: 'Trace line by line. A new key is added at the end; an existing key has its value **overwritten** and keeps its place. `get(k, default)` never raises an error; `pop(k)` returns the removed **value**.' },
+    { cue: 'A loop with `counts[x] = counts.get(x, 0) + 1`', method: 'This counts occurrences. Make a tally table: one key per distinct item, keys in first-seen order (dictionaries are not sorted).' },
+    { cue: 'Set operators `|`, `&`, `-`, `^`, or `len(set(...))`', method: 'Write out what is only in A, in both, and only in B. `|` = all, `&` = both, `A - B` = only in A (order matters), `^` = in exactly one. Duplicates vanish.' },
+    { cue: '`x in d` or `x in d.values()`', method: '`in d` checks the **keys** only; searching values needs `d.values()`.' },
+    { cue: 'Which object can be a key / set element, or a `TypeError` option', method: 'Keys and set elements must be hashable (immutable): numbers, strings and tuples are fine; lists, sets and dictionaries raise a `TypeError`.' },
+    { cue: 'A hash table with $h(k) = k \\bmod m$ and **linear probing**', method: 'Insert keys in order: compute $k \\bmod m$; if that slot is taken, try the next slot, wrapping from $m - 1$ back to 0.' },
+    { cue: 'Speed of a lookup, or a **chaining** table with $n$ keys and $m$ buckets', method: 'Set/dictionary lookups are $O(1)$ on average (a list search is $O(n)$). With chaining, an average search checks about $\\alpha = \\frac{n}{m}$ keys.' },
+  ],
   know:
     '### Why dictionaries and sets?\n\n' +
     'A list stores items in positions 0, 1, 2, and so on. To find something in a list, Python may have to look at every item. A **dictionary** lets you look things up by a name (a **key**) instead of a position, and a **set** lets you ask "is this value in here?" very quickly. Both are built on the same idea, the **hash table**.\n\n' +

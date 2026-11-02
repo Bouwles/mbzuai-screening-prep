@@ -96,6 +96,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'First decide which branch runs: work out `17 mod 2` and compare it with 0.\n\n' +
         '1. Test the condition: `17 mod 2` is the remainder when 17 is divided by 2. $17 = 2 \\times 8 + 1$, so the remainder is 1.\n' +
         '2. Is $1 = 0$? No, so the condition is **false** (17 is odd) and the `else` branch runs.\n' +
         '3. `x = 3 * x + 1`: multiply first, then add: $3 \\times 17 + 1 = 51 + 1 = 52$.\n' +
@@ -718,7 +719,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'tracing-pseudocode-017',
     subtopic: 'tracing-pseudocode',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       'What is printed? (`mod` gives the remainder, `div` gives whole-number division, `str` turns a number into text, and `+` between two pieces of text joins them, so `"1" + "0"` is `"10"`.)',
     code: {
@@ -762,7 +763,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'tracing-pseudocode-018',
     subtopic: 'tracing-pseudocode',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'How many times is the line `count = count + 1` executed?',
     code: {
       lang: 'pseudocode',

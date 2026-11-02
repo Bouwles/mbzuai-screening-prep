@@ -138,7 +138,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
-        'Every Python function call gives back **some** value. If the body ends without a `return` (or with a bare `return` that has no value), Python returns the special value `None`, which means "no value".\n\n' +
+        'Every Python function call gives back **some** value: whatever `return` sends back. So ask what is sent back when there is no `return` at all.\n\n' +
+        'If the body ends without a `return` (or with a bare `return` that has no value), Python returns the special value `None`, which means "no value".\n\n' +
         'Example:\n\n' +
         '```python\ndef greet():\n    print("hi")\n\nx = greet()   # prints hi\nprint(x)      # prints None\n```\n\n' +
         'So the call evaluates to `None`.',
@@ -429,7 +430,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'functions-scope-012',
     subtopic: 'functions-scope',
-    difficulty: 'exam',
+    difficulty: 'challenge',
     stem: 'What happens when this Python code runs?',
     code: {
       lang: 'python',

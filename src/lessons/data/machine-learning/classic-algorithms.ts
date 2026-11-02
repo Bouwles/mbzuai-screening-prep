@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'classic-algorithms',
+  simple:
+    'Three classic methods. **k-nearest neighbours** classifies a new point by letting its $k$ closest labelled neighbours vote, like guessing a house\'s price band from the houses next door. **k-means** sorts unlabelled points into $k$ groups by moving each group\'s centre to the average of its members. A **decision tree** asks a chain of yes/no questions, choosing questions that leave each group as pure (all one class) as possible.',
+  methods: [
+    { cue: 'Classify a new point with **k-NN**', method: 'Work out the distance to every training point (squared distances give the same order), sort, keep the $k$ nearest and take a majority vote of their labels.' },
+    { cue: '**Euclidean** or **Manhattan** distance', method: 'Euclidean: $\\sqrt{(\\Delta x)^2 + (\\Delta y)^2}$. Manhattan: $|\\Delta x| + |\\Delta y|$. The choice can change which neighbour is nearest.' },
+    { cue: 'One **k-means** iteration, or where a **centroid** moves', method: 'Assign each point to its nearest centroid, then move each centroid to the mean of its own points (average each coordinate separately).' },
+    { cue: '**Gini** impurity or **entropy** of a node', method: 'Gini $= 1 - \\sum p_i^2$; entropy $= -\\sum p_i \\log_2 p_i$ (use $\\log_2$, not $\\ln$). Both are $0$ for a pure node.' },
+    { cue: 'Which **split** is best, or the **information gain**', method: 'Weight each child\'s impurity by its share of the examples and add. The best split has the lowest weighted impurity; gain $=$ parent entropy minus weighted child entropy.' },
+    { cue: 'Follow a **decision tree** for given inputs', method: 'Apply the tests in order and treat boundary values exactly as the sign says: $\\ge$ includes equality, $>$ does not.' },
+  ],
   know:
     '### Three classic algorithms\n\n' +
     'Three simple, classic algorithms are the starting point of machine learning. They are still widely used, and they appear in every exam:\n\n' +

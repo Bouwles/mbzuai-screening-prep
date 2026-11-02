@@ -137,7 +137,9 @@ Overall: there is no reliable public evidence on difficulty or question count. T
 - **Never trust the `Exam.pdf` key.** Any item adapted from it must be re-solved, de-duplicated and kept on syllabus.
 - **Track awareness:** the exam is "relevant to your chosen track". A future Engineering/Business toggle could shift Programming weight. No public data on how the versions differ.
 - **Deadline banner:** EA deadline is 1 Nov 2026, and the exam must be done within 10 days of submitting. If the student applies EA, the exam lands by about 11 Nov 2026.
-- All tunables live in `src/config/exam.ts`. Update its header comment: it still cites the 2023 graduate 40 Q / 45 min format and says scoring "above" 75%.
+- All tunables live in `src/config/exam.ts`.
+
+**Applied 2026-11-02:** the full mock is now 60 min (53 questions, an estimate at ~67 s each); 40 Q / 45 min is kept only as a labelled "graduate-format drill". Area weights changed to Math 40 / Data & AI 25 / Programming 20 / CT & Logic 15 (estimate). Mocks use Foundation 30% / Exam 70% and no Challenge questions (estimate; Challenge is optional enrichment). 75% is labelled everywhere as the fee-waiver score, not a pass mark. The question bank's difficulty labels were re-checked against the 4 official UG samples: Exam = sample-like 2–4 step questions, Foundation = one idea, Challenge = clearly harder than the samples.
 
 ---
 

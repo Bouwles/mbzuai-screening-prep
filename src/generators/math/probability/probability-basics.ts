@@ -207,8 +207,10 @@ export const generators: Generator[] = [
           answerValue: answer.value(),
           distractors: ds.map((d) => ({ text: m(dec(d.f)), value: d.f.value(), why: d.why })),
           solution:
-            `Picture a Venn diagram: both $= ${dec(H(c))}$, $A$ only $= ${dec(H(a - c))}$, $B$ only $= ${dec(H(b - c))}$, neither $= ${dec(H(100 - U))}$ (these four add to $1$).\n\n` +
-            `${finalStep}\n\nAnswer: ${ansText}`,
+            `Picture a Venn diagram with four regions (both, $A$ only, $B$ only, neither) that add to $1$. Start from the overlap: both $= ${dec(H(c))}$.\n\n` +
+            `${finalStep}\n\n` +
+            `Check with the full Venn diagram: both $= ${dec(H(c))}$, $A$ only $= ${dec(H(a - c))}$, $B$ only $= ${dec(H(b - c))}$, neither $= ${dec(H(100 - U))}$.\n\n` +
+            `Answer: ${ansText}`,
           keyIdea: 'Fill the Venn diagram from the overlap outwards; the addition rule $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$ links all the regions.',
         };
       }

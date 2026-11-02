@@ -2,6 +2,19 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'vectors',
+  simple:
+    'A **vector** is an arrow: it has a length (its **magnitude**) and a direction, and it is written as a column of numbers, such as $\\begin{pmatrix} 3 \\\\ 4 \\end{pmatrix}$ for "3 across, 4 up". ' +
+    'You add vectors and multiply them by numbers one component at a time. ' +
+    'The **dot product** multiplies matching components and adds the results; it is $0$ exactly when the two arrows are at right angles (**perpendicular**).',
+  methods: [
+    { cue: '$2\\mathbf{a} - \\mathbf{b}$, a **magnitude**, or a **unit vector**', method: 'Combine component by component. Magnitude $= \\sqrt{\\text{sum of the squares}}$. Unit vector: divide every component by the magnitude.' },
+    { cue: '**Perpendicular** (orthogonal), or "find $k$ so that they are perpendicular"', method: 'Set the dot product equal to $0$ and solve.' },
+    { cue: '**Parallel** vectors', method: 'One is a scalar multiple of the other: every component has the same ratio (a negative ratio still counts as parallel).' },
+    { cue: '**Angle** between two vectors', method: '$\\cos\\theta = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{|\\mathbf{a}|\\,|\\mathbf{b}|}$, then $\\cos^{-1}$. A negative dot product means an obtuse angle.' },
+    { cue: '**Midpoint**, a point dividing $AB$ in a ratio, or the fourth vertex of a parallelogram', method: '$\\overrightarrow{AB} = \\mathbf{b} - \\mathbf{a}$ (end minus start). Midpoint $\\frac{1}{2}(\\mathbf{a} + \\mathbf{b})$; ratio $m : n$ gives $\\mathbf{a} + \\frac{m}{m + n}\\overrightarrow{AB}$; parallelogram $ABCD$ has $\\mathbf{d} = \\mathbf{a} + \\mathbf{c} - \\mathbf{b}$.' },
+    { cue: 'Find the scalars in a **linear combination**, or test **linear independence**', method: 'Write one equation per component and solve them together (or test the options). $n$ vectors in $n$ dimensions are dependent exactly when their determinant is $0$; more than $n$ are always dependent.' },
+    { cue: 'Length of a combination such as $|2\\mathbf{a} - \\mathbf{b}|$, given lengths and an angle', method: 'Square it: $|\\mathbf{v}|^{2} = \\mathbf{v} \\cdot \\mathbf{v}$. Expand, use $\\mathbf{a} \\cdot \\mathbf{b} = |\\mathbf{a}|\\,|\\mathbf{b}|\\cos\\theta$, then take the square root.' },
+  ],
   know:
     '### What is a vector?\n\n' +
     'A **vector** is a quantity with a size *and* a direction, like "3 steps right and 1 step down". We write it as a column of numbers called **components**: $\\begin{pmatrix} 3 \\\\ -1 \\end{pmatrix}$ in 2D, or $\\begin{pmatrix} 2 \\\\ 5 \\\\ -4 \\end{pmatrix}$ in 3D. The same vectors can be written with unit vectors as $3\\mathbf{i} - \\mathbf{j}$ and $2\\mathbf{i} + 5\\mathbf{j} - 4\\mathbf{k}$. Vectors are written in bold ($\\mathbf{a}$) or underlined by hand. A plain number (no direction) is called a **scalar**.\n\n' +

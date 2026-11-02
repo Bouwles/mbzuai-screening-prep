@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'valid-conclusions',
+  simple:
+    'These questions ask whether a claim really follows from the data. Think of an advert\'s chart: it may be drawn to impress rather than to inform. So work from the actual numbers, not from how the picture looks; ask who was in the sample (the people actually asked or measured); and remember that two things rising together (a **correlation**) does not prove that one causes the other.',
+  methods: [
+    {
+      cue: 'A bar chart whose vertical axis **does not start at 0**, a picture scaled up, or uneven gaps on the time axis',
+      method: 'Ignore how the picture looks and calculate from the real values (a percentage change, or a rate per year). A picture scaled by $k$ in both directions has $k^2$ times the area.',
+    },
+    {
+      cue: 'A correlation or scatter graph, and options with "causes", "will", "every" or "tend to"',
+      method: 'Pick the option saying the variables **tend** to move together. Reject cause-and-effect claims from observational data (look for a confounder such as weather or wealth) and "every" claims.',
+    },
+    {
+      cue: 'A survey or poll, and asked what is wrong with the **sample** or method',
+      method: 'Ask who could have been included. If one kind of person is over-represented the sample is biased, a bigger sample does not fix it, and the estimate is pushed towards that group.',
+    },
+    {
+      cue: 'A dramatic headline with a **big percentage**, or a claim based on a short, hand-picked time range',
+      method: 'Also work out the actual change and look at the whole period: a $50\\%$ rise from 20 is only 10 more.',
+    },
+    {
+      cue: 'Rates for **subgroups** and an overall rate, or asked to combine percentages from groups',
+      method: 'Add the counts, then divide; never average the percentages. If one group wins in every subgroup but loses overall, that is Simpson\'s paradox, caused by a different mix of subgroups.',
+    },
+    {
+      cue: 'An average from **very few** values, or a group **filtered to the best** compared with everything from another group',
+      method: 'Very small samples are unreliable. A filtered group shows survivorship bias, so the comparison is not like-for-like.',
+    },
+    {
+      cue: 'A regression line $\\hat{y} = mx + c$ and asked what a change in $x$ predicts',
+      method: 'The gradient $m$ is the predicted change in $y$ for each 1 unit of $x$, so multiply $m$ by the change in $x$. It predicts, but it does not prove that $x$ causes $y$.',
+    },
+  ],
   know:
     '### The big idea\n\n' +
     'These questions give you a chart, a table or a claim and ask: **is the conclusion actually supported by the data?** You rarely need hard maths. You need a checklist, and the habit of working from the **numbers**, not from how the picture looks.\n\n' +

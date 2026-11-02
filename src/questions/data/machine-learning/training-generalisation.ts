@@ -501,7 +501,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'training-generalisation-017',
     subtopic: 'training-generalisation',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The training values of a feature are $4, 8, 10, 12, 16$. A standardiser is fitted on these values using their mean and **population** standard deviation (divide by $n$). A test example has the value $19$. What is its standardised value?',
     options: ['$2.25$', '$1.25$', '$0.5625$', '$4.75$'],
     correctIndex: 0,

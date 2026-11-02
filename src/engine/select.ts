@@ -6,7 +6,30 @@ import { Rng, freshSeed } from '../lib/rng';
 import { GENERATORS, STATIC, refKey } from './bank';
 import { accuracyBySub, getState, lastResultByKey, type MistakeCard } from '../store/progress';
 
-export type DiffChoice = Difficulty | 'mixed';
+/** 'stepup' starts at Foundation and moves to Exam level as you get questions right (see stepLevel). */
+export type DiffChoice = Difficulty | 'mixed' | 'stepup';
+
+/**
+ * Level for the next "Build up" question, from this session's answers so far (oldest first):
+ * two hint-free correct answers in a row at Foundation move up to Exam; two wrong in a row at Exam move back down.
+ */
+export function stepLevel(history: { correct: boolean; hints?: number }[]): 'foundation' | 'exam' {
+  let level: 'foundation' | 'exam' = 'foundation';
+  let right = 0;
+  let wrong = 0;
+  for (const h of history) {
+    if (h.correct && !h.hints) {
+      right++;
+      wrong = 0;
+    } else if (!h.correct) {
+      wrong++;
+      right = 0;
+    }
+    if (level === 'foundation' && right >= 2) [level, right] = ['exam', 0];
+    if (level === 'exam' && wrong >= 2) [level, wrong] = ['foundation', 0];
+  }
+  return level;
+}
 
 const genRef = (id: string, seed = freshSeed()): QRef => ({ kind: 'gen', id, seed });
 
@@ -14,12 +37,13 @@ const genRef = (id: string, seed = freshSeed()): QRef => ({ kind: 'gen', id, see
  * Next question for Topic Practice: unseen static questions first, then ones last answered wrong,
  * then generated variants (endless).
  */
-export function nextPractice(subs: string[], diff: DiffChoice, used: Set<string>, rng: Rng): QRef | null {
+export function nextPractice(subs: string[], diff: Difficulty | 'mixed', used: Set<string>, rng: Rng): QRef | null {
   const last = lastResultByKey(getState());
   const okDiff = (d: Difficulty) => diff === 'mixed' || d === diff;
   const pool = STATIC.filter((q) => subs.includes(q.subtopic) && okDiff(q.difficulty) && !used.has(q.id));
   const gens = GENERATORS.filter((g) => subs.includes(g.subtopic) && okDiff(g.difficulty));
-  const allGens = gens.length ? gens : GENERATORS.filter((g) => subs.includes(g.subtopic));
+  // Generators of another difficulty only when nothing of the chosen difficulty is left.
+  const allGens = gens.length ? gens : pool.length ? [] : GENERATORS.filter((g) => subs.includes(g.subtopic));
   const unseen = pool.filter((q) => !last.has(q.id));
   const wrong = pool.filter((q) => last.get(q.id) === false);
   // About one in four questions is a fresh generated variant, for variety.
@@ -96,6 +120,8 @@ export function buildMock(n: number, seed: number): QRef[] {
   const perDiff = apportion(n, EXAM.difficultyMix as Record<Difficulty, number>);
   (Object.keys(perDiff) as Difficulty[]).forEach((d) => diffs.push(...Array(perDiff[d]).fill(d)));
   const diffQueue = rng.shuffle(diffs);
+  // Difficulties with a zero share (Challenge, by default) never appear, even as a fallback.
+  const allowed = (d: Difficulty) => (EXAM.difficultyMix as Record<Difficulty, number>)[d] > 0;
   const refs: QRef[] = [];
   const used = new Set<string>();
   const usedGen = new Set<string>();
@@ -111,10 +137,10 @@ export function buildMock(n: number, seed: number): QRef[] {
       const fresh = subs.filter((s) => !usedSubs.includes(s));
       const sub = rng.pick(fresh.length ? fresh : subs);
       const wantGen = rng.bool(EXAM.generatedShare);
-      const gens = GENERATORS.filter((g) => g.subtopic === sub && !usedGen.has(g.id));
+      const gens = GENERATORS.filter((g) => g.subtopic === sub && allowed(g.difficulty) && !usedGen.has(g.id));
       const gensD = gens.filter((g) => g.difficulty === diff);
       const stat = STATIC.filter((q) => q.subtopic === sub && q.difficulty === diff && !used.has(q.id));
-      const statAny = STATIC.filter((q) => q.subtopic === sub && !used.has(q.id));
+      const statAny = STATIC.filter((q) => q.subtopic === sub && allowed(q.difficulty) && !used.has(q.id));
       let ref: QRef | null = null;
       if (wantGen && (gensD.length || gens.length)) {
         const g = rng.pick(gensD.length ? gensD : gens);

@@ -533,7 +533,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'matrix-operations-017',
     subtopic: 'matrix-operations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: `For which value(s) of $k$ is the matrix $A = ${matrix([[1, 'k^{2}', 3], [4, 2, 'k + 1'], [3, -1, 0]])}$ symmetric?`,
     options: ['$k = 2$', '$k = 2$ or $k = -2$', 'No value of $k$ makes $A$ symmetric', '$k = -2$'],
     correctIndex: 3,
@@ -667,7 +667,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'matrix-operations-021',
     subtopic: 'matrix-operations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: `Let $A = ${matrix([[1, 2], [3, 1]])}$ and $B = ${matrix([[1, -1], [2, 1]])}$. Find $(A + B)^{2}$.`,
     options: [T([[16, 4], [20, 2]]), T([[6, 2], [10, 6]]), T([[4, 1], [25, 4]]), T([[9, 4], [20, 9]])],
     correctIndex: 3,

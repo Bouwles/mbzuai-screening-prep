@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'percentages-ratio',
+  simple:
+    '"Per cent" means "out of 100", so 35% is the same as $0.35$, and 35% of 240 means $0.35 \\times 240$. The key tool is the multiplier: a 15% rise means multiply by $1.15$, and a 15% fall means multiply by $0.85$. A ratio like $4 : 5$ splits an amount into equal-sized parts, 4 parts for one person and 5 for the other.',
+  methods: [
+    { cue: 'Find a **percentage of** an amount, or a **percentage change**', method: 'Multiply by $\\frac{p}{100}$. For a change, divide the change by the **original** value and multiply by 100.' },
+    { cue: 'The value **after** a change is given (sale price, price including VAT); find the **original**', method: 'Reverse percentage: original $\\times$ multiplier $=$ new value, so divide the new value by the multiplier (e.g. $240 \\div 0.8$). Never take the percentage of the new value.' },
+    { cue: '**Successive** changes, **compound** interest or **depreciation**', method: 'Multiply the multipliers: the value is $P\\left(1 \\pm \\frac{r}{100}\\right)^{n}$; successive percentages never simply add. Simple interest adds the same $\\frac{Prt}{100}$ each year instead.' },
+    { cue: '**Share** an amount in a ratio, or a ratio with a known **difference**', method: 'Add the ratio parts (or subtract them for a difference), divide to find one part, then multiply by the number of parts you need.' },
+    { cue: '**Directly** or **inversely proportional**, or workers and days', method: 'Write $y = kx^n$ (direct) or $y = \\frac{k}{x^n}$ (inverse), find $k$ from the given pair, then substitute. For workers and days, workers $\\times$ days stays constant.' },
+    { cue: '**Unit rates**: price per gram, fuel per 100 km', method: 'Convert to the same units, find the cost or amount for ONE unit, then multiply by the quantity you need. Chain the rates one step at a time.' },
+    { cue: 'A **ratio changes** after something is added', method: 'Call one part $k$, write both quantities in terms of $k$, keep the one that does not change, and set up an equation from the new ratio.' },
+  ],
   know:
     '### What a percentage really is\n\n' +
     '"Per cent" means "out of 100". So 35% is $\\frac{35}{100} = 0.35$. To turn a percentage into a decimal, divide by 100 (move the decimal point two places left): 7% is $0.07$, 120% is $1.2$, 2.5% is $0.025$.\n\n' +

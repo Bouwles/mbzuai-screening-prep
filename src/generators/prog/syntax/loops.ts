@@ -216,7 +216,7 @@ const INNERS: Inner[] = [
 const nestedCount: Generator = {
   id: 'gen-loops-nested-count',
   subtopic: 'loops',
-  difficulty: 'challenge',
+  difficulty: 'exam',
   title: 'Count how often a nested-loop body runs',
   generate(rng: Rng) {
     const typeIdx = rng.int(0, INNERS.length - 1);

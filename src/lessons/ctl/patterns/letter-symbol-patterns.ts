@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'letter-symbol-patterns',
+  simple:
+    "Letter puzzles turn into number puzzles once you replace each letter by its place in the alphabet: A = 1, B = 2, and so on up to Z = 26. A letter sequence is then just a number sequence, and a code is just a rule applied to those numbers, such as \"move every letter 3 places forward\". For a row of repeating symbols, find the length of the repeating block and use the remainder after dividing.",
+  methods: [
+    {
+      cue: "A **sequence of letters**, asked for the next one",
+      method: "Convert to positions (anchors E = 5, J = 10, O = 15, T = 20, Y = 25), then treat it as a number sequence: constant gaps, growing gaps, two interleaved sequences, or a famous list such as the primes.",
+    },
+    {
+      cue: "A word and its **code**, asked to code another word",
+      method: "Compare positions letter by letter. The same shift for every letter is a shift cipher; positions that always add to $27$ mean the reversed alphabet; a shift that grows along the word is a position-dependent code.",
+    },
+    {
+      cue: "Asked to **decode** a coded word",
+      method: "Apply the opposite shift. Add $26$ when you go back past A, and subtract $26$ when you go forward past Z.",
+    },
+    {
+      cue: "A word written as a **number** (for example CAT = 24)",
+      method: "Test the sum and the product of the letter positions on every example given; only a rule that reproduces all of them can be used.",
+    },
+    {
+      cue: "A **repeating block** of symbols, asked for the $n$th symbol or how many of one symbol",
+      method: "Divide by the block length. The remainder gives the place in the block (remainder 0 means the last symbol); count the full blocks, then look at exactly which symbols the leftover part contains.",
+    },
+    {
+      cue: "A **table or grid of numbers** with one missing",
+      method: "Guess a rule from one complete row (add, multiply, square, then adjust by a fixed number), confirm it on every complete row, then apply it.",
+    },
+    {
+      cue: "**Symbols stand for numbers** in a few equations",
+      method: "Solve the line with only one kind of symbol first, then substitute into the others.",
+    },
+  ],
   know:
     '### The one big idea: letters are numbers in disguise\n\n' +
     'Almost every letter puzzle becomes easy once you replace each letter by its **position in the alphabet**: A = 1, B = 2, C = 3, ..., Z = 26. After that, a "letter sequence" is just a number sequence, and a "code" is just arithmetic.\n\n' +

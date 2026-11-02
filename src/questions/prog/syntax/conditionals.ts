@@ -212,7 +212,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'conditionals-008',
     subtopic: 'conditionals',
-    difficulty: 'exam',
+    difficulty: 'challenge',
     stem: 'What does this Python code print? (The three printed lines are shown separated by spaces.)',
     code: { lang: 'python', source: 'print(0 or 5)\nprint(3 and 0)\nprint("" or "hi")' },
     options: ['`True False True`', '`5 3 hi`', '`5 0 hi`', '`5 False hi`'],
@@ -351,7 +351,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'conditionals-012',
     subtopic: 'conditionals',
-    difficulty: 'exam',
+    difficulty: 'challenge',
     stem: 'What does this Python code print?',
     code: { lang: 'python', source: 'print("apple" < "banana", "Zebra" < "apple", "10" < "9")' },
     options: ['`True False False`', '`True False True`', '`True True False`', '`True True True`'],
@@ -561,7 +561,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'conditionals-018',
     subtopic: 'conditionals',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Which condition is equivalent to `not (x > 3 and y <= 5)` for **all** integer values of `x` and `y`?',
     options: ['`x <= 3 and y > 5`', '`x < 3 or y > 5`', '`x <= 3 or y > 5`', '`x > 3 or y <= 5`'],
     correctIndex: 2,

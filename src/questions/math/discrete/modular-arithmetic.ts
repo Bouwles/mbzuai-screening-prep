@@ -355,9 +355,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
-        '1. Prime factorisation: $72 = 8 \\times 9 = 2^3 \\times 3^2$.\n' +
-        '2. A divisor of 72 has the form $2^a \\times 3^b$ with $a \\in \\{0, 1, 2, 3\\}$ (4 choices) and $b \\in \\{0, 1, 2\\}$ (3 choices).\n' +
-        '3. Number of divisors $= (3 + 1)(2 + 1) = 4 \\times 3 = 12$.\n\n' +
+        'Start with the prime factorisation: $72 = 8 \\times 9 = 2^3 \\times 3^2$.\n\n' +
+        'A divisor of 72 has the form $2^a \\times 3^b$ with $a \\in \\{0, 1, 2, 3\\}$ (4 choices) and $b \\in \\{0, 1, 2\\}$ (3 choices).\n\n' +
+        'Number of divisors $= (3 + 1)(2 + 1) = 4 \\times 3 = 12$.\n\n' +
         'Check by listing pairs: $1 \\times 72$, $2 \\times 36$, $3 \\times 24$, $4 \\times 18$, $6 \\times 12$, $8 \\times 9$: 6 pairs, so 12 divisors.',
       whyWrong: [
         'This multiplies the exponents, $3 \\times 2 = 6$, forgetting that each exponent can also be 0. (6 is also the number of factor **pairs**, but each pair contains two divisors.)',
@@ -538,7 +538,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'modular-arithmetic-018',
     subtopic: 'modular-arithmetic',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'What is the last digit of $3^{2026} + 7^{2026}$?',
     options: ['$8$', '$0$', '$2$', '$18$'],
     correctIndex: 0,
@@ -639,7 +639,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'modular-arithmetic-021',
     subtopic: 'modular-arithmetic',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'How many integers from 1 to 200 inclusive are divisible by $4$ or by $6$ (or both)?',
     options: ['$83$', '$75$', '$67$', '$51$'],
     correctIndex: 2,

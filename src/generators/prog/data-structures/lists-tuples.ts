@@ -389,7 +389,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-lists-tuples-slice',
     subtopic: 'lists-tuples',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     title: 'Predict the output of a list slice',
     generate: genSlice,
   },

@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'conditionals',
+  simple:
+    'A **condition** is a yes/no question the computer asks, such as "is the temperature above 30?". Python writes the answer as `True` or `False`. An `if` statement is like a fork in a road: the indented lines under it run only when the answer is `True`. With `if / elif / else`, Python tries each question from the top and takes the **first** road whose answer is yes, ignoring the rest; `else` is the road taken when every answer is no.',
+  methods: [
+    { cue: 'An `if / elif / else` chain and "what is printed?"', method: 'Test the conditions from the top down and stop at the **first** True one; only that branch runs. Watch for `>` versus `>=` when the value sits exactly on a boundary.' },
+    { cue: 'A condition joining tests with `and`, `or`, `not`', method: 'Use precedence comparisons, then `not`, then `and`, then `or`. `x == 1 or 2` is `(x == 1) or 2`, which is always truthy.' },
+    { cue: 'Counting how many items in a list pass a condition', method: 'Make a table with one row per item and one column per part of the condition, then count the rows where the whole condition is True.' },
+    { cue: 'A value with no comparison used as a condition (`if v:` or `not v`)', method: 'Apply truthiness: `0`, `0.0`, empty `""`/`[]`/`{}`, `None` and `False` are falsy; everything else (even `"0"` or `" "`) is truthy.' },
+    { cue: 'A risky part such as `b / a` inside `and`/`or`, or functions with side effects', method: 'Short-circuit: `and` stops at the first False, `or` at the first True, so later parts are never evaluated. Evaluate strictly left to right.' },
+    { cue: 'A chained comparison such as `1 < x < 10`', method: 'Read it as `1 < x and x < 10`, never as `(1 < x) < 10`.' },
+    { cue: 'Asked which condition is **equivalent** to `not (A and B)` or `not (A or B)`', method: 'De Morgan: negate each part and swap `and` with `or`. The opposite of `>` is `<=`, and of `<` is `>=`.' },
+  ],
   know:
     '### True, False and comparisons\n\n' +
     'A **Boolean** is a value that is either `True` or `False` (capital letters in Python). You usually get one by **comparing** two values:\n\n' +

@@ -87,9 +87,9 @@ const missingValue: Generator = {
       answerValue: x,
       distractors,
       solution:
-        `1. Total of all ${n} values $=$ mean $\\times$ number of values $= ${M} \\times ${n} = ${T}$.\n` +
-        `2. Total of the ${n - 1} known values $= ${known.join(' + ')} = ${S}$.\n` +
-        `3. Missing value $= ${T} - ${S} = ${x}$.\n\n` +
+        `**Step 1:** Total of all ${n} values $=$ mean $\\times$ number of values $= ${M} \\times ${n} = ${T}$.\n\n` +
+        `**Step 2:** Total of the ${n - 1} known values $= ${known.join(' + ')} = ${S}$.\n\n` +
+        `**Step 3:** Missing value $= ${T} - ${S} = ${x}$.\n\n` +
         `Check: ${m(`\\frac{${S} + ${x}}{${n}} = \\frac{${T}}{${n}} = ${M}`)}.\n\n` +
         `Answer: ${answer}`,
       keyIdea: 'Turn the mean into a total (mean $\\times$ number of values), then subtract the values you already know.',
@@ -189,11 +189,10 @@ const iqrFence: Generator = {
     const lower = sorted.slice(0, half);
     const upper = sorted.slice(half + 1);
     const steps =
-      `1. Order the ${n} values: ${sorted.join(', ')}.\n` +
-      `2. The median is the ${half + 1}th value: ${m(num(q2))}.\n` +
-      `3. Lower half: ${lower.join(', ')}, so ${m(`Q_1 = ${q1}`)}.\n` +
-      `4. Upper half: ${upper.join(', ')}, so ${m(`Q_3 = ${q3}`)}.\n` +
-      `5. ${m(`\\text{IQR} = Q_3 - Q_1 = ${q3} - ${q1} = ${iqr}`)}.\n`;
+      `**Step 1:** Order the ${n} values: ${sorted.join(', ')}.\n\n` +
+      `**Step 2:** The median is the ${half + 1}th value: ${m(num(q2))}.\n\n` +
+      `**Step 3:** Lower half: ${lower.join(', ')}, so ${m(`Q_1 = ${q1}`)}. Upper half: ${upper.join(', ')}, so ${m(`Q_3 = ${q3}`)}.\n\n` +
+      `**Step 4:** ${m(`\\text{IQR} = Q_3 - Q_1 = ${q3} - ${q1} = ${iqr}`)}.\n\n`;
     if (ask === 'iqr') {
       const unsortedDiff = Math.abs(raw[3 * qPos - 1] - raw[qPos - 1]);
       const pool: Cand[] = [
@@ -211,7 +210,7 @@ const iqrFence: Generator = {
         answer,
         answerValue: iqr,
         distractors,
-        solution: `${steps}\nAnswer: ${answer}`,
+        solution: `${steps}Answer: ${answer}`,
         keyIdea: 'Always sort first; $Q_1$ and $Q_3$ are the medians of the lower and upper halves, and $\\text{IQR} = Q_3 - Q_1$.',
       };
     }
@@ -236,8 +235,7 @@ const iqrFence: Generator = {
       distractors,
       solution:
         steps +
-        `6. ${m(`1.5 \\times \\text{IQR} = 1.5 \\times ${iqr} = ${num(1.5 * iqr)}`)}.\n` +
-        `7. Upper fence: ${m(`Q_3 + 1.5 \\times \\text{IQR} = ${q3} + ${num(1.5 * iqr)} = ${num(fence)}`)}.\n\n` +
+        `**Step 5:** ${m(`1.5 \\times \\text{IQR} = 1.5 \\times ${iqr} = ${num(1.5 * iqr)}`)}, so the upper fence is ${m(`Q_3 + 1.5 \\times \\text{IQR} = ${q3} + ${num(1.5 * iqr)} = ${num(fence)}`)}.\n\n` +
         (outs.length
           ? `So ${outs.length === 1 ? 'the value' : 'the values'} ${listAnd(outs)} ${outs.length === 1 ? 'is an outlier' : 'are outliers'} at the top end.\n\n`
           : `No value in this data set is above the upper fence.\n\n`) +

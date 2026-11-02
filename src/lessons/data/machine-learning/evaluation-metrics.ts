@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'evaluation-metrics',
+  simple:
+    'A classifier can make two kinds of mistake: a **false alarm** (saying "yes" when the truth is no) and a **miss** (saying "no" when the truth is yes). A **confusion matrix** is a little table that counts the hits, misses, false alarms and correct rejections. **Precision** asks "when it says yes, how often is it right?"; **recall** asks "of all the real yeses, how many did it find?". Accuracy alone can fool you when the thing you are looking for is rare.',
+  methods: [
+    { cue: 'A **confusion matrix** and "which statement is true?"', method: 'Read the row and column labels, write down TP, FP, FN and TN, then work out accuracy, precision and recall and test each statement. The false statements usually quote another metric\'s value or swap FP and FN.' },
+    { cue: 'Asked for **precision** or **recall** from a table or a story', method: 'Precision $= \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$ divides by everything **predicted** positive; recall $= \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$ divides by everything **actually** positive.' },
+    { cue: 'Asked for the **F1 score**', method: 'From counts use $F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$; from precision and recall use $\\frac{2PR}{P + R}$. Never take the ordinary average.' },
+    { cue: '"Which metric matters most?" with a story about the **cost of mistakes**', method: 'Ask which mistake is worse. Costly misses (disease, weapons, faulty parts) mean maximise recall; costly false alarms (deleting emails, convicting someone) mean maximise precision.' },
+    { cue: '**Rare positives** and a suspiciously high **accuracy**', method: 'Work out what a lazy "always negative" model would score. On imbalanced data compare recall and precision, not accuracy.' },
+    { cue: 'A list of **scores** and a **threshold**', method: 'Predict positive when the score is at least the threshold (equal counts as positive), label each example TP, FP, FN or TN, then apply the formula. Raising the threshold pushes precision up and recall down.' },
+    { cue: 'Metrics are given and you are asked for a **count**', method: 'Work backwards: $\\text{TP} = R \\times (\\text{actual positives})$, then $\\text{TP} + \\text{FP} = \\frac{\\text{TP}}{P}$, and use the total to find TN.' },
+  ],
   know:
     '### Why we need more than "how many did it get right?"\n\n' +
     'A **binary classifier** sorts each example into one of two classes, for example spam / not spam, or ill / healthy. We call the class we are trying to detect the **positive** class (spam, ill, fraud) and the other one the **negative** class. "Positive" does not mean "good"; it just means "the thing we are looking for".\n\n' +

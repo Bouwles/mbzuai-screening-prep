@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'complexity',
+  simple:
+    '**Big-O** answers one question: if the input gets bigger, how much more work does the program do? Reading a book page by page takes twice as long for a book twice as thick, which is $O(n)$, where $n$ is the input size. Finding a word in a dictionary by halving takes only one extra step when the dictionary doubles, which is $O(\\log n)$. Comparing every pair of students in a class quadruples when the class doubles, which is $O(n^2)$.',
+  methods: [
+    { cue: 'A step count like $T(n) = 3n^2 + 5n + 7$, or "which grows fastest?"', method: 'Keep only the fastest-growing term and drop its constant: $O(n^2)$. Ladder: $\\log n < \\sqrt{n} < n < n \\log n < n^2 < n^3 < 2^n$.' },
+    { cue: 'Code with loops: "what is the Big-O?"', method: 'Loops one after another **add**; a loop inside a loop **multiplies**. A loop that halves or doubles its counter runs about $\\log_2 n$ times.' },
+    { cue: '"How many times does this line run?" for a given $n$', method: 'Count the exact passes of each loop (check where `range` or `for i = a to b` starts and stops). A triangular loop gives $1 + 2 + \\dots + n = \\frac{n(n + 1)}{2}$.' },
+    { cue: 'It takes $t$ seconds for $n$ items; how long for $kn$ items?', method: 'For $O(n^p)$ multiply the time by $k^p$ (e.g. $O(n^2)$, triple $n$: $\\times 9$). For $O(\\log n)$ the time grows only a little.' },
+    { cue: 'Binary search worst case for $n$ items', method: '$\\lfloor \\log_2 n \\rfloor + 1$ comparisons: about 20 for a million items.' },
+    { cue: 'Cost of a Python operation, or which structure to use', method: 'List: index, `append`, `len` are $O(1)$; `x in list`, `insert(0, x)`, `pop(0)` are $O(n)$. Set/dict lookup is $O(1)$ on average. Use a dict to look up a value by key and a `deque` for a queue.' },
+    { cue: 'When is algorithm A (e.g. $20n + 500$) faster than B (e.g. $n^2$)?', method: 'Solve the inequality (here $n^2 - 20n - 500 > 0$), then check the whole numbers either side of the root.' },
+  ],
   know:
     '### What Big-O is measuring\n\n' +
     'Big-O notation describes **how the amount of work grows as the input gets bigger**. We call the input size $n$ (for example, the number of items in a list). We do not care about exact seconds, which depend on the computer. We care about the *shape* of the growth: if $n$ doubles, does the work stay the same, double, or quadruple?\n\n' +

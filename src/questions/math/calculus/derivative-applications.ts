@@ -195,11 +195,10 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Find the point: $y = 1^{2} + 3(1) = 4$, so the point is $(1, 4)$.\n' +
-        '2. Find the gradient: $\\frac{dy}{dx} = 2x + 3$, so at $x = 1$ the gradient is $m = 2(1) + 3 = 5$.\n' +
-        '3. Use $y - y_1 = m(x - x_1)$: $y - 4 = 5(x - 1)$.\n' +
-        '4. Expand: $y - 4 = 5x - 5$, so $y = 5x - 1$.\n\n' +
-        'Check: at $x = 1$ the line gives $5 - 1 = 4$, which matches the curve.',
+        '**Step 1: the point.** $y = 1^{2} + 3(1) = 4$, so the tangent passes through $(1, 4)$.\n\n' +
+        '**Step 2: the gradient.** $\\frac{dy}{dx} = 2x + 3$, so at $x = 1$ the gradient is $m = 2(1) + 3 = 5$.\n\n' +
+        '**Step 3: the line.** Use $y - y_1 = m(x - x_1)$: $y - 4 = 5(x - 1)$.\n\n' +
+        'Expand: $y - 4 = 5x - 5$, so $y = 5x - 1$. Check: at $x = 1$ the line gives $5 - 1 = 4$, which matches the curve.',
       whyWrong: [
         'This uses the $y$-coordinate $4$ as the $y$-intercept. The point $(1, 4)$ is not on the $y$-axis, so you must use $y - 4 = 5(x - 1)$ to find the intercept.',
         null,
@@ -281,12 +280,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
-        '1. Differentiate: $\\frac{dy}{dx} = 3x^{2} - 12x + 9 = 3(x^{2} - 4x + 3) = 3(x - 1)(x - 3)$.\n' +
-        '2. Stationary points where $\\frac{dy}{dx} = 0$: $x = 1$ and $x = 3$.\n' +
-        '3. Second derivative: $\\frac{d^{2}y}{dx^{2}} = 6x - 12$.\n' +
-        '4. At $x = 1$: $6 - 12 = -6 < 0$, so this is a **maximum**. At $x = 3$: $18 - 12 = 6 > 0$, so that one is a minimum.\n' +
-        '5. Find $y$ at $x = 1$: $1 - 6 + 9 + 1 = 5$.\n\n' +
-        'The local maximum is $(1, 5)$.',
+        '**Step 1: stationary points.** $\\frac{dy}{dx} = 3x^{2} - 12x + 9 = 3(x^{2} - 4x + 3) = 3(x - 1)(x - 3)$, which is $0$ at $x = 1$ and $x = 3$.\n\n' +
+        '**Step 2: which is the maximum?** $\\frac{d^{2}y}{dx^{2}} = 6x - 12$. At $x = 1$: $6 - 12 = -6 < 0$, so this is a **maximum**. At $x = 3$: $18 - 12 = 6 > 0$, so that one is a minimum.\n\n' +
+        '**Step 3: the $y$-coordinate.** At $x = 1$: $y = 1 - 6 + 9 + 1 = 5$, so the local maximum is $(1, 5)$.',
       whyWrong: [
         null,
         '$(3, 1)$ is the other stationary point, but $\\frac{d^{2}y}{dx^{2}} = 6 > 0$ there, so it is the local **minimum**.',
@@ -446,7 +442,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'derivative-applications-015',
     subtopic: 'derivative-applications',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The curve $y = ax^{3} + bx$ has a stationary point at $(1, -4)$. What are the values of $a$ and $b$?',
     options: ['$a = -2$, $b = 2$', '$a = -2$, $b = 6$', '$a = 0$, $b = -4$', '$a = 2$, $b = -6$'],
     correctIndex: 3,

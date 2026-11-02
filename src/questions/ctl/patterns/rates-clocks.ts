@@ -514,7 +514,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'rates-clocks-019',
     subtopic: 'rates-clocks',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A boat travels $36$ km downstream (with the current) in $2$ hours. The return trip of $36$ km upstream (against the current) takes $3$ hours. Assuming the boat\'s engine and the current are both steady, what is the speed of the boat in still water?',
     options: ['$3$ km/h', '$30$ km/h', '$14.4$ km/h', '$15$ km/h'],
     correctIndex: 3,

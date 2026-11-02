@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'number-bases',
+  simple:
+    'We normally count in tens: in $352$ the 3 means three hundreds. A **base** just changes the group size. Computers use **binary** (base 2), where each place is worth double the one to its right ($1, 2, 4, 8, \\dots$) and the only digits are 0 and 1. **Hexadecimal** (base 16) is a short way to write binary: each hex digit stands for exactly 4 bits.',
+  methods: [
+    {
+      cue: 'Convert a binary, octal or hex number **to decimal**',
+      method: 'Write the place values $1, b, b^2, \\dots$ from the **right**, multiply each digit by its place value and add.',
+    },
+    {
+      cue: 'Write a decimal number **in binary or hex**',
+      method: 'Divide by the base repeatedly, keep the whole-number remainders (10 to 15 become A to F) and read them from the last one to the first.',
+    },
+    {
+      cue: 'Convert **between hex, octal and binary** directly',
+      method: 'Swap each hex digit for 4 bits (each octal digit for 3 bits). For octal to hex, expand to binary and regroup into 4s starting from the right.',
+    },
+    {
+      cue: '**Two\'s complement**: encode a negative number, or decode a pattern that starts with 1',
+      method: 'Encode: write the positive value, flip every bit, add 1. Decode: the top bit is worth $-2^{n-1}$; add the other place values to it.',
+    },
+    {
+      cue: '"How many values / what range / how many bits are needed?"',
+      method: '$n$ bits give $2^{n}$ patterns: unsigned $0$ to $2^{n} - 1$, two\'s complement $-2^{n-1}$ to $2^{n-1} - 1$. For $N$ codes find the smallest $n$ with $2^{n} \\ge N$.',
+    },
+    {
+      cue: 'Binary addition, or Python `<<`, `>>`, `bin`, `hex`',
+      method: 'Add column by column with $1 + 1 = 10_2$ (write 0, carry 1). `x << k` is $x \\times 2^{k}$ and `x >> k` is $x \\div 2^{k}$ rounded down.',
+    },
+  ],
   know:
     '### Place value: the idea behind every base\n\n' +
     'In ordinary decimal (base 10), the number $352$ means $3 \\times 100 + 5 \\times 10 + 2 \\times 1$. Each place is worth **10 times** the place to its right, and we only need the ten digits $0$ to $9$.\n\n' +

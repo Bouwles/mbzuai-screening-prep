@@ -1,31 +1,48 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { SYLLABUS, SUBTOPICS, hasSubtopic } from '../syllabus';
 import { generatorsForSubtopic, staticForSubtopic } from '../engine/bank';
-import { nextPractice, type DiffChoice } from '../engine/select';
+import { nextPractice, stepLevel, type DiffChoice } from '../engine/select';
+import { getState } from '../store/progress';
 import { QuestionSession } from '../components/QuestionSession';
 import { Rng, freshSeed } from '../lib/rng';
 
 const DIFFS: { id: DiffChoice; label: string; hint: string }[] = [
-  { id: 'foundation', label: 'Foundation', hint: 'Basics, one or two steps' },
-  { id: 'exam', label: 'Exam', hint: 'Typical exam questions' },
-  { id: 'challenge', label: 'Challenge', hint: 'Harder, multi-step' },
+  { id: 'stepup', label: 'Build up', hint: 'Starts with Foundation, moves to Exam level as you get them right' },
+  { id: 'foundation', label: 'Foundation', hint: 'The basics, one or two steps' },
+  { id: 'exam', label: 'Exam level', hint: "Like MBZUAI's official samples" },
+  { id: 'challenge', label: 'Challenge', hint: 'Optional: harder than the exam is likely to be' },
   { id: 'mixed', label: 'Mixed', hint: 'All levels' },
 ];
+const isDiff = (d: string | null): d is DiffChoice => DIFFS.some((x) => x.id === d);
 const COUNTS: (number | null)[] = [10, 20, 30, null];
 
 export function Practice() {
   const [params] = useSearchParams();
   const initial = (params.get('subs') ?? '').split(',').filter(hasSubtopic);
   const [subs, setSubs] = useState<string[]>(initial);
-  const [diff, setDiff] = useState<DiffChoice>('mixed');
+  const [wide] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 900px)').matches);
+  const d0 = params.get('diff');
+  const [diff, setDiff] = useState<DiffChoice>(isDiff(d0) ? d0 : 'stepup');
   const [count, setCount] = useState<number | null>(10);
   const [run, setRun] = useState(0);
 
   const toggle = (ids: string[], on: boolean) => setSubs((cur) => (on ? [...new Set([...cur, ...ids])] : cur.filter((x) => !ids.includes(x))));
 
   const rng = useMemo(() => new Rng(freshSeed()), [run]);
-  const next = useCallback((used: Set<string>) => nextPractice(subs, diff, used, rng), [subs, diff, rng]);
+  const started = useRef(0);
+  const next = useCallback(
+    (used: Set<string>) => {
+      if (diff !== 'stepup') return nextPractice(subs, diff, used, rng);
+      const session = getState().attempts.filter((a) => a.at >= started.current && a.mode === 'practice');
+      return nextPractice(subs, stepLevel(session), used, rng) ?? nextPractice(subs, 'mixed', used, rng);
+    },
+    [subs, diff, rng],
+  );
+  const start = (r: number) => {
+    started.current = Date.now();
+    setRun(r);
+  };
   const available = subs.reduce((n, s) => n + staticForSubtopic(s).length, 0);
   const gens = subs.reduce((n, s) => n + generatorsForSubtopic(s).length, 0);
 
@@ -41,7 +58,7 @@ export function Practice() {
           limit={count}
           onDone={() => (
             <div className="row-actions">
-              <button type="button" className="btn-primary" onClick={() => setRun((r) => r + 1)}>
+              <button type="button" className="btn-primary" onClick={() => start(run + 1)}>
                 Same settings again
               </button>
               <button type="button" className="btn-ghost" onClick={() => setRun(0)}>
@@ -77,13 +94,19 @@ export function Practice() {
           {SYLLABUS.map((area) => {
             const ids = area.topics.flatMap((t) => t.subtopics.map((s) => s.id));
             const allOn = ids.every((id) => subs.includes(id));
+            const nOn = ids.filter((id) => subs.includes(id)).length;
             return (
-              <fieldset key={area.id} className="picker-area">
-                <legend>
-                  <label>
-                    <input type="checkbox" checked={allOn} onChange={(e) => toggle(ids, e.target.checked)} /> {area.name}
-                  </label>
-                </legend>
+              // Areas fold away on small screens unless something in them is already picked.
+              <details key={area.id} className="picker-area" open={wide || nOn > 0}>
+                <summary>
+                  <span className="picker-area-name">{area.name}</span>
+                  <span className="muted">
+                    {nOn} of {ids.length} selected
+                  </span>
+                </summary>
+                <label className="picker-all">
+                  <input type="checkbox" checked={allOn} onChange={(e) => toggle(ids, e.target.checked)} /> All of {area.name}
+                </label>
                 {area.topics.map((t) => {
                   const tids = t.subtopics.map((s) => s.id);
                   return (
@@ -102,7 +125,7 @@ export function Practice() {
                     </div>
                   );
                 })}
-              </fieldset>
+              </details>
             );
           })}
         </div>
@@ -130,7 +153,7 @@ export function Practice() {
           <span className="muted">
             {subs.length ? `${subs.length} subtopics · ${available} hand-written questions + ${gens} generators` : 'Pick at least one topic.'}
           </span>
-          <button type="button" className="btn-primary" disabled={!subs.length} onClick={() => setRun(1)}>
+          <button type="button" className="btn-primary" disabled={!subs.length} onClick={() => start(1)}>
             Start practice
           </button>
         </div>

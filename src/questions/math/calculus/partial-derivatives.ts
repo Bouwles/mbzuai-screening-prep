@@ -543,7 +543,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'partial-derivatives-018',
     subtopic: 'partial-derivatives',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Let $f(x, y) = ax^2 + bxy$, where $a$ and $b$ are constants. At the point $(1, 2)$ it is known that $\\frac{\\partial f}{\\partial x} = 10$ and $\\frac{\\partial f}{\\partial y} = 3$. Find $a$ and $b$.',
     options: ['$a = 3.5,\\ b = 3$', '$a = 4,\\ b = 3$', '$a = 2,\\ b = 3$', '$a = 3.5,\\ b = 1.5$'],
     correctIndex: 2,
@@ -581,7 +581,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'partial-derivatives-019',
     subtopic: 'partial-derivatives',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Let $f(x, y) = e^{2x}y^3$. Find the value of the mixed partial derivative $\\frac{\\partial^2 f}{\\partial y \\, \\partial x}$ at the point $(0, 2)$.',
     options: ['$16$', '$32$', '$12$', '$24$'],
     correctIndex: 3,

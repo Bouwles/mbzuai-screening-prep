@@ -152,6 +152,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Look for a **base case**: is there any input for which `total` returns without calling itself again?\n\n' +
         'There is **no base case**: every call to `total` immediately calls `total` again with a smaller number.\n\n' +
         '- `total(3)` calls `total(2)`\n' +
         '- `total(2)` calls `total(1)`\n' +

@@ -385,10 +385,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. Convert to a $z$-score: $z = \\frac{80 - 60}{10} = 2$, so $80$ is $2$ SDs above the mean.\n' +
-        '2. About 95% of scores lie within $2$ SDs of the mean (between $40$ and $80$).\n' +
-        '3. That leaves $100\\% - 95\\% = 5\\%$ outside, split **equally** between the two tails because the normal curve is symmetric.\n' +
-        '4. Upper tail: $\\frac{5\\%}{2} = 2.5\\%$.\n\n' +
+        '**Step 1:** Convert to a $z$-score: $z = \\frac{80 - 60}{10} = 2$, so $80$ is $2$ SDs above the mean.\n\n' +
+        '**Step 2:** About 95% of scores lie within $2$ SDs of the mean (between $40$ and $80$).\n\n' +
+        '**Step 3:** That leaves $100\\% - 95\\% = 5\\%$ outside, split **equally** between the two tails because the normal curve is symmetric. Upper tail: $\\frac{5\\%}{2} = 2.5\\%$.\n\n' +
         'So 2.5% of candidates score more than $80$.',
       whyWrong: [
         '5% is the total of **both** tails (below $40$ and above $80$). Only the upper tail is wanted, so halve it.',
@@ -641,16 +640,15 @@ export const questions: StaticQuestion[] = [
   {
     id: 'correlation-normal-019',
     subtopic: 'correlation-normal',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The times taken by $400$ runners to complete a $100$ m race are normally distributed with mean $14$ s and standard deviation $0.5$ s. Runners qualify for the final if their time is **less than** $13$ s. Using the 68-95-99.7 rule, about how many runners qualify?',
     options: ['$20$', '$10$', '$190$', '$390$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        '1. $z$-score of $13$ s: $z = \\frac{13 - 14}{0.5} = \\frac{-1}{0.5} = -2$. So $13$ s is 2 SDs **below** the mean (faster than average).\n' +
-        '2. About 95% of times are within 2 SDs of the mean, leaving 5% in the two tails.\n' +
-        '3. By symmetry, the lower tail (times under $13$ s) is $\\frac{5\\%}{2} = 2.5\\%$.\n' +
-        '4. Number of runners: $2.5\\% \\times 400 = 0.025 \\times 400 = 10$.\n\n' +
+        '**Step 1:** $z$-score of $13$ s: $z = \\frac{13 - 14}{0.5} = \\frac{-1}{0.5} = -2$. So $13$ s is 2 SDs **below** the mean (faster than average).\n\n' +
+        '**Step 2:** About 95% of times are within 2 SDs of the mean, leaving 5% in the two tails. By symmetry, the lower tail (times under $13$ s) is $\\frac{5\\%}{2} = 2.5\\%$.\n\n' +
+        '**Step 3:** Number of runners: $2.5\\% \\times 400 = 0.025 \\times 400 = 10$.\n\n' +
         'About $10$ runners qualify.',
       whyWrong: [
         'This uses 5% of $400$, which counts **both** tails (very fast and very slow runners). Only times under $13$ s qualify, which is half of that.',
@@ -708,7 +706,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'correlation-normal-021',
     subtopic: 'correlation-normal',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Aisha scored $78$ in test A, which had mean $66$ and standard deviation $8$. Test B had mean $50$ and standard deviation $12$. What score in test B would be **equally good** compared with the other candidates?',
     options: ['$62$', '$84$', '$18$', '$68$'],
     correctIndex: 3,

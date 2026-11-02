@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'matrix-operations',
+  simple:
+    'A **matrix** is a grid of numbers, like a small spreadsheet. Its size (its **order**) is written rows $\\times$ columns, rows first. ' +
+    'Adding two matrices, or multiplying one by a number, is done entry by entry, like adding two price lists item by item. ' +
+    'Multiplying two matrices is different: each entry of $AB$ is a **row** of $A$ times a **column** of $B$ (multiply the matching pairs and add them up), so the order matters and $AB$ is usually not the same as $BA$.',
+  methods: [
+    { cue: 'Asked for the **order** of a product, or whether $AB$ is **defined**', method: 'Write the sizes side by side, $(m \\times n)(n \\times p)$: the inner numbers must match, and the outer numbers give the answer $m \\times p$. Transpose first if there is a $^{T}$ ($m \\times n$ becomes $n \\times m$).' },
+    { cue: '$2A - B$, $A - kI$, or "find $x$ and $y$" in a matrix equation', method: 'Work entry by entry. $kI$ only changes the main diagonal. Equal matrices have equal entries, so a matrix equation gives one ordinary equation per position.' },
+    { cue: 'Find $AB$, $A^{2}$, or just **one entry** of a product', method: 'Entry (row $i$, column $j$) = row $i$ of the first matrix times column $j$ of the second. For one entry compute only that one. $A^{2}$ means $AA$: never square the entries. For $(A + B)^{2}$, add first, then multiply.' },
+    { cue: '$(AB)^{T}$, or "which matrix is **symmetric**"', method: 'Transpose = swap rows and columns, and $(AB)^{T} = B^{T}A^{T}$ (the order reverses). Symmetric means square with $a_{ij} = a_{ji}$ for every mirror pair across the main diagonal.' },
+    { cue: 'A **diagonal** matrix in a product, or a high power such as $A^{10}$', method: 'A diagonal matrix on the left scales the rows; on the right it scales the columns. For a high power, work out $A^{2}$ and $A^{3}$ and spot the pattern.' },
+    { cue: 'Python triple loop with `C[i][j] += A[i][k] * B[k][j]`', method: 'That is the matrix product $AB$: work it out by hand, row times column (Python indices start at 0).' },
+  ],
   know:
     '### What is a matrix?\n\n' +
     'A **matrix** is a rectangle of numbers arranged in rows and columns. In AI, matrices are everywhere: a dataset is a matrix (one row per example, one column per feature), and a layer of a neural network is a matrix of weights.\n\n' +

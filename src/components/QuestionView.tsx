@@ -6,7 +6,7 @@ import { CodeView } from './CodeView';
 import { Rich, RichInline } from './Rich';
 
 export const LETTERS = ['A', 'B', 'C', 'D'];
-const DIFF_LABEL = { foundation: 'Foundation', exam: 'Exam', challenge: 'Challenge' } as const;
+const DIFF_LABEL = { foundation: 'Foundation', exam: 'Exam level', challenge: 'Challenge (optional)' } as const;
 
 export function QuestionMeta({ q, showTopic = true }: { q: ServedQuestion; showTopic?: boolean }) {
   const info = subtopicInfo(q.subtopic);
@@ -66,9 +66,26 @@ export function QuestionView({ q, selected, onSelect, reveal }: Props) {
 
 export function MarkScheme({ q, selected }: { q: ServedQuestion; selected: number | null }) {
   const info = subtopicInfo(q.subtopic);
+  const wrong = selected !== null && selected >= 0 && selected !== q.correctIndex;
+  const keyIdea = (
+    <div className="key-idea">
+      <span className="ms-label">How to recognise this type</span>
+      <Rich text={q.markScheme.keyIdea} />
+    </div>
+  );
   return (
     <section className="markscheme" aria-label="Mark scheme">
       <h3>Mark scheme</h3>
+      {wrong && (
+        <div className="ms-mistake">
+          <span className="ms-label">Where your answer went wrong</span>
+          <div className="why-head">
+            <strong>{LETTERS[selected]}</strong> <RichInline text={q.options[selected]} />
+          </div>
+          <Rich text={q.markScheme.whyWrong[selected] ?? ''} />
+        </div>
+      )}
+      {wrong && keyIdea}
       <div className="ms-answer">
         <span className="ms-label">Correct answer</span>
         <span className="ms-answer-text">
@@ -81,26 +98,22 @@ export function MarkScheme({ q, selected }: { q: ServedQuestion; selected: numbe
       </div>
       <h4>Worked solution</h4>
       <Rich text={q.markScheme.solution} className="ms-solution" />
-      <h4>Why the other options are wrong</h4>
+      <h4>{wrong ? 'Why the other options are wrong' : 'Why the wrong options are wrong'}</h4>
       <ul className="why-list">
         {q.options.map((o, i) =>
-          i === q.correctIndex ? null : (
-            <li key={i} className={selected === i ? 'chosen' : ''}>
+          i === q.correctIndex || (wrong && i === selected) ? null : (
+            <li key={i}>
               <div className="why-head">
                 <strong>{LETTERS[i]}</strong> <RichInline text={o} />
-                {selected === i && <span className="why-yours">Your answer</span>}
               </div>
               <Rich text={q.markScheme.whyWrong[i] ?? ''} />
             </li>
           ),
         )}
       </ul>
-      <div className="key-idea">
-        <span className="ms-label">Key idea</span>
-        <Rich text={q.markScheme.keyIdea} />
-      </div>
+      {!wrong && keyIdea}
       <p className="ms-lesson">
-        <Link to={`/learn/${q.subtopic}`}>Read the lesson: {info.name}</Link>
+        <Link to={`/learn/${q.subtopic}`}>Revisit the lesson: {info.name}</Link>
       </p>
     </section>
   );

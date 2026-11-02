@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'pigeonhole-counting',
+  simple:
+    'This subtopic is about counting choices without listing them all. If you pick a starter **and** a main, multiply the numbers of options; if you pick one dish from starters **or** mains, add them. The **pigeonhole principle** says that if you put more pigeons than holes, some hole must hold at least two pigeons: 13 people always include two born in the same month.',
+  methods: [
+    {
+      cue: 'Choices made in stages ("one from each", codes, PINs, plates), or one choice from separate groups',
+      method: 'Stages joined by AND: multiply (product rule). One item from groups joined by OR: add (sum rule). With repeats allowed each position keeps $n$ choices ($n^{k}$); without repeats the choices drop by one each time.',
+    },
+    {
+      cue: '"Smallest number to **guarantee** / be **certain**", or "at least how many must share"',
+      method: 'Picture the worst case: fill every box to $r - 1$, then one more forces $r$, so $k(r - 1) + 1$. $N$ objects in $k$ boxes force a box with at least $\\lceil \\frac{N}{k} \\rceil$.',
+    },
+    {
+      cue: '"Divisible by $a$ **or** $b$", "neither", or two overlapping groups',
+      method: 'Inclusion-exclusion: $|A| + |B| - |A \\cap B|$, where "divisible by both" means a multiple of $\\operatorname{lcm}(a, b)$. For three sets add singles, subtract pairs, add back the triple.',
+    },
+    {
+      cue: '"**At least one**", "**not** next to each other", or "at least one repeated digit"',
+      method: 'Complementary counting: total minus the opposite case (none / together / all different).',
+    },
+    {
+      cue: 'Handshakes, pairs, diagonals, or "everyone meets everyone once"',
+      method: 'Unordered pairs: $\\binom{n}{2} = \\frac{n(n-1)}{2}$. For diagonals subtract the $n$ sides; to work backwards solve $n(n-1) = 2 \\times$ total.',
+    },
+    {
+      cue: 'Shortest right/up routes on a grid, possibly **through** a point',
+      method: 'With $m$ rights and $n$ ups there are $\\binom{m+n}{n}$ routes. Through a point: multiply (routes to the point) by (routes from the point onwards).',
+    },
+  ],
   know:
     '### Counting without listing\n\n' +
     'Counting questions ask "how many ways?". Listing every possibility is slow and easy to get wrong, so we use a few simple rules instead. Almost every question in this topic is one of these rules, or two of them combined.\n\n' +

@@ -5,6 +5,18 @@ const L = (...lines: string[]) => lines.join('\n');
 
 export const lesson: Lesson = {
   subtopic: 'determinants-inverses',
+  simple:
+    'The **determinant** is a single number worked out from a square matrix. For $\\begin{bmatrix} a & b \\\\ c & d \\end{bmatrix}$ it is $ad - bc$. ' +
+    'It tells you whether the matrix can be undone: if the determinant is $0$ the matrix is **singular**, it squashes everything flat and has no inverse. ' +
+    'If it is not $0$, the **inverse** $A^{-1}$ exists and undoes $A$, the way dividing undoes multiplying, and a system of equations written with $A$ has exactly one solution.',
+  methods: [
+    { cue: '$\\det$ or the **inverse** of a $2 \\times 2$ matrix', method: '$\\det = ad - bc$. Inverse: swap $a$ and $d$, change the signs of $b$ and $c$, then divide every entry by the determinant. Check by multiplying back to get $I$.' },
+    { cue: 'Determinant of a $3 \\times 3$ matrix', method: 'Expand along the first row with signs $+, -, +$: each entry times the $2 \\times 2$ determinant left when you cover its row and column. A triangular matrix: just multiply the diagonal.' },
+    { cue: '"**Singular**" or "**not invertible**" with an unknown $k$', method: 'Write the determinant in terms of $k$ and set it equal to $0$. It may be a quadratic in $k$ with two answers.' },
+    { cue: '$\\det(2A)$, $\\det(AB)$, $\\det(A^{-1})$ or $\\det(A^{T})$ when only $\\det A$ is given', method: 'Use the rules, never multiply matrices out: $\\det(kA) = k^{n}\\det A$ for an $n \\times n$ matrix, $\\det(AB) = \\det A \\det B$, $\\det(A^{-1}) = \\frac{1}{\\det A}$, $\\det(A^{T}) = \\det A$.' },
+    { cue: 'Solve $AX = B$ or $XA = B$', method: '$AX = B$ gives $X = A^{-1}B$ (inverse on the left); $XA = B$ gives $X = BA^{-1}$ (inverse on the right).' },
+    { cue: '"**No solution**" / "how many solutions" for a system with a parameter', method: '$\\det \\ne 0$ means exactly one solution. $\\det = 0$ means none or infinitely many: substitute that value and compare the equations (a contradiction means none, a multiple means infinitely many).' },
+  ],
   know: L(
     '### What a determinant is',
     '',

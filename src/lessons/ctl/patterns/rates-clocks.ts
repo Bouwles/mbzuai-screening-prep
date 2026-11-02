@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'rates-clocks',
+  simple:
+    "A **rate** says how much happens per unit of time, like kilometres per hour or tanks filled per hour. Most questions use one link: distance $=$ speed $\\times$ time (and in the same way, work done $=$ rate $\\times$ time). Convert units first: 15 minutes is $0.25$ hours, not $0.15$. Clock questions are rates too: the minute hand turns $6^\\circ$ per minute and the hour hand $0.5^\\circ$ per minute.",
+  methods: [
+    {
+      cue: "Distance and time given, asked for the **speed** (or the reverse)",
+      method: "Speed $=$ distance $\\div$ time, with the time in hours for km/h. Turn minutes into hours by dividing by $60$.",
+    },
+    {
+      cue: "Two objects moving **towards each other**, or one **chasing** another",
+      method: "Towards each other, the gap closes at the sum of the speeds; same direction, at the difference. Time $=$ gap $\\div$ closing speed.",
+    },
+    {
+      cue: "**Average speed** for a trip made of two legs",
+      method: "Total distance $\\div$ total time, never the plain average of the two speeds. For two equal distances it is $\\frac{2ab}{a + b}$.",
+    },
+    {
+      cue: "**Pipes, workers or machines** working together (or a drain working against them)",
+      method: "Add the rates $\\frac{1}{\\text{time}}$ (subtract a drain's rate), then take the reciprocal of the total. Never add the times.",
+    },
+    {
+      cue: "The **angle between the hands** of a clock at a given time",
+      method: "Angle $= |30H - 5.5M|$ degrees; if that is more than $180^\\circ$, subtract it from $360^\\circ$ to get the smaller angle.",
+    },
+    {
+      cue: "The **day of the week** after many days, or the same date a year later",
+      method: "Divide the number of days by $7$ and move forward by the remainder. A $365$-day year moves the weekday on by $1$; a span that contains 29 February moves it on by $2$.",
+    },
+    {
+      cue: "**Time zones**, trains passing through tunnels, boats with a current",
+      method: "Time zones: do the elapsed time in one zone, then shift by the UTC difference. A train clears a tunnel after travelling tunnel length plus train length. Boats: downstream speed $b + c$, upstream $b - c$.",
+    },
+  ],
   know:
     '### What a rate is\n\n' +
     'A **rate** tells you how much of one thing happens per one unit of another: kilometres per hour, dirhams per gram, tanks per hour, jobs per day. Almost every question in this topic is solved by finding the rate for **one** unit, then scaling up.\n\n' +

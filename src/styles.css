@@ -170,33 +170,6 @@ pre {
   align-items: center;
   gap: 32px;
 }
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--text);
-  flex: none;
-}
-.brand:hover {
-  text-decoration: none;
-}
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-weight: 800;
-  font-size: 0.8rem;
-  letter-spacing: 0.02em;
-}
-.brand-name {
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
-}
 .topnav {
   display: flex;
   align-items: stretch;
@@ -1169,16 +1142,14 @@ input[type='checkbox'] {
   margin-bottom: 4px;
 }
 .upnext {
-  padding: 32px;
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent), var(--shadow);
+  padding: 28px 32px;
 }
 .upnext h2 {
   font-size: 1.6rem;
   margin-bottom: 6px;
 }
 .upnext .card-kicker {
-  color: var(--accent);
+  color: var(--muted);
 }
 .upnext p {
   max-width: 62ch;
@@ -1257,21 +1228,23 @@ input[type='checkbox'] {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 12px;
+  column-gap: 32px;
+}
+.mode-list li {
+  border-top: 1px solid var(--line);
 }
 .mode-list a {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  height: 100%;
-  padding: 14px 16px;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
+  padding: 12px 0;
   color: var(--text);
 }
 .mode-list a:hover {
-  border-color: var(--accent);
   text-decoration: none;
+}
+.mode-list a:hover strong {
+  color: var(--accent);
 }
 .mode-list span {
   color: var(--muted);
@@ -1508,13 +1481,24 @@ input[type='checkbox'] {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 16px 24px 20px;
-  margin: 0;
-  box-shadow: var(--shadow);
+  padding: 0 20px;
 }
-.picker-area legend {
+.picker-area summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.picker-area[open] summary {
+  border-bottom: 1px solid var(--line);
+}
+.picker-area-name {
+  font-size: 1.05rem;
   font-weight: 700;
-  padding: 0 6px;
+  margin-right: auto;
 }
 .picker-area label {
   display: inline-flex;
@@ -1522,25 +1506,50 @@ input[type='checkbox'] {
   gap: 8px;
   cursor: pointer;
 }
+.picker-all {
+  margin: 12px 0 4px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+/* topic name on the left, its subtopics beside it */
 .picker-topic {
-  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.picker-all + .picker-topic {
+  border-top: none;
+}
+.picker-topic:last-child {
+  padding-bottom: 16px;
 }
 .picker-topic-name {
   font-weight: 650;
   font-size: 0.94rem;
+  padding-top: 5px;
 }
 .picker-subs {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 6px;
 }
 .chip-check {
-  border: 1.5px solid var(--line-strong);
-  border-radius: 999px;
-  padding: 5px 14px 5px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 5px 12px;
   font-size: 0.88rem;
   background: var(--surface);
+  line-height: 1.4;
+}
+/* the chip itself shows the state, so the box is only kept for keyboard and screen readers */
+.chip-check input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
 }
 .chip-check:hover {
   border-color: var(--muted);
@@ -1548,6 +1557,12 @@ input[type='checkbox'] {
 .chip-check:has(input:checked) {
   border-color: var(--accent);
   background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.chip-check:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 .start-bar {
   position: sticky;
@@ -2176,4 +2191,232 @@ input[type='checkbox'] {
   align-items: center;
   gap: 10px;
   margin-top: 16px;
+}
+
+/* ---------------------------------------------------------------- learning flow: mastery, steps, hints */
+.mastery-badge {
+  flex: none;
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.mastery-badge.lvl-started,
+.mastery-badge.lvl-developing {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.mastery-badge.lvl-weak {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.mastery-badge.lvl-mastered {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.revisit {
+  margin: 12px 0 0;
+}
+.lesson-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 12px;
+  font-size: 0.92rem;
+}
+.btn-text.inline {
+  min-height: 0;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline;
+}
+.stepper {
+  list-style: none;
+  display: flex;
+  gap: 6px;
+  padding: 0;
+  margin: 24px 0 8px;
+}
+.stepper li {
+  flex: 1;
+  min-width: 0;
+}
+.stepper button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 12px;
+  border: none;
+  border-bottom: 3px solid var(--line);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+.stepper button.reached {
+  border-bottom-color: var(--accent-soft);
+  color: var(--text);
+}
+.stepper button.on {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 650;
+}
+.step-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.step-label {
+  line-height: 1.25;
+}
+.lesson-section.simple {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 24px;
+}
+.lesson-section.simple .reading {
+  font-size: 1.1rem;
+}
+.lesson-section.optional {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+}
+.video-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.video-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.video-list a {
+  font-weight: 600;
+}
+.video-list .muted {
+  font-size: 0.85rem;
+}
+.method-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+.method {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 18px;
+  background: var(--surface);
+}
+.method dt {
+  font-weight: 600;
+}
+.method dd {
+  margin: 0;
+}
+.method .rich p {
+  margin: 0;
+}
+.hint-panel {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+.hint {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 0 10px 10px 0;
+  padding: 10px 16px;
+}
+.hint-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: var(--accent);
+}
+.hint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+.ms-mistake {
+  background: var(--bad-soft);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+.ms-mistake .ms-label {
+  color: var(--bad);
+}
+.ms-mistake + .key-idea {
+  margin: 0 0 16px;
+}
+@media (max-width: 700px) {
+  .step-label {
+    display: none;
+  }
+  .stepper button {
+    justify-content: center;
+  }
+  .stepper button.on .step-label {
+    display: inline;
+  }
+  .method {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+/* keep scrolled-to blocks clear of the sticky top bar */
+.session.is-inline,
+.markscheme {
+  scroll-margin-top: 80px;
+}
+@media (max-width: 700px) {
+  .picker-area {
+    padding: 0 14px;
+  }
+  .picker-topic {
+    grid-template-columns: 1fr;
+  }
+  .picker-topic-name {
+    padding-top: 0;
+  }
+}
+.chip-check {
+  position: relative;
+}
+.picker-topic-name {
+  align-items: flex-start !important;
+}
+.picker-topic-name input {
+  margin-top: 4px;
 }

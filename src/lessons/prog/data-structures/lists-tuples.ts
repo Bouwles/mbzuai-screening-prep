@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'lists-tuples',
+  simple:
+    'A **list** is like a row of numbered lockers, each holding one value, and the numbering starts at 0, not 1. You can open one locker (`a[2]`), take a run of lockers (`a[1:4]`, which stops just before locker 4), or add and remove lockers. A **tuple** is the same row but sealed shut: you can look inside, but you cannot change it. Finally, a variable is just a name tag on a list, so two tags can point to the very same list.',
+  methods: [
+    { cue: 'A single index like `a[3]` or `a[-1]`', method: 'Write the indices 0, 1, 2, ... under the values first. Index `-1` is the last item, `-2` the one before it.' },
+    { cue: 'A slice `a[i:j]` or `a[i:j:s]`', method: 'Take indices $i, i + s, i + 2s, \\ldots$ while they are **less than** $j$ (the stop is excluded). A plain slice has $j - i$ items; a negative step starts from the end and walks backwards.' },
+    { cue: 'A sequence of `append`, `insert`, `pop`, `remove`, `extend` calls', method: 'Trace the list line by line. `remove(x)` works by **value**; `pop(i)` and `insert(i, x)` work by **index**; `extend` adds items one by one, `append` adds one item (even a whole list).' },
+    { cue: 'A result stored from `a.sort()` (or another in-place method)', method: 'In-place methods change the list and return `None`. Only `sorted(a)` returns a new list and leaves `a` alone.' },
+    { cue: '`b = a`, a function parameter, `a[:]`, `copy()` or `deepcopy`, then a change through one name', method: 'Ask "same list or new list?" for every `=`. Plain assignment and passing to a function share the list; slices, `copy()`, `+` and `sorted` make new ones; a shallow copy still shares inner lists.' },
+    { cue: 'A tuple being changed, or `a, b = b, a + b`', method: 'Assigning to `t[i]` on a tuple raises a `TypeError` (but a list stored inside a tuple can still be changed). For multiple assignment, work out the whole right side with the old values first, then assign.' },
+    { cue: 'A list comprehension `[expr for x in ... if ...]`', method: 'List the values of `x` (remember `range(a, b)` stops before `b`), keep only those that pass the `if`, then apply `expr` to each.' },
+  ],
   know:
     '### Lists: an ordered row of boxes\n\n' +
     'A **list** stores several values in order: `a = [10, 20, 30, 40, 50]`. Each value sits at a numbered position called an **index**, and Python counts from **0**. Negative indices count back from the end, so `a[-1]` is always the last item.\n\n' +

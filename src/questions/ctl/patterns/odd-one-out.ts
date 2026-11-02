@@ -101,29 +101,30 @@ export const questions: StaticQuestion[] = [
     subtopic: 'odd-one-out',
     difficulty: 'foundation',
     stem: 'Which word is the odd one out?',
-    options: ['LEVEL', 'MOTOR', 'RADAR', 'ROTOR'],
+    options: ['REFER', 'MOTOR', 'RADAR', 'ROTOR'],
     correctIndex: 1,
     markScheme: {
       solution:
         'Read each word **backwards**:\n\n' +
         '| Word | Backwards | Same? |\n' +
         '| --- | --- | --- |\n' +
-        '| LEVEL | LEVEL | yes |\n' +
+        '| REFER | REFER | yes |\n' +
         '| RADAR | RADAR | yes |\n' +
         '| ROTOR | ROTOR | yes |\n' +
         '| MOTOR | ROTOM | no |\n\n' +
-        'LEVEL, RADAR and ROTOR are **palindromes** (they read the same in both directions). MOTOR is not, so MOTOR is the odd one out.',
+        'REFER, RADAR and ROTOR are **palindromes** (they read the same in both directions). MOTOR is not, so MOTOR is the odd one out.\n\n' +
+        '(MOTOR is also the only word that does not start with R, so both rules point to the same word.)',
       whyWrong: [
-        'LEVEL reads the same forwards and backwards (L-E-V-E-L), so it shares the palindrome property with RADAR and ROTOR.',
+        'REFER reads the same forwards and backwards (R-E-F-E-R), so it shares the palindrome property with RADAR and ROTOR. It is the only word with an E or an F, but every word here has some letter of its own, so that is not a rule.',
         null,
         'RADAR is a palindrome: backwards it is still RADAR. It is the only word with an A, but that is a one-off detail, not a rule that the other three share.',
-        'ROTOR looks very like MOTOR (they differ by one letter), which tempts you to pair them, but ROTOR backwards is still ROTOR, so it is a palindrome like LEVEL and RADAR.',
+        'ROTOR looks very like MOTOR (they differ by one letter), which tempts you to pair them, but ROTOR backwards is still ROTOR, so it is a palindrome like REFER and RADAR.',
       ],
       keyIdea: 'With words, check structural rules such as palindromes, anagrams or letter patterns, not surface details like a single shared letter.',
     },
     check: {
-      optionValues: ['LEVEL', 'MOTOR', 'RADAR', 'ROTOR'],
-      compute: () => oddByKey(['LEVEL', 'MOTOR', 'RADAR', 'ROTOR'], (w) => String(isPalindrome(w))),
+      optionValues: ['REFER', 'MOTOR', 'RADAR', 'ROTOR'],
+      compute: () => oddByKey(['REFER', 'MOTOR', 'RADAR', 'ROTOR'], (w) => String(isPalindrome(w))),
     },
   },
   {
@@ -363,29 +364,29 @@ export const questions: StaticQuestion[] = [
     subtopic: 'odd-one-out',
     difficulty: 'exam',
     stem: 'Which number is the odd one out?',
-    options: ['$51$', '$67$', '$57$', '$87$'],
+    options: ['$51$', '$67$', '$57$', '$93$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'All four numbers are odd, so parity does not help. Try divisibility.\n\n' +
+        'All four numbers are odd, so parity does not help, and the last digits (1, 7, 7, 3) do not split them 3 against 1 either. Try divisibility.\n\n' +
         '**Divisibility by 3** (a number is a multiple of 3 when its digit sum is):\n\n' +
         '- $51$: $5 + 1 = 6$, so $51 = 3 \\times 17$.\n' +
         '- $57$: $5 + 7 = 12$, so $57 = 3 \\times 19$.\n' +
-        '- $87$: $8 + 7 = 15$, so $87 = 3 \\times 29$.\n' +
+        '- $93$: $9 + 3 = 12$, so $93 = 3 \\times 31$.\n' +
         '- $67$: $6 + 7 = 13$, not a multiple of 3.\n\n' +
         '**Is 67 prime?** Since $8^2 = 64 < 67 < 81 = 9^2$, we only need to test the primes $2, 3, 5, 7$. $67$ is odd, its digit sum is not a multiple of 3, it does not end in 0 or 5, and $7 \\times 9 = 63$, $7 \\times 10 = 70$. So $67$ is prime.\n\n' +
         '$67$ is the only prime; the other three are multiples of 3. The odd one out is $67$.',
       whyWrong: [
-        '$51$ looks prime, but $51 = 3 \\times 17$ (its digit sum $6$ is a multiple of 3). Like $57$ and $87$, it is a multiple of 3.',
+        '$51$ looks prime, but $51 = 3 \\times 17$ (its digit sum $6$ is a multiple of 3). Like $57$ and $93$, it is a multiple of 3.',
         null,
-        '$57$ looks prime, but $57 = 3 \\times 19$. It belongs with $51$ and $87$, which are also multiples of 3.',
-        '$87 = 3 \\times 29$. It is the largest number, but like $51$ and $57$ it is a multiple of 3, so it belongs with them.',
+        '$57$ looks prime, but $57 = 3 \\times 19$. It belongs with $51$ and $93$, which are also multiples of 3.',
+        '$93$ looks prime, but $93 = 3 \\times 31$ (digit sum $12$). It is the largest number, but like $51$ and $57$ it is a multiple of 3, so it belongs with them.',
       ],
-      keyIdea: 'Numbers like 51, 57, 87 and 91 look prime but are not; use the digit-sum test for 3 and test primes up to the square root.',
+      keyIdea: 'Numbers like 51, 57, 87, 91 and 93 look prime but are not; use the digit-sum test for 3 and test primes up to the square root.',
     },
     check: {
-      optionValues: [51, 67, 57, 87],
-      compute: () => oddByKey([51, 67, 57, 87], (n) => String(isPrime(n))),
+      optionValues: [51, 67, 57, 93],
+      compute: () => oddByKey([51, 67, 57, 93], (n) => String(isPrime(n))),
     },
   },
   {
@@ -587,7 +588,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'odd-one-out-016',
     subtopic: 'odd-one-out',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A function machine multiplies its input by a fixed number and then adds another fixed number. An input of $3$ gives an output of $17$, and an input of $7$ gives an output of $33$. Which input gives an output of $85$?',
     options: ['$20$', '$15$', '$18$', '$16.25$'],
     correctIndex: 0,

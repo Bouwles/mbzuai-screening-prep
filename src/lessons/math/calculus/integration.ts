@@ -2,6 +2,19 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'integration',
+  simple:
+    'Integration is differentiation run backwards: given the slope formula, find the function it came from. ' +
+    'For powers of $x$, add one to the power and divide by the new power, so $x^{2}$ becomes $\\frac{x^{3}}{3}$, plus a constant $C$ (because constants vanish when you differentiate). ' +
+    'A **definite integral** $\\int_{a}^{b} f(x)\\,dx$ gives a number: the area between the curve and the $x$-axis from $a$ to $b$, with area below the axis counted as negative.',
+  methods: [
+    { cue: 'Powers of $x$, roots, or $\\frac{2}{x^{2}}$', method: 'Rewrite as powers, then add 1 to the power and divide by the new power. A fraction with a single power of $x$ underneath: split it into separate terms first.' },
+    { cue: '$e^{x}$, $\\frac{1}{x}$, $\\sin x$ or $\\cos x$', method: '$\\int e^{x}\\,dx = e^{x}$, $\\int \\frac{1}{x}\\,dx = \\ln|x|$, $\\int \\cos x\\,dx = \\sin x$, $\\int \\sin x\\,dx = -\\cos x$ (each $+ C$).' },
+    { cue: 'A function of $ax + b$: $(2x + 1)^{4}$, $e^{2x}$, $\\cos 3x$, $\\frac{1}{2x + 5}$', method: 'Integrate as if the bracket were just $x$, then **divide** by $a$.' },
+    { cue: 'A definite integral $\\int_{a}^{b}$', method: 'Integrate, then top limit minus bottom limit: $F(b) - F(a)$. Careful: $e^{0} = 1$ and $\\cos 0 = 1$, so a lower limit of $0$ does not always give $0$.' },
+    { cue: '**Area** between a curve and the $x$-axis, or **total distance** from a velocity', method: 'Find where the curve crosses the axis, integrate each piece separately, and add the sizes (a piece below the axis comes out negative).' },
+    { cue: "Given $f'(x)$ and one point, or an unknown limit $k$", method: 'Integrate with $+ C$ and use the point to find $C$. For an unknown limit, integrate, substitute the limits, and solve the equation for $k$.' },
+    { cue: 'Given $\\int f$ and $\\int g$, find $\\int (2f - 3g + 1)$', method: 'Split term by term with the constants in front. Swapping the limits flips the sign, and $\\int_{a}^{b} 1\\,dx = b - a$.' },
+  ],
   know:
     '### What integration is\n\n' +
     '**Integration** is differentiation run backwards. If differentiating $F(x)$ gives $f(x)$, then $F(x)$ is called an **antiderivative** (or integral) of $f(x)$. We write\n\n' +

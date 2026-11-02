@@ -585,7 +585,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'data-calculations-017',
     subtopic: 'data-calculations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A year group of 50 students has a mean test score of 66. The 20 students in Class A have a mean score of 72. The other 30 students are in Class B. What is the mean score of Class B?',
     options: ['$60$', '$93$', '$62$', '$37.2$'],
     correctIndex: 2,
@@ -653,7 +653,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'data-calculations-019',
     subtopic: 'data-calculations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A final grade is worked out as $40\\%$ coursework and $60\\%$ exam. A student scored 65 (out of 100) in the coursework. What exam score (out of 100) does the student need to get a final grade of exactly 80?',
     options: ['$90$', '$95$', '$54$', '$102.5$'],
     correctIndex: 0,

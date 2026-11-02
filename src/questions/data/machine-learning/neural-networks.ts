@@ -298,7 +298,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'neural-networks-010',
     subtopic: 'neural-networks',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'During training, backpropagation finds that for a weight $w = 0.8$ the gradient of the loss is $\\frac{\\partial L}{\\partial w} = -2.5$. The learning rate is $\\eta = 0.1$. What is the value of $w$ after one gradient descent update?',
     options: ['$0.55$', '$3.3$', '$-1.7$', '$1.05$'],
     correctIndex: 3,
@@ -322,7 +322,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'neural-networks-011',
     subtopic: 'neural-networks',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'When a neural network is trained using **backpropagation**, what is calculated for every weight in the network?',
     options: [
       'The partial derivative of the loss with respect to that weight, found with the chain rule working backwards from the output layer.',

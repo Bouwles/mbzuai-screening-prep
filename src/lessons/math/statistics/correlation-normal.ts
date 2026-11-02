@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'correlation-normal',
+  simple:
+    '**Correlation** says how well two measurements move together, like hours revised and test score: the coefficient $r$ runs from $-1$ (perfect downhill line) through $0$ (no straight-line pattern) to $1$ (perfect uphill line), and it never proves that one causes the other. A **normal distribution** is the familiar bell-shaped curve, and a **$z$-score** counts how many standard deviations a value is from the mean.',
+  methods: [
+    { cue: 'A **scatter plot**: "describe the correlation" or "most likely value of $r$"', method: 'Sign from the direction of the trend (uphill positive, downhill negative), size from how tightly the points hug a line; $|r| = 1$ only for a perfect line.' },
+    { cue: 'Statements about $r$: **causation**, units, outliers', method: 'Correlation is not causation (look for a third variable); $r$ has no units and is unchanged by positive rescaling; an off-trend outlier pulls $r$ towards $0$.' },
+    { cue: '**Line of best fit**: predict $y$, interpret the gradient, or a line through $(\\bar{x}, \\bar{y})$', method: 'Substitute $x$; the gradient is the change in $y$ per unit of $x$. If only the mean point is given, find $c$ from $\\bar{y} = m\\bar{x} + c$. Distrust predictions outside the data range (extrapolation).' },
+    { cue: 'A value, mean and SD: "**$z$-score**", "compared with the class", "**equally good**"', method: '$z = \\frac{x - \\mu}{\\sigma}$; compare $z$-scores, not raw marks. Back to a value with $x = \\mu + z\\sigma$.' },
+    { cue: '**Normally distributed** with "68-95-99.7 rule": percentage or number between / above / below', method: 'Turn each boundary into SDs from the mean, then use 68%, 95%, 99.7% with symmetry (each side gets half; a single tail is $\\frac{100\\% - \\text{rule}}{2}$). Multiply by the total for a count.' },
+    { cue: '$S_{xx}$, $S_{yy}$ and $S_{xy}$ given', method: 'Pearson $r = \\frac{S_{xy}}{\\sqrt{S_{xx} S_{yy}}}$, with the same sign as $S_{xy}$.' },
+  ],
   know:
     '### Scatter plots and correlation\n\n' +
     'When each person or object gives you **two** numbers (hours revised and test score, temperature and drinks sold), you can plot one point per pair. This is a **scatter plot**. Put the variable you think does the influencing on the $x$-axis.\n\n' +

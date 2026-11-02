@@ -458,7 +458,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'transformations-015',
     subtopic: 'transformations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The point $(4, 1)$ lies on the graph of $y = f(x)$. Which point must lie on the graph of $y = f(2x + 6)$?',
     options: ['$(14, 1)$', '$(-1, 1)$', '$(5, 1)$', '$(-4, 1)$'],
     correctIndex: 1,
@@ -485,7 +485,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'transformations-016',
     subtopic: 'transformations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Under the transformation $y = f(x) \\to y = af(x - b)$, where $a$ and $b$ are constants, the point $(2, 3)$ on the graph of $y = f(x)$ is mapped to the point $(5, -6)$. Find $a$ and $b$.',
     options: ['$a = -2$, $b = -3$', '$a = 2$, $b = 3$', '$a = -2$, $b = 3$', '$a = -9$, $b = 3$'],
     correctIndex: 2,
@@ -586,7 +586,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'transformations-019',
     subtopic: 'transformations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The table shows some values of a function $f$. The function $g$ is defined by $g(x) = 3 - 2f(1 - x)$. Find $g(2)$.',
     table: {
       headers: ['$x$', '$-3$', '$-2$', '$-1$', '$0$', '$1$', '$2$', '$3$'],

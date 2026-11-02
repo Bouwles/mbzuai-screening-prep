@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'stacks-queues',
+  simple:
+    'A **stack** is a pile of plates: you add to the top and take from the top, so the last thing in is the first thing out. A **queue** is a line at a shop: people join at the back and leave from the front, so the first in is the first out. A **linked list** is a chain of boxes where each box holds a value and an arrow (a pointer) to the next box, so you reach an item by following the arrows from the start.',
+  methods: [
+    { cue: 'A list of `push`/`pop` or `enqueue`/`dequeue` operations, then "what is returned / left?"', method: 'Draw the structure after every operation. A stack removes the **newest** item (top); a queue removes the **oldest** item (front).' },
+    { cue: 'A real-life situation: undo, Back button, printer jobs, customers waiting', method: 'Ask "does the most recent item come out first?" If yes it is a stack (LIFO); if the item that waited longest comes out first, it is a queue (FIFO).' },
+    { cue: 'A **postfix** expression like `6 2 3 + * 4 -`, or a bracket-matching check', method: 'Postfix: push numbers; for an operator pop $b$ then $a$ and push $a \\text{ op } b$ (order matters for $-$ and $\\div$). Brackets: push openers, each closer must match the top, and the stack must end empty.' },
+    { cue: 'A **circular queue** in a fixed array, asking for an index', method: 'Every index moves on with $(i + 1) \\bmod N$, wrapping from $N - 1$ to 0. The rear item is at $(\\text{front} + \\text{size} - 1) \\bmod N$; items never shift.' },
+    { cue: 'Linked-list pointer statements (`P.next ← ...`) to insert or delete a node', method: 'Draw the boxes and arrows. To delete the node after `P`: `P.next ← P.next.next`. To insert `N` after `P`: first `N.next ← P.next`, then `P.next ← N`.' },
+    { cue: 'Cost of inserting at the front or reaching the $k$-th item, linked list vs array', method: 'Linked list: insert at the head is $O(1)$, reaching node $k$ takes $k - 1$ hops, $O(n)$. Array: index access is $O(1)$, inserting at the front shifts all items, $O(n)$.' },
+  ],
   know:
     '### Why data structures?\n\n' +
     'A **data structure** is a way of organising data so that the operations you need are quick. Stacks, queues and linked lists are the three simplest ones, and exam questions on them are mostly about **tracing**: following a list of operations carefully and writing down what is stored after each one.\n\n' +

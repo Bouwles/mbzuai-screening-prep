@@ -333,7 +333,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
-        'There is no solution when the lines are parallel, i.e. when the $x$ and $y$ coefficients are in the same ratio:\n\n' +
+        'There is no solution when the lines are parallel, i.e. when the $x$ and $y$ coefficients are in the same ratio.\n\n' +
+        'Set the two ratios equal, comparing $x$-coefficients with each other and $y$-coefficients with each other:\n\n' +
         '$$\\frac{2}{3} = \\frac{k}{6} \\quad\\Rightarrow\\quad 3k = 12 \\quad\\Rightarrow\\quad k = 4$$\n\n' +
         '(Equivalently, the determinant $2 \\times 6 - 3k$ must be $0$.)\n\n' +
         'Check the constants: with $k = 4$, multiplying the first equation by $\\frac{3}{2}$ gives $3x + 6y = 6$, but the second equation says $3x + 6y = 7$. Contradiction, so there is no solution (not infinitely many).',
@@ -560,7 +561,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'simultaneous-equations-018',
     subtopic: 'simultaneous-equations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'There are three boxes, A, B and C. Boxes A and B together weigh 13 kg, boxes B and C together weigh 17 kg, and boxes A and C together weigh 16 kg. How much does box B weigh?',
     options: ['$23$ kg', '$30$ kg', '$7$ kg', '$6$ kg'],
     correctIndex: 2,

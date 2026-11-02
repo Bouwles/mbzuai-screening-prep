@@ -486,7 +486,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'number-sequences-017',
     subtopic: 'number-sequences',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Which expression gives the $n$th term of the sequence $4, 10, 18, 28, 40, \\dots$?',
     options: ['$2n^2 + 2$', '$n^2 + 3n$', '$6n - 2$', '$n^2 + 3$'],
     correctIndex: 1,
@@ -511,7 +511,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'number-sequences-018',
     subtopic: 'number-sequences',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The triangular numbers are $1, 3, 6, 10, 15, \\dots$ What is the **first** triangular number greater than $250$?',
     options: ['$231$', '$256$', '$276$', '$253$'],
     correctIndex: 3,

@@ -221,7 +221,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'number-bases-008',
     subtopic: 'number-bases',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'Convert the octal (base 8) number $157_8$ to decimal.',
     options: ['$111$', '$343$', '$489$', '$13$'],
     correctIndex: 0,
@@ -245,7 +245,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'number-bases-009',
     subtopic: 'number-bases',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'Write the decimal number $200$ in hexadecimal.',
     options: ['$\\mathrm{8C}_{16}$', '$\\mathrm{C8}_{16}$', '$128_{16}$', '$\\mathrm{C5}_{16}$'],
     correctIndex: 1,
@@ -540,7 +540,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'number-bases-019',
     subtopic: 'number-bases',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A value is stored as a **12-bit two\'s complement** integer. What is the difference between the **largest** and the **smallest** values that can be stored?',
     options: ['$4096$', '$4094$', '$2047$', '$4095$'],
     correctIndex: 3,

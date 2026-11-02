@@ -387,10 +387,9 @@ if check(3) or check(0):
     correctIndex: 3,
     markScheme: {
       solution:
-        '1. First gate: $X = \\neg(A \\land B)$.\n' +
-        '2. Second gate: $X \\text{ NAND } X = \\neg(X \\land X)$. Since $X \\land X = X$, this is $\\neg X$. (A NAND gate with its inputs tied together is a NOT gate.)\n' +
-        '3. So the output is $\\neg X = \\neg\\neg(A \\land B) = A \\land B$ (two NOTs cancel).\n\n' +
-        'This is how an AND gate is built from NAND gates only.',
+        'Work gate by gate. The first gate gives $X = \\neg(A \\land B)$.\n\n' +
+        'The second gate gives $X \\text{ NAND } X = \\neg(X \\land X)$. Since $X \\land X = X$, this is $\\neg X$. (A NAND gate with its inputs tied together is a NOT gate.)\n\n' +
+        'So the output is $\\neg X = \\neg\\neg(A \\land B) = A \\land B$ (two NOTs cancel). This is how an AND gate is built from NAND gates only.',
       whyWrong: [
         'This is $X$ itself: you forgot that the second NAND gate inverts again ($X \\text{ NAND } X = \\neg X$).',
         'That is the output of $(A \\text{ NAND } A) \\text{ NAND } (B \\text{ NAND } B)$, where each input first gets its own NAND gate. Here both inputs of the second gate are the same signal $X$.',
@@ -553,6 +552,7 @@ if check(3) or check(0):
     correctIndex: 0,
     markScheme: {
       solution:
+        'Start with the two equations that involve only $A$ and $B$: $A \\lor B = 1$ and $A \\lor \\neg B = 1$. See what happens if $A = 0$.\n\n' +
         '1. Suppose $A = 0$. Then $A \\lor B = 1$ forces $B = 1$, and $A \\lor \\neg B = 1$ forces $\\neg B = 1$, i.e. $B = 0$. Contradiction, so $A = 1$.\n' +
         '2. $A \\oplus C = 0$ means $A$ and $C$ are the **same** (XOR is 0 for equal inputs), so $C = 1$.\n' +
         '3. $\\neg(B \\land C) = 1$ means $B \\land C = 0$. With $C = 1$ this needs $B = 0$.\n\n' +

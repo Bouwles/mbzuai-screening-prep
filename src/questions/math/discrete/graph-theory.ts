@@ -239,7 +239,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'graph-theory-007',
     subtopic: 'graph-theory',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem:
       'A **directed** graph has these 7 edges:\n\n' +
       '$A \\to B$, $A \\to C$, $B \\to C$, $C \\to A$, $C \\to D$, $D \\to B$, $D \\to C$\n\n' +
@@ -682,7 +682,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'graph-theory-018',
     subtopic: 'graph-theory',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       'The table is the adjacency matrix of a **directed** graph: the entry in row X, column Y is 1 if there is an edge $X \\to Y$, and 0 otherwise. How many directed walks of length 2 (two edges, following the arrows) go **from P to S**?',
     table: {

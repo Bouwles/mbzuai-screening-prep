@@ -420,7 +420,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        '**Spot the pair.** Imran and Kira make the *same* claim ("Imran didn\'t eat it"), so they are both true or both false. Only one statement is true, so they cannot both be true. Hence both are **false**, which means **Imran ate it**.\n\n' +
+        '**Spot the pair.** Imran and Kira make the *same* claim ("Imran didn\'t eat it"), so they are either both true or both false.\n\n' +
+        'Only one statement is true, so they cannot both be true. Hence both are **false**, which means **Imran ate it**.\n\n' +
         'Check every suspect by counting true statements:\n\n' +
         '| Culprit | Hana | Imran | Jude | Kira | Number true |\n|---|---|---|---|---|---|\n' +
         '| Hana | false | true | true | true | 3 |\n' +

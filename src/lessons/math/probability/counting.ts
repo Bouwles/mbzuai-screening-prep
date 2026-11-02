@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'counting',
+  simple:
+    'Counting is a shortcut for listing. If you pick a shirt (3 choices) **and** then trousers (4 choices), there are $3 \\times 4 = 12$ outfits: multiply the choices at each step. The one question to ask every time is: does the **order** matter? Lining people up for gold, silver and bronze is an ordered choice (a **permutation**); picking a team of 3 is not (a **combination**), so you divide out the repeats.',
+  methods: [
+    { cue: 'Several stages joined by **and** (a starter and a main, letters then digits)', method: 'Multiplication principle: multiply the number of choices at each stage. Use $n^r$ when repeats are allowed, $n(n-1)(n-2)\\cdots$ when they are not.' },
+    { cue: 'Different **roles** or positions: medals, chair and secretary, arranging people in a row', method: 'Order matters: use ${}^{n}P_{r} = \\frac{n!}{(n-r)!}$, or $n!$ to arrange everyone.' },
+    { cue: 'A **team, committee, group or hand** where only who is chosen matters', method: 'Order does not matter: use $\\binom{n}{r}$. For "exactly $k$ from this group", choose from each group separately and multiply.' },
+    { cue: 'Arrangements of a **word with repeated letters**', method: 'Divide $n!$ by $k!$ for every letter that appears $k$ times, e.g. BANANA gives $\\frac{6!}{3!\\,2!}$.' },
+    { cue: 'People **must sit together** / must **not** sit next to each other', method: 'Together: glue them into one block, arrange the blocks, multiply by the orders inside the block. Apart: total minus together.' },
+    { cue: '**At least one** of something', method: 'Use the complement: total minus "none". Never pick one first and then anyone, which double counts.' },
+    { cue: '**Probability** of a selection or arrangement ("chosen at random")', method: 'Count favourable outcomes and total outcomes the same way (both $\\binom{n}{r}$ or both ordered) and divide.' },
+  ],
   know:
     '### Why counting matters\n\n' +
     'Many probability questions boil down to one fraction: $P = \\frac{\\text{favourable outcomes}}{\\text{total outcomes}}$. When the outcomes are things like "groups of 3 people" or "arrangements of a word", listing them all is far too slow, so you need quick ways to **count** them. Four tools cover almost everything: the multiplication principle, factorials, permutations and combinations.\n\n' +

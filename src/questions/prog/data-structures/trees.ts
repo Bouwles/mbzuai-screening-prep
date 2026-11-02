@@ -632,7 +632,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trees-018',
     subtopic: 'trees',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       'The keys 30, 10, 50, 20, 40, 25, 22, 60 are inserted, **in that order**, into an empty binary search tree. Taking height as the number of edges on the longest root-to-leaf path, what is the height of the resulting tree?',
     options: ['4', '3', '5', '7'],

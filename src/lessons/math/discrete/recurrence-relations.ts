@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'recurrence-relations',
+  simple:
+    'A **recurrence relation** is a recipe for a sequence that tells you how to get the next term from the ones before it, like "start with 4 and keep adding 3" ($4, 7, 10, 13, \\dots$). To use it, start from the given first term and apply the rule one step at a time. A **closed form** is a shortcut formula that jumps straight to any term without working through all the earlier ones.',
+  methods: [
+    {
+      cue: 'Starting value(s) and a rule given; asked for a nearby term such as $a_4$ or $a_5$',
+      method: 'Apply the rule one step at a time in a list or table, in the order written (multiply before adding). Check whether the sequence starts at $a_0$ or $a_1$ to count the steps.',
+    },
+    {
+      cue: 'The rule uses **two** earlier terms ($a_{n-1}$ and $a_{n-2}$), or a staircase / binary-string counting story',
+      method: 'You need two starting values; build a table term by term. Counting stories give $S_n = S_{n-1} + S_{n-2}$ by splitting on the last move.',
+    },
+    {
+      cue: '"Which **closed-form** formula?" for an add-a-constant or multiply-by-a-constant rule',
+      method: 'Add $d$ each time: $a_n = a_1 + (n - 1)d$. Multiply by $r$: $a_n = a_0 r^{n}$ (or $a_1 r^{n-1}$). Test your formula at $n = 0$ or $1$ and at $n = 2$.',
+    },
+    {
+      cue: 'A **far-away** term (like $a_{10}$) of $a_n = r a_{n-1} + d$',
+      method: 'Find the fixed point $L$ from $L = rL + d$; then $a_n = L + (a_1 - L)r^{n-1}$.',
+    },
+    {
+      cue: 'A later term is given and an **earlier** term is asked for',
+      method: 'Run the rule backwards by undoing the operations in reverse order (undo the $+d$ first, then the $\\times r$), then check forwards.',
+    },
+    {
+      cue: 'Recursive code, divide-and-conquer $T(n) = aT(\\frac{n}{2}) + \\dots$, or a money/population story',
+      method: 'Write down the base case and the rule, then work up from the base case in a table ($n = 1, 2, 4, 8, \\dots$ for halving recurrences).',
+    },
+  ],
   know:
     '### What is a recurrence relation?\n\n' +
     'Most formulas tell you a term **directly**: for example $a_n = 3n + 1$ gives $a_{10} = 31$ straight away. A **recurrence relation** works differently: it tells you how to get each term **from the term (or terms) before it**. You also need a **starting value**, otherwise you cannot begin.\n\n' +

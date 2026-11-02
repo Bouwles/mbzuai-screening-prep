@@ -333,6 +333,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Start from the range of the basic exponential $2^x$, then see what adding $3$ does to every output.\n\n' +
         '1. Start with the basic exponential: $2^x > 0$ for every real $x$. It gets very close to 0 for large negative $x$ (e.g. $2^{-10} \\approx 0.001$) but never reaches 0.\n' +
         '2. Add 3: $2^x + 3 > 3$.\n' +
         '3. Every value above 3 is reached (the graph rises without limit), but 3 itself is never reached: the line $y = 3$ is a horizontal asymptote.\n\n' +
@@ -486,7 +487,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'domain-range-016',
     subtopic: 'domain-range',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The function $f(x) = \\frac{2x + 1}{x - 3}$ has domain $x \\ne 3$. Which value is **not** in its range?',
     options: ['$3$', '$-\\frac{1}{3}$', '$2$', 'None: every real number is in the range'],
     correctIndex: 2,
@@ -524,7 +525,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'domain-range-017',
     subtopic: 'domain-range',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The function $f(x) = x^2 - 4x + 1$ is defined only for $0 \\le x \\le 5$. What is its range?',
     options: ['$1 \\le f(x) \\le 6$', '$-3 \\le f(x) \\le 6$', '$f(x) \\ge -3$', '$-3 \\le f(x) \\le 1$'],
     correctIndex: 1,
@@ -556,7 +557,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'domain-range-018',
     subtopic: 'domain-range',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The function $f(x) = x^2 - 6x + 10$ is given the domain $x \\ge k$. What is the **smallest** value of $k$ for which $f$ is one-to-one?',
     options: ['$1$', '$-3$', '$0$', '$3$'],
     correctIndex: 3,

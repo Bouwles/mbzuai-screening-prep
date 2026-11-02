@@ -443,7 +443,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'valid-conclusions-014',
     subtopic: 'valid-conclusions',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A university has two departments. Overall, 64% of male applicants and 41% of female applicants were accepted. A newspaper concludes that the university is biased against women. Using the table, which statement is best supported by the data?',
     table: {
       caption: 'Accepted / applied',
@@ -484,7 +484,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'valid-conclusions-015',
     subtopic: 'valid-conclusions',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Two drugs, P and Q, were each given to 200 patients. The table shows how many patients recovered, by age group. Drug P has the higher recovery rate in **both** age groups. What are the **overall** recovery rates of the two drugs?',
     table: {
       caption: 'Recovered / treated',

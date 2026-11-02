@@ -24,8 +24,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
-        'Use the **complement rule**: "not blue" is everything except blue, so\n\n' +
-        '$$P(\\text{not blue}) = 1 - P(\\text{blue}) = 1 - 0.45 = 0.55$$\n\n' +
+        'Use the **complement rule**: "not blue" is everything except blue, so $P(\\text{not blue}) = 1 - P(\\text{blue})$.\n\n' +
+        'Here $P(\\text{blue}) = 0.45$, so $P(\\text{not blue}) = 1 - 0.45 = 0.55$.\n\n' +
         'Check another way: green has probability $1 - 0.3 - 0.45 = 0.25$, and "not blue" means red or green: $0.3 + 0.25 = 0.55$.',
       whyWrong: [
         'This is $P(\\text{green}) = 1 - 0.3 - 0.45$. "Not blue" also includes red, so red must be added on.',
@@ -404,7 +404,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'probability-basics-014',
     subtopic: 'probability-basics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A basketball player scores each free throw with probability $0.8$, independently of the other throws. She takes 3 free throws. What is the probability that she **misses at least one**?',
     options: ['$0.488$', '$0.6$', '$0.008$', '$0.512$'],
     correctIndex: 0,
@@ -499,15 +499,14 @@ export const questions: StaticQuestion[] = [
   {
     id: 'probability-basics-017',
     subtopic: 'probability-basics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'For two events, $P(A) = 0.5$ and $P(B) = 0.3$. The probability that **neither** $A$ nor $B$ happens is $0.3$. Find $P(A \\cap B)$.',
     options: ['$0.1$', '$0.15$', '$0$', '$0.4$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        '- Neither has probability $0.3$, so $P(A \\cup B) = 1 - 0.3 = 0.7$.\n' +
-        '- Rearrange the addition rule: $P(A \\cap B) = P(A) + P(B) - P(A \\cup B)$.\n' +
-        '- $P(A \\cap B) = 0.5 + 0.3 - 0.7 = 0.1$.\n\n' +
+        'Neither has probability $0.3$, so $P(A \\cup B) = 1 - 0.3 = 0.7$.\n\n' +
+        'Rearrange the addition rule: $P(A \\cap B) = P(A) + P(B) - P(A \\cup B) = 0.5 + 0.3 - 0.7 = 0.1$.\n\n' +
         'Venn check: $A$ only $= 0.4$, both $= 0.1$, $B$ only $= 0.2$, neither $= 0.3$, and $0.4 + 0.1 + 0.2 + 0.3 = 1$.',
       whyWrong: [
         null,

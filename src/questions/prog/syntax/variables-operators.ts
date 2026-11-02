@@ -288,6 +288,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Look at the **types** on each side of the `+` in the last line before working out any values.\n\n' +
         '1. `age = 17` makes `age` an int. `age += 1` makes it the int `18`.\n' +
         '2. `"Age: " + age` tries to `+` a **string** and an **int**. Python will not guess whether you mean "join" or "add", so it stops with a `TypeError` (can only concatenate str to str).\n\n' +
         'To print `Age: 18` you must convert first: `"Age: " + str(age)`, or use `print("Age:", age)` or an f-string `f"Age: {age}"`.\n\n' +
@@ -312,6 +313,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'A comparison such as `7 > 3` produces a **bool** (`True` or `False`). Ask what `+` does with bools.\n\n' +
         '1. `7 > 3` is `True`, so `passed = True`. `2 > 5` is `False`, so `failed = False`.\n' +
         '2. In Python, `bool` is a kind of int: `True` behaves as `1` and `False` as `0` in arithmetic.\n' +
         '3. `True + True + False` is `1 + 1 + 0 = 2`.\n\n' +
@@ -436,6 +438,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Notice the quotes: `x` holds text, not a number. Ask what `int()` is able to convert.\n\n' +
         '1. `x` is the **string** `"3.5"`.\n' +
         '2. `int()` can turn a float into an int (`int(3.5)` is `3`, it chops off the decimals), and it can turn a string of **whole-number digits** into an int (`int("3")` is `3`).\n' +
         '3. But `int("3.5")` is a string that does not look like a whole number, so Python raises a `ValueError` (invalid literal for int).\n\n' +
@@ -560,6 +563,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Keep a trace table with one column per variable and update it line by line. A tuple assignment works out its whole right side before assigning.\n\n' +
         '| Line | What happens | x | y | z |\n| --- | --- | --- | --- | --- |\n' +
         '| `x, y, z = 1, 2, 3` | three values unpacked | 1 | 2 | 3 |\n' +
         '| `x, y = y, x` | right side `(2, 1)` worked out first, then assigned: a swap | 2 | 1 | 3 |\n' +

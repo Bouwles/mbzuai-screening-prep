@@ -261,7 +261,11 @@ describe('lessons', () => {
       if (!l.examples || l.examples.length < 3) p.push('needs at least 3 worked examples');
       if (!l.traps || l.traps.length < 3) p.push('needs at least 3 common traps');
       if (!l.examTip || l.examTip.length < 60) p.push('exam tip too short');
+      if (!l.simple || l.simple.length < 80 || l.simple.length > 700) p.push('"simple" must be a short plain-English overview (80-700 chars)');
+      if (!l.methods || l.methods.length < 3 || l.methods.length > 7) p.push('needs 3-7 "methods" (cue -> method)');
       const fields: [string, string][] = [
+        ['simple', l.simple ?? ''],
+        ...(l.methods ?? []).flatMap((m, i) => [[`method ${i} cue`, m.cue] as [string, string], [`method ${i} method`, m.method] as [string, string]]),
         ['know', l.know],
         ['examTip', l.examTip],
         ...l.traps.map((t, i) => [`trap ${i}`, t] as [string, string]),

@@ -216,7 +216,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-partial-derivatives-mixed-partial',
     subtopic: 'partial-derivatives',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     title: 'Evaluate a mixed second partial derivative at a point',
     generate(rng) {
       let mx = 1;

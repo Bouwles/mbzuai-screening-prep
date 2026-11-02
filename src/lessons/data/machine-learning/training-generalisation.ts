@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'training-generalisation',
+  simple:
+    'A model is only useful if it works on **new** data, not just on the examples it learned from. Think of two students: one memorises past papers word for word (**overfitting**) and fails on new questions; the other never learned the ideas (**underfitting**) and fails everywhere. So we hold some data back: a **validation set** to choose between models, and a **test set** to check the final model honestly, once.',
+  methods: [
+    { cue: 'Training and test (or validation) **accuracies or errors** are given; asked what is happening', method: 'Very good on training but much worse on test (a big gap) is **overfitting**; poor on both with a small gap is **underfitting**; good on both and close together is a good fit.' },
+    { cue: 'Asked how to **fix** overfitting or underfitting', method: 'Overfitting (high variance): more training data, regularisation, a simpler model, fewer features, early stopping. Underfitting (high bias): a more flexible model, better features, less regularisation.' },
+    { cue: 'Which data set to use, or a model **chosen using the test set**', method: 'Train on the training set, choose with the validation set (or cross-validation), and report the test score once at the end. Choosing by test score makes that score too optimistic.' },
+    { cue: '**k-fold cross-validation**: counts or scores', method: 'Each round trains on $\\frac{k - 1}{k}$ of the data and validates on the one remaining fold. The CV score is the **mean** of the $k$ fold scores; tuning $h$ settings trains $h \\times k$ models.' },
+    { cue: 'Scale a value with **min-max** or a **z-score**', method: 'Min-max: $\\frac{x - x_{\\min}}{x_{\\max} - x_{\\min}}$. Z-score: $\\frac{x - \\mu}{\\sigma}$, dividing by the standard deviation, not the variance. Always use the **training** statistics.' },
+    { cue: 'A **regularised loss** with $\\lambda$ and some weights', method: 'Add $\\lambda \\sum w_i^2$ (L2) or $\\lambda \\sum |w_i|$ (L1) to the training loss. Square each weight separately; a negative weight squared is positive.' },
+    { cue: 'A **too-good-to-be-true** score, or preprocessing done before the split', method: 'Suspect **data leakage**: a feature that is only known after the outcome, or scaling statistics computed with the test data included.' },
+  ],
   know:
     '### The goal: do well on data you have never seen\n\n' +
     'A model learns from examples, but what matters is how well it does on **new** examples it has never seen. This is called **generalisation**. This topic is about measuring it honestly and improving it.\n\n' +

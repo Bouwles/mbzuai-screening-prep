@@ -171,7 +171,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'recurrence-relations-006',
     subtopic: 'recurrence-relations',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'A sequence is defined by $a_1 = 2$ and $a_n = 3a_{n-1} - 1$ for $n \\ge 2$. What is $a_4$?',
     options: ['$41$', '$14$', '$122$', '$15$'],
     correctIndex: 0,
@@ -432,7 +432,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'recurrence-relations-015',
     subtopic: 'recurrence-relations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A sequence satisfies $a_n = 2a_{n-1} + 3$ for $n \\ge 2$, and $a_4 = 61$. What is $a_1$?',
     options: ['$13$', '$5$', '$1$', '$2.375$'],
     correctIndex: 1,
@@ -515,7 +515,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'recurrence-relations-018',
     subtopic: 'recurrence-relations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Let $b_n$ be the number of binary strings of length $n$ (strings of 0s and 1s) that contain **no two consecutive 1s**. For example $b_1 = 2$ and $b_2 = 3$ (00, 01, 10). It can be shown that $b_n = b_{n-1} + b_{n-2}$. How many such strings of length 6 are there?',
     options: ['$13$', '$43$', '$64$', '$21$'],
     correctIndex: 3,

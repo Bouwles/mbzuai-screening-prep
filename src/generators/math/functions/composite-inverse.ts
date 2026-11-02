@@ -179,6 +179,7 @@ export const generators: Generator[] = [
       const excl = new Frac(-d, c);
       const fTex = `\\frac{${sum([[a, 'x'], [b, '']])}}{${sum([[c, 'x'], [d, '']])}}`;
       const solution =
+        `Swap $x$ and $y$, then clear the fraction by multiplying both sides by the denominator, and gather every $y$ term on one side.\n\n` +
         `1. Write ${m(`y = ${fTex}`)} and swap $x$ and $y$: ${m(`x = \\frac{${sum([[a, 'y'], [b, '']])}}{${sum([[c, 'y'], [d, '']])}}`)}.\n` +
         `2. Multiply both sides by the denominator: ${m(`${sum([[c, 'xy'], [d, 'x']])} = ${sum([[a, 'y'], [b, '']])}`)}.\n` +
         `3. Collect the $y$ terms on the left and everything else on the right: ${m(`${sum([[c, 'xy'], [-a, 'y']])} = ${sum([[-d, 'x'], [b, '']])}`)}.\n` +

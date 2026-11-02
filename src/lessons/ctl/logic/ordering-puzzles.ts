@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'ordering-puzzles',
+  simple:
+    "Ordering puzzles give clues such as \"taller than\", \"sits next to\" or \"finished after\", and ask who is in a certain place. Write every clue the same way round and line people up like beads on a string, placing anyone with a fixed spot first. Counting questions ask **how many** orders are possible: multiply the choices for each place, so 4 people can stand in a line in $4 \\times 3 \\times 2 \\times 1 = 24$ ways.",
+  methods: [
+    {
+      cue: "Comparison clues (**taller than**, **finished before**, **scored more**) and a position asked for",
+      method: "Rewrite every clue in one direction (all \"taller than\"), chain them into one line, and read off the position. Check which end you are counting from.",
+    },
+    {
+      cue: "Asked which statement **must** be true, or which **extra clue** fixes the order",
+      method: "List every order that fits the clues. \"Must\" means true in all of them; an extra clue fixes the order only if exactly one order is left.",
+    },
+    {
+      cue: "Clues with **amounts** (\"20 cm taller\", \"3 years longer\")",
+      method: "Give one person the value $0$, give everyone else a number relative to them, then sort the numbers.",
+    },
+    {
+      cue: "**Seats in a row or around a table** with \"next to\", \"opposite\" or \"clockwise\" clues",
+      method: "Place fixed people first (around a table, fix one person and number the seats clockwise). Join \"next to\" clues into blocks, then test each remaining case.",
+    },
+    {
+      cue: "Matching clues (who owns which pet, who orders which drink)",
+      method: "Use a grid with exactly one \"yes\" in each row and column. A row with only one open cell must be a \"yes\", which crosses out the rest of its row and column.",
+    },
+    {
+      cue: "**How many ways** can people be arranged in a row or around a table?",
+      method: "Row: $n!$. Round table (rotations count as the same): $(n - 1)!$. \"Together\": glue them into one block, then multiply by the orders inside it. \"Not together\": total minus together. \"A before B\": half of all orders.",
+    },
+  ],
   know:
     '### What these puzzles are\n\n' +
     'Ordering and arrangement puzzles give you a few **clues** about people or objects and ask you to work out an order (who is tallest, who finished third), a seating plan (who sits opposite whom), a matching (who owns which pet), or simply **how many** arrangements are possible. No school maths is needed for most of them, just careful, organised thinking. The skill being tested is the same one programmers use: turn messy words into a tidy structure, then check every case.\n\n' +

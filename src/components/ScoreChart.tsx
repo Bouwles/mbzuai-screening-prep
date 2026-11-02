@@ -31,7 +31,7 @@ export function ScoreChart({ mocks, compact = false }: { mocks: MockRecord[]; co
       ))}
       <line x1={M.l} x2={W - M.r} y1={y(target)} y2={y(target)} className="target-line" />
       <text x={W - M.r} y={y(target) - 6} className="target-label" textAnchor="end">
-        Target {target}%
+        {target}% fee waiver
       </text>
       {n > 1 && <polyline points={done.map((m, i) => `${x(i)},${y(m.score!)}`).join(' ')} className="score-line" fill="none" />}
       {done.map((m, i) => (

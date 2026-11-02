@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'quadratics',
+  simple:
+    'A quadratic is an expression with an $x^2$ term, like $x^2 - x - 12$, and its graph is a U-shaped curve called a parabola. Solving $ax^2 + bx + c = 0$ means finding where the curve crosses the $x$-axis: it can cross twice, just touch once, or miss completely. The number $b^2 - 4ac$, called the discriminant, tells you which of these happens.',
+  methods: [
+    { cue: '**Solve** or **factorise**, e.g. $x^2 - x - 12$ or $2x^2 + 5x - 3 = 0$', method: 'Find two numbers that multiply to $c$ and add to $b$; if $a \\ne 1$, split the middle term with two numbers that multiply to $ac$. If nothing factorises, use $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$.' },
+    { cue: '**How many real roots**, or find $k$ so that there are two, one or no roots', method: 'Use the discriminant $\\Delta = b^2 - 4ac$: $\\Delta > 0$ two roots, $\\Delta = 0$ one repeated root, $\\Delta < 0$ none. "Positive for every $x$" means $a > 0$ and $\\Delta < 0$.' },
+    { cue: 'Asked for the **minimum value**, the **vertex**, or the form $(x - p)^2 + q$', method: 'Complete the square: $a(x - h)^2 + k$ has minimum $k$ at $x = h$ when $a > 0$. Take out $a$ first and remember to multiply it into the subtracted square.' },
+    { cue: 'A **quadratic inequality**, e.g. $x^2 - x - 6 < 0$', method: 'Move everything to one side, find the roots, and picture the U-shape: $< 0$ is between the roots, $> 0$ is outside them.' },
+    { cue: '**Sum or product of the roots** $\\alpha$ and $\\beta$, "without solving"', method: 'Use $\\alpha + \\beta = -\\frac{b}{a}$ and $\\alpha\\beta = \\frac{c}{a}$, with identities such as $\\alpha^2 + \\beta^2 = (\\alpha + \\beta)^2 - 2\\alpha\\beta$.' },
+    { cue: '**Remainder** on dividing by $(x - h)$, or "$(x - h)$ is a **factor**"', method: 'Substitute $x = h$: the remainder is $f(h)$, and a factor means $f(h) = 0$ (for $(x + 2)$ use $h = -2$). For the quotient, use synthetic division.' },
+    { cue: 'Only $x^4$ and $x^2$ appear, e.g. $x^4 - 3x^2 - 4 = 0$', method: 'It is a hidden quadratic: let $u = x^2$, solve for $u$, then solve $x^2 = u$, rejecting negative $u$ and keeping both $\\pm$ roots.' },
+  ],
   know:
     '### What is a quadratic?\n\n' +
     'A **quadratic** is an expression like $ax^2 + bx + c$, where $a \\ne 0$. The highest power of $x$ is 2. Its graph is a **parabola**: a U-shape when $a > 0$ and an upside-down U when $a < 0$. The **roots** (solutions of $ax^2 + bx + c = 0$) are where the graph crosses the $x$-axis.\n\n' +

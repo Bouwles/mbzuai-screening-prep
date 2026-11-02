@@ -221,7 +221,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-functions-007',
     subtopic: 'trig-functions',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: "A sector has radius $4$ cm and angle $1.5$ radians at the centre. What is its area?",
     options: ['$6 \\text{ cm}^2$', '$24 \\text{ cm}^2$', '$4.5 \\text{ cm}^2$', '$12 \\text{ cm}^2$'],
     correctIndex: 3,
@@ -506,7 +506,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-functions-016',
     subtopic: 'trig-functions',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: "A sector of a circle has radius $6$ cm and area $24 \\text{ cm}^2$. What is the perimeter of the sector?",
     options: ['$8$ cm', '$14$ cm', '$20$ cm', '$16$ cm'],
     correctIndex: 2,
@@ -580,7 +580,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-functions-018',
     subtopic: 'trig-functions',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       "Two boats leave a harbour at the same time. After one hour boat $P$ is $5$ km from the harbour and boat $Q$ is $3$ km from the harbour, and the angle between their two straight paths at the harbour is $120^\\circ$. How far apart are the boats?",
     options: ['$\\sqrt{19}$ km', '$\\sqrt{34}$ km', '$8$ km', '$7$ km'],
@@ -609,7 +609,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-functions-019',
     subtopic: 'trig-functions',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: "For $y = 2 - 3\\cos\\left(\\frac{x}{2}\\right)$, with $x$ in radians, what are the range and the period?",
     options: [
       'Range $-1 \\le y \\le 5$, period $4\\pi$',
@@ -645,7 +645,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'trig-functions-020',
     subtopic: 'trig-functions',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: "Given that $\\sin\\theta = \\frac{5}{13}$ and that $\\theta$ is obtuse ($90^\\circ < \\theta < 180^\\circ$), find the exact value of $\\tan\\theta$.",
     options: ['$\\frac{5}{12}$', '$-\\frac{12}{5}$', '$-\\frac{5}{12}$', '$-\\frac{12}{13}$'],
     correctIndex: 2,

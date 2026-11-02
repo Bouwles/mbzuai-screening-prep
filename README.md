@@ -20,13 +20,16 @@ Made by Paul Nercessian
 
 | | |
 |---|---|
-| **Learn** | 66 lessons, one per subtopic of MBZUAI's published syllabus: plain-English explanation, key formulas, worked examples, common traps, an exam tip and five check questions. Plus a printable formula sheet. |
-| **Topic practice** | Pick topics, a difficulty (Foundation / Exam / Challenge / Mixed) and 10, 20, 30 or endless questions. Instant feedback and a full mark scheme after every answer, with a timer against real exam pace. |
+| **Learn** | 66 lessons, one per subtopic of MBZUAI's published syllabus, each in five steps you can skip between: (1) the simple version, recommended YouTube videos (Khan Academy, 3Blue1Brown, StatQuest, CS50 and others) and a step-by-step explanation; (2) worked examples revealed one step at a time, "which method when?" cues and common traps; (3) guided Foundation practice with progressive hints; (4) questions on your own, stepping up from Foundation to Exam level; (5) exam-level questions. Challenge questions are offered as optional enrichment. Plus a printable formula sheet. |
+| **Mastery** | A topic is *mastered* only from independent performance: of your last 10 answers without hints, at least 80% right and at least 3 right at Exam level. Topics you keep getting wrong are flagged *Needs work* and suggested for revisiting. Reading a lesson does not count. |
+| **Topic practice** | Pick topics, a difficulty (Build up / Foundation / Exam / Challenge / Mixed) and 10, 20, 30 or endless questions. *Build up* starts at Foundation and moves to Exam level after two hint-free right answers in a row. Progressive hints (one solution step at a time), instant feedback that starts with why your answer was wrong and how to recognise the question type, and a timer against the estimated exam pace. |
 | **General questions** | An endless mixed feed from the whole syllabus that leans towards your weakest topics. |
 | **Question bank** | Browse and search every question by area, topic, subtopic, difficulty and status (unseen / correct / wrong / flagged). |
-| **Mock exams** | 15, 30 and 60 minute mocks (60 minutes is the official BSc exam length) plus the 40-question / 45-minute full format. Countdown timer, navigator, flags, Submit only after the last question, auto-submit at zero, resumes after a reload. Results with a 75% line, breakdown by topic and a full review. |
+| **Mock exams** | A 60-minute full-length mock (60 minutes is the official BSc length; the question count is unpublished, so 53 is an estimate), 15 and 30 minute mocks, and a 40-question / 45-minute speed drill (MBZUAI's 2023 *graduate* format, not the BSc one). Foundation and Exam-level questions only. Countdown timer, navigator, flags, Submit only after the last question, auto-submit at zero, resumes after a reload. Results with the 75% line, breakdown by topic and a full review. |
 | **Mistakes** | Spaced repetition: wrong answers come back after 1, 3, 7 and 14 days. Generated questions come back with new numbers. |
-| **Dashboard** | Accuracy, streak, recent mock scores against the 75% target, weakest topics, and "continue where you left off". |
+| **Dashboard** | Topics mastered, accuracy, streak, recent mock scores against the 75% line, weakest topics, and one "up next" step (due mistakes, then topics that need work, then where you left off). |
+
+> **About 75%:** a score of 75% or above waives the AED 200 application fee. MBZUAI publishes no pass mark, so 75% is a useful target, not an admission cut-off. Question counts, topic weights and difficulty mixes in the mocks are estimates.
 
 <table>
 <tr>
@@ -92,9 +95,10 @@ Other commands:
 
 Everything about the exam lives in one file: [`src/config/exam.ts`](src/config/exam.ts).
 
-- `targetPercent`: the target line (75).
-- `mockFormats`: each mock's minutes and question count.
+- `targetPercent`: the target line (75, the fee-waiver score).
+- `mockFormats`: each mock's minutes and question count (counts are estimates).
 - `areaWeights`: share of each area in a mock (estimates; MBZUAI doesn't publish them).
+- Videos for each lesson live in [`src/config/videos.ts`](src/config/videos.ts).
 - `difficultyMix`, `generatedShare`, `mistakeIntervalsDays`, `streakDailyTarget`.
 
 When you read the real question count and timing in the applicant portal, change the numbers there and save. The running site updates instantly.
@@ -134,7 +138,8 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 - Every question whose answer is a value is recomputed in code and must match the marked option (and no other option).
 - Every Python output question (175 of them) is run with real Python 3 and its output compared with the marked option. If Python isn't installed, the test prints the list of question ids to check by hand instead of failing.
 - Every generator: 2,000 variants each, checking one correct option, four distinct options, no `NaN`/`undefined`, clean LaTeX, and that the worked solution ends on the correct answer.
-- Every lesson has the required sections, and every subtopic has a lesson, at least 15 questions and at least one generator.
+- Every lesson has the required sections (including the simple version and "which method when?" cues), and every subtopic has a lesson, recommended videos, at least 15 questions and at least one generator.
+- Every question yields at least one progressive hint that stops short of the full solution; mastery levels, the Build up ladder, and "no Challenge questions in mocks" are unit-tested.
 
 On top of the automated tests, each subtopic was written and then independently re-solved by a separate reviewer, question by question.
 

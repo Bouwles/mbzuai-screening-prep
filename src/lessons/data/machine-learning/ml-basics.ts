@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'ml-basics',
+  simple:
+    'In **machine learning** a computer learns patterns from examples instead of being given every rule. If every example comes with the right answer (a **label**), it is **supervised** learning; if there are no labels and the computer finds groups by itself, it is **unsupervised**; if it learns by trial and error from rewards, like training a pet with treats, it is **reinforcement** learning. A model is only as fair as the data it learns from.',
+  methods: [
+    { cue: 'Asked **which type of learning** a project uses', method: 'Labelled examples: supervised. No labels, groups found from the data: unsupervised. An agent taking actions and getting rewards: reinforcement learning.' },
+    { cue: 'Asked **which task**: classification, regression or clustering', method: 'Output is a category (even digits 0 to 9): classification. Output is a continuous number such as a price: regression. No labels and the groups are discovered: clustering.' },
+    { cue: 'Asked for the **label** or the **number of features**', method: 'The label is the column being predicted. Features are the other input columns, leaving out pure ID columns. For an image: width $\\times$ height $\\times$ values per pixel.' },
+    { cue: 'A **fairness** check comparing two groups', method: 'Compare **rates** (approved divided by that group\'s own applicants), not raw counts, and give the difference in percentage points. For equal opportunity, use qualified applicants only.' },
+    { cue: 'A model that does worse for one group, or stays biased after a column is deleted', method: 'Look for under-represented groups in the training data (sampling bias), biased historical labels, or proxy features that carry the same information as the deleted column.' },
+    { cue: '**Privacy** or anonymisation questions', method: 'Get consent, remove identifiers, keep only the fields needed and store data securely. Remember that postcode, birth date and gender together can still identify a person.' },
+  ],
   know:
     '### What machine learning is\n\n' +
     'In **traditional programming**, a person writes every rule: "if the email contains *win a prize*, mark it as spam". In **machine learning (ML)**, we give the computer lots of **examples (data)** and it **works out the rules itself**. It then uses those learned patterns on **new** data it has never seen.\n\n' +

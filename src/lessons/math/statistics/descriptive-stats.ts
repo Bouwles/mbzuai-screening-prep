@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'descriptive-stats',
+  simple:
+    'Descriptive statistics sum up a list of numbers in a couple of values: an **average** (a typical value) and a **spread** (how far apart the values are). The **mean** shares the total out equally, the **median** is the middle value once the list is sorted, and the **mode** is the most common value. For spread, the **range** is biggest minus smallest, and the **interquartile range** (IQR) is the width of the middle half of the data.',
+  methods: [
+    { cue: 'A **missing value**, or a mean that changes when a value is **added or removed**, or two groups combined', method: 'Work with totals: total $=$ mean $\\times$ count. Add or subtract the value, then divide by the **new** count.' },
+    { cue: '**Frequency table** ("number of matches", "frequency $f$")', method: 'Mean $= \\frac{\\sum fx}{\\sum f}$ (divide by the total frequency, not the number of rows). Median: find position $\\frac{n + 1}{2}$ using running totals.' },
+    { cue: 'Median, quartiles or **IQR** from a raw list', method: 'Sort first. Median at position $\\frac{n + 1}{2}$; $Q_1$ and $Q_3$ are the medians of the lower and upper halves; $\\text{IQR} = Q_3 - Q_1$.' },
+    { cue: '**Outlier** or "$1.5 \\times \\text{IQR}$ rule"', method: 'Fences at $Q_1 - 1.5 \\times \\text{IQR}$ and $Q_3 + 1.5 \\times \\text{IQR}$; only values beyond them are outliers.' },
+    { cue: '**Box plot**, or comparing two box plots', method: 'Median = line in the box, IQR = box length, range = whisker to whisker; each section holds about a quarter of the data.' },
+    { cue: '"Which average is **most typical**?" with one extreme value', method: 'Use the median: the mean is pulled towards outliers.' },
+    { cue: 'Every value is **multiplied and/or shifted** ($ax + b$)', method: 'Mean and median become $a \\times \\text{old} + b$; range and IQR are only multiplied by $|a|$.' },
+  ],
   know:
     '### What "descriptive statistics" means\n\n' +
     'A list of numbers is hard to take in. Descriptive statistics squeeze it into a few useful numbers: an **average** (where the middle of the data is) and a **measure of spread** (how far apart the values are). Almost every exam question here is one of these, done carefully.\n\n' +

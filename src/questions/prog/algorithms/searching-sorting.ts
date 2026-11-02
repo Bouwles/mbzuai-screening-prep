@@ -372,6 +372,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Each pass looks only at the unsorted part, finds its smallest item and swaps it into the first unsorted position. Write a row for every pass, even when no swap is needed.\n\n' +
         '| Pass | Unsorted part | Smallest | Action | List afterwards |\n' +
         '| --- | --- | --- | --- | --- |\n' +
         '| 1 | `[29, 10, 14, 37, 13, 5]` | 5 | swap 5 with 29 | `[5, 10, 14, 37, 13, 29]` |\n' +
@@ -471,6 +472,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Compare the two front items, move the smaller one to the output, and count one comparison each time. Stop counting as soon as one list is empty.\n\n' +
         '| Compare | Smaller (moved to output) | Output so far |\n' +
         '| --- | --- | --- |\n' +
         '| 2 and 3 | 2 | `[2]` |\n' +
@@ -633,7 +635,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'searching-sorting-016',
     subtopic: 'searching-sorting',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Bubble sort (compare neighbours left to right, swap if the left one is bigger, repeat passes until sorted) is used to sort `[6, 3, 8, 1, 5]` into ascending order. How many **swaps** does it make in total?',
     options: ['10', '6', '4', '2'],
     correctIndex: 1,
@@ -793,7 +795,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'searching-sorting-020',
     subtopic: 'searching-sorting',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A binary search on a sorted list never needs more than **6** comparisons, whatever the target. What is the **largest** possible number of items in the list?',
     options: ['63', '64', '32', '36'],
     correctIndex: 0,

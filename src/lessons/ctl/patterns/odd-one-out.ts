@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'odd-one-out',
+  simple:
+    "An odd-one-out question shows four items: three share a rule and one does not. Test one property at a time (even or odd, square, prime, reads the same backwards, same letters) and look for one that splits the items **3 against 1**; a property that splits them 2 against 2 is not the rule. \"Find the rule\" questions use the same skill: guess a rule from one example, then check it on every example.",
+  methods: [
+    {
+      cue: "Four **numbers**: which is the odd one out?",
+      method: "Test properties one at a time: even or odd, multiple of 3, square, prime, triangular. Keep the property that splits them 3 against 1.",
+    },
+    {
+      cue: "Four **words**: which is the odd one out?",
+      method: "Check structural rules: palindromes (the same backwards), anagrams (sort the letters), letter patterns. Ignore one-off details such as a single unusual letter.",
+    },
+    {
+      cue: "Four **pairs** $(x, y)$, three of which follow the same rule",
+      method: "Find a rule from one pair (try $y = ax + b$, $y = x^2 + c$ or $y = x^3 + c$), test it on every pair, and the single pair that fails is the answer.",
+    },
+    {
+      cue: "A **function machine** table, asked for the output of a new input",
+      method: "The multiplier is the change in output for each 1 of input; get the fixed number from one row, check the rule on another row, then apply it.",
+    },
+    {
+      cue: "A function machine **run backwards** (given the output, find the input)",
+      method: "Undo the steps in reverse order with inverse operations, then check by running the machine forwards on your answer.",
+    },
+    {
+      cue: "**Analogies** (\"2 is to 8 as 3 is to 27\") or a mystery operation such as $a \\star b$",
+      method: "Find the one transformation that fits every example: compare with squares, cubes or simple operations on the inputs (or on their digits), then apply it to the new item.",
+    },
+  ],
   know:
     '### What these questions test\n\n' +
     'All the questions in this topic ask the same thing in different clothes: **can you spot a hidden rule from a few examples, and then use it?** You will meet three main types:\n\n' +

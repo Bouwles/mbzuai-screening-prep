@@ -17,6 +17,8 @@ export interface Attempt {
   mode: Mode;
   /** Seed for generated variants (also part of `key`). */
   seed?: number;
+  /** Hints revealed before answering. Only hint-free answers count towards mastery. */
+  hints?: number;
 }
 
 export interface MistakeCard {
@@ -59,6 +61,8 @@ export interface State {
   practiceTimer: boolean;
   daily: Record<string, number>;
   last: { path: string; label: string; at: number } | null;
+  /** Furthest lesson stage reached per subtopic (0 = Understand ... 4 = Exam level). */
+  stage: Record<string, number>;
 }
 
 const KEY = 'mbzuai-prep-v1';
@@ -77,6 +81,7 @@ export const emptyState = (): State => ({
   practiceTimer: true,
   daily: {},
   last: null,
+  stage: {},
 });
 
 function load(): State {
@@ -165,6 +170,10 @@ export function setLast(path: string, label: string) {
 
 export function toggleFlag(key: string) {
   update((s) => ({ ...s, flags: s.flags.includes(key) ? s.flags.filter((k) => k !== key) : [...s.flags, key] }));
+}
+
+export function setStage(sub: string, stage: number) {
+  update((s) => ({ ...s, stage: { ...s.stage, [sub]: Math.max(stage, s.stage[sub] ?? 0) } }));
 }
 
 export function markRead(sub: string, read = true) {

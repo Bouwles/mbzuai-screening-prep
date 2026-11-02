@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'function-families',
+  simple:
+    'Most graphs you meet belong to a few families, like breeds of dog: straight lines, U-shaped parabolas, exponential curves and log curves. ' +
+    'Every member of a family has the same basic shape, and the numbers in the equation just tell you where it sits: how steep a line is, where a parabola turns, or which level an exponential curve flattens out towards (its **asymptote**, a line the graph gets closer and closer to but never touches).',
+  methods: [
+    { cue: '**Gradient** from two points, or from an equation like $3x + 2y = 12$', method: 'Use $m = \\frac{y_2 - y_1}{x_2 - x_1}$; for an equation, rearrange to $y = mx + c$ first and read off $m$ and $c$.' },
+    { cue: 'Line **parallel** or **perpendicular** to a given line through a point', method: 'Parallel: same gradient. Perpendicular: negative reciprocal ($-\\frac{1}{m}$). Then use $y - y_1 = m(x - x_1)$ and set $x = 0$ for the $y$-intercept.' },
+    { cue: '**Vertex**, axis of symmetry or roots of a quadratic', method: 'Axis: $x = -\\frac{b}{2a}$; substitute it (in brackets) for the vertex $y$. Roots: factorise or use the quadratic formula. Touches the axis once: $b^2 - 4ac = 0$.' },
+    { cue: 'Parabola from its **roots** and one more point (or from a graph)', method: 'Write $y = a(x - p)(x - q)$, substitute the extra point to find $a$, then check the direction of opening.' },
+    { cue: 'Grows or falls **by $r\\%$** each period', method: 'Multiply by $1 + \\frac{r}{100}$ (growth) or $1 - \\frac{r}{100}$ (decay) once per period: $A = A_0\\left(1 \\pm \\frac{r}{100}\\right)^n$.' },
+    { cue: '$y = a \\cdot b^x + c$: asymptote, intercept, a table or two points', method: 'Asymptote is $y = c$; $y$-intercept is $a + c$. Constant ratios in a table mean exponential. With two points, divide the equations to cancel $a$.' },
+    { cue: '$y = \\log_b(x - h) + k$: asymptote or $x$-intercept', method: 'Asymptote where the bracket is $0$ ($x = h$). For a crossing, isolate the log and rewrite $\\log_b A = n$ as $A = b^n$.' },
+  ],
   know:
     '### Why "families"?\n\n' +
     'Most graphs in the exam belong to a few families. Each family has a typical shape, and the numbers in its equation tell you exactly where the key features are. If you know what each number does, you can sketch a graph, or match a graph to its equation, in seconds.\n\n' +

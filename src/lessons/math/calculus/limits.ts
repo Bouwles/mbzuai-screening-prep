@@ -2,6 +2,19 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'limits',
+  simple:
+    'A **limit** asks: as $x$ gets closer and closer to some value, what number does the expression settle towards? ' +
+    'Usually you can just substitute the value. If substituting gives $\\frac{0}{0}$, that is not an answer but a signal to simplify first (factorise and cancel), like wiping a misted window before you can see through it. ' +
+    'Limits matter because derivatives are defined as limits.',
+  methods: [
+    { cue: 'Substituting the value gives an ordinary number', method: 'That number is the limit (polynomials, and fractions whose bottom is not $0$).' },
+    { cue: 'Substituting gives $\\frac{0}{0}$ (polynomials or square roots)', method: 'Factorise top and bottom and cancel the common factor $(x - a)$, or multiply by the conjugate when there is a root. Then substitute again.' },
+    { cue: '$x \\to \\infty$ in a fraction', method: 'Compare the highest powers: equal degrees give the ratio of the leading coefficients, a higher power on the bottom gives $0$, a higher power on top gives $\\pm\\infty$. Under a root, $\\sqrt{4x^{2} + 1}$ behaves like $2x$.' },
+    { cue: '$\\sin$ or $\\cos$ with $x \\to 0$', method: 'Use $\\frac{\\sin x}{x} \\to 1$ (radians), so $\\frac{\\sin ax}{bx} \\to \\frac{a}{b}$. For $1 - \\cos x$, multiply top and bottom by $1 + \\cos x$.' },
+    { cue: '$\\left(1 + \\frac{k}{n}\\right)^{n}$ as $n \\to \\infty$', method: 'The limit is $e^{k}$ (not $1$).' },
+    { cue: 'Piecewise function, $|x|$, or a one-sided limit $x \\to a^{+}$ / $x \\to a^{-}$', method: 'Find the left-hand and right-hand limits separately. The two-sided limit exists only if they are equal.' },
+    { cue: '$\\lim_{h \\to 0} \\frac{f(a + h) - f(a)}{h}$', method: "This is the derivative $f'(a)$: expand and cancel the $h$, or simply differentiate $f$ and substitute $x = a$." },
+  ],
   know:
     '### What is a limit?\n\n' +
     'A **limit** describes the value a function *heads towards* as $x$ gets closer and closer to some number, even if the function is not defined exactly there. We write\n\n' +

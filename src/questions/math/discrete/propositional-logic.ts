@@ -212,7 +212,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'propositional-logic-007',
     subtopic: 'propositional-logic',
-    difficulty: 'exam',
+    difficulty: 'foundation',
     stem: 'Which statement is the **contrapositive** of "If a number is divisible by 6, then it is divisible by 3."?',
     options: [
       'If a number is divisible by 3, then it is divisible by 6.',
@@ -435,7 +435,8 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
-        'The output is false only in the row where $p$ and $q$ are both true, so the statement means "not both": $\\neg(p \\land q)$. By De Morgan this is $\\neg p \\lor \\neg q$.\n\n' +
+        'Look at the rows where the output is **false**: there is only one, the row where $p$ and $q$ are both true.\n\n' +
+        'So the statement means "not both": $\\neg(p \\land q)$. By De Morgan this is $\\neg p \\lor \\neg q$.\n\n' +
         'Check every option against the column F, T, T, T:\n\n' +
         '| $p$ | $q$ | $\\neg p \\land \\neg q$ | $p \\leftrightarrow \\neg q$ | $\\neg p \\to q$ | $\\neg p \\lor \\neg q$ |\n' +
         '| --- | --- | --- | --- | --- | --- |\n' +
@@ -629,7 +630,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'propositional-logic-018',
     subtopic: 'propositional-logic',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Which statement is the **contrapositive** of $(p \\land q) \\to r$?',
     options: [
       '$\\neg r \\to (\\neg p \\land \\neg q)$',

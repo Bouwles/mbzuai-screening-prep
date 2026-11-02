@@ -299,13 +299,13 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution: L(
-        t`1. Determinant: $3 \times 2 - 4 \times 1 = 6 - 4 = 2$ (not zero, so $A^{-1}$ exists).`,
-        t`2. Swap $3$ and $2$, change the signs of $4$ and $1$: $${M([[2, -4], [-1, 3]])}$.`,
-        t`3. Divide every entry by the determinant $2$:`,
+        t`**Step 1: determinant.** $3 \times 2 - 4 \times 1 = 6 - 4 = 2$ (not zero, so $A^{-1}$ exists).`,
         '',
-        t`$$A^{-1} = \frac{1}{2}${M([[2, -4], [-1, 3]])} = ${M([[1, -2], [h(-1), h(3)]])}$$`,
+        t`**Step 2: swap and change signs.** Swap $3$ and $2$, change the signs of $4$ and $1$: $${M([[2, -4], [-1, 3]])}$.`,
         '',
-        t`Check: $${M([[3, 4], [1, 2]])}${M([[1, -2], [h(-1), h(3)]])} = ${M([['3 - 2', '-6 + 6'], ['1 - 1', '-2 + 3']])} = ${M([[1, 0], [0, 1]])}$.`,
+        t`**Step 3:** divide every entry by the determinant $2$.`,
+        '',
+        t`So $A^{-1} = \frac{1}{2}${M([[2, -4], [-1, 3]])} = ${M([[1, -2], [h(-1), h(3)]])}$. Check: $${M([[3, 4], [1, 2]])}${M([[1, -2], [h(-1), h(3)]])} = ${M([['3 - 2', '-6 + 6'], ['1 - 1', '-2 + 3']])} = ${M([[1, 0], [0, 1]])}$.`,
       ),
       whyWrong: [
         null,

@@ -499,7 +499,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'quadratics-016',
     subtopic: 'quadratics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Solve the inequality $(x - 1)(x + 2) \\ge 4$.',
     options: ['$x \\le -3$ or $x \\ge 2$', '$-3 \\le x \\le 2$', '$x \\le -2$ or $x \\ge 1$', '$x \\ge 2$'],
     correctIndex: 0,

@@ -651,7 +651,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'letter-symbol-patterns-020',
     subtopic: 'letter-symbol-patterns',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'In a code, the 1st letter of a word moves **1** place forward in the alphabet, the 2nd letter moves **2** places, the 3rd letter moves **3** places, and so on. For example, **BAD** becomes **CCG**. What does **CODE** become?',
     options: ['DPEF', 'CPFH', 'GSHI', 'DQGI'],
     correctIndex: 3,
@@ -686,7 +686,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'letter-symbol-patterns-021',
     subtopic: 'letter-symbol-patterns',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'In a certain code, **BAG = 14** and **FED = 120**. Using the same code, what is **HIDE**?',
     options: ['26', '1440', '30', '672'],
     correctIndex: 1,

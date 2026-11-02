@@ -2,6 +2,18 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'rank-eigen',
+  simple:
+    'The **rank** of a matrix counts how many of its rows carry genuinely new information: a row that is just a multiple (or a mix) of other rows adds nothing. ' +
+    'An **eigenvector** is a special direction that the matrix only stretches and never turns, and the stretch factor is its **eigenvalue** $\\lambda$, so $A\\mathbf{v} = \\lambda\\mathbf{v}$. ' +
+    'Picture stretching a rubber sheet: most arrows drawn on it rotate, but a few just get longer or shorter.',
+  methods: [
+    { cue: 'Find the **rank** of a given matrix', method: 'Row reduce (subtract multiples of row 1 to clear the first column, and so on) and count the non-zero rows left. A diagonal matrix: count the non-zero diagonal entries.' },
+    { cue: 'For which $k$ is the rank **less than full** (rank 1 for a $2 \\times 2$, rank 2 for a $3 \\times 3$)', method: 'Set the determinant equal to $0$ and solve for $k$.' },
+    { cue: 'Find the **eigenvalues** of a $2 \\times 2$ matrix', method: 'Solve $\\lambda^{2} - (\\text{trace})\\lambda + \\det = 0$. A triangular or diagonal matrix: the eigenvalues are the diagonal entries. Check: sum = trace, product = det.' },
+    { cue: '"Which vector is an **eigenvector**" or "find an eigenvector for $\\lambda$"', method: 'Multiply each option by $A$ and see which comes out as a multiple of itself, or solve $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$. The zero vector never counts.' },
+    { cue: 'Eigenvalues given; asked for the trace, the determinant, an unknown entry, or invertibility', method: 'Trace = sum of the eigenvalues, $\\det$ = product. An eigenvalue $0$ means $\\det = 0$, so no inverse. If one eigenvalue is given, use $\\det(A - \\lambda I) = 0$ to find the unknown.' },
+    { cue: 'Eigenvalues of $A^{2}$ or $A + cI$, or a **repeated** eigenvalue', method: '$A^{k}$ has eigenvalues $\\lambda^{k}$ and $A + cI$ has $\\lambda + c$. A repeated eigenvalue needs $(\\text{trace})^{2} - 4\\det = 0$ (discriminant zero).' },
+  ],
   know:
     '### Rank: how much "real information" a matrix holds\n\n' +
     'Think of each row of a matrix as an arrow (a vector). A set of rows is **linearly independent** if no row can be built from the others by multiplying by numbers and adding. The **rank** of a matrix is the number of linearly independent rows. (Amazingly, counting independent **columns** always gives the same number.)\n\n' +

@@ -2,6 +2,19 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'derivative-applications',
+  simple:
+    'The derivative is the slope of a graph, so it tells you its shape. A positive slope means the graph goes uphill (**increasing**), a negative slope means downhill (**decreasing**), ' +
+    'and a zero slope means a flat spot, called a **stationary point**: the top of a hill (a maximum) or the bottom of a valley (a minimum). ' +
+    'The same idea finds the best possible value in a real problem, such as the largest area you can fence off with a fixed length of fence.',
+  methods: [
+    { cue: '**Gradient** or **equation of the tangent** at $x = a$', method: "Gradient $m = f'(a)$, point $(a, f(a))$, then $y - y_1 = m(x - x_1)$. The **normal** is perpendicular, with gradient $-\\frac{1}{m}$." },
+    { cue: 'Tangent **parallel** to a given line', method: "Set $f'(x)$ equal to the gradient of that line and solve for $x$." },
+    { cue: '**Stationary point**, local maximum or minimum', method: "Solve $f'(x) = 0$, then put $x$ into $f$ to get $y$. Classify with $f''$: negative means a maximum, positive means a minimum." },
+    { cue: 'Where is $f$ **increasing** or **decreasing**?', method: "Find where $f'(x) = 0$, then test the sign of $f'$ in each interval between those points: $f' < 0$ means decreasing." },
+    { cue: '**Maximum value on an interval** $a \\le x \\le b$', method: 'Compare $f$ at the stationary points inside the interval and at both endpoints.' },
+    { cue: '**Optimisation** word problem (fencing, a box, a shortest distance)', method: 'Use the constraint to write the quantity in one variable, differentiate, set to $0$, check it is a max or min, and answer what was asked (the area, not $x$). For a distance, minimise its square.' },
+    { cue: '"**How fast** is ... changing?"', method: 'Chain rule: $\\frac{dA}{dt} = \\frac{dA}{ds} \\times \\frac{ds}{dt}$. For linked quantities (a sliding ladder), differentiate the equation linking them with respect to $t$, then substitute.' },
+  ],
   know:
     '### The one big idea\n\n' +
     'The derivative $f\'(x)$ (also written $\\frac{dy}{dx}$) is a formula for the **gradient** (steepness) of a curve at any point. Put a value of $x$ into $f\'(x)$ and you get one number: how steep the curve is right there. Everything in this topic is that one idea used in different ways.\n\n' +

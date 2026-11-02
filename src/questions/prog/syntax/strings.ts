@@ -77,6 +77,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        '`len` counts **every** character, spaces included. Then ask which spaces `strip()` removes.\n\n' +
         '1. Count every character of `s`, spaces included: 2 spaces + `Hello` (5) + 1 space + `World` (5) + 2 spaces $= 15$.\n' +
         '2. `s.strip()` removes whitespace from the **two ends only**, giving `"Hello World"`. The space in the middle stays.\n' +
         '3. `len("Hello World")` $= 5 + 1 + 5 = 11$.\n\n' +
@@ -370,6 +371,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Two things to decide: how many `a`s get replaced, and whether `s` itself changes.\n\n' +
         '1. `s.replace("a", "o")` builds a **new** string in which **every** `a` becomes `o`: `"bonono"`.\n' +
         '2. That new string is stored in `t`. Strings are immutable, so `s` itself is unchanged: still `"banana"`.\n' +
         '3. `print(s, t)` prints both, separated by a space.\n\n' +
@@ -502,6 +504,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
+        'Remember two facts: string methods return a **new** string (the original is unchanged), and `==` is case-sensitive.\n\n' +
         '1. `word.upper()` returns a new string with every letter in capitals: `a = "PYTHON"`. So `a == "PYTHON"` is `True`.\n' +
         '2. `word.lower()` returns a new string with every letter in lower case: `b = "python"`. Comparison is case-sensitive, and `"python"` is not `"Python"`, so this is `False`.\n' +
         '3. Strings are immutable, so `word` is still `"PyThOn"` and `word == "PyThOn"` is `True`.\n\n' +
@@ -666,6 +669,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Work from the inside out: first find the list `words`, then reverse it, then join it.\n\n' +
         "1. `s.split()` with **no argument** splits on any run of whitespace and ignores spaces at the ends: `words = ['Data', 'Science', 'is', 'fun']`.\n" +
         "2. `words[::-1]` reverses the **list** (the order of the words, not the letters): `['fun', 'is', 'Science', 'Data']`.\n" +
         '3. `"_".join(...)` puts `_` between neighbouring words: `fun_is_Science_Data`.\n' +

@@ -267,6 +267,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Think about how each structure finds a value: does it have to look through the items one by one, or can it jump straight to the right place?\n\n' +
         '- **List:** Python has no shortcut, so `in` compares `x` with the items one by one from the start (a linear search). On average it checks about half the list, and in the worst case all of it: $O(n)$.\n' +
         '- **Set:** a set is a **hash table**. Python computes `hash(x)`, which points straight to the place where `x` would be stored, so it checks only that place: $O(1)$ on average, whatever the size of the set.\n\n' +
         'So: list $O(n)$, set $O(1)$. This is why a set (or a dict) is the right choice when you need many fast "is this already there?" checks.',
@@ -567,7 +568,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'complexity-018',
     subtopic: 'complexity',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Algorithm A takes $20n + 500$ steps and algorithm B takes $n^2$ steps on an input of size $n$. What is the **smallest** whole number $n$ for which A takes **fewer** steps than B?',
     options: ['$21$', '$34$', '$35$', '$23$'],
     correctIndex: 2,
@@ -598,7 +599,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'complexity-019',
     subtopic: 'complexity',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'What does this Python code print?',
     code: {
       lang: 'python',
@@ -633,7 +634,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'complexity-020',
     subtopic: 'complexity',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Both functions return `True` if two different items of `nums` add up to `target`. Using the average-case cost of set operations, what are their worst-case time complexities, where $n$ is the length of `nums`?',
     code: {
       lang: 'python',

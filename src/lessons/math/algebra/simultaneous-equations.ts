@@ -4,6 +4,17 @@ import type { Lesson } from '../../../types';
 // so reading the lesson never hands over a practice answer.
 export const lesson: Lesson = {
   subtopic: 'simultaneous-equations',
+  simple:
+    'Simultaneous equations are two (or more) facts about the same unknowns that must all be true at the same time. For example, if two numbers add to 10 and differ by 4, only 7 and 3 work. On a graph each linear equation is a straight line and the answer is the point where the lines cross; parallel lines never cross, so then there is no solution.',
+  methods: [
+    { cue: 'One unknown has **matching or opposite** coefficients, e.g. $+2y$ and $-2y$', method: 'Eliminate it: add the equations if the signs are opposite, subtract if they are the same. Otherwise first scale one equation (every term, including the constant) so the coefficients match.' },
+    { cue: 'One equation already says $y = \\dots$ or $x = \\dots$', method: 'Substitute that whole expression, in brackets, into the other equation, solve, then put the value back to find the other unknown.' },
+    { cue: 'A **word problem** with two unknown prices or counts', method: 'Write one equation for each fact (for example the number of items and the total cost), solve the pair, and give the quantity the question actually asks for.' },
+    { cue: 'A **line and a curve**, or a line that **touches** a curve', method: 'Substitute the line into the curve to get a quadratic and solve it for the meeting points. "Touches" or "exactly one point" means discriminant $= 0$.' },
+    { cue: 'Find $k$ for **no solution** or **infinitely many** solutions', method: 'Make the $x$ and $y$ coefficients proportional ($ae - bd = 0$). If the constants are in the same ratio too, it is the same line (infinitely many); if not, the lines are parallel (none).' },
+    { cue: '**Three** equations in $x$, $y$ and $z$', method: 'Eliminate the same unknown from two different pairs to get a 2 by 2 system, solve it, then back-substitute. If options are given, test each one in all three equations.' },
+    { cue: 'Asked only for $x + y$, or the unknowns appear as $\\frac{1}{x}$, $2^x$ or $\\log_2 x$', method: 'Look for a shortcut or a substitution: adding the equations may give $x + y$ at once, and letting $u = \\frac{1}{x}$ or $a = 2^x$ turns the system into a linear one. Convert back at the end.' },
+  ],
   know:
     '### What "simultaneous" means\n\n' +
     'One equation with two unknowns, like $x + y = 12$, has endless solutions: $(1, 11)$, $(4, 8)$, $(7, 5)$ and so on. ' +

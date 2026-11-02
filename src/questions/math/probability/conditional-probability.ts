@@ -463,7 +463,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'conditional-probability-015',
     subtopic: 'conditional-probability',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Three machines make all the parts in a workshop. Machine A makes 50% of the parts, B makes 30% and C makes 20%. The percentages of faulty parts are 2% for A, 3% for B and 5% for C. A part is chosen at random and found to be **faulty**. What is the probability that it was made by machine C?',
     options: ['$\\frac{1}{2}$', '$\\frac{1}{100}$', '$\\frac{10}{29}$', '$\\frac{1}{20}$'],
     correctIndex: 2,

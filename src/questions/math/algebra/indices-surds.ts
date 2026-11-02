@@ -67,6 +67,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
+        'Look for a square number ($4, 9, 16, 25, 36, \\ldots$) that divides 72; the bigger it is, the better.\n\n' +
         '1. Find the **largest square number** that divides 72. The squares are $4, 9, 16, 25, 36, 49, \\ldots$ and $72 = 36 \\times 2$.\n' +
         '2. Split the root: $\\sqrt{72} = \\sqrt{36} \\times \\sqrt{2}$.\n' +
         '3. Take the square root of the square: $\\sqrt{36} = 6$, so $\\sqrt{72} = 6\\sqrt{2}$.\n\n' +
@@ -134,6 +135,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Use the rule $\\sqrt{a} \\times \\sqrt{b} = \\sqrt{ab}$ to put everything under one root.\n\n' +
         '1. Multiply under one root: $\\sqrt{3} \\times \\sqrt{12} = \\sqrt{3 \\times 12} = \\sqrt{36}$.\n' +
         '2. $\\sqrt{36} = 6$.\n\n' +
         'Another route: $\\sqrt{12} = 2\\sqrt{3}$, so $\\sqrt{3} \\times 2\\sqrt{3} = 2 \\times 3 = 6$.',
@@ -213,6 +215,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 0,
     markScheme: {
       solution:
+        'Deal with the bracket first: the power 4 outside applies to everything inside it.\n\n' +
         '1. Expand the bracket: the power 4 applies to **both** the 2 and the $x^{3}$. $(2x^{3})^{4} = 2^{4} \\times (x^{3})^{4} = 16x^{12}$ (power of a power: multiply, $3 \\times 4 = 12$).\n' +
         '2. Divide the numbers: $16 \\div 4 = 4$.\n' +
         '3. Divide the powers of $x$: $x^{12} \\div x^{5} = x^{12-5} = x^{7}$.\n\n' +
@@ -296,6 +299,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Multiply the front numbers and the powers of 10 separately, then check that the front number is between 1 and 10.\n\n' +
         '1. Multiply the numbers: $6 \\times 4 = 24$.\n' +
         '2. Multiply the powers of 10 by adding indices: $10^{5} \\times 10^{-8} = 10^{5 + (-8)} = 10^{-3}$.\n' +
         '3. So the product is $24 \\times 10^{-3}$, but this is **not** standard form because 24 is not between 1 and 10.\n' +
@@ -534,6 +538,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
+        'Work from the inside out: first tidy up the $y^{-3}$ on the bottom, then deal with the three parts of the index (minus sign, root, power).\n\n' +
         '1. Tidy the inside first: $\\frac{1}{y^{-3}} = y^{3}$, so $\\frac{8x^{6}}{27y^{-3}} = \\frac{8x^{6}y^{3}}{27}$.\n' +
         '2. The minus sign in the index flips the fraction: $\\left(\\frac{8x^{6}y^{3}}{27}\\right)^{-\\frac{2}{3}} = \\left(\\frac{27}{8x^{6}y^{3}}\\right)^{\\frac{2}{3}}$.\n' +
         '3. Cube root of each part: $\\sqrt[3]{27} = 3$, $\\sqrt[3]{8} = 2$, $(x^{6})^{\\frac{1}{3}} = x^{2}$, $(y^{3})^{\\frac{1}{3}} = y$. This gives $\\frac{3}{2x^{2}y}$.\n' +

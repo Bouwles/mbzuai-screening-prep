@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'propositional-logic',
+  simple:
+    'Logic is about sentences that are either **true** or **false**, like "it is raining". We join them with words such as AND, OR, NOT and IF...THEN, and work out whether the whole sentence is true. An "if...then" sentence works like a promise: it is only broken when the "if" part happens and the "then" part does not.',
+  methods: [
+    {
+      cue: 'Truth values are given ("$p$ is true, $q$ is false") and you must say which statement is true',
+      method: 'Substitute T and F into each option and evaluate it, innermost bracket first. Remember $p \\to q$ is false only for true $\\to$ false.',
+    },
+    {
+      cue: 'Asked for the **converse**, **inverse**, **contrapositive** or **negation** of "if $p$ then $q$"',
+      method: 'Converse = swap ($q \\to p$); inverse = negate both ($\\neg p \\to \\neg q$); contrapositive = swap and negate ($\\neg q \\to \\neg p$); negation = $p \\land \\neg q$.',
+    },
+    {
+      cue: '"Negate" an AND/OR sentence, or rewrite `not (A and B)` in code',
+      method: 'Use De Morgan: $\\neg(p \\land q) \\equiv \\neg p \\lor \\neg q$ and $\\neg(p \\lor q) \\equiv \\neg p \\land \\neg q$. Negate each part and swap AND with OR (the opposite of `>` is `<=`).',
+    },
+    {
+      cue: '**Logically equivalent**, **tautology**, **contradiction**, or "which column" questions',
+      method: 'Build the 4-row (or 8-row) truth table and compare columns. To rule an option out, one row where it fails is enough.',
+    },
+    {
+      cue: 'A truth table is given and you must name the statement',
+      method: 'Look at the rows where the output is F. A single F at T, T means "not both" ($\\neg p \\lor \\neg q$); a single F at T, F means $p \\to q$.',
+    },
+    {
+      cue: 'Several statements must all be true at once, or "what can be concluded about $p$?"',
+      method: 'Use the implications to force values: if $p \\to q$ is true and $q$ is false, $p$ must be false. Then check your values in every statement.',
+    },
+  ],
   know:
     '### What is a proposition?\n\n' +
     'A **proposition** is a sentence that makes a claim and is either **true (T)** or **false (F)**, never both. "Abu Dhabi is in the UAE" is a proposition (true). "7 is even" is also a proposition: it is false, but it still has a definite truth value.\n\n' +

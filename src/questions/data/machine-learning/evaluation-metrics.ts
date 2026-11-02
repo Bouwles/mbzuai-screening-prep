@@ -213,7 +213,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-006',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A factory uses a model to spot **defective** parts (defective = positive class). Its results on 200 parts are shown. What is the model\'s **precision**?',
+    stem: 'A factory uses a model to spot **defective** parts (defective = positive class). Its results on 200 parts are shown in the confusion matrix. Which statement is **true**?',
     table: {
       caption: 'Rows: actual class. Columns: predicted class.',
       headers: ['Actual class', 'Predicted: defective', 'Predicted: not defective'],
@@ -222,28 +222,49 @@ export const questions: StaticQuestion[] = [
         ['Not defective', 10, 140],
       ],
     },
-    options: ['$0.6$', '$0.85$', '$0.75$', '$0.25$'],
+    options: [
+      'The recall is $75\\%$',
+      'The model makes $20$ false positives',
+      'The precision is $75\\%$',
+      'The accuracy is $15\\%$',
+    ],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Read the cells carefully (rows are the **actual** class):\n\n' +
+        'First read the four cells carefully (rows are the **actual** class):\n\n' +
         '- TP (defective, predicted defective) $= 30$\n' +
         '- FN (defective, predicted not defective) $= 20$\n' +
         '- FP (not defective, predicted defective) $= 10$\n' +
         '- TN (not defective, predicted not defective) $= 140$\n\n' +
-        'Precision uses the **predicted defective** column: $\\text{TP} + \\text{FP} = 30 + 10 = 40$ parts were flagged.\n\n' +
-        '$$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{30}{40} = 0.75$$',
+        'Now work out each metric:\n\n' +
+        '- Recall $= \\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{30}{50} = 60\\%$\n' +
+        '- Accuracy $= \\frac{\\text{TP} + \\text{TN}}{200} = \\frac{170}{200} = 85\\%$\n' +
+        '- Precision $= \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{30}{40} = 75\\%$\n\n' +
+        'So the true statement is that the **precision is $75\\%$**: of the 40 parts flagged as defective, 30 really were.',
       whyWrong: [
-        'This is $\\frac{30}{50}$, the **recall**: it divides by the "Defective" row total (all actual defective parts) instead of the "Predicted: defective" column total.',
-        'This is the **accuracy**, $\\frac{30 + 140}{200}$, the fraction of all parts classified correctly.',
+        '$75\\%$ is the **precision** ($\\frac{30}{40}$, dividing by the "Predicted: defective" column). Recall divides by the "Defective" row, all actual defective parts: $\\frac{30}{50} = 60\\%$.',
+        'The $20$ is in the "Actual: defective, predicted not defective" cell, so those are **false negatives** (missed defective parts). There are only $10$ false positives.',
         null,
-        'This is $\\frac{10}{40}$: the right denominator, but the false positives are on top instead of the true positives. It is the fraction of flagged parts that were false alarms.',
+        '$15\\%$ is the **error rate**, $\\frac{20 + 10}{200}$: the fraction classified wrongly. Accuracy counts the correct ones on the diagonal: $\\frac{30 + 140}{200} = 85\\%$.',
       ],
-      keyIdea: 'Precision divides TP by the total of the PREDICTED-positive column; always check which way round the table is labelled.',
+      keyIdea: 'For "which statement is true" on a confusion matrix, write down TP, FP, FN and TN from the labels first, then compute each metric the options mention.',
     },
     check: {
-      optionValues: [0.6, 0.85, 0.75, 0.25],
-      compute: () => precisionOf(30, 10),
+      optionValues: ['recall75', 'fp20', 'precision75', 'accuracy15'],
+      compute: () => {
+        const tp = 30;
+        const fn = 20;
+        const fp: number = 10;
+        const tn = 140;
+        const claims: [string, boolean][] = [
+          ['recall75', recallOf(tp, fn) === 0.75],
+          ['fp20', fp === 20],
+          ['precision75', precisionOf(tp, fp) === 0.75],
+          ['accuracy15', accuracyOf(tp, fp, fn, tn) === 0.15],
+        ];
+        const trueOnes = claims.filter(([, ok]) => ok).map(([k]) => k);
+        return trueOnes.length === 1 ? trueOnes[0] : 'not unique';
+      },
     },
   },
   {
@@ -319,7 +340,7 @@ export const questions: StaticQuestion[] = [
       compute: () => {
         // rows = predicted, columns = actual
         const tp = 30;
-        const fp = 10;
+        const fp: number = 10;
         const fn = 30;
         return f1Of(tp, fp, fn);
       },
@@ -680,7 +701,7 @@ print(precision, recall)`,
   {
     id: 'evaluation-metrics-019',
     subtopic: 'evaluation-metrics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A disease affects 1% of a population of 10,000 people. A diagnostic model has a recall of 90%, and it wrongly flags 5% of healthy people. What is the model\'s **precision** (the fraction of flagged people who really have the disease)?',
     options: ['$\\frac{2}{13}$', '$\\frac{9}{10}$', '$\\frac{9}{1000}$', '$\\frac{19}{20}$'],
     correctIndex: 0,

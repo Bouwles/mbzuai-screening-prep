@@ -3,6 +3,7 @@ import { EXAM } from '../config/exam';
 import { accuracyBySub, dayKey, dueMistakes, streak, useStore, type State } from '../store/progress';
 import { SUBTOPICS, subtopicInfo } from '../syllabus';
 import { ScoreChart } from '../components/ScoreChart';
+import { masteryBySub } from '../engine/mastery';
 
 /** The single recommended next step, like Khan Academy's "Up next". */
 function upNext(s: State): { title: string; text: string; to: string; cta: string } {
@@ -10,10 +11,13 @@ function upNext(s: State): { title: string; text: string; to: string; cta: strin
   if (active) return { title: `Finish your ${active.label.toLowerCase()}`, text: 'Your mock exam is still running. The clock has kept going.', to: `/mock/run/${active.id}`, cta: 'Return to the exam' };
   const due = dueMistakes(s).length;
   if (due) return { title: `Review ${due} mistake${due > 1 ? 's' : ''}`, text: 'These questions are due today. Spaced review is the fastest way to stop repeating errors.', to: '/mistakes', cta: 'Start review' };
+  const mastery = masteryBySub(s);
+  const weak = SUBTOPICS.find((x) => mastery.get(x.id)?.level === 'weak');
+  if (weak) return { title: `Revisit: ${weak.name}`, text: 'Your recent answers here are mostly wrong. Go back over the lesson, then try guided practice with hints.', to: `/learn/${weak.id}`, cta: 'Revisit the lesson' };
   if (s.last) return { title: `Continue: ${s.last.label}`, text: 'Pick up exactly where you left off.', to: s.last.path, cta: 'Continue' };
-  const unread = SUBTOPICS.find((x) => !s.read.includes(x.id));
-  if (unread) return { title: `Lesson: ${unread.name}`, text: `${unread.area.name} › ${unread.topic.name}. Start from the basics, then try five check questions.`, to: `/learn/${unread.id}`, cta: 'Start lesson' };
-  return { title: 'Take a full mock exam', text: 'You have read every lesson. Test yourself under exam conditions.', to: '/mock?start=full', cta: 'Start mock' };
+  const fresh = SUBTOPICS.find((x) => !mastery.has(x.id) && !s.read.includes(x.id));
+  if (fresh) return { title: `Lesson: ${fresh.name}`, text: `${fresh.area.name} › ${fresh.topic.name}. A simple explanation and videos first, then examples and guided practice.`, to: `/learn/${fresh.id}`, cta: 'Start lesson' };
+  return { title: 'Take a full-length mock', text: 'You have started every topic. Test yourself under exam conditions.', to: '/mock?start=full', cta: 'Start mock' };
 }
 
 export function Home() {
@@ -34,14 +38,20 @@ export function Home() {
   const mocks = s.mocks.filter((m) => m.submittedAt);
   const recent = mocks.slice(-3);
   const estimate = recent.length ? Math.round(recent.reduce((n, m) => n + (m.score ?? 0), 0) / recent.length) : null;
-  const readPct = Math.round((100 * s.read.length) / SUBTOPICS.length);
+  const mastery = masteryBySub(s);
+  const mastered = SUBTOPICS.filter((x) => mastery.get(x.id)?.level === 'mastered').length;
+  const needWork = SUBTOPICS.filter((x) => mastery.get(x.id)?.level === 'weak').length;
+  const masteredPct = Math.round((100 * mastered) / SUBTOPICS.length);
   const target = EXAM.targetPercent;
 
   return (
     <div className="page home">
       <header className="home-head">
         <h1>Your exam prep</h1>
-        <p className="lede">MBZUAI BSc screening exam. Aim for {target}% or above.</p>
+        <p className="lede">
+          MBZUAI BSc screening exam: 60 minutes, multiple choice. Aim for {target}% or above, the score that waives the application fee (it is
+          not an official pass mark).
+        </p>
       </header>
 
       <section className="upnext card">
@@ -66,18 +76,22 @@ export function Home() {
             <span className={`fill ${estimate !== null && estimate >= target ? 'ok' : ''}`} style={{ width: `${estimate ?? 0}%` }} />
             <span className="mark" style={{ left: `${target}%` }} />
           </div>
-          <p className="small-print muted">Line marks the {target}% target</p>
+          <p className="small-print muted">Line marks {target}%, the fee-waiver score</p>
         </div>
         <div className="card">
-          <p className="card-kicker">Syllabus</p>
+          <p className="card-kicker">Mastery</p>
           <p className="metric">
-            {readPct}%<span className="metric-sub">of lessons read ({s.read.length} of {SUBTOPICS.length})</span>
+            {mastered}
+            <span className="metric-sub">
+              of {SUBTOPICS.length} topics mastered{needWork ? `, ${needWork} need${needWork === 1 ? 's' : ''} work` : ''}
+            </span>
           </p>
           <div className="target-meter" aria-hidden>
-            <span className="fill" style={{ width: `${readPct}%` }} />
+            <span className="fill" style={{ width: `${masteredPct}%` }} />
           </div>
           <p className="small-print muted">
-            {total.toLocaleString()} {total === 1 ? 'question' : 'questions'} answered{acc !== null ? `, ${acc}% correct` : ''}
+            From exam-level answers without hints. {total.toLocaleString()} {total === 1 ? 'question' : 'questions'} answered
+            {acc !== null ? `, ${acc}% correct` : ''}
           </p>
         </div>
         <div className="card">
@@ -144,7 +158,7 @@ export function Home() {
           <li>
             <Link to="/learn">
               <strong>Learn</strong>
-              <span>Lessons for every topic, from the basics to exam level</span>
+              <span>Simple explanation and videos, worked examples, guided practice with hints, then exam level</span>
             </Link>
           </li>
           <li>
@@ -167,8 +181,8 @@ export function Home() {
           </li>
           <li>
             <Link to="/mock?start=full">
-              <strong>Full mock</strong>
-              <span>40 questions in 45 minutes</span>
+              <strong>Full-length mock</strong>
+              <span>60 minutes, the real exam length (question count estimated)</span>
             </Link>
           </li>
           <li>
@@ -180,7 +194,6 @@ export function Home() {
         </ul>
       </section>
 
-      <p className="byline">Made by Paul Nercessian</p>
     </div>
   );
 }

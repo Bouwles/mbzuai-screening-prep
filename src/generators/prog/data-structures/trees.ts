@@ -268,7 +268,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-trees-bst-build',
     subtopic: 'trees',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     title: 'Build a BST from an insertion order: height or search cost',
     generate(rng) {
       for (;;) {

@@ -2,6 +2,34 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'graph-theory',
+  simple:
+    'In maths a **graph** is not a chart: it is a set of dots (**vertices**) joined by lines (**edges**), like towns joined by roads or friends joined by friendships. The **degree** of a dot is how many lines touch it. Most questions come down to counting lines and dots, using the fact that every line has exactly two ends.',
+  methods: [
+    {
+      cue: 'Degrees given (or an adjacency matrix), asked for the **number of edges**, or "which degree is possible?"',
+      method: 'Handshake lemma: sum of degrees $= 2E$, so halve the total. The sum must be even, and in a simple graph no degree can exceed $n - 1$.',
+    },
+    {
+      cue: '"Every pair is joined", "everyone plays everyone once", or a complete network',
+      method: 'Use the complete graph $K_n$: it has $\\frac{n(n-1)}{2}$ edges. If the edge count is given, solve $n(n-1) = 2E$ by spotting consecutive numbers.',
+    },
+    {
+      cue: '**Tree**, **spanning tree**, "minimum cables to connect everything", or a forest of separate pieces',
+      method: 'A tree on $V$ vertices has $V - 1$ edges; a forest with $k$ pieces has $V - k$. To reach a spanning tree, remove $E - (V - 1)$ edges.',
+    },
+    {
+      cue: '**Euler path / circuit**, or "trace every edge once without lifting the pen"',
+      method: 'Count the odd-degree vertices: 0 gives a circuit, exactly 2 gives a path that starts at one odd vertex and ends at the other, more than 2 gives neither.',
+    },
+    {
+      cue: 'Roads with lengths: "**shortest route** from A to E"',
+      method: 'List the sensible routes (or use Dijkstra) and add the weights; a route with more roads can still be shorter.',
+    },
+    {
+      cue: 'Adjacency matrix and "number of **walks of length 2 or 3**"',
+      method: 'Walks of length 2 from $X$ to $Y$: count the middle vertices $Z$ with edges $X \\to Z$ and $Z \\to Y$ (the entry of $M^2$). The diagonal of $M^3$ counts triangles through a vertex, twice each.',
+    },
+  ],
   know:
     '### What is a graph?\n\n' +
     'In discrete maths a **graph** is not a curve on axes. It is a set of dots called **vertices** (or nodes) joined by lines called **edges**. Graphs model anything with connections: friends on a social network, cities and roads, computers and cables, web pages and links. In AI they appear as neural-network diagrams, decision trees and knowledge graphs.\n\n' +

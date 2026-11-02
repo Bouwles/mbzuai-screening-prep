@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'probability-basics',
+  simple:
+    'A probability is a number from $0$ (impossible) to $1$ (certain). When every outcome is equally likely, it is just a fraction: favourable outcomes divided by all outcomes, like $\\frac{1}{6}$ for rolling a 6. Often the opposite is easier: the chance something does **not** happen is $1$ minus the chance it does. And "or" means you add, but take away any overlap you counted twice.',
+  methods: [
+    { cue: 'Equally likely outcomes: **cards, dice, coins**, "chosen at random"', method: 'Count: $P = \\frac{\\text{favourable}}{\\text{total}}$. For two dice use all $36$ ordered pairs; for coins list the $2^n$ outcomes.' },
+    { cue: '**Not** something, or **neither**', method: 'Complement rule: $P(A\') = 1 - P(A)$; neither $= 1 - P(A \\cup B)$.' },
+    { cue: '**At least one** success in several independent attempts', method: '$1 - P(\\text{none})$, where $P(\\text{none})$ is the single-attempt failure probability to the power $n$. Never add the single probabilities.' },
+    { cue: '**$A$ or $B$** with an overlap, or a Venn diagram with "both" given', method: 'Addition rule $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$; fill the Venn diagram from the overlap outwards ("$A$ only" $= P(A) - P(A \\cap B)$).' },
+    { cue: 'Events are called **independent**', method: 'Multiply: $P(A \\cap B) = P(A)P(B)$, then use it in the addition rule if "or" is asked.' },
+    { cue: '**Mutually exclusive** (cannot both happen), or "which pair is independent?"', method: 'Mutually exclusive: $P(A \\cap B) = 0$, so just add. Independent: test $P(A \\cap B) = P(A)P(B)$. The two are different properties.' },
+  ],
   know:
     '### What probability means\n\n' +
     'A **probability** is a number from $0$ to $1$ that says how likely something is. $0$ means impossible, $1$ means certain, and $0.5$ means "as likely as not". You can write it as a fraction, a decimal or a percentage: $\\frac{1}{4} = 0.25 = 25\\%$. If you ever get a probability below $0$ or above $1$, you have made a mistake.\n\n' +

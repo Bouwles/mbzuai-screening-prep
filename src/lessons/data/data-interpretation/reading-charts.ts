@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'reading-charts',
+  simple:
+    'A chart is just a picture of a table of numbers. Before doing any maths, check what one gridline is worth, what the units are (for example "thousands") and which colour in the key means what. Then turn the words of the question into one operation: "how many more" means subtract, and "what fraction" or "what percentage" means divide by the total of everything.',
+  methods: [
+    {
+      cue: 'Asked **how many more** (or fewer) one bar, row or point has than another',
+      method: 'Read both values against the gridlines and subtract the smaller from the larger. "How many **times** as many" is a division instead.',
+    },
+    {
+      cue: 'Asked what **fraction or percentage** of all the people a bar, slice or group is',
+      method: 'Add every bar or slice to get the total first, then work out $\\frac{\\text{part}}{\\text{total}}$ (times 100 for a percentage).',
+    },
+    {
+      cue: 'Asked where the **largest increase**, the biggest rise or the fastest change happened',
+      method: 'Work out later minus earlier for every pair of neighbouring values (or new minus old for every category) and pick the biggest **positive** result. The tallest bar and the biggest fall are traps.',
+    },
+    {
+      cue: 'A **pie chart** labelled with **percentages** or **angles**, plus a total in the stem',
+      method: 'Convert to people: $\\frac{\\text{angle}}{360} \\times \\text{total}$ or $\\frac{\\text{percentage}}{100} \\times \\text{total}$. For the angle of a sector use $\\frac{\\text{count}}{\\text{total}} \\times 360^\\circ$.',
+    },
+    {
+      cue: 'A **histogram** and "at least", "less than" or "more than" a boundary',
+      method: 'Decide exactly which classes meet the condition (each class includes its lower boundary) and add their heights. If the boundary falls inside a class, take the matching fraction of that class\'s frequency.',
+    },
+    {
+      cue: 'A **running total** (cumulative) graph or a **distance-time** graph',
+      method: 'What happened in one period is the **rise** between two consecutive points, not the height of a point. The steepest segment is the busiest period (or the fastest speed); a flat part means nothing was added (or stopped).',
+    },
+    {
+      cue: 'A scatter plot with a line of best fit $y = mx + c$, or with the line $y = x$ drawn',
+      method: 'To estimate, substitute the given $x$ into $y = mx + c$ and check the answer looks right on the graph. With $y = x$ drawn, points above it have $y > x$ and points below it have $y < x$.',
+    },
+  ],
   know:
     '### Why this topic is "free marks"\n\n' +
     'Chart questions need very little maths: read a number carefully, then add, subtract, divide or find a percentage. Nearly every mistake comes from **reading the wrong thing**, not from hard calculation. So slow down for the first 15 seconds: read the title, the axis labels, the units and the key before you look at the numbers.\n\n' +

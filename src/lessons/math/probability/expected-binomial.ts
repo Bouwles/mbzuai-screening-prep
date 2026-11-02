@@ -2,6 +2,17 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'expected-binomial',
+  simple:
+    'A **random variable** is a number decided by chance, like the number of goals in a match. Its **expected value** is the long-run average: multiply each value by its probability and add them up. A **binomial** situation is "repeat the same yes/no trial $n$ times and count the yeses", like counting heads in 10 coin tosses; then you expect $np$ successes, for example $10 \\times 0.5 = 5$ heads.',
+  methods: [
+    { cue: 'A probability **table with an unknown** $k$ (or $a$ and $b$)', method: 'The probabilities add to $1$: solve for $k$. With two unknowns, also use the given mean as a second equation.' },
+    { cue: 'Find $E(X)$ from a table, or the expected **gain** of a game', method: '$E(X) = \\sum x \\, P(X = x)$, no dividing at the end. Expected gain = expected prize minus the cost; a **fair** game has expected gain $0$.' },
+    { cue: 'Find $\\text{Var}(X)$ from a table', method: '$\\text{Var}(X) = E(X^2) - [E(X)]^2$: square the values for $E(X^2)$, then subtract the squared mean.' },
+    { cue: '$Y = aX + b$, or a score like "$+4$ correct, $-1$ wrong"', method: 'Write the score as $aX + b$, then $E(Y) = aE(X) + b$ and $\\text{Var}(Y) = a^2 \\, \\text{Var}(X)$.' },
+    { cue: 'Fixed number of independent yes/no trials: "**exactly** $r$" successes', method: 'Binomial: $P(X = r) = \\binom{n}{r} p^r (1-p)^{n-r}$.' },
+    { cue: '"**At least one**", "**at most**", "**at least two**" successes', method: 'Add the needed $P(X = r)$ terms, or use the complement, e.g. $P(X \\ge 1) = 1 - P(X = 0)$.' },
+    { cue: 'Mean, variance or SD of $\\text{B}(n, p)$, or $n$ and $p$ from the mean and variance', method: '$E(X) = np$, $\\text{Var}(X) = np(1-p)$, SD $= \\sqrt{np(1-p)}$. Dividing variance by mean gives $1 - p$.' },
+  ],
   know:
     '### Random variables and probability tables\n\n' +
     'A **random variable** is a number whose value depends on chance, such as the score on a die or the number of goals in a match. We use a capital letter like $X$ for the variable and a small letter like $x$ for a particular value it can take.\n\n' +

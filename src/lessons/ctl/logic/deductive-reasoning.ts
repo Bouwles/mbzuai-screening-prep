@@ -2,6 +2,38 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'deductive-reasoning',
+  simple:
+    "Deductive reasoning means working out what **must** be true from facts you are told to accept, like a detective who only uses the clues. A conclusion counts only if it is guaranteed: if you can imagine a situation where all the clues hold but the conclusion fails, it does not follow. Most questions use an \"if-then\" rule, or statements with \"all\", \"some\" and \"no\".",
+  methods: [
+    {
+      cue: "An **if-then rule** plus one fact, asked what **follows** or whether an argument is **valid**",
+      method: "Label the rule \"If $P$ then $Q$\". Given $P$, conclude $Q$ (modus ponens); given not $Q$, conclude not $P$ (modus tollens). Given $Q$, or given not $P$, nothing follows: those are the two fallacies.",
+    },
+    {
+      cue: "Asked which statement is **logically equivalent** to an if-then rule",
+      method: "Take the contrapositive: swap the two parts and negate both. The converse (swap only) and the inverse (negate only) are the traps.",
+    },
+    {
+      cue: "Wording with **only if**, **necessary** or **sufficient**",
+      method: "Rewrite it first. \"$X$ is sufficient for $Y$\" means \"if $X$ then $Y$\"; \"$X$ is necessary for $Y$\" and \"$Y$ only if $X$\" both mean \"if $Y$ then $X$\".",
+    },
+    {
+      cue: "Statements with **all**, **some** or **no** (syllogisms), asked what **must** be true",
+      method: "Draw each group as a circle and try to draw a picture where the premises hold but the option fails. Follow the one guaranteed member of a \"some\" statement through the other statements.",
+    },
+    {
+      cue: "Asked for the **negation** (exact opposite) of an \"all\" or \"some\" statement",
+      method: "\"Not all $A$ are $B$\" means \"at least one $A$ is not $B$\", not \"no $A$ are $B$\". The negation of \"some $A$ are $B$\" is \"no $A$ are $B$\".",
+    },
+    {
+      cue: "A **chain of several rules** and one known fact",
+      method: "Go one rule at a time from the known fact: modus ponens forwards, modus tollens backwards. Then check every rule with your final values.",
+    },
+    {
+      cue: "**Who owns what** clues, asked which statement **must** be true",
+      method: "Make a table of what each person could have, cross out with each clue, look for two people who must share two items, and keep only facts that hold in every remaining case.",
+    },
+  ],
   know: `### What deductive reasoning is
 
 **Deductive reasoning** means starting from statements you are told to accept (the **premises**) and working out what **must** follow from them (the **conclusion**). No guessing, no real-world knowledge, no "probably": a conclusion only counts if it is **guaranteed** by the premises.

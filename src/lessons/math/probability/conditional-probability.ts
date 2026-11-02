@@ -2,6 +2,16 @@ import type { Lesson } from '../../../types';
 
 export const lesson: Lesson = {
   subtopic: 'conditional-probability',
+  simple:
+    'A conditional probability is a probability **after** you have been told something. Being told "the number rolled is even" shrinks the possibilities to 2, 4 and 6, so the chance of a 6 jumps from $\\frac{1}{6}$ to $\\frac{1}{3}$. The rule is: only count inside the group you were told about, and divide by the size of that group. Careful: "the chance of a positive test given illness" is not the same as "the chance of illness given a positive test".',
+  methods: [
+    { cue: '**Two-way table** and "a student who ... is chosen" / "given that"', method: 'Divide the cell by the total of the row or column you are told about (not by the grand total).' },
+    { cue: 'Formula form: $P(A \\cap B)$, $P(B)$ or $P(A \\cup B)$ given, find $P(A \\mid B)$', method: 'Use $P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$; if only the union is given, get the overlap first from the addition rule.' },
+    { cue: 'Draws **one after another**, with or **without replacement**', method: 'Tree diagram: multiply along each branch, reducing the counts after each draw when there is no replacement. Add the branches for "one of each" or "second is red".' },
+    { cue: 'Several sources (machines, bags, groups): "**what is the probability it is faulty**?"', method: 'Law of total probability: $P(F) = \\sum P(\\text{source}) \\times P(F \\mid \\text{source})$.' },
+    { cue: 'The evidence is given and you are asked about the cause: "**tests positive**, probability it **has the disease**" / "is red, probability it came from Bag 1"', method: 'Bayes: that branch divided by the sum of all branches giving the evidence. Natural frequencies (imagine 1000 people) make it quick.' },
+    { cue: '"Given that **at least one** ..." or "given the sum is 8"', method: 'List the equally likely outcomes, cross out those the condition rules out, and count what is left.' },
+  ],
   know:
     '### What "conditional" means\n\n' +
     'A **conditional probability** is a probability worked out *after* you are told something. We write $P(A \\mid B)$ and say "the probability of $A$ **given** $B$". The bar $\\mid$ means "given that".\n\n' +

@@ -105,9 +105,9 @@ export const questions: StaticQuestion[] = [
     correctIndex: 2,
     markScheme: {
       solution:
-        'The standard deviation is the square root of the variance:\n\n' +
-        '$$\\sigma = \\sqrt{2.25} = 1.5$$\n\n' +
-        'Check: $1.5^2 = 2.25$. Units: the variance is in squared units ($\\text{s}^2$); taking the square root brings the SD back to the units of the data, seconds. So $\\sigma = 1.5$ s.',
+        'The standard deviation is the square root of the variance: $\\sigma = \\sqrt{\\sigma^2}$.\n\n' +
+        'So $\\sigma = \\sqrt{2.25} = 1.5$. Check: $1.5^2 = 2.25$.\n\n' +
+        'Units: the variance is in squared units ($\\text{s}^2$); taking the square root brings the SD back to the units of the data, seconds. So $\\sigma = 1.5$ s.',
       whyWrong: [
         'This **squares** the variance ($2.25^2 = 5.0625$). To go from variance to SD you take the square root, not the square.',
         'This halves the variance. Taking a square root is not the same as dividing by $2$: check $1.125^2 \\approx 1.27$, not $2.25$.',
@@ -469,7 +469,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'variance-sd-015',
     subtopic: 'variance-sd',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A data set has mean $10$ and standard deviation $2$. Every value $x$ is transformed to $y = ax + b$, where $a > 0$. The new data set has mean $23$ and standard deviation $5$. What is the value of $b$?',
     options: ['$13$', '$-7$', '$20.5$', '$-2$'],
     correctIndex: 3,
