@@ -457,8 +457,8 @@ function LessonBody({ sub }: { sub: string }) {
               <section className="lesson-section">
                 <h2>Exam level</h2>
                 <p className="muted">
-                  Five questions modelled on the level of MBZUAI's official sample questions, with the timer at the estimated exam pace. Get at least 80% of
-                  your recent hint-free answers right, including three at exam level, to master the topic.
+                  Five questions modelled on the level of MBZUAI's official sample questions. Get at least 80% of your recent hint-free answers right,
+                  including three at exam level, to master the topic.
                 </p>
                 <StepSession
                   sub={sub}
@@ -477,16 +477,6 @@ function LessonBody({ sub }: { sub: string }) {
                     )
                   }
                 />
-              </section>
-              <section className="lesson-section optional">
-                <h2>Optional: Challenge questions</h2>
-                <p className="muted">
-                  Harder than the official samples, for when the exam-level questions feel easy. Skip them if time is short; they are not needed for
-                  mastery.
-                </p>
-                <Link className="btn-ghost" to={`/practice?subs=${sub}&diff=challenge`}>
-                  Try Challenge questions
-                </Link>
               </section>
             </>
           )}

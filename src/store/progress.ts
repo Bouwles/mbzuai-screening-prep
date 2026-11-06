@@ -2,6 +2,8 @@
 // so closing the tab never loses anything.
 import { useSyncExternalStore } from 'react';
 import { EXAM } from '../config/exam';
+import { GEN_BY_ID, STATIC_BY_ID } from '../engine/bank';
+import { hasSubtopic } from '../syllabus';
 import type { QRef } from '../types';
 
 export type Mode = 'practice' | 'feed' | 'mock' | 'lesson' | 'mistakes' | 'bank';
@@ -58,7 +60,6 @@ export interface State {
   mocks: MockRecord[];
   activeMockId: string | null;
   theme: 'dark' | 'light';
-  practiceTimer: boolean;
   daily: Record<string, number>;
   last: { path: string; label: string; at: number } | null;
   /** Furthest lesson stage reached per subtopic (0 = Understand ... 4 = Exam level). */
@@ -78,17 +79,84 @@ export const emptyState = (): State => ({
   mocks: [],
   activeMockId: null,
   theme: 'light',
-  practiceTimer: true,
   daily: {},
   last: null,
   stage: {},
 });
 
+const isObject = (x: unknown): x is Record<string, unknown> => !!x && typeof x === 'object' && !Array.isArray(x);
+const staticExists = (id: unknown) => typeof id === 'string' && STATIC_BY_ID.has(id);
+const genExists = (id: unknown) => typeof id === 'string' && GEN_BY_ID.has(id);
+
+/** A flag key: a static id, or "gen:<generatorId>:<seed>". */
+const flagExists = (k: unknown) => typeof k === 'string' && (k.startsWith('gen:') ? genExists(k.split(':')[1]) : staticExists(k));
+/** A Mistakes card key: a static id, or "tpl:<generatorId>". */
+const cardExists = (k: string) => (k.startsWith('tpl:') ? genExists(k.slice(4)) : staticExists(k));
+const refExists = (r: unknown) => isObject(r) && (r.kind === 'gen' ? genExists(r.id) : staticExists(r.id));
+
+function cleanMock(m: Record<string, unknown>): MockRecord | null {
+  if (!Array.isArray(m.refs) || !Array.isArray(m.answers) || !Array.isArray(m.flags)) return null;
+  const rec = m as unknown as MockRecord;
+  // A finished mock keeps its score; its review simply skips anything that no longer exists.
+  if (rec.submittedAt) return rec;
+  const keep = rec.refs.map((r) => refExists(r));
+  const refs = rec.refs.filter((_, i) => keep[i]);
+  if (!refs.length) return null;
+  const before = (n: number) => keep.slice(0, n).filter(Boolean).length;
+  const last = refs.length - 1;
+  return {
+    ...rec,
+    refs,
+    answers: rec.answers.filter((_, i) => keep[i]),
+    flags: rec.flags.filter((_, i) => keep[i]),
+    current: Math.min(before(rec.current ?? 0), last),
+    maxVisited: Math.max(0, Math.min(before((rec.maxVisited ?? 0) + 1) - 1, last)),
+  };
+}
+
+/**
+ * Makes saved or imported progress safe to use: anything that refers to a question, generator or
+ * subtopic that no longer exists is dropped, and everything else is kept. Never throws.
+ */
+export function sanitizeState(raw: unknown): State {
+  const base = emptyState();
+  if (!isObject(raw)) return base;
+  // Unknown keys pass through; only `practiceTimer`, which no longer exists, is removed.
+  const { practiceTimer: _removed, ...r } = raw;
+  const attempts = Array.isArray(r.attempts)
+    ? (r.attempts as unknown[]).filter((a): a is Attempt => isObject(a) && (staticExists(a.sourceId) || genExists(a.sourceId)) && typeof a.sub === 'string' && hasSubtopic(a.sub))
+    : [];
+  const mistakes = isObject(r.mistakes)
+    ? (Object.fromEntries(Object.entries(r.mistakes).filter(([k, c]) => cardExists(k) && isObject(c) && typeof c.sub === 'string' && hasSubtopic(c.sub))) as Record<string, MistakeCard>)
+    : {};
+  const mocks = Array.isArray(r.mocks) ? (r.mocks as unknown[]).flatMap((m) => (isObject(m) ? (cleanMock(m) ?? []) : [])) : [];
+  const stage = isObject(r.stage) ? (Object.fromEntries(Object.entries(r.stage).filter(([k]) => hasSubtopic(k))) as Record<string, number>) : {};
+  const lastSub = isObject(r.last) && typeof r.last.path === 'string' ? r.last.path.match(/^\/learn\/(.+)$/)?.[1] : undefined;
+  const clean: State = {
+    ...base,
+    ...r,
+    v: 1,
+    attempts,
+    read: Array.isArray(r.read) ? (r.read as unknown[]).filter((x): x is string => typeof x === 'string' && hasSubtopic(x)) : [],
+    flags: Array.isArray(r.flags) ? (r.flags as unknown[]).filter((k): k is string => flagExists(k)) : [],
+    mistakes,
+    mastered: typeof r.mastered === 'number' ? r.mastered : 0,
+    mocks,
+    activeMockId: mocks.some((m) => m.id === r.activeMockId && !m.submittedAt) ? (r.activeMockId as string) : null,
+    theme: r.theme === 'dark' ? 'dark' : 'light',
+    daily: isObject(r.daily) ? (r.daily as Record<string, number>) : {},
+    last: isObject(r.last) && !(lastSub && !hasSubtopic(lastSub)) ? (r.last as State['last']) : null,
+    stage,
+  };
+  if ((clean as unknown as Record<string, unknown>).practiceDiff === 'challenge') (clean as unknown as Record<string, unknown>).practiceDiff = 'mixed';
+  return clean;
+}
+
 function load(): State {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return emptyState();
-    return { ...emptyState(), ...JSON.parse(raw) };
+    return sanitizeState(JSON.parse(raw));
   } catch {
     return emptyState();
   }
@@ -229,7 +297,7 @@ export function importJson(text: string): void {
   const parsed = JSON.parse(text);
   const s = parsed?.state ?? parsed;
   if (!s || s.v !== 1 || !Array.isArray(s.attempts)) throw new Error('This file is not a progress export from this app.');
-  commit({ ...emptyState(), ...s });
+  commit(sanitizeState(s));
 }
 export function resetAll() {
   commit({ ...emptyState(), theme: state.theme });

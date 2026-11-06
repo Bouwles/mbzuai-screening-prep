@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EXAM, type MockFormat } from '../config/exam';
 import { buildMock } from '../engine/select';
@@ -6,7 +6,12 @@ import { refKey, serve } from '../engine/bank';
 import { getState, recordAttempt, update, useStore, type MockRecord } from '../store/progress';
 import { SYLLABUS, subtopicInfo } from '../syllabus';
 import { freshSeed } from '../lib/rng';
-import { LETTERS, MarkScheme, QuestionMeta, QuestionView } from '../components/QuestionView';
+import { MarkScheme, QuestionMeta } from '../components/QuestionView';
+import { ExamNavStrip } from '../components/exam/ExamNavStrip';
+import { ExamQuestion } from '../components/exam/ExamQuestion';
+import { ExamSubmitDialog } from '../components/exam/ExamSubmitDialog';
+import { ExamTimer } from '../components/exam/ExamTimer';
+import { ExamTopBar } from '../components/exam/ExamTopBar';
 import { QuestionSession } from '../components/QuestionSession';
 import { ScoreChart } from '../components/ScoreChart';
 import { useKeys } from '../components/useKeys';
@@ -90,8 +95,8 @@ export function MockHome() {
             <li>No negative marking, so answer every question. A blank scores the same as a wrong answer.</li>
             <li>You may use a physical calculator, blank paper and a pen. No notes, books, phone or other people.</li>
             <li>Sit somewhere quiet, as you would for the real AI-proctored exam.</li>
-            <li>Each question has four options and exactly one correct answer. You can flag questions and go back to them.</li>
-            <li>The Submit button appears once you reach the last question. The exam submits itself when time runs out.</li>
+            <li>Each question has four options and exactly one correct answer. You can mark questions for review and go back to them.</li>
+            <li>The Submit tab unlocks once you reach the last question. The exam submits itself when time runs out.</li>
             <li>No feedback until the end. Then you get your score, a breakdown and a full mark scheme for every question.</li>
           </ul>
         </section>
@@ -128,7 +133,7 @@ export function MockHome() {
           The real BSc exam lasts 60 minutes. MBZUAI does not publish the number of questions, the topic weights or the difficulty mix, so
           the question counts here, the topic mix (about {Math.round(EXAM.areaWeights.math * 100)}% Math, {Math.round(EXAM.areaWeights.data * 100)}% Data & AI,{' '}
           {Math.round(EXAM.areaWeights.prog * 100)}% Programming, {Math.round(EXAM.areaWeights.ctl * 100)}% CT & Logic) and the Foundation/Exam split are
-          estimates. Mocks use Foundation and Exam-level questions only; Challenge questions stay optional. {EXAM.targetPercent}% is the score that
+          estimates. {EXAM.targetPercent}% is the score that
           waives the application fee, not an official pass mark.
         </p>
       </header>
@@ -194,8 +199,9 @@ export function MockRun() {
   const rec = useStore((s) => s.mocks.find((m) => m.id === id));
   const [now, setNow] = useState(Date.now());
   const [confirm, setConfirm] = useState(false);
-  const [showNav, setShowNav] = useState(false);
   const [timerHidden, setTimerHidden] = useState(false);
+  const [saves, setSaves] = useState(0);
+  const mid = useRef<HTMLDivElement>(null);
   const questions = useMemo(() => rec?.refs.map((r) => serve(r)) ?? [], [rec?.id]);
 
   const remaining = rec ? rec.startedAt + rec.durationSec * 1000 - now : 0;
@@ -214,28 +220,46 @@ export function MockRun() {
     }
   }, [rec, remaining, nav]);
 
+  // Each question starts at the top of the page.
+  useEffect(() => {
+    mid.current?.scrollTo(0, 0);
+  }, [rec?.current]);
+
   const go = (i: number) => {
     if (!rec) return;
     const c = Math.max(0, Math.min(rec.refs.length - 1, i));
     patchMock(rec.id, (m) => ({ ...m, current: c, maxVisited: Math.max(m.maxVisited, c) }));
   };
-  const choose = (i: number) => rec && patchMock(rec.id, (m) => ({ ...m, answers: m.answers.map((a, k) => (k === m.current ? i : a)) }));
-  const flag = () => rec && patchMock(rec.id, (m) => ({ ...m, flags: m.flags.map((f, k) => (k === m.current ? !f : f)) }));
+  const saved = () => setSaves((n) => n + 1);
+  const setAnswer = (i: number | null) => {
+    if (!rec || rec.answers[rec.current] === i) return;
+    patchMock(rec.id, (m) => ({ ...m, answers: m.answers.map((a, k) => (k === m.current ? i : a)) }));
+    saved();
+  };
+  const flag = () => {
+    if (!rec) return;
+    patchMock(rec.id, (m) => ({ ...m, flags: m.flags.map((f, k) => (k === m.current ? !f : f)) }));
+    saved();
+  };
 
   useKeys((e) => {
     if (!rec || confirm) return;
     const k = e.key.toLowerCase();
-    const idx = '1234'.indexOf(k) >= 0 && k.length === 1 ? '1234'.indexOf(k) : 'abcd'.indexOf(k) >= 0 && k.length === 1 ? 'abcd'.indexOf(k) : -1;
-    if (idx >= 0) choose(idx);
+    const idx = k.length === 1 ? ('1234'.includes(k) ? '1234'.indexOf(k) : 'abcd'.indexOf(k)) : -1;
+    if (idx >= 0) setAnswer(idx);
     else if (k === 'f') flag();
-    else if (k === 'arrowright' || k === 'enter') go(rec.current + 1);
-    else if (k === 'arrowleft') go(rec.current - 1);
+    else if (k === 'arrowright' || k === 'arrowleft') {
+      // Left and right always move between questions. Up and down still move within the options.
+      e.preventDefault();
+      go(rec.current + (k === 'arrowright' ? 1 : -1));
+    } else if (k === 'enter') go(rec.current + 1);
   });
 
   if (!rec) return <p className="empty">This mock exam doesn't exist.</p>;
   const q = questions[rec.current];
   const n = rec.refs.length;
-  const unanswered = rec.answers.filter((a) => a === null).length;
+  const answeredCount = rec.answers.filter((a) => a !== null).length;
+  const markedCount = rec.flags.filter(Boolean).length;
   const canSubmit = rec.maxVisited >= n - 1;
   const lowTime = remaining < 5 * 60 * 1000;
 
@@ -245,117 +269,43 @@ export function MockRun() {
   };
 
   return (
-    <div className="exam">
-      <header className="exam-top">
-        <span className="exam-title">{rec.label}</span>
-        <div className="exam-timer">
-          {timerHidden && !lowTime ? (
-            <span className="timer muted">Timer hidden</span>
-          ) : (
-            <span className={`timer ${lowTime ? 'low' : ''}`} role="timer">
-              {fmtTime(remaining / 1000)}
-            </span>
-          )}
-          <button type="button" className="btn-text small" onClick={() => setTimerHidden((h) => !h)}>
-            {timerHidden && !lowTime ? 'Show' : 'Hide'}
-          </button>
-        </div>
-        <span />
-      </header>
-
-      <main className="exam-col">
-        <div className="exam-qhead">
-          <span className="qnum">{rec.current + 1}</span>
-          <button type="button" className={`btn-text ${rec.flags[rec.current] ? 'on' : ''}`} onClick={flag}>
-            {rec.flags[rec.current] ? '⚑ Marked for review' : '⚐ Mark for review'}
-          </button>
-        </div>
-        {q ? <QuestionView q={q} selected={rec.answers[rec.current]} onSelect={choose} /> : <p className="empty">Question unavailable.</p>}
-        <p className="kbd-hint">
-          Shortcuts: <kbd>1</kbd>–<kbd>4</kbd> or <kbd>A</kbd>–<kbd>D</kbd> choose, <kbd>F</kbd> mark for review, <kbd>←</kbd> <kbd>→</kbd> move
-        </p>
+    <div className="ex ex-mock">
+      <ExamTopBar saves={saves} />
+      <main className="ex-mid" ref={mid}>
+        {q ? (
+          <ExamQuestion
+            number={rec.current + 1}
+            q={q}
+            selected={rec.answers[rec.current]}
+            onSelect={setAnswer}
+            onReset={() => setAnswer(null)}
+            marked={rec.flags[rec.current]}
+            onToggleMark={flag}
+            mode="mock"
+          />
+        ) : (
+          <p className="empty">Question unavailable.</p>
+        )}
       </main>
-
-      <footer className="exam-bottom">
-        <div className="exam-bottom-inner">
-          <span className="exam-answered muted">
-            {n - unanswered} of {n} answered
-          </span>
-          <div className="nav-pop-wrap">
-            <button type="button" className="nav-toggle" aria-expanded={showNav} onClick={() => setShowNav((v) => !v)}>
-              Question {rec.current + 1} of {n} <span aria-hidden>{showNav ? '▾' : '▴'}</span>
-            </button>
-            {showNav && (
-              <div className="nav-pop" role="dialog" aria-label="Question navigator">
-                <div className="nav-grid">
-                  {rec.refs.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      className={`nav-cell ${rec.answers[i] !== null ? 'answered' : ''} ${rec.flags[i] ? 'flagged' : ''} ${i === rec.current ? 'current' : ''}`}
-                      onClick={() => {
-                        go(i);
-                        setShowNav(false);
-                      }}
-                      aria-label={`Question ${i + 1}${rec.answers[i] !== null ? ', answered' : ', unanswered'}${rec.flags[i] ? ', marked for review' : ''}`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-                <ul className="nav-legend">
-                  <li>
-                    <span className="nav-cell answered sample" /> Answered
-                  </li>
-                  <li>
-                    <span className="nav-cell sample" /> Unanswered ({unanswered})
-                  </li>
-                  <li>
-                    <span className="nav-cell flagged sample" /> For review ({rec.flags.filter(Boolean).length})
-                  </li>
-                </ul>
-              </div>
-            )}
-          </div>
-          <div className="exam-buttons">
-            <button type="button" className="btn-secondary" disabled={rec.current === 0} onClick={() => go(rec.current - 1)}>
-              Back
-            </button>
-            {rec.current < n - 1 && (
-              <button type="button" className="btn-primary" onClick={() => go(rec.current + 1)}>
-                Next
-              </button>
-            )}
-            {canSubmit && (
-              <button type="button" className={rec.current === n - 1 ? 'btn-primary' : 'btn-secondary'} onClick={() => setConfirm(true)}>
-                Submit
-              </button>
-            )}
-          </div>
-        </div>
-      </footer>
-      {confirm && (
-        <div className="modal-back" role="dialog" aria-modal="true" aria-labelledby="submit-title">
-          <div className="modal">
-            <h2 id="submit-title">Submit your exam?</h2>
-            {unanswered > 0 ? (
-              <p className="warn">
-                You have {unanswered} unanswered question{unanswered > 1 ? 's' : ''}. There is no negative marking, so a guess can only help.
-              </p>
-            ) : (
-              <p>All questions answered. You can't change answers after submitting.</p>
-            )}
-            <div className="modal-actions">
-              <button type="button" className="btn-secondary" onClick={() => setConfirm(false)}>
-                Keep working
-              </button>
-              <button type="button" className="btn-primary" onClick={doSubmit}>
-                Submit now
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ExamNavStrip
+        label={rec.label}
+        current={rec.current}
+        answered={rec.answers.map((a) => a !== null)}
+        marked={rec.flags}
+        onGo={go}
+        canSubmit={canSubmit}
+        onSubmit={() => setConfirm(true)}
+        timer={
+          <ExamTimer
+            remainingMs={remaining}
+            hidden={timerHidden}
+            onToggle={() => {
+              if (!lowTime) setTimerHidden((h) => !h);
+            }}
+          />
+        }
+      />
+      {confirm && <ExamSubmitDialog answered={answeredCount} total={n} marked={markedCount} onClose={() => setConfirm(false)} onSubmit={doSubmit} />}
     </div>
   );
 }
@@ -510,11 +460,13 @@ export function MockResults() {
               <header className="review-head">
                 <strong>Question {x.i + 1}</strong>
                 <span className={x.ok ? 'pass' : 'below'}>
-                  {x.ok ? 'Correct' : x.chosen === null ? 'Not answered' : `Wrong: you chose ${LETTERS[x.chosen]}`}
+                  {x.ok ? 'Correct' : x.chosen === null ? 'Not answered' : 'Wrong'}
                 </span>
                 <QuestionMeta q={x.q} />
               </header>
-              <QuestionView q={x.q} selected={x.chosen} reveal />
+              <div className="ex ex-review">
+                <ExamQuestion number={x.i + 1} q={x.q} selected={x.chosen} marked={rec.flags[x.i]} mode="review" reveal={{ correctIndex: x.q.correctIndex }} locked />
+              </div>
               <details open={!x.ok}>
                 <summary>Mark scheme</summary>
                 <MarkScheme q={x.q} selected={x.chosen} />

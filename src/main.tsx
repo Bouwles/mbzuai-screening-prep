@@ -8,6 +8,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/600.css';
 import 'katex/dist/katex.min.css';
 import './styles.css';
+import './components/exam/exam.css';
 import App from './App';
 
 createRoot(document.getElementById('root')!).render(

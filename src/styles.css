@@ -1,6 +1,6 @@
-/* Screening Prep — design modelled on Khan Academy, Brilliant, Quizlet and the Bluebook exam app:
-   light canvas, white cards, one blue accent, green/red only for right/wrong, a focus view for
-   practice with the main action fixed at the bottom right. No transitions or animations, by design. */
+/* Screening Prep: light canvas, white cards, one blue accent, green/red only for right/wrong.
+   No transitions or animations, by design. The exam screen (components/exam/exam.css) is the one
+   exception: its few small transitions are part of how that screen reads. */
 
 :root,
 [data-theme='light'] {
@@ -237,24 +237,15 @@ pre {
 .footer-inner strong {
   color: var(--text);
 }
-/* focus / exam modes hide the site navigation */
-.focus-mode .topbar,
-.exam-mode .topbar {
+/* A session runs full width under the site navigation. A mock takes over the whole screen. */
+.exam-mode .topbar,
+.exam-mode .footer {
   display: none;
 }
-.focus-mode .main {
-  max-width: none;
-  padding: 0 0 120px;
-}
-.focus-mode .footer {
-  margin-bottom: 76px;
-}
+.focus-mode .main,
 .exam-mode .main {
   max-width: none;
   padding: 0;
-}
-.exam-mode .footer {
-  margin-bottom: 72px;
 }
 
 /* ---------------------------------------------------------------- building blocks */
@@ -396,9 +387,6 @@ button:disabled {
   color: var(--text);
   background: var(--surface-2);
 }
-.btn-text.on {
-  color: var(--accent);
-}
 .small {
   min-height: 34px;
   padding: 0 12px;
@@ -415,14 +403,9 @@ button:disabled {
   white-space: nowrap;
 }
 .tag.diff-foundation,
-.tag.diff-exam,
-.tag.diff-challenge {
+.tag.diff-exam {
   background: transparent;
   box-shadow: inset 0 0 0 1px var(--line-strong);
-}
-.tag.diff-challenge {
-  color: var(--text);
-  font-weight: 650;
 }
 .tag-variant {
   background: var(--accent-soft);
@@ -555,7 +538,6 @@ input[type='checkbox'] {
   color: var(--muted);
   background: var(--surface-2);
 }
-.question .data-table,
 .rich .data-table {
   width: auto;
   min-width: 50%;
@@ -743,9 +725,6 @@ input[type='checkbox'] {
 
 /* ---------------------------------------------------------------- question + session (focus view) */
 .focus-top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -802,167 +781,10 @@ input[type='checkbox'] {
   margin: 0;
   padding: 0;
 }
-.q-head {
-  margin-bottom: 16px;
-}
 .q-meta {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-}
-.question .stem {
-  font-size: 1.25rem;
-  line-height: 1.6;
-  margin-bottom: 8px;
-}
-.options {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 24px;
-}
-.option {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  min-height: 60px;
-  padding: 12px 18px;
-  text-align: left;
-  border-radius: 12px;
-  border: 1.5px solid var(--line-strong);
-  background: var(--surface);
-  font-size: 1.05rem;
-  box-shadow: var(--shadow);
-}
-.option:hover:not(:disabled) {
-  border-color: var(--accent);
-}
-.option:disabled {
-  cursor: default;
-}
-.option .letter {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1.5px solid var(--line-strong);
-  font-weight: 700;
-  font-size: 0.88rem;
-  color: var(--muted);
-}
-.option-text {
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 4px 0;
-}
-.option.selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  box-shadow: inset 0 0 0 1px var(--accent);
-}
-.option.selected .letter {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--on-accent);
-}
-.option.correct {
-  border-color: var(--ok-strong);
-  background: var(--ok-soft);
-  box-shadow: inset 0 0 0 1px var(--ok-strong);
-}
-.option.correct .letter {
-  background: var(--ok-strong);
-  border-color: var(--ok-strong);
-  color: #fff;
-}
-.option.wrong {
-  border-color: var(--bad);
-  background: var(--bad-soft);
-  box-shadow: inset 0 0 0 1px var(--bad);
-}
-.option.wrong .letter {
-  background: var(--bad);
-  border-color: var(--bad);
-  color: #fff;
-}
-.verdict {
-  flex: none;
-  font-size: 0.8rem;
-  font-weight: 650;
-}
-.option.correct .verdict {
-  color: var(--ok);
-}
-.option.wrong .verdict {
-  color: var(--bad);
-}
-
-/* bottom action bar: progress left, primary action right */
-.action-bar {
-  background: var(--surface);
-}
-.action-bar.fixed {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  box-shadow: var(--shadow-bar);
-}
-.is-inline .action-bar {
-  margin-top: 20px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-.action-bar.is-ok {
-  /* tint layered on a solid surface so content never shows through the fixed bar */
-  background: linear-gradient(var(--ok-soft), var(--ok-soft)), var(--surface);
-}
-.action-bar.is-bad {
-  background: linear-gradient(var(--bad-soft), var(--bad-soft)), var(--surface);
-}
-.action-inner {
-  max-width: 760px;
-  margin: 0 auto;
-  min-height: 76px;
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-.is-inline .action-inner {
-  padding: 12px 16px;
-  min-height: 64px;
-}
-.action-left {
-  min-width: 0;
-}
-.action-meta {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font-weight: 600;
-}
-.pace {
-  color: var(--muted);
-  font-weight: 550;
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
-}
-.pace.over {
-  color: var(--bad);
-}
-.action-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: none;
 }
 .feedback {
   display: flex;
@@ -1065,11 +887,6 @@ input[type='checkbox'] {
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 4px;
-}
-.why-yours {
-  color: var(--bad);
-  font-size: 0.8rem;
-  font-weight: 650;
 }
 .key-idea {
   margin-top: 24px;
@@ -1577,12 +1394,6 @@ input[type='checkbox'] {
   justify-content: space-between;
   gap: 16px;
 }
-.check-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 16px;
-}
 
 /* ---------------------------------------------------------------- bank */
 .filters {
@@ -1713,193 +1524,6 @@ input[type='checkbox'] {
 }
 .rules li {
   margin: 8px 0;
-}
-
-.exam {
-  min-height: 100vh;
-}
-.exam-top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  height: 64px;
-  padding: 0 24px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-.exam-title {
-  font-weight: 650;
-}
-.exam-timer {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.timer {
-  font-size: 1.25rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.timer.muted {
-  font-size: 0.95rem;
-  font-weight: 550;
-}
-.timer.low {
-  color: var(--bad);
-}
-.exam-col {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 32px 24px 40px;
-}
-.exam-qhead {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-bottom: 14px;
-  margin-bottom: 20px;
-  border-bottom: 1px dashed var(--line-strong);
-}
-.qnum {
-  display: grid;
-  place-items: center;
-  min-width: 34px;
-  height: 34px;
-  padding: 0 8px;
-  border-radius: 8px;
-  background: var(--text);
-  color: var(--bg);
-  font-weight: 700;
-}
-.exam-bottom {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  background: var(--surface);
-  box-shadow: var(--shadow-bar);
-}
-.exam-bottom-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  height: 72px;
-  padding: 0 24px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 16px;
-}
-.exam-answered {
-  font-size: 0.9rem;
-}
-.exam-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-.nav-pop-wrap {
-  position: relative;
-}
-.nav-toggle {
-  min-height: 40px;
-  padding: 0 16px;
-  border-radius: 999px;
-  border: none;
-  background: var(--text);
-  color: var(--bg);
-  font-weight: 650;
-}
-.nav-pop {
-  position: absolute;
-  bottom: calc(100% + 14px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(420px, calc(100vw - 32px));
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 12px;
-  padding: 18px;
-  box-shadow: 0 12px 32px rgba(16, 24, 40, 0.16);
-}
-.nav-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-  gap: 8px;
-}
-.nav-cell {
-  position: relative;
-  display: grid;
-  place-items: center;
-  height: 40px;
-  border-radius: 8px;
-  border: 1.5px dashed var(--line-strong);
-  background: var(--surface);
-  font-size: 0.88rem;
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent);
-}
-.nav-cell.answered {
-  border-style: solid;
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--on-accent);
-}
-.nav-cell.flagged::after {
-  content: '⚑';
-  position: absolute;
-  top: -9px;
-  right: -5px;
-  font-size: 0.8rem;
-  color: var(--bad);
-}
-.nav-cell.current {
-  outline: 2px solid var(--text);
-  outline-offset: 2px;
-}
-.nav-cell.sample {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  vertical-align: middle;
-  margin-right: 6px;
-}
-.nav-legend {
-  list-style: none;
-  padding: 0;
-  margin: 14px 0 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 16px;
-  font-size: 0.82rem;
-  color: var(--muted);
-}
-.modal-back {
-  position: fixed;
-  inset: 0;
-  background: rgba(16, 24, 40, 0.45);
-  display: grid;
-  place-items: center;
-  z-index: 30;
-  padding: 16px;
-}
-.modal {
-  background: var(--surface);
-  border-radius: 14px;
-  padding: 28px;
-  max-width: 480px;
-  width: 100%;
-  box-shadow: 0 20px 48px rgba(16, 24, 40, 0.24);
-}
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
 }
 
 .result-hero {
@@ -2050,12 +1674,6 @@ input[type='checkbox'] {
   .session-col {
     padding: 24px 16px;
   }
-  .action-inner {
-    padding: 10px 16px;
-  }
-  .feedback span {
-    display: none;
-  }
   .formula,
   .fs-row {
     grid-template-columns: minmax(0, 1fr);
@@ -2063,23 +1681,6 @@ input[type='checkbox'] {
   }
   .kbd-hint {
     display: none;
-  }
-  .exam-top {
-    padding: 0 16px;
-    grid-template-columns: 1fr auto;
-  }
-  .exam-top > span:last-child {
-    display: none;
-  }
-  .exam-bottom-inner {
-    grid-template-columns: auto 1fr;
-    padding: 0 16px;
-  }
-  .exam-answered {
-    display: none;
-  }
-  .question .stem {
-    font-size: 1.125rem;
   }
 }
 
@@ -2293,10 +1894,6 @@ input[type='checkbox'] {
 .lesson-section.simple .reading {
   font-size: 1.1rem;
 }
-.lesson-section.optional {
-  border-top: 1px solid var(--line);
-  padding-top: 24px;
-}
 .video-list {
   list-style: none;
   padding: 0;
@@ -2360,12 +1957,6 @@ input[type='checkbox'] {
   font-size: 0.8rem;
   font-weight: 650;
   color: var(--accent);
-}
-.hint-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 12px;
 }
 .ms-mistake {
   background: var(--bad-soft);

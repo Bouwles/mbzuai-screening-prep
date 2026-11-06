@@ -3,7 +3,6 @@ import { exportJson, importJson, resetAll, update, useStore } from '../store/pro
 
 export function Settings() {
   const theme = useStore((s) => s.theme);
-  const timer = useStore((s) => s.practiceTimer);
   const answered = useStore((s) => s.attempts.length);
   const fileRef = useRef<HTMLInputElement>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -42,10 +41,6 @@ export function Settings() {
             </button>
           ))}
         </div>
-        <label className="check-row">
-          <input type="checkbox" checked={timer} onChange={(e) => update((s) => ({ ...s, practiceTimer: e.target.checked }))} /> Show the per-question timer in
-          practice
-        </label>
       </section>
       <section className="panel">
         <h2>Move progress between computers</h2>

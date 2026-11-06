@@ -1,0 +1,677 @@
+/* The exam-style screen: mocks, and the question block in every other mode.
+   Scoped under .ex so nothing leaks into the rest of the site. */
+
+/* ---------------------------------------------------------------- tokens */
+.ex {
+  --ex-bg: #f0f0f0;
+  --ex-bar: #f7f7f7;
+  --ex-line: #d4d4d4;
+  --ex-text: #1f1f1f;
+  --ex-muted: #636363;
+  --ex-icon: #444444;
+  --ex-row: #e9e9e9;
+  --ex-row-hover: #e1e1e1;
+  --ex-row-line: #dadada;
+  --ex-row-selected: #b5c9e2;
+  --ex-radio: #5a5a5a;
+  --ex-radio-fill: #ffffff;
+  --ex-accent: #2f5d8f;
+  --ex-accent-2: #2a56c6;
+  --ex-rule: #8a8a8a;
+  --ex-link: #3b5f8a;
+  --ex-focus: #2a56c6;
+  --ex-low: #b3261e;
+  --ex-ok: #256b29;
+  --ex-ok-bg: #cfe8d4;
+  --ex-bad: #b3261e;
+  --ex-bad-bg: #f1d0d0;
+  /* Left edge of the number column. The stem then starts about 7vw from the page edge. */
+  --ex-left: max(24px, calc(7vw - 64px));
+
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0;
+  color: var(--ex-text);
+}
+
+/* Practice modes follow the site theme. */
+[data-theme='dark'] .ex:not(.ex-mock) {
+  --ex-bg: #17191d;
+  --ex-bar: #1d2025;
+  --ex-line: #30343b;
+  --ex-text: #e6e7ea;
+  --ex-muted: #9aa0aa;
+  --ex-icon: #b8bdc6;
+  --ex-row: #22262c;
+  --ex-row-hover: #292e35;
+  --ex-row-line: #2f343b;
+  --ex-row-selected: #2c3f5c;
+  --ex-radio: #8a909a;
+  --ex-radio-fill: #17191d;
+  --ex-accent: #5b8fd6;
+  --ex-accent-2: #7aa6ff;
+  --ex-rule: #4a4f57;
+  --ex-link: #8fb3e8;
+  --ex-focus: #7aa6ff;
+  --ex-ok: #6fcf7a;
+  --ex-ok-bg: #1f3a25;
+  --ex-bad: #ff8a80;
+  --ex-bad-bg: #3d2222;
+}
+
+/* Mocks are always light, whatever the site theme: site colours inside a mock (charts, inline code) stay light too. */
+.ex.ex-mock {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --line: #e3e6eb;
+  --line-strong: #cfd4dc;
+  --text: #21242c;
+  --muted: #5b6170;
+  --accent: #1865f2;
+  --code-bg: #f6f7f9;
+  --chart-1: #1865f2;
+  --chart-2: #e08a1e;
+  --chart-3: #7b4fd6;
+  --chart-4: #0f9b78;
+  --chart-5: #d1495b;
+  --chart-6: #6b7280;
+  color-scheme: light;
+}
+
+.ex .katex {
+  font-size: 1.05em;
+}
+.ex .ex-opt-math .katex {
+  font-size: 1.15em;
+}
+.ex :focus-visible {
+  outline: 2px solid var(--ex-focus);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+/* ---------------------------------------------------------------- mock page */
+.ex.ex-mock {
+  display: grid;
+  grid-template-rows: 44px minmax(0, 1fr) 64px;
+  height: 100dvh;
+  background: var(--ex-bg);
+}
+.ex .ex-mid {
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 40px;
+}
+
+/* ---------------------------------------------------------------- top bar */
+.ex .ex-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 24px;
+  background: var(--ex-bar);
+  border-bottom: 1px solid var(--ex-line);
+}
+.ex .ex-saved {
+  font-size: 13px;
+  color: var(--ex-muted);
+  opacity: 0;
+  transition: opacity 300ms linear !important;
+}
+.ex .ex-saved.is-on {
+  opacity: 1;
+  transition: none !important;
+}
+
+/* ---------------------------------------------------------------- question block */
+.ex .ex-q {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 48px;
+  grid-template-areas: 'num body mark';
+  margin: 40px 0 0 var(--ex-left);
+  width: min(calc(78vw + 112px), 1292px, calc(100% - var(--ex-left) - 16px));
+}
+.ex .ex-num {
+  grid-area: num;
+  padding-top: 1px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--ex-text);
+}
+.ex .ex-body {
+  grid-area: body;
+  min-width: 0;
+  max-width: 1100px;
+}
+.ex .ex-stem {
+  font-size: 17px;
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--ex-text);
+}
+.ex .ex-stem p,
+.ex .ex-stem li {
+  line-height: inherit;
+}
+.ex .ex-stem p {
+  margin: 0 0 10px;
+}
+.ex .ex-stem > *:last-child {
+  margin-bottom: 0;
+}
+.ex .ex-mark {
+  grid-area: mark;
+  display: flex;
+  justify-content: flex-end;
+}
+.ex .ex-mark-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -5px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--ex-icon);
+}
+.ex .ex-mark-btn.is-marked {
+  color: var(--ex-accent);
+}
+.ex .ex-mark-btn svg {
+  display: block;
+}
+
+/* ---------------------------------------------------------------- options */
+.ex .ex-opts {
+  margin-top: 14px;
+  width: 100%;
+}
+.ex .ex-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 52px;
+  padding: 13px 18px;
+  background: var(--ex-row);
+  color: var(--ex-text);
+  cursor: pointer;
+  transition: background-color 80ms linear !important;
+}
+.ex .ex-opt + .ex-opt {
+  border-top: 1px solid var(--ex-row-line);
+}
+.ex .ex-opt:not(.is-locked):hover {
+  background: var(--ex-row-hover);
+}
+.ex .ex-opt:has(input:focus-visible) {
+  outline: 2px solid var(--ex-focus);
+  outline-offset: -2px;
+}
+.ex .ex-opt input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 15px;
+  height: 15px;
+  /* Sits on the first line of text, so it stays aligned when the text wraps. */
+  margin: 5px 0 0;
+  border: 1.5px solid var(--ex-radio);
+  border-radius: 50%;
+  background: var(--ex-radio-fill);
+  cursor: inherit;
+}
+.ex .ex-opt input:focus-visible {
+  outline: none;
+}
+.ex .ex-opt input:checked {
+  border-color: var(--ex-accent-2);
+  background: var(--ex-accent-2);
+  box-shadow: inset 0 0 0 2.5px var(--ex-radio-fill);
+}
+.ex .ex-opt.has-math {
+  align-items: center;
+}
+.ex .ex-opt.has-math input {
+  margin-top: 0;
+}
+.ex .ex-opt-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 17px;
+  line-height: 26px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.ex .ex-q .inline-code {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1em;
+}
+.ex .ex-opt.is-selected,
+.ex .ex-opt.is-selected:not(.is-locked):hover {
+  background: var(--ex-row-selected);
+}
+.ex .ex-opt.is-locked {
+  cursor: default;
+}
+.ex .ex-opt.is-right {
+  background: var(--ex-ok-bg);
+}
+.ex .ex-opt.is-wrong {
+  background: var(--ex-bad-bg);
+}
+.ex .ex-verdict {
+  flex: none;
+  font-size: 16px;
+  line-height: 26px;
+  font-weight: 700;
+}
+.ex .ex-verdict-ok {
+  color: var(--ex-ok);
+}
+.ex .ex-verdict-bad {
+  color: var(--ex-bad);
+}
+
+/* ---------------------------------------------------------------- rule and Reset */
+.ex .ex-rule {
+  margin-top: 16px;
+  border-top: 1px solid var(--ex-rule);
+}
+.ex .ex-reset {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ex-link);
+  cursor: pointer;
+}
+.ex .ex-reset:hover:not(:disabled),
+.ex .ex-reset:focus-visible {
+  text-decoration: underline;
+}
+.ex .ex-reset:disabled {
+  color: var(--ex-muted);
+  cursor: default;
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- code, charts and tables in a question */
+.ex-code {
+  margin: 10px 0 4px;
+  padding: 0;
+  overflow-x: auto;
+  background: none;
+  color: inherit;
+  white-space: pre;
+  font-size: 15px;
+  line-height: 1.55;
+}
+.ex-code,
+.ex-code code {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0;
+}
+.ex .ex-q .chart {
+  max-width: 720px;
+  margin: 12px 0 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+.ex .ex-q .table-wrap {
+  max-width: 720px;
+  margin: 12px 0 0;
+}
+.ex .ex-q .data-table {
+  width: auto;
+  min-width: 0;
+  background: none;
+  border: 0;
+  font-size: 15px;
+  color: var(--ex-text);
+}
+.ex .ex-q .data-table th,
+.ex .ex-q .data-table td {
+  padding: 8px 12px;
+  border: 1px solid var(--ex-line);
+}
+.ex .ex-q .data-table th {
+  background: var(--ex-bar);
+  color: var(--ex-text);
+  font-size: 15px;
+}
+.ex .ex-q .data-table caption {
+  color: var(--ex-muted);
+}
+
+/* ---------------------------------------------------------------- bottom strip */
+.ex .ex-strip {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+  align-items: stretch;
+  background: var(--ex-bar);
+  border-top: 1px solid var(--ex-line);
+}
+.ex .ex-strip-label {
+  align-self: center;
+  padding: 0 20px;
+  font-size: 13px;
+  color: var(--ex-muted);
+  white-space: nowrap;
+}
+.ex .ex-arrow {
+  width: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--ex-muted);
+}
+.ex .ex-arrow:disabled {
+  opacity: 0.35;
+}
+.ex .ex-track {
+  display: flex;
+  /* Room above the tabs so the raised current tab isn't clipped by the scroll container. */
+  margin-top: -5px;
+  padding-top: 5px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.ex .ex-track::-webkit-scrollbar {
+  display: none;
+}
+.ex .ex-tab {
+  position: relative;
+  flex: 0 0 148px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid var(--ex-line);
+  border-radius: 0;
+  background: none;
+  font-size: 17px;
+  color: var(--ex-muted);
+}
+.ex .ex-tab:hover {
+  background: var(--ex-row-hover);
+}
+.ex .ex-tab.is-answered {
+  box-shadow: inset 0 3px 0 var(--ex-accent);
+}
+.ex .ex-tab.is-current,
+.ex .ex-tab.is-current:hover {
+  background: var(--ex-accent);
+  box-shadow: none;
+  color: #ffffff;
+  font-weight: 700;
+  transform: translateY(-4px);
+}
+.ex .ex-tab.is-current::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 4px;
+  background: var(--ex-accent);
+}
+.ex .ex-tab-mark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 11px;
+  color: var(--ex-accent);
+}
+.ex .ex-tab.is-current .ex-tab-mark {
+  color: #ffffff;
+}
+.ex .ex-tab-submit {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ex-accent);
+}
+.ex .ex-tab-submit.is-disabled {
+  color: var(--ex-muted);
+  cursor: not-allowed;
+}
+.ex .ex-tab-submit.is-disabled:hover {
+  background: none;
+}
+
+/* ---------------------------------------------------------------- timer */
+.ex .ex-timer {
+  min-width: 96px;
+  padding: 0 24px 0 12px;
+  border: 0;
+  border-left: 1px solid var(--ex-line);
+  border-radius: 0;
+  background: none;
+  text-align: right;
+}
+.ex .ex-timer-text {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ex-text);
+}
+.ex .ex-timer-text.is-low {
+  color: var(--ex-low);
+}
+.ex .ex-timer-text.is-hidden {
+  color: var(--ex-muted);
+}
+.ex .ex-timer-text.is-last {
+  animation: ex-pulse 1s ease-in-out infinite !important;
+}
+@keyframes ex-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ex .ex-timer-text.is-last {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------- submit dialog */
+.ex .ex-dialog-back {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.ex .ex-dialog {
+  width: 440px;
+  max-width: 90vw;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid var(--ex-line);
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.35);
+  font-size: 15px;
+  color: var(--ex-text);
+}
+.ex .ex-dialog h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.ex .ex-dialog p {
+  margin: 0 0 8px;
+}
+.ex .ex-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+.ex .ex-dialog-back-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ex-link);
+}
+.ex .ex-dialog-back-btn:hover {
+  text-decoration: underline;
+}
+.ex .ex-dialog-submit {
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 0;
+  background: var(--ex-accent);
+  font: inherit;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* ---------------------------------------------------------------- practice modes */
+.ex.ex-practice {
+  display: flow-root;
+  background: var(--ex-bg);
+  padding-bottom: 40px;
+}
+.is-focus > .ex.ex-practice {
+  min-height: calc(100vh - 128px);
+}
+/* The panel under the question is in the site's normal style, in the question's column. */
+.ex .ex-panel {
+  margin: 28px 0 0 calc(var(--ex-left) + 64px);
+  width: min(78vw, 1100px, calc(100% - var(--ex-left) - 88px));
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--text);
+}
+.ex .ex-panel .q-meta {
+  margin-bottom: 12px;
+}
+.ex .ex-panel .hint-panel {
+  margin: 0 0 16px;
+}
+.ex .ex-panel .markscheme {
+  margin-top: 16px;
+  scroll-margin-top: 80px;
+}
+.ex .ex-answer-note {
+  scroll-margin-top: 80px;
+}
+.ex .ex-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0 0 calc(var(--ex-left) + 64px);
+  width: min(78vw, 1100px, calc(100% - var(--ex-left) - 88px));
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+.ex .ex-actions-meta {
+  color: var(--muted);
+  font-weight: 550;
+}
+.ex .ex-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.ex .ex-keys {
+  margin: 14px 0 0 calc(var(--ex-left) + 64px);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* A question inside a narrower column: a lesson step, or the review after a mock. */
+.is-inline > .ex.ex-practice,
+.ex.ex-review {
+  --ex-left: 16px;
+}
+.ex.ex-review {
+  display: flow-root;
+  background: var(--ex-bg);
+  padding-bottom: 20px;
+}
+.is-inline > .ex.ex-practice .ex-q,
+.ex.ex-review .ex-q {
+  margin-top: 24px;
+}
+
+/* ---------------------------------------------------------------- under 760px */
+@media (max-width: 759px) {
+  .ex .ex-q,
+  .is-inline > .ex.ex-practice .ex-q,
+  .ex.ex-review .ex-q {
+    grid-template-columns: minmax(0, 1fr) 40px;
+    grid-template-areas:
+      'num mark'
+      'body body';
+    row-gap: 6px;
+    width: auto;
+    margin: 24px 16px 0;
+  }
+  .ex .ex-stem,
+  .ex .ex-opt-text {
+    font-size: 16px;
+  }
+  .ex .ex-panel,
+  .ex .ex-actions,
+  .ex .ex-keys {
+    width: auto;
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+  .ex .ex-keys {
+    display: none;
+  }
+  .ex.ex-practice {
+    padding-bottom: 0;
+  }
+  /* Check / Next stays reachable while scrolling on a phone. */
+  .ex .ex-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin: 16px 0 0;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+  .ex .ex-strip {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+  }
+  .ex .ex-strip-label {
+    display: none;
+  }
+  .ex .ex-tab {
+    flex-basis: 72px;
+  }
+  .ex .ex-timer {
+    min-width: 0;
+    padding: 0 12px;
+  }
+}

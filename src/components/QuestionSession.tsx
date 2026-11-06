@@ -1,16 +1,16 @@
 // One-question-at-a-time session with instant feedback and mark schemes.
-// Layout follows Khan Academy / Brilliant / Duolingo practice screens: a focus view with the
-// site navigation hidden, an exit button top-left, a thin progress bar, the question in a centred
-// column and one primary action (Check -> Next) in a fixed bar at the bottom right.
+// The question is drawn in the exam layout. Under it, the practice panel holds what only practice
+// has: hints, Check, feedback, the mark scheme and Next.
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { EXAM } from '../config/exam';
 import { hintsFor } from '../lib/hints';
-import { Rich } from './Rich';
+import { toPlain } from '../lib/richtext';
+import { Rich, RichInline } from './Rich';
 import { refKey, serve } from '../engine/bank';
 import { recordAttempt, toggleFlag, useStore, type Mode } from '../store/progress';
 import type { QRef, ServedQuestion } from '../types';
 import { useKeys } from './useKeys';
-import { LETTERS, MarkScheme, QuestionMeta, QuestionView } from './QuestionView';
+import { MarkScheme, QuestionMeta } from './QuestionView';
+import { ExamQuestion } from './exam/ExamQuestion';
 
 interface Props {
   mode: Mode;
@@ -39,34 +39,30 @@ export interface SessionResult {
   hints: number;
 }
 
-/** Hints revealed so far, plus the button for the next one. */
-function HintPanel({ hints, shown, onMore, open }: { hints: string[]; shown: number; onMore: () => void; open: boolean }) {
-  if (!hints.length) return null;
+/** Hints revealed so far. */
+function HintPanel({ hints, shown, open }: { hints: string[]; shown: number; open: boolean }) {
+  if (!hints.length || (!shown && open)) return null;
   return (
-    <section className={`hint-panel ${open ? 'is-open' : ''}`} aria-label="Hints">
+    <section className="hint-panel" aria-label="Hints">
       {hints.slice(0, shown).map((h, i) => (
         <div key={i} className="hint">
           <span className="hint-label">Hint {i + 1}</span>
           <Rich text={h} />
         </div>
       ))}
-      {shown < hints.length && (
-        <div className="hint-actions">
-          <button type="button" className={open ? 'btn-secondary' : 'btn-text'} onClick={onMore} title="Show a hint (H)">
-            {shown === 0 ? 'Show a hint' : `Next hint (${shown + 1} of ${hints.length})`}
-          </button>
-          {shown === 0 && (
-            <span className="muted small-print">
-              {open ? 'Stuck? Hints show one step at a time.' : "One step at a time. Answers after a hint don't count towards mastery."}
-            </span>
-          )}
-        </div>
-      )}
+      {shown === 0 && <span className="muted small-print">Answers after a hint don't count towards mastery.</span>}
     </section>
   );
 }
 
-/** Hides the site navigation while a focus session is on screen. */
+/** The correct option for the feedback line. Long text is cut; maths can't be cut safely, so it stays whole. */
+function AnswerText({ option }: { option: string }) {
+  const plain = toPlain(option);
+  if (!option.includes('$') && plain.length > 60) return <>{plain.slice(0, 60)}…</>;
+  return <RichInline text={option} />;
+}
+
+/** Marks a full-width session while it's on screen. */
 function useFocusMode(on: boolean) {
   useEffect(() => {
     if (!on) return;
@@ -86,11 +82,9 @@ export function QuestionSession({ mode, title, next, limit, onExit, onDone, show
   const [answered, setAnswered] = useState(false);
   const [finished, setFinished] = useState(false);
   const [exhausted, setExhausted] = useState(false);
-  const [elapsed, setElapsed] = useState(0);
   const started = useRef(Date.now());
   const msRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
-  const timerOn = useStore((s) => s.practiceTimer);
   const flagged = useStore((s) => (q ? s.flags.includes(q.key) : false));
 
   const loadNext = useCallback(
@@ -105,7 +99,6 @@ export function QuestionSession({ mode, title, next, limit, onExit, onDone, show
         setSelected(null);
         setHintsShown(0);
         setAnswered(false);
-        setElapsed(0);
         started.current = Date.now();
         return;
       }
@@ -123,17 +116,10 @@ export function QuestionSession({ mode, title, next, limit, onExit, onDone, show
     loadNext(0);
   }, [loadNext]);
 
-  useEffect(() => {
-    if (answered || !q) return;
-    const id = setInterval(() => setElapsed(Math.floor((Date.now() - started.current) / 1000)), 1000);
-    return () => clearInterval(id);
-  }, [answered, q]);
-
   const submit = () => {
     if (!q || selected === null || answered) return;
     const correct = selected === q.correctIndex;
     const ms = Date.now() - started.current;
-    setElapsed(Math.floor(ms / 1000));
     recordAttempt(
       { key: q.key, sourceId: q.sourceId, sub: q.subtopic, correct, chosen: selected, ms, at: Date.now(), mode, seed: q.seed, ...(hintsShown ? { hints: hintsShown } : {}) },
       q.generated,
@@ -221,73 +207,78 @@ export function QuestionSession({ mode, title, next, limit, onExit, onDone, show
     );
   if (!q) return <p className="empty">Loading…</p>;
 
-  const pace = Math.round(EXAM.secondsPerQuestion);
   const correct = answered && selected === q.correctIndex;
   const qNumber = done + (answered ? 0 : 1);
-
-  const actionBar = (
-    <div className={`action-bar ${answered ? (correct ? 'is-ok' : 'is-bad') : ''} ${focus ? 'fixed' : ''}`}>
-      <div className="action-inner">
-        <div className="action-left">
-          {answered ? (
-            <div className="feedback" role="status">
-              <span className="feedback-icon" aria-hidden>
-                {correct ? '✓' : '✗'}
-              </span>
-              <div>
-                <strong>{correct ? 'Correct' : 'Not quite'}</strong>
-                <span>{correct ? `Answered in ${elapsed}s.` : `You chose ${LETTERS[selected!]}. The answer is ${LETTERS[q.correctIndex]}. See the mark scheme below.`}</span>
-              </div>
-            </div>
-          ) : (
-            <span className="action-meta">
-              Question {qNumber}
-              {limit !== null ? ` of ${limit}` : ''}
-              {timerOn && (
-                <span className={`pace ${elapsed > pace ? 'over' : ''}`} title="Time on this question compared with the real exam pace">
-                  {elapsed}s of {pace}s
-                </span>
-              )}
-            </span>
-          )}
-        </div>
-        <div className="action-right">
-          <button type="button" className={`btn-text ${flagged ? 'on' : ''}`} onClick={() => toggleFlag(q.key)} title="Flag this question (F)">
-            {flagged ? '⚑ Flagged' : '⚐ Flag'}
-          </button>
-          {!answered ? (
-            <button type="button" className="btn-primary btn-lg" disabled={selected === null} onClick={submit}>
-              Check
-            </button>
-          ) : (
-            <button type="button" className={`btn-primary btn-lg ${correct ? 'btn-ok' : 'btn-bad'}`} onClick={goNext}>
-              {limit !== null && done >= limit ? 'See results' : 'Next question'}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  const moreHints = !answered && hintMode !== 'off' && hintsShown < hintList.length;
 
   return (
     <div className={`session ${focus ? 'is-focus' : 'is-inline'}`} ref={rootRef}>
       {topBar}
-      <div className="session-col">
-        <div className="q-head">
+      <div className="ex ex-practice">
+        <ExamQuestion
+          number={qNumber}
+          q={q}
+          selected={selected}
+          onSelect={answered ? undefined : setSelected}
+          onReset={() => setSelected(null)}
+          marked={flagged}
+          onToggleMark={() => toggleFlag(q.key)}
+          mode="practice"
+          reveal={answered ? { correctIndex: q.correctIndex } : undefined}
+          locked={answered}
+        />
+        <div className="ex-panel">
           <QuestionMeta q={q} showTopic={showTopic} />
-        </div>
-        <QuestionView q={q} selected={selected} onSelect={answered ? undefined : setSelected} reveal={answered} />
-        {!answered && hintMode !== 'off' && (
-          <HintPanel hints={hintList} shown={hintsShown} open={hintMode === 'open'} onMore={() => setHintsShown((n) => n + 1)} />
-        )}
-        {!focus && actionBar}
-        {answered && (
-          <div ref={msRef}>
-            <MarkScheme q={q} selected={selected} />
+          {!answered && hintMode !== 'off' && <HintPanel hints={hintList} shown={hintsShown} open={hintMode === 'open'} />}
+          <div aria-live="polite">
+            {answered && (
+              <div ref={msRef} className={`ex-answer-note ${correct ? 'is-ok' : 'is-bad'}`}>
+                <div className="feedback">
+                  <span className="feedback-icon" aria-hidden>
+                    {correct ? '✓' : '✗'}
+                  </span>
+                  <div>
+                    <strong>{correct ? 'Correct' : 'Not quite'}</strong>
+                    {correct ? (
+                      <span>Nice — that's right.</span>
+                    ) : (
+                      <span>
+                        The answer is: <AnswerText option={q.options[q.correctIndex]} />
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        <p className="kbd-hint">
-          Shortcuts: <kbd>1</kbd>–<kbd>4</kbd> choose, <kbd>Enter</kbd> {answered ? 'next' : 'check'}, <kbd>F</kbd> flag
+          {answered && <MarkScheme q={q} selected={selected} />}
+        </div>
+        <div className="ex-actions">
+          {!answered && (
+            <span className="ex-actions-meta">
+              Question {qNumber}
+              {limit !== null ? ` of ${limit}` : ''}
+            </span>
+          )}
+          <div className="ex-actions-right">
+            {moreHints && (
+              <button type="button" className={hintMode === 'open' ? 'btn-secondary' : 'btn-text'} onClick={() => setHintsShown((n) => n + 1)} title="Show a hint (H)">
+                {hintsShown === 0 ? 'Hint' : `Next hint (${hintsShown + 1} of ${hintList.length})`}
+              </button>
+            )}
+            {!answered ? (
+              <button type="button" className="btn-primary btn-lg" disabled={selected === null} onClick={submit}>
+                Check
+              </button>
+            ) : (
+              <button type="button" className={`btn-primary btn-lg ${correct ? 'btn-ok' : 'btn-bad'}`} onClick={goNext}>
+                {limit !== null && done >= limit ? 'See results' : 'Next question'}
+              </button>
+            )}
+          </div>
+        </div>
+        <p className="ex-keys kbd-hint">
+          Shortcuts: <kbd>1</kbd>–<kbd>4</kbd> choose, <kbd>Enter</kbd> {answered ? 'next' : 'check'}, <kbd>F</kbd> mark
           {hintMode !== 'off' && !answered && (
             <>
               , <kbd>H</kbd> hint
@@ -295,7 +286,6 @@ export function QuestionSession({ mode, title, next, limit, onExit, onDone, show
           )}
         </p>
       </div>
-      {focus && actionBar}
     </div>
   );
 }
