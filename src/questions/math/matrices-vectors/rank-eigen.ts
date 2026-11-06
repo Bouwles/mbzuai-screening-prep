@@ -1,6 +1,6 @@
 import type { StaticQuestion } from '../../../types';
 import { matrix, vec } from '../../../lib/tex';
-import { det, det2, inv2, matMul, rank } from '../../../lib/mathx';
+import { det, det2, matMul, rank, transpose } from '../../../lib/mathx';
 import type { Mat } from '../../../lib/mathx';
 
 // ---- helpers used only by the answer checks ----
@@ -431,35 +431,6 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'rank-eigen-015',
-    subtopic: 'rank-eigen',
-    difficulty: 'challenge',
-    stem: `For which value of $k$ does $A = ${M([[1, 1, 1], [1, 2, 3], [1, 3, 'k']])}$ have rank $2$?`,
-    options: ['$6$', '$4$', '$5$', '$\\frac{9}{2}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Rows 1 and 2 are not multiples of each other, so the rank is at least $2$. It is exactly $2$ when the rows are dependent, i.e. when $\\det A = 0$.\n\n' +
-        'Expand along row 1:\n\n' +
-        '$$\\det A = 1\\begin{vmatrix} 2 & 3 \\\\ 3 & k \\end{vmatrix} - 1\\begin{vmatrix} 1 & 3 \\\\ 1 & k \\end{vmatrix} + 1\\begin{vmatrix} 1 & 2 \\\\ 1 & 3 \\end{vmatrix}$$\n\n' +
-        '$$= (2k - 9) - (k - 3) + (3 - 2) = k - 5$$\n\n' +
-        'Set $k - 5 = 0$: $k = 5$.\n\n' +
-        'Check: with $k = 5$, row 3 $= (1, 3, 5) = 2(1, 2, 3) - (1, 1, 1)$, so row 3 is a combination of rows 1 and 2.',
-      whyWrong: [
-        'This drops the third cofactor term $+1 \\times (3 - 2)$: $(2k - 9) - (k - 3) = k - 6 = 0$ gives $k = 6$.',
-        'This drops the middle cofactor term $-1 \\times (k - 3)$: $(2k - 9) + 1 = 2k - 8 = 0$ gives $k = 4$.',
-        null,
-        'This only uses the first term of the expansion, solving $2k - 9 = 0$. All three cofactor terms are needed.',
-      ],
-      keyIdea: 'A $3 \\times 3$ matrix whose rank is at least $2$ has rank exactly $2$ when its determinant is $0$.',
-    },
-    check: {
-      optionValues: [6, 4, 5, 9 / 2],
-      compute: () => linearRoot((k) => det([[1, 1, 1], [1, 2, 3], [1, 3, k]])),
-    },
-  },
   {
     id: 'rank-eigen-016',
     subtopic: 'rank-eigen',
@@ -492,107 +463,337 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+  // ------------------------------------------------------------------ symbolic rank facts
   {
-    id: 'rank-eigen-017',
+    id: 'rank-eigen-020',
     subtopic: 'rank-eigen',
-    difficulty: 'challenge',
-    stem: `For which value of $k$ does $A = ${M([[2, 1], ['k', 4]])}$ have a **repeated** eigenvalue?`,
-    options: ['$1$', '$8$', '$-28$', '$-1$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Characteristic equation: $\\lambda^2 - (\\text{trace})\\lambda + \\det = 0$ with\n\n' +
-        '- trace $= 2 + 4 = 6$\n' +
-        '- $\\det A = 2 \\times 4 - 1 \\times k = 8 - k$\n\n' +
-        'So $\\lambda^2 - 6\\lambda + (8 - k) = 0$.\n\n' +
-        'A quadratic has a repeated root when its discriminant is $0$:\n\n' +
-        '$$6^2 - 4(8 - k) = 36 - 32 + 4k = 4 + 4k = 0$$\n\n' +
-        'So $k = -1$.\n\n' +
-        'Check: with $k = -1$, $\\det = 9$ and $\\lambda^2 - 6\\lambda + 9 = (\\lambda - 3)^2$, so $\\lambda = 3$ twice.',
-      whyWrong: [
-        'This uses $\\det A = 8 + k$ (adding $bc$ instead of subtracting it), giving $36 - 4(8 + k) = 0$, so $k = 1$.',
-        'This sets $\\det A = 0$, which makes $0$ an eigenvalue (eigenvalues $0$ and $6$), not a repeated eigenvalue.',
-        'This forgets the $4$ in $b^2 - 4ac$: $36 - (8 - k) = 0$ gives $k = -28$.',
-        null,
-      ],
-      keyIdea: 'A $2 \\times 2$ matrix has a repeated eigenvalue when $(\\text{trace})^2 - 4\\det = 0$.',
-    },
-    check: {
-      optionValues: [1, 8, -28, -1],
-      compute: () =>
-        linearRoot((k) => {
-          const A = [[2, 1], [k, 4]];
-          const t = A[0][0] + A[1][1];
-          return t * t - 4 * det2(A);
-        }),
-    },
-  },
-  {
-    id: 'rank-eigen-018',
-    subtopic: 'rank-eigen',
-    difficulty: 'challenge',
-    stem: `A $2 \\times 2$ matrix $A$ has eigenvector $${V([1, 1])}$ with eigenvalue $3$ and eigenvector $${V([1, -1])}$ with eigenvalue $1$. What is $A$?`,
-    options: [`$${M([[3, 0], [0, 1]])}$`, `$${M([[2, -1], [-1, 2]])}$`, `$${M([[2, 1], [1, 2]])}$`, `$${M([[1, 1], [1, -1]])}$`],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        `Let $A = ${M([['a', 'b'], ['c', 'd']])}$. Write out the two eigenvector equations.\n\n` +
-        `- $A${V([1, 1])} = 3${V([1, 1])}$ gives $a + b = 3$ and $c + d = 3$.\n` +
-        `- $A${V([1, -1])} = 1${V([1, -1])}$ gives $a - b = 1$ and $c - d = -1$.\n\n` +
-        'Add and subtract the pairs:\n\n' +
-        '- $a + b = 3$, $a - b = 1$: $2a = 4$, so $a = 2$ and $b = 1$.\n' +
-        '- $c + d = 3$, $c - d = -1$: $2c = 2$, so $c = 1$ and $d = 2$.\n\n' +
-        `So $A = ${M([[2, 1], [1, 2]])}$.\n\n` +
-        `Check: $A${V([1, 1])} = ${V([3, 3])}$ and $A${V([1, -1])} = ${V([1, -1])}$. Also trace $= 4 = 3 + 1$ and $\\det = 3 = 3 \\times 1$.`,
-      whyWrong: [
-        `This is the diagonal matrix of eigenvalues. It has the right eigenvalues, but its eigenvectors are $${V([1, 0])}$ and $${V([0, 1])}$, not the given ones.`,
-        `This attaches the eigenvalues to the wrong eigenvectors: here $A${V([1, 1])} = ${V([1, 1])}$ (eigenvalue $1$) and $A${V([1, -1])} = 3${V([1, -1])}$.`,
-        null,
-        'This is just the matrix whose columns are the eigenvectors. Multiplying it by an eigenvector does not stretch that eigenvector by the right factor.',
-      ],
-      keyIdea: 'Turn each statement $A\\mathbf{v} = \\lambda\\mathbf{v}$ into equations for the unknown entries and solve them.',
-    },
-    check: {
-      optionValues: ['3,0,0,1', '2,-1,-1,2', '2,1,1,2', '1,1,1,-1'],
-      compute: () => {
-        // A = P D P^{-1} with the eigenvectors as the columns of P.
-        const P = [[1, 1], [1, -1]];
-        const D = [[3, 0], [0, 1]];
-        const Pinv = inv2(P).map((r) => r.map((f) => f.value()));
-        return matMul(matMul(P, D), Pinv).flat().map((x) => Math.round(x)).join(',');
-      },
-    },
-  },
-  {
-    id: 'rank-eigen-019',
-    subtopic: 'rank-eigen',
-    difficulty: 'challenge',
-    stem: `The matrix $A = ${M([['a', 2], [2, 'b']])}$, where $a > b$, has eigenvalues $1$ and $6$. Find $a$.`,
-    options: ['$5$', '$6$', '$3.5$', '$2$'],
+    difficulty: 'exam',
+    stem: 'Let $A$ be a $m \\times n$ matrix and $B$ a $n \\times m$ matrix with $m < n$, such that $AB = I_{m}$, the unit matrix of order $m$. Then for $r(X)$ as the rank of a matrix $X$:',
+    options: ['$r(A) = m$, $r(B) = m$', '$r(A) = m$, $r(B) = n$', '$r(A) = n$, $r(B) = m$', '$r(A) = n$, $r(B) = n$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Use trace = sum and determinant = product of the eigenvalues.\n\n' +
-        '- Trace: $a + b = 1 + 6 = 7$\n' +
-        '- Determinant: $ab - 2 \\times 2 = 1 \\times 6$, so $ab - 4 = 6$ and $ab = 10$\n\n' +
-        'Two numbers with sum $7$ and product $10$ are the roots of $t^2 - 7t + 10 = (t - 2)(t - 5) = 0$, so they are $2$ and $5$.\n\n' +
-        'Since $a > b$: $a = 5$ and $b = 2$.\n\n' +
-        'Check: $\\lambda^2 - 7\\lambda + (10 - 4) = \\lambda^2 - 7\\lambda + 6 = (\\lambda - 1)(\\lambda - 6)$.',
+        'The **unit matrix of order $m$**, $I_{m}$, is the $m \\times m$ identity matrix, and $r(X)$ means the rank of $X$. All $m$ rows of $I_{m}$ are independent, so $r(I_{m}) = m$.\n\n' +
+        '1. The rank of a product is at most the rank of each factor, so $m = r(AB) \\le r(A)$ and $m \\le r(B)$.\n' +
+        '2. A rank cannot exceed the smaller dimension. $A$ has $m$ rows and $B$ has $m$ columns, so $r(A) \\le m$ and $r(B) \\le m$.\n' +
+        '3. Both bounds together give $r(A) = m$ and $r(B) = m$.',
       whyWrong: [
         null,
-        'This puts the eigenvalues on the diagonal as if $A$ were triangular (or, equivalently, forgets the $-4$ and uses $ab = 6$). The off-diagonal $2$s change the eigenvalues.',
-        'This splits the trace $7$ equally between $a$ and $b$ and ignores the determinant condition.',
-        'This is $b$, the smaller of the two diagonal entries. The question says $a > b$.',
+        'This takes the rank of $B$ to be $n$ because $B$ has $n$ rows. But $B$ has only $m$ columns, so its rank is at most $m$, which is less than $n$.',
+        'This takes the rank of $A$ to be $n$ because $A$ has $n$ columns. But $A$ has only $m$ rows, so its rank is at most $m$, which is less than $n$.',
+        'This uses the larger dimension for both. A rank can never exceed the smaller dimension, which is $m$ for each matrix.',
       ],
-      keyIdea: 'With unknown entries, write trace = sum of eigenvalues and det = product of eigenvalues, then solve the two equations together.',
+      keyIdea: 'If $AB = I_{m}$ then $m \\le r(A)$ and $m \\le r(B)$, and the size limits then force $r(A) = r(B) = m$.',
     },
     check: {
-      optionValues: [5, 6, 3.5, 2],
+      optionValues: ['m,m', 'm,n', 'n,m', 'n,n'],
       compute: () => {
-        const s = 1 + 6;
-        const p = 1 * 6 + 2 * 2;
-        return (s + Math.sqrt(s * s - 4 * p)) / 2;
+        // A concrete case with m = 2, n = 3 and AB equal to the 2 x 2 identity.
+        const A = [[1, 0, 0], [0, 1, 0]];
+        const B = [[1, 0], [0, 1], [0, 0]];
+        const [mm, nn] = [A.length, A[0].length];
+        if (JSON.stringify(matMul(A, B)) !== JSON.stringify([[1, 0], [0, 1]])) return 'bad example';
+        const name = (r: number) => (r === mm ? 'm' : r === nn ? 'n' : String(r));
+        return `${name(rank(A))},${name(rank(B))}`;
       },
+    },
+  },
+  {
+    id: 'rank-eigen-021',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: 'Let $P$ be a $p \\times q$ matrix and $Q$ a $q \\times p$ matrix with $q < p$. Which statement about $PQ$ is always true?',
+    options: ['$r(PQ) \\le q$', '$r(PQ) = p$', '$PQ$ is invertible', '$r(PQ) = p - q$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $r(X)$ means the rank of $X$.\n\n' +
+        '1. $PQ$ is $(p \\times q)(q \\times p)$, which is a $p \\times p$ matrix.\n' +
+        '2. $Q$ has only $q$ rows, so $r(Q) \\le q$.\n' +
+        '3. The rank of a product is at most the rank of each factor: $r(PQ) \\le r(Q) \\le q$.\n\n' +
+        'Since $q < p$, the $p \\times p$ matrix $PQ$ never has full rank, so it is never invertible.',
+      whyWrong: [
+        null,
+        'This picks $p$ because $PQ$ is $p \\times p$. The size only gives an upper limit; here the rank is at most $q$, which is less than $p$.',
+        'A $p \\times p$ matrix is invertible only when its rank is $p$, but here the rank is at most $q < p$.',
+        'Rank does not come from subtracting dimensions. If $P$ and $Q$ are zero matrices then $r(PQ) = 0$, while $p - q > 0$.',
+      ],
+      keyIdea: 'A product can never have a higher rank than either of its factors, whatever the size of the result.',
+    },
+  },
+  {
+    id: 'rank-eigen-022',
+    subtopic: 'rank-eigen',
+    difficulty: 'foundation',
+    stem: 'What is the maximum possible rank of a $3 \\times 5$ matrix?',
+    options: ['$3$', '$5$', '$8$', '$15$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A rank cannot exceed the number of rows or the number of columns, so it is at most the smaller of the two.\n\n' +
+        'For a $3 \\times 5$ matrix the maximum is $\\min(3, 5) = 3$.',
+      whyWrong: [
+        null,
+        'This uses the larger dimension. There are only $3$ rows, so at most $3$ rows can be independent.',
+        'This adds the dimensions. The rank is limited by the smaller dimension, not their sum.',
+        'This is the number of entries, $3 \\times 5$. The rank counts independent rows, not entries.',
+      ],
+      keyIdea: 'A $p \\times q$ matrix has rank at most $\\min(p, q)$.',
+    },
+    check: {
+      optionValues: [3, 5, 8, 15],
+      compute: () => rank([[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0]]),
+    },
+  },
+  {
+    id: 'rank-eigen-023',
+    subtopic: 'rank-eigen',
+    difficulty: 'foundation',
+    stem: 'Let $A$ be a $p \\times q$ matrix with $p < q$. What is the largest possible value of $r(A)$, the rank of $A$?',
+    options: ['$p$', '$q$', '$p + q$', '$pq$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $r(A)$ means the rank of $A$. The rank is at most the smaller dimension: $r(A) \\le \\min(p, q)$.\n\n' +
+        'Since $p < q$, the largest possible value is $p$.',
+      whyWrong: [
+        null,
+        'This picks $q$ because $A$ has $q$ columns. With only $p$ rows, at most $p$ rows can be independent, and $p < q$.',
+        'This adds the dimensions. The rank is limited by the smaller dimension, not their sum.',
+        'This is the number of entries in $A$. The rank counts independent rows, not entries.',
+      ],
+      keyIdea: 'The rank of a matrix is at most its smaller dimension.',
+    },
+  },
+  {
+    id: 'rank-eigen-024',
+    subtopic: 'rank-eigen',
+    difficulty: 'foundation',
+    stem: 'What is the **rank** of a matrix?',
+    options: ['The maximum number of linearly independent rows', 'The total number of rows', 'The number of non-zero entries', 'The value of its determinant'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The rank is the largest number of rows you can pick so that none of the picked rows can be built from the others (**linearly independent** rows). Counting columns the same way always gives the same number.',
+      whyWrong: [
+        null,
+        'This counts every row. A row that is a multiple of another row adds nothing, so it does not raise the rank.',
+        'This counts entries. $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$ has four non-zero entries but rank $1$.',
+        'The determinant is a different number, and it exists only for square matrices. It tells you whether a square matrix has full rank, not what the rank is.',
+      ],
+      keyIdea: 'Rank = maximum number of linearly independent rows = maximum number of linearly independent columns.',
+    },
+  },
+  {
+    id: 'rank-eigen-025',
+    subtopic: 'rank-eigen',
+    difficulty: 'foundation',
+    stem: 'What is $r(I_{m})$, the rank of the unit matrix of order $m$?',
+    options: ['$m$', '$1$', '$0$', '$m^{2}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **unit matrix of order $m$**, $I_{m}$, is the $m \\times m$ identity matrix: $1$s on the main diagonal and $0$s elsewhere.\n\n' +
+        'Its $m$ rows are all independent, because each has its single $1$ in a different column. So $r(I_{m}) = m$.',
+      whyWrong: [
+        null,
+        'This reads "unit" as "rank one". Each row of $I_{m}$ has its $1$ in a different column, so all $m$ rows count.',
+        'Only the zero matrix has rank $0$. Having many zero entries does not make the rank zero.',
+        'This is the number of entries in $I_{m}$. The rank counts independent rows, and there are only $m$ rows.',
+      ],
+      keyIdea: 'The unit matrix of order $m$ has full rank: $r(I_{m}) = m$.',
+    },
+    check: {
+      optionValues: [4, 1, 0, 16],
+      compute: () => rank([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]),
+    },
+  },
+  {
+    id: 'rank-eigen-026',
+    subtopic: 'rank-eigen',
+    difficulty: 'foundation',
+    stem: 'If $A\\mathbf{v} = \\lambda\\mathbf{v}$ with $\\mathbf{v} \\ne \\mathbf{0}$, what is $\\lambda$ called?',
+    options: ['An eigenvalue of $A$', 'An eigenvector of $A$', 'The rank of $A$', 'The trace of $A$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'In $A\\mathbf{v} = \\lambda\\mathbf{v}$, the matrix only stretches $\\mathbf{v}$. The number $\\lambda$ is the stretch factor, called an **eigenvalue**, and the vector $\\mathbf{v}$ is an **eigenvector**.',
+      whyWrong: [
+        null,
+        'The eigenvector is the vector $\\mathbf{v}$. Here $\\lambda$ is a number, the stretch factor.',
+        'The rank counts independent rows. It does not appear in the equation $A\\mathbf{v} = \\lambda\\mathbf{v}$.',
+        'The trace is the sum of the diagonal entries, which equals the sum of **all** the eigenvalues, not one of them.',
+      ],
+      keyIdea: 'In $A\\mathbf{v} = \\lambda\\mathbf{v}$, $\\mathbf{v}$ is the eigenvector and $\\lambda$ is the eigenvalue.',
+    },
+  },
+  {
+    id: 'rank-eigen-027',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: 'Matrices $A$ and $B$ have $AB$ defined, with $r(A) = 3$ and $r(B) = 2$. What is the largest possible value of $r(AB)$?',
+    options: ['$2$', '$3$', '$5$', '$6$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $r(X)$ means the rank of $X$. The rank of a product is limited by both factors:\n\n' +
+        '$$r(AB) \\le \\min(r(A), r(B))$$\n\n' +
+        'So $r(AB) \\le \\min(3, 2) = 2$.',
+      whyWrong: [
+        null,
+        'This uses the larger rank. The product is limited by **both** factors, so the smaller rank is the limit.',
+        'This adds the ranks. Multiplying matrices can never increase the rank beyond that of either factor.',
+        'This multiplies the ranks. The limit is the smaller rank, not the product of the ranks.',
+      ],
+      keyIdea: '$r(AB) \\le \\min(r(A), r(B))$.',
+    },
+    check: {
+      optionValues: [2, 3, 5, 6],
+      compute: () => {
+        // Rank 3 and rank 2 matrices whose product reaches the limit.
+        const A = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+        const B = [[1, 0, 0], [0, 1, 0], [0, 0, 0]];
+        return rank(matMul(A, B));
+      },
+    },
+  },
+  {
+    id: 'rank-eigen-028',
+    subtopic: 'rank-eigen',
+    difficulty: 'foundation',
+    stem: 'Which statement is always true for matrices $A$ and $B$ with $AB$ defined?',
+    options: ['$r(AB) \\le \\min(r(A), r(B))$', '$r(AB) = r(A) + r(B)$', '$r(AB) = r(A) \\times r(B)$', '$r(AB) \\ge \\max(r(A), r(B))$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $r(X)$ means the rank of $X$. Multiplying matrices can keep or lose independent rows and columns, but it cannot create new ones, so the rank of $AB$ is at most the smaller of $r(A)$ and $r(B)$.',
+      whyWrong: [
+        null,
+        'Ranks do not add under multiplication. With $A = B = I_{2}$, $r(AB) = 2$, not $4$.',
+        'Ranks do not multiply either. With $A = B = I_{3}$, $r(AB) = 3$, not $9$.',
+        'This has the inequality the wrong way round. A zero matrix times any matrix has rank $0$.',
+      ],
+      keyIdea: 'A product cannot have a higher rank than either factor.',
+    },
+  },
+  {
+    id: 'rank-eigen-029',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: 'Let $A$ be a $n \\times n$ matrix with $r(A) = n$. Which statement must be true?',
+    options: ['$\\det(A) \\ne 0$', '$\\det(A) = 0$', '$A$ is the unit matrix of order $n$', '$A$ has no inverse'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $r(A)$ means the rank of $A$, and $r(A) = n$ is called **full rank**. For a square matrix these three statements go together:\n\n' +
+        '$$r(A) = n \\iff A \\text{ is invertible} \\iff \\det(A) \\ne 0$$\n\n' +
+        'So $\\det(A) \\ne 0$.',
+      whyWrong: [
+        null,
+        'A zero determinant means the rank is **less** than $n$, which is the opposite of what is given.',
+        'The unit matrix of order $n$ (the $n \\times n$ identity) has rank $n$, but so do many other matrices, such as $2I_{n}$.',
+        'This reverses the fact. A square matrix of full rank always has an inverse.',
+      ],
+      keyIdea: 'For a square matrix: full rank, invertible and non-zero determinant all mean the same thing.',
+    },
+  },
+  {
+    id: 'rank-eigen-030',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: '$A$ is a $4 \\times 4$ matrix with $\\det(A) = 0$. Which statement must be true?',
+    options: ['$r(A) < 4$', '$r(A) = 0$', '$r(A) = 4$', '$A$ is the zero matrix'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $r(A)$ means the rank of $A$. A square matrix has full rank exactly when its determinant is non-zero.\n\n' +
+        'Since $\\det(A) = 0$, the rank is less than full: $r(A) < 4$. It could still be $1$, $2$ or $3$.',
+      whyWrong: [
+        null,
+        'A zero determinant does not mean rank $0$. It only means the rank is less than $4$; only the zero matrix has rank $0$.',
+        'Rank $4$ would need $\\det A \\ne 0$, which is the opposite of what is given.',
+        'Many non-zero matrices have determinant $0$, for example any matrix with two equal rows.',
+      ],
+      keyIdea: '$\\det(A) = 0$ means the rank is less than full, not that the rank is zero.',
+    },
+  },
+  {
+    id: 'rank-eigen-031',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: 'Can the columns of a $4 \\times 6$ matrix be linearly independent?',
+    options: ['No, because the rank is at most $4$', 'Yes, always', 'Yes, if the rank is $6$', 'Yes, if no column is all zeros'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Six independent columns would need rank $6$.\n\n' +
+        'But the rank is at most the smaller dimension: $\\min(4, 6) = 4$. So at most $4$ of the $6$ columns can be independent, and the columns are always dependent.',
+      whyWrong: [
+        null,
+        'More columns does not mean more independence. Each column has only $4$ entries, and at most $4$ such vectors can be independent.',
+        'A $4 \\times 6$ matrix can never have rank $6$, because the rank is at most the smaller dimension, $4$.',
+        'Non-zero columns can still depend on each other. With $6$ columns and rank at most $4$, some column is always a combination of the others.',
+      ],
+      keyIdea: 'A matrix with more columns than rows always has dependent columns.',
+    },
+    check: {
+      optionValues: ['no', 'always', 'rank 6', 'non-zero columns'],
+      compute: () => {
+        // Even the fullest possible 4 x 6 matrix reaches only rank 4, short of its 6 columns.
+        const M46 = [[1, 0, 0, 0, 1, 2], [0, 1, 0, 0, 3, 1], [0, 0, 1, 0, 2, 5], [0, 0, 0, 1, 7, 4]];
+        return rank(M46) < M46[0].length ? 'no' : 'always';
+      },
+    },
+  },
+  {
+    id: 'rank-eigen-032',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: 'Let $A$ be a $3 \\times 5$ matrix and $B$ a $5 \\times 3$ matrix with $AB = I_{3}$, the unit matrix of order $3$. What is $r(A)$?',
+    options: ['$3$', '$5$', '$2$', '$15$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **unit matrix of order $3$**, $I_{3}$, is the $3 \\times 3$ identity matrix, and it has rank $3$. Here $r(A)$ means the rank of $A$.\n\n' +
+        '1. $3 = r(AB) \\le r(A)$, because a product cannot have a higher rank than its factors.\n' +
+        '2. $r(A) \\le 3$, because $A$ has only $3$ rows.\n\n' +
+        'So $r(A) = 3$.',
+      whyWrong: [
+        null,
+        'This picks $5$ because $A$ has $5$ columns. With only $3$ rows, the rank of $A$ cannot exceed $3$.',
+        'This subtracts the dimensions, $5 - 3$. Rank does not come from subtracting, and a rank of $2$ would limit $AB$ to rank $2$, so it could not be $I_{3}$.',
+        'This is the number of entries in $A$. The rank counts independent rows.',
+      ],
+      keyIdea: 'If $AB$ is the unit matrix of order $m$, then $A$ and $B$ both have rank at least $m$.',
+    },
+    check: {
+      optionValues: [3, 5, 2, 15],
+      compute: () => {
+        const A = [[1, 0, 0, 0, 0], [0, 1, 0, 0, 0], [0, 0, 1, 0, 0]];
+        const B = transpose(A);
+        return JSON.stringify(matMul(A, B)) === JSON.stringify([[1, 0, 0], [0, 1, 0], [0, 0, 1]]) ? rank(A) : NaN;
+      },
+    },
+  },
+  {
+    id: 'rank-eigen-033',
+    subtopic: 'rank-eigen',
+    difficulty: 'exam',
+    stem: 'Let $A$ and $B$ be $n \\times n$ matrices with $AB = I_{n}$, the unit matrix of order $n$. Which statement must be true?',
+    options: ['$r(A) = n$ and $\\det(A) \\ne 0$', '$r(A) < n$', '$\\det(A) = 0$', '$A = B$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **unit matrix of order $n$**, $I_{n}$, is the $n \\times n$ identity matrix, whose determinant is $1$. Here $r(A)$ means the rank of $A$.\n\n' +
+        '1. $\\det(A)\\det(B) = \\det(AB) = \\det(I_{n}) = 1$, so $\\det(A) \\ne 0$.\n' +
+        '2. A square matrix with a non-zero determinant has full rank, so $r(A) = n$.',
+      whyWrong: [
+        null,
+        'A rank below $n$ would make $\\det A = 0$, and then $\\det A \\det B$ could not equal $1$.',
+        'If $\\det A = 0$ then $\\det(AB) = 0$, but $\\det(I_{n}) = 1$.',
+        '$AB = I_{n}$ says $B$ is the inverse of $A$, which is usually a different matrix. For example, $A = 2I_{n}$ has $B = \\frac{1}{2}I_{n}$.',
+      ],
+      keyIdea: 'If $AB = I_{n}$ for square matrices, then $A$ is invertible, so it has full rank and a non-zero determinant.',
     },
   },
 ];

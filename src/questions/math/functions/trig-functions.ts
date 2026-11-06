@@ -479,8 +479,7 @@ export const questions: StaticQuestion[] = [
     id: 'trig-functions-015',
     subtopic: 'trig-functions',
     difficulty: 'exam',
-    stem:
-      "From a point on level ground $20$ m from the foot of a vertical tower, the angle of elevation of the top of the tower is $60^\\circ$. How tall is the tower?",
+    stem: 'From a point on level ground $20$ m from the foot of a vertical tower, the angle of elevation of its top is $60^\\circ$. How tall is the tower?',
     options: ['$10\\sqrt{3}$ m', '$20\\sqrt{3}$ m', '$10$ m', '$\\frac{20\\sqrt{3}}{3}$ m'],
     correctIndex: 1,
     markScheme: {
@@ -537,66 +536,24 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'trig-functions-017',
-    subtopic: 'trig-functions',
-    difficulty: 'challenge',
-    stem:
-      "In triangle $ABC$, angle $A = 30^\\circ$, side $a = BC = 5$ cm and side $b = AC = 8$ cm. How many different triangles fit this information?",
-    options: ['$0$', '$1$', '$2$', 'Infinitely many'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        "We know one angle and the side opposite it, plus another side, so use the sine rule to find angle $B$:\n\n" +
-        "$$\\frac{\\sin B}{b} = \\frac{\\sin A}{a} \\quad\\Rightarrow\\quad \\sin B = \\frac{b\\sin A}{a} = \\frac{8 \\times \\frac{1}{2}}{5} = \\frac{4}{5} = 0.8$$\n\n" +
-        "Since $0.8 < 1$, there is at least one solution. But **two** angles between $0^\\circ$ and $180^\\circ$ have sine $0.8$:\n\n" +
-        "- $B_1 = \\sin^{-1}(0.8) \\approx 53.1^\\circ$ (the calculator answer)\n" +
-        "- $B_2 = 180^\\circ - 53.1^\\circ \\approx 126.9^\\circ$\n\n" +
-        "Check each still leaves room for angle $C$ (the angles must add to $180^\\circ$):\n\n" +
-        "- $30^\\circ + 53.1^\\circ = 83.1^\\circ < 180^\\circ$, so $C \\approx 96.9^\\circ$. Valid.\n" +
-        "- $30^\\circ + 126.9^\\circ = 156.9^\\circ < 180^\\circ$, so $C \\approx 23.1^\\circ$. Valid.\n\n" +
-        "Both work, so there are $2$ different triangles (the \"ambiguous case\" of the sine rule).",
-      whyWrong: [
-        "This comes from rearranging the sine rule wrongly, for example $\\sin B = \\frac{b}{a\\sin A} = \\frac{8}{2.5} = 3.2 > 1$, which looks impossible. Correctly, $\\sin B = \\frac{b\\sin A}{a} = 0.8$.",
-        "This takes only the calculator value $B \\approx 53.1^\\circ$ and forgets that $\\sin(180^\\circ - B) = \\sin B$, so $126.9^\\circ$ also works.",
-        null,
-        "This assumes that because the known angle is not between the two known sides, the triangle is not fixed at all. In fact the sine rule gives at most two possible values for $B$, so there can be at most two triangles.",
-      ],
-      keyIdea: "When the sine rule gives an angle, also test $180^\\circ$ minus it: if both fit with the known angle, there are two triangles.",
-    },
-    check: {
-      optionValues: [0, 1, 2, null],
-      compute: () => {
-        const A = rad(30);
-        const a = 5;
-        const b = 8;
-        const s = (b * Math.sin(A)) / a;
-        if (s > 1) return 0;
-        const B1 = Math.asin(s);
-        const options = Math.abs(s - 1) < 1e-12 ? [B1] : [B1, PI - B1];
-        return options.filter((B) => A + B < PI - 1e-9).length;
-      },
-    },
-  },
-  {
     id: 'trig-functions-018',
     subtopic: 'trig-functions',
     difficulty: 'exam',
-    stem:
-      "Two boats leave a harbour at the same time. After one hour boat $P$ is $5$ km from the harbour and boat $Q$ is $3$ km from the harbour, and the angle between their two straight paths at the harbour is $120^\\circ$. How far apart are the boats?",
+    stem: 'In triangle $HPQ$, $HP = 5$ km, $HQ = 3$ km and angle $PHQ = 120^\\circ$. Find the length of $PQ$.',
     options: ['$\\sqrt{19}$ km', '$\\sqrt{34}$ km', '$8$ km', '$7$ km'],
     correctIndex: 3,
     markScheme: {
       solution:
-        "The harbour $H$ and the boats form triangle $HPQ$ with $HP = 5$, $HQ = 3$ and angle $H = 120^\\circ$ between them. Two sides and the included angle: use the cosine rule.\n\n" +
+        "Two sides and the included angle are given ($HP = 5$, $HQ = 3$ and angle $H = 120^\\circ$), so use the cosine rule.\n\n" +
         "$$PQ^2 = 5^2 + 3^2 - 2 \\times 5 \\times 3 \\times \\cos 120^\\circ$$\n\n" +
         "Careful: $120^\\circ$ is in the second quadrant, so its cosine is **negative**: $\\cos 120^\\circ = -\\frac{1}{2}$.\n\n" +
         "$$PQ^2 = 25 + 9 - 30 \\times \\left(-\\frac{1}{2}\\right) = 34 + 15 = 49$$\n\n" +
         "$$PQ = \\sqrt{49} = 7 \\text{ km}$$\n\n" +
-        "Sanity check: the angle is wider than $90^\\circ$, so the distance must be more than the Pythagoras value $\\sqrt{34} \\approx 5.8$, and less than $5 + 3 = 8$. It is.",
+        "Sanity check: the angle is wider than $90^\\circ$, so the side must be more than the Pythagoras value $\\sqrt{34} \\approx 5.8$, and less than $5 + 3 = 8$. It is.",
       whyWrong: [
         "This uses $\\cos 120^\\circ = +\\frac{1}{2}$, so $34 - 15 = 19$. Cosine is negative for obtuse angles.",
         "This uses Pythagoras, $5^2 + 3^2$, which only works for a $90^\\circ$ angle.",
-        "This just adds the distances, which would only be right if the boats went in exactly opposite directions ($180^\\circ$).",
+        "This just adds the two sides, which would only be right if $H$ lay on the straight segment $PQ$, with an angle of $180^\\circ$.",
         null,
       ],
       keyIdea: "For an obtuse included angle, $\\cos$ is negative, so the cosine rule ADDS to $b^2 + c^2$ and the third side gets longer.",
@@ -734,4 +691,103 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-];
+  {
+    id: 'trig-functions-023',
+    subtopic: 'trig-functions',
+    difficulty: 'foundation',
+    stem: 'How many degrees are equal to $\\pi$ radians?',
+    options: ['$180^\\circ$', '$360^\\circ$', '$90^\\circ$', '$3.14^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A full turn is $360^\\circ$ or $2\\pi$ radians. Halving both gives $\\pi$ radians $= 180^\\circ$.',
+      whyWrong: [
+        null,
+        '$360^\\circ$ is a full turn, which is $2\\pi$ radians.',
+        '$90^\\circ$ is a quarter turn, which is $\\frac{\\pi}{2}$ radians.',
+        'This uses the size of the number $\\pi$ as if it were in degrees. One radian is about $57.3^\\circ$, so $\\pi$ radians is far more than $3.14^\\circ$.',
+      ],
+      keyIdea: '$\\pi$ radians $= 180^\\circ$ is the conversion to remember.',
+    },
+    check: {
+      optionValues: [180, 360, 90, 3.14],
+      compute: () => PI / rad(1),
+    },
+  },
+  {
+    id: 'trig-functions-024',
+    subtopic: 'trig-functions',
+    difficulty: 'foundation',
+    stem: 'What is the range of $y = \\sin x$?',
+    options: ['$-1 \\le y \\le 1$', '$0 \\le y \\le 1$', '$-\\pi \\le y \\le \\pi$', 'All real numbers'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$\\sin x$ is the height of a point moving round a circle of radius $1$, so its value goes from $-1$ to $1$ and no further.\n\n' +
+        'Both ends are reached: $\\sin 90^\\circ = 1$ and $\\sin 270^\\circ = -1$.',
+      whyWrong: [
+        null,
+        'This leaves out negative values, but $\\sin 270^\\circ = -1$.',
+        'This confuses the outputs with the inputs. $\\pi$ is an angle in radians, not a value that the sine reaches.',
+        'This is the range of $y = \\tan x$. The sine never goes beyond $\\pm 1$.',
+      ],
+      keyIdea: 'Sine and cosine always lie between $-1$ and $1$.',
+    },
+    check: {
+      optionValues: ['-1|1', '0|1', '-3.14|3.14', 'all'],
+      compute: () => {
+        const f = features((x) => Math.sin(x));
+        return `${f.min}|${f.max}`;
+      },
+    },
+  },
+  {
+    id: 'trig-functions-025',
+    subtopic: 'trig-functions',
+    difficulty: 'foundation',
+    stem: 'What is the period of $y = \\cos x$, with $x$ in degrees?',
+    options: ['$360^\\circ$', '$180^\\circ$', '$90^\\circ$', '$720^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **period** is the length of one full cycle of the graph before it repeats.\n\n' +
+        '$\\cos x$ starts at $1$ when $x = 0^\\circ$, falls to $-1$ at $180^\\circ$, and returns to $1$ at $360^\\circ$. So the period is $360^\\circ$.',
+      whyWrong: [
+        null,
+        '$180^\\circ$ is the period of $\\tan x$. After $180^\\circ$, $\\cos x$ is at $-1$, only halfway through its cycle.',
+        '$90^\\circ$ is a quarter of a cycle: this is where $\\cos x$ first reaches $0$.',
+        '$720^\\circ$ is two full cycles. The graph has already repeated by $360^\\circ$.',
+      ],
+      keyIdea: 'Sine and cosine repeat every $360^\\circ$ ($2\\pi$ radians); tangent repeats every $180^\\circ$.',
+    },
+    check: {
+      optionValues: [360, 180, 90, 720],
+      compute: () => {
+        const c = (d: number) => Math.cos(rad(d));
+        for (let p = 1; p <= 720; p++) {
+          if ([0, 10, 25, 70].every((d) => Math.abs(c(d + p) - c(d)) < 1e-9)) return p;
+        }
+        return 0;
+      },
+    },
+  },
+  {
+    id: 'trig-functions-026',
+    subtopic: 'trig-functions',
+    difficulty: 'foundation',
+    stem: 'In a right-angled triangle, which ratio equals $\\frac{\\text{opposite}}{\\text{hypotenuse}}$?',
+    options: ['Sine', 'Cosine', 'Tangent', 'Inverse sine'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Use SOH CAH TOA: **S**ine = **O**pposite / **H**ypotenuse, **C**osine = **A**djacent / **H**ypotenuse, **T**angent = **O**pposite / **A**djacent.\n\n' +
+        'So opposite over hypotenuse is the sine.',
+      whyWrong: [
+        null,
+        'Cosine is adjacent over hypotenuse.',
+        'Tangent is opposite over adjacent.',
+        'Inverse sine goes the other way: it takes a ratio and gives back an angle.',
+      ],
+      keyIdea: 'SOH CAH TOA: sine is opposite over hypotenuse.',
+    },
+  },];

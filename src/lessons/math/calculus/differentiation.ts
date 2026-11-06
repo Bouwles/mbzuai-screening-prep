@@ -12,7 +12,7 @@ export const lesson: Lesson = {
     { cue: 'One function **divided** by another', method: "Quotient rule: $\\frac{u'v - uv'}{v^{2}}$. Keep the order of the top and square the bottom." },
     { cue: 'A function **inside** another: a bracket to a power, $e^{-2x}$, $\\cos(4x)$, $\\ln(x^{2} + 1)$', method: "Chain rule: differentiate the outside (inside unchanged), then multiply by the derivative of the inside. Shortcuts: $e^{kx} \\to ke^{kx}$ and $\\ln(g) \\to \\frac{g'}{g}$." },
     { cue: "\"Find the **gradient** at $x = 2$\" or \"find $f'(2)$\"", method: 'Differentiate first, then substitute. Substituting into $f(x)$ gives the height of the curve, not its gradient.' },
-    { cue: "The **second derivative** $f''$, or unknown coefficients from given derivative values", method: 'Differentiate twice (constants vanish each time). For unknowns, differentiate the general form, then turn each condition into an equation.' },
+    { cue: "The **second derivative** $f''$", method: 'Differentiate twice (constants vanish each time).' },
   ],
   know:
     '### What a derivative is\n\n' +
@@ -47,7 +47,7 @@ export const lesson: Lesson = {
     '- $(3x^{2} - 1)^{5} \\to 5(3x^{2} - 1)^{4} \\times 6x$\n' +
     '- $e^{kx} \\to ke^{kx}$ and $\\sin(kx) \\to k\\cos(kx)$\n' +
     '- $\\ln(g(x)) \\to \\frac{g\'(x)}{g(x)}$ ("derivative of the inside over the inside")\n\n' +
-    'Forgetting the "times derivative of the inside" is the number one calculus mistake. With several layers, like $\\sin^{2}(3x)$, multiply one factor per layer.\n\n' +
+    'Forgetting the "times derivative of the inside" is the number one calculus mistake.\n\n' +
     '### Evaluating a derivative at a point\n\n' +
     'To find the gradient at $x = 2$: **differentiate first, then substitute** $x = 2$ into $f\'(x)$. Substituting into $f(x)$ gives the height of the curve, not its gradient.\n\n' +
     '### The second derivative\n\n' +

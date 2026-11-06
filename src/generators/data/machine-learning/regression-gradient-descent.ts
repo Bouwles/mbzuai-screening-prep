@@ -50,15 +50,9 @@ function gdStep(rng: Rng): GeneratedCore {
       grad = 2 * e * x;
       gradNo2 = e * x;
       gradNoX = x === 1 ? null : 2 * e;
-      const ctx = rng.pick([
-        'A simple model with no bias, $\\hat{y} = wx$,',
-        'A one-weight linear model $\\hat{y} = wx$',
-        'A linear regression model through the origin, $\\hat{y} = wx$,',
-      ]);
       stem =
-        `${ctx} is trained on a single example $(x, y) = (${num(x)}, ${num(y)})$ using the squared-error loss $L = (wx - y)^2$. ` +
-        `The weight is currently $w = ${num(w)}$ and the learning rate is $\\eta = ${num(eta)}$. ` +
-        'Using the gradient descent update rule, what is the new value of $w$ after one step?';
+        `A model $\\hat{y} = wx$ is trained on the single example $(x, y) = (${num(x)}, ${num(y)})$ with loss $L = (wx - y)^2$. ` +
+        `If $w = ${num(w)}$ and the learning rate is $\\eta = ${num(eta)}$, what is $w$ after one gradient descent step?`;
       workGrad =
         'Differentiate with the chain rule (outside "squared", inside $wx - y$ whose derivative with respect to $w$ is $x$):' +
         dm('\\frac{dL}{dw} = 2(wx - y)x') +
@@ -76,8 +70,8 @@ function gdStep(rng: Rng): GeneratedCore {
       const inside = c === 0 ? 'w' : `w${signed(-c)}`;
       const lossTex = c === 0 ? `w^2${k ? signed(k) : ''}` : `(${inside})^2${k ? signed(k) : ''}`;
       stem =
-        `A loss function is $L(w) = ${lossTex}$. Gradient descent is currently at $w = ${num(w)}$ and uses learning rate $\\eta = ${num(eta)}$. ` +
-        'What is the value of $w$ after one gradient descent step?';
+        `A loss is $L(w) = ${lossTex}$. Gradient descent is at $w = ${num(w)}$ with learning rate $\\eta = ${num(eta)}$. ` +
+        'What is $w$ after one step?';
       workGrad =
         (k ? `Differentiate. The constant $${num(k)}$ has derivative $0$, so` : 'Differentiate:') +
         dm(`L'(w) = 2${c === 0 ? 'w' : `(${inside})`}`) +
@@ -140,10 +134,10 @@ function gdStep(rng: Rng): GeneratedCore {
 
 // ---------------------------------------------------------------- 2. MSE of a linear model on a table
 const MSE_CTX = [
-  { intro: 'predicts a test score $y$ from hours of revision $x$', xh: 'Hours $x$', yh: 'Score $y$' },
-  { intro: 'predicts a taxi fare $y$ (in AED) from the distance $x$ (in km)', xh: 'Distance $x$', yh: 'Fare $y$' },
-  { intro: 'predicts daily ice-cream sales $y$ (in hundreds) from $x$, the number of degrees above $20$', xh: '$x$', yh: 'Sales $y$' },
-  { intro: 'predicts the yield $y$ of a plant (in kg) from the amount of fertiliser $x$', xh: 'Fertiliser $x$', yh: 'Yield $y$' },
+  { xh: 'Hours $x$', yh: 'Score $y$' },
+  { xh: 'Distance $x$', yh: 'Fare $y$' },
+  { xh: '$x$', yh: 'Sales $y$' },
+  { xh: 'Fertiliser $x$', yh: 'Yield $y$' },
 ];
 
 function mseTable(rng: Rng): GeneratedCore {
@@ -199,9 +193,7 @@ function mseTable(rng: Rng): GeneratedCore {
     if (ds.some((d) => Math.abs(d.v * 100 - Math.round(d.v * 100)) > 1e-9)) continue;
     const ctx = rng.pick(MSE_CTX);
     const model = lin(w, 'x', b);
-    const stem =
-      `A linear regression model ${ctx.intro}. Its equation is $\\hat{y} = ${model}$. ` +
-      `It is tested on the ${n} data points in the table. What is the mean squared error (MSE) of the model on these points?`;
+    const stem = `A linear regression model is $\\hat{y} = ${model}$. What is its mean squared error (MSE) on the ${n} data points in the table?`;
     const table = {
       headers: [ctx.xh, ...xs.map((x) => num(x))],
       rows: [[ctx.yh, ...ys.map((y) => num(y))]] as (string | number)[][],
@@ -238,16 +230,15 @@ const p2s = (p: number) => p.toFixed(2);
 const expTex = (k: number) => (k === 1 ? 'e' : `e^{${num(k)}}`);
 
 const LOGI_CTX = [
-  { what: 'whether a student passes an exam', x1: 'hours of study', x2: 'practice tests taken', c1: 'pass', c0: 'fail' },
-  { what: 'whether an email is spam', x1: 'number of links', x2: 'number of words in capitals', c1: 'spam', c0: 'not spam' },
-  { what: 'whether a customer buys a product', x1: 'minutes on the website', x2: 'items viewed', c1: 'buys', c0: 'does not buy' },
-  { what: 'whether a machine part fails this month', x1: 'age in years', x2: 'warning lights shown', c1: 'fails', c0: 'does not fail' },
+  { c1: 'pass', c0: 'fail' },
+  { c1: 'spam', c0: 'not spam' },
+  { c1: 'buys', c0: 'does not buy' },
+  { c1: 'fails', c0: 'does not fail' },
 ];
 
 function logisticPredict(rng: Rng): GeneratedCore {
   for (;;) {
-    // Positive weights only: every feature in LOGI_CTX makes class 1 MORE likely (e.g. more warning
-    // lights must not lower the chance of failure). A negative bias still gives negative z values.
+    // Positive weights only, so more of either input makes class 1 more likely. A negative bias still gives negative z values.
     const w1 = rng.pick([0.5, 1, 1.5, 2]);
     const w2 = rng.pick([0.5, 1, 2, 3]);
     const b = rng.intNonZero(-8, 4);
@@ -300,7 +291,7 @@ function logisticPredict(rng: Rng): GeneratedCore {
       signed(b);
     const ez = Math.exp(-z);
     const stem =
-      `A logistic regression model predicts ${ctx.what}. With $x_1$ = ${ctx.x1} and $x_2$ = ${ctx.x2}, it computes` +
+      'A logistic regression model computes' +
       dm(`z = ${lin(w1, 'x_1', 0)}${w2 < 0 ? ` - ${w2 === -1 ? '' : num(-w2)}x_2` : ` + ${w2 === 1 ? '' : num(w2)}x_2`}${signed(b)}, \\qquad p = \\sigma(z) = \\frac{1}{1 + e^{-z}}`) +
       `and predicts "${ctx.c1}" when $p \\ge 0.5$, otherwise "${ctx.c0}". For $x_1 = ${x1}$ and $x_2 = ${x2}$, what are $p$ (to 2 decimal places) and the prediction?`;
     const solution =

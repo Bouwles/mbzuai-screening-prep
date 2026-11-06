@@ -28,19 +28,6 @@ function imageHeight(f: (x: number) => number, mapX: (a: number) => number, mapY
   throw new Error('no preimage found');
 }
 
-/** Root of a continuous increasing-or-decreasing function on [lo, hi] by bisection. */
-function bisect(g: (x: number) => number, lo: number, hi: number): number {
-  let a = lo;
-  let b = hi;
-  const ga = g(a);
-  for (let i = 0; i < 200; i++) {
-    const mid = (a + b) / 2;
-    if (Math.sign(g(mid)) === Math.sign(ga)) a = mid;
-    else b = mid;
-  }
-  return (a + b) / 2;
-}
-
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------------ foundation
   {
@@ -127,12 +114,7 @@ export const questions: StaticQuestion[] = [
     subtopic: 'transformations',
     difficulty: 'foundation',
     stem: 'Which transformation maps the graph of $y = f(x)$ onto the graph of $y = 3f(x)$?',
-    options: [
-      'A vertical stretch with scale factor 3 (parallel to the $y$-axis)',
-      'A horizontal stretch with scale factor 3 (parallel to the $x$-axis)',
-      'A horizontal stretch with scale factor $\\frac{1}{3}$ (parallel to the $x$-axis)',
-      'A translation of 3 units up',
-    ],
+    options: ['Vertical stretch, scale factor $3$', 'Horizontal stretch, scale factor $3$', 'Horizontal stretch, scale factor $\\frac{1}{3}$', 'Translation of $3$ units up'],
     correctIndex: 0,
     markScheme: {
       solution:
@@ -454,7 +436,6 @@ export const questions: StaticQuestion[] = [
       compute: () => imageHeight((x) => x * x, (a) => a + 3, (y) => 2 * y - 1, 1),
     },
   },
-  // ------------------------------------------------------------------ challenge
   {
     id: 'transformations-015',
     subtopic: 'transformations',
@@ -518,47 +499,9 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'transformations-017',
-    subtopic: 'transformations',
-    difficulty: 'challenge',
-    stem: 'The graph of $y = \\frac{1}{x}$ is translated 1 unit to the left, then stretched vertically with scale factor 2, then reflected in the $x$-axis, then translated 3 units up. Where does the final graph cross the $x$-axis?',
-    options: ['$x = -\\frac{1}{3}$', '$x = \\frac{5}{3}$', '$x = -\\frac{5}{3}$', '$x = \\frac{2}{3}$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Build the equation one step at a time:\n\n' +
-        '1. 1 unit left (replace $x$ with $x + 1$): $y = \\frac{1}{x + 1}$\n' +
-        '2. Vertical stretch, factor 2: $y = \\frac{2}{x + 1}$\n' +
-        '3. Reflect in the $x$-axis: $y = -\\frac{2}{x + 1}$\n' +
-        '4. 3 units up: $y = 3 - \\frac{2}{x + 1}$\n\n' +
-        'It crosses the $x$-axis where $y = 0$:\n\n' +
-        '$$3 - \\frac{2}{x + 1} = 0 \\Rightarrow \\frac{2}{x + 1} = 3 \\Rightarrow x + 1 = \\frac{2}{3} \\Rightarrow x = \\frac{2}{3} - 1 = -\\frac{1}{3}$$\n\n' +
-        'Check: $x + 1 = \\frac{2}{3}$, so $\\frac{2}{x + 1} = 3$ and $y = 3 - 3 = 0$.',
-      whyWrong: [
-        null,
-        'This uses $x - 1$ in the denominator, which moves the graph 1 unit **right**. Moving left replaces $x$ with $x + 1$.',
-        'This forgets the reflection: solving $3 + \\frac{2}{x + 1} = 0$ gives $x + 1 = -\\frac{2}{3}$, so $x = -\\frac{5}{3}$.',
-        'This forgets the translation 1 unit left and solves $3 - \\frac{2}{x} = 0$, giving $x = \\frac{2}{3}$.',
-      ],
-      keyIdea: 'For a chain of transformations, write the equation after each step in the order given, then solve $y = 0$ for the $x$-intercept.',
-    },
-    check: {
-      optionValues: [-1 / 3, 5 / 3, -5 / 3, 2 / 3],
-      compute: () => {
-        const f0 = (x: number) => 1 / x;
-        const f1 = (x: number) => f0(x + 1); // 1 left
-        const f2 = (x: number) => 2 * f1(x); // vertical stretch 2
-        const f3 = (x: number) => -f2(x); // reflect in x-axis
-        const f4 = (x: number) => f3(x) + 3; // 3 up
-        // for x > -1, f4 is increasing; for x < -1, f4 > 3 > 0, so the only root is in (-1, 100)
-        return bisect(f4, -0.999999, 100);
-      },
-    },
-  },
-  {
     id: 'transformations-018',
     subtopic: 'transformations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The graph of $y = f(x)$ is reflected in the $y$-axis and **then** translated 2 units to the right. Which is the equation of the final graph?',
     options: ['$y = f(-x - 2)$', '$y = f(2 - x)$', '$y = -f(x - 2)$', '$y = f(-x) - 2$'],
     correctIndex: 1,
@@ -620,4 +563,113 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-];
+  {
+    id: 'transformations-020',
+    subtopic: 'transformations',
+    difficulty: 'foundation',
+    stem: 'Which transformation maps the graph of $y = f(x)$ onto the graph of $y = -f(x)$?',
+    options: ['Reflection in the $x$-axis', 'Reflection in the $y$-axis', 'Reflection in the line $y = x$', 'Translation of $1$ unit down'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The minus sign is **outside** the function, so it changes the outputs: every $y$-value changes sign and each $x$ stays the same.\n\n' +
+        'A point $(a, b)$ goes to $(a, -b)$, which is a reflection in the $x$-axis.',
+      whyWrong: [
+        null,
+        'A reflection in the $y$-axis changes the inputs: that is $y = f(-x)$, with the minus sign inside the bracket.',
+        'A reflection in $y = x$ swaps the coordinates, which gives the graph of the inverse function.',
+        'A translation down is $y = f(x) - 1$. It subtracts from each output; it does not change their signs.',
+      ],
+      keyIdea: 'Changes outside the bracket act on $y$: $y = -f(x)$ is a reflection in the $x$-axis.',
+    },
+  },
+  {
+    id: 'transformations-021',
+    subtopic: 'transformations',
+    difficulty: 'foundation',
+    stem: 'Which transformation maps the graph of $y = f(x)$ onto the graph of $y = f(-x)$?',
+    options: ['Reflection in the $y$-axis', 'Reflection in the $x$-axis', 'Reflection in the line $y = x$', 'Translation of $1$ unit left'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The minus sign is **inside** the bracket, so it changes the inputs: the height at $x$ is now the old height at $-x$.\n\n' +
+        'A point $(a, b)$ goes to $(-a, b)$, which is a reflection in the $y$-axis.',
+      whyWrong: [
+        null,
+        'A reflection in the $x$-axis changes the outputs: that is $y = -f(x)$, with the minus sign outside the bracket.',
+        'A reflection in $y = x$ swaps the coordinates, which gives the graph of the inverse function.',
+        'A translation left is $y = f(x + 1)$. Here each input changes sign; nothing is added to it.',
+      ],
+      keyIdea: 'Changes inside the bracket act on $x$: $y = f(-x)$ is a reflection in the $y$-axis.',
+    },
+  },
+  {
+    id: 'transformations-022',
+    subtopic: 'transformations',
+    difficulty: 'foundation',
+    stem: 'The graph of $y = f(x) - 6$ is the graph of $y = f(x)$ translated:',
+    options: ['$6$ units down', '$6$ units up', '$6$ units left', '$6$ units right'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The $-6$ is **outside** the bracket, so it acts on the outputs directly.\n\n' +
+        'Every $y$-value becomes $6$ smaller while each $x$ stays the same, so the whole graph moves $6$ units down.',
+      whyWrong: [
+        null,
+        'Outside the bracket the sign means what it says: subtracting $6$ lowers every output.',
+        'A horizontal move needs a change inside the bracket: $6$ units left is $y = f(x + 6)$.',
+        'A horizontal move needs a change inside the bracket: $6$ units right is $y = f(x - 6)$.',
+      ],
+      keyIdea: '$y = f(x) + a$ moves the graph vertically: up for positive $a$, down for negative $a$.',
+    },
+  },
+  {
+    id: 'transformations-023',
+    subtopic: 'transformations',
+    difficulty: 'foundation',
+    stem: 'Which transformation maps the graph of $y = f(x)$ onto the graph of $y = f(2x)$?',
+    options: ['Horizontal stretch, scale factor $\\frac{1}{2}$', 'Horizontal stretch, scale factor $2$', 'Vertical stretch, scale factor $2$', 'Translation of $2$ units left'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A number multiplying $x$ **inside** the bracket acts horizontally, and it works the opposite way to what it looks like.\n\n' +
+        'In $y = f(2x)$, the height that $f$ had at $x = a$ now occurs at $x = \\frac{a}{2}$. Every $x$-coordinate is halved, which is a horizontal stretch with scale factor $\\frac{1}{2}$.',
+      whyWrong: [
+        null,
+        'A horizontal stretch with scale factor $2$ is $y = f\\left(\\frac{1}{2}x\\right)$. Inside the bracket the effect is the reciprocal of the number.',
+        'A vertical stretch with scale factor $2$ is $y = 2f(x)$, with the $2$ outside the bracket.',
+        'A translation left is $y = f(x + 2)$, which adds to $x$ instead of multiplying it.',
+      ],
+      keyIdea: '$y = f(ax)$ is a horizontal stretch with scale factor $\\frac{1}{a}$.',
+    },
+  },
+  {
+    id: 'transformations-024',
+    subtopic: 'transformations',
+    difficulty: 'exam',
+    stem: 'The graph of $y = x^2$ is translated by the vector $\\binom{3}{-2}$. What is the equation of the new graph?',
+    options: ['$y = (x - 3)^2 - 2$', '$y = (x + 3)^2 - 2$', '$y = (x - 3)^2 + 2$', '$y = (x + 2)^2 + 3$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **translation by the vector** $\\binom{a}{b}$ moves every point $a$ units right and $b$ units up, so a negative $b$ means down.\n\n' +
+        '1. $3$ units right: replace $x$ by $x - 3$, giving $y = (x - 3)^2$.\n' +
+        '2. $2$ units down: subtract $2$, giving $y = (x - 3)^2 - 2$.\n\n' +
+        'Check: the vertex moves from $(0, 0)$ to $(3, -2)$.',
+      whyWrong: [
+        null,
+        'This moves the graph left. A move of $3$ units right replaces $x$ by $x - 3$, not $x + 3$.',
+        'This moves the graph up. The $-2$ in the vector means $2$ units down.',
+        'This swaps the two parts of the vector. The top number is the horizontal move and the bottom number the vertical one.',
+      ],
+      keyIdea: 'Translating by $\\binom{a}{b}$ turns $y = f(x)$ into $y = f(x - a) + b$.',
+    },
+    check: {
+      optionValues: [2, 62, 6, 52],
+      compute: () => {
+        // the image of (t, t^2) is (t + 3, t^2 - 2); read off the new graph at x = 5
+        const t = 5 - 3;
+        return t * t - 2;
+      },
+    },
+  },];

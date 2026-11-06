@@ -28,30 +28,37 @@ function build(rng: Rng, attempt: (rng: Rng) => GeneratedCore | null): Generated
 // ================================================================ 1. trace stack / queue operations
 type Op = { kind: 'add'; v: number } | { kind: 'remove' };
 
-function simulate(ops: Op[], lifo: boolean): { items: number[]; removed: number[]; rows: string[] } {
+const addCall = (lifo: boolean, v: number) => (lifo ? `push(S, ${v})` : `enqueue(Q, ${v})`);
+const removeCall = (lifo: boolean) => (lifo ? 'pop(S)' : 'dequeue(Q)');
+
+/** The operations as dialect lines; with printLast the final removal is printed. */
+function opLines(ops: Op[], lifo: boolean, printLast: boolean): string[] {
+  return ops.map((op, i) => {
+    if (op.kind === 'add') return addCall(lifo, op.v);
+    return printLast && i === ops.length - 1 ? `print(${removeCall(lifo)})` : removeCall(lifo);
+  });
+}
+
+function simulate(ops: Op[], lifo: boolean, lines: string[] = opLines(ops, lifo, false)): { items: number[]; removed: number[]; rows: string[] } {
   const items: number[] = [];
   const removed: number[] = [];
   const rows: string[] = [];
-  for (const op of ops) {
-    let label: string;
+  ops.forEach((op, i) => {
     let out = '';
-    if (op.kind === 'add') {
-      items.push(op.v);
-      label = lifo ? `\`push(${op.v})\`` : `\`enqueue(${op.v})\``;
-    } else {
+    if (op.kind === 'add') items.push(op.v);
+    else {
       const x = (lifo ? items.pop() : items.shift()) as number;
       removed.push(x);
       out = String(x);
-      label = lifo ? '`pop()`' : '`dequeue()`';
     }
-    rows.push(`| ${label} | ${items.length ? items.join(', ') : '(empty)'} | ${out} |`);
-  }
+    rows.push(`| \`${lines[i]}\` | ${items.length ? items.join(', ') : '(empty)'} | ${out} |`);
+  });
   return { items, removed, rows };
 }
 
 function traceAttempt(rng: Rng): GeneratedCore | null {
   const lifo = rng.bool();
-  const nAdd = rng.int(5, 7);
+  const nAdd = rng.int(4, 6);
   const nRemove = rng.int(2, nAdd - 2);
   const values = rng.sample([2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 17, 18, 19, 21, 23, 25], nAdd);
   // random valid order of adds/removes (never remove from an empty structure)
@@ -74,7 +81,8 @@ function traceAttempt(rng: Rng): GeneratedCore | null {
   if (ops[ops.length - 1].kind !== 'remove') return null; // end on a removal so the question is about tracing
   const ask = rng.pick(['next', 'last'] as const); // what is at the top/front now, or what did the last removal return
 
-  const real = simulate(ops, lifo);
+  const lines = opLines(ops, lifo, ask === 'last');
+  const real = simulate(ops, lifo, lines);
   const other = simulate(ops, !lifo);
   const top = (r: { items: number[] }, isLifo: boolean) => (isLifo ? r.items[r.items.length - 1] : r.items[0]);
   const bottom = (r: { items: number[] }, isLifo: boolean) => (isLifo ? r.items[0] : r.items[r.items.length - 1]);
@@ -82,8 +90,7 @@ function traceAttempt(rng: Rng): GeneratedCore | null {
   const S = lifo ? 'stack' : 'queue';
   const end = lifo ? 'top' : 'front';
   const otherEnd = lifo ? 'bottom' : 'rear';
-  const opList = ops.map((o) => (o.kind === 'add' ? (lifo ? `\`push(${o.v})\`` : `\`enqueue(${o.v})\``) : lifo ? '`pop()`' : '`dequeue()`')).join(', ');
-  const removeWord = lifo ? '`pop()`' : '`dequeue()`';
+  const removeWord = `\`${removeCall(lifo)}\``;
 
   let answer: number;
   let question: string;
@@ -109,7 +116,7 @@ function traceAttempt(rng: Rng): GeneratedCore | null {
     ];
   } else {
     answer = real.removed[real.removed.length - 1];
-    question = `What value is returned by the **last** ${removeWord}?`;
+    question = 'What is printed?';
     pool = [
       {
         v: other.removed[other.removed.length - 1],
@@ -130,7 +137,7 @@ function traceAttempt(rng: Rng): GeneratedCore | null {
   const ds = pickDistinct(answer, pool);
   if (ds.length < 3) return null;
 
-  const ans = m(num(answer));
+  const ans = String(answer);
   const header = lifo ? '| Operation | Stack (bottom to top) | Returned |' : '| Operation | Queue (front to rear) | Removed |';
   const solution =
     (lifo
@@ -139,14 +146,15 @@ function traceAttempt(rng: Rng): GeneratedCore | null {
     `Trace the ${S} after every operation:\n\n` +
     `${header}\n|---|---|---|\n${real.rows.join('\n')}\n\n` +
     (ask === 'next'
-      ? `At the end the ${S} holds ${real.items.join(', ')} (${lifo ? 'bottom to top' : 'front to rear'}), so the ${end} value is ${num(answer)}.\n\n`
-      : `The last ${removeWord} returned ${num(answer)}.\n\n`) +
+      ? `At the end the ${S} holds ${real.items.join(', ')} (${lifo ? 'bottom to top' : 'front to rear'}), so the ${end} value is ${ans}.\n\n`
+      : `The last removal returns ${ans}, and that is what is printed.\n\n`) +
     `Answer: ${ans}`;
   return {
-    stem: `Starting with an empty **${S}**, these operations are carried out in order:\n\n${opList}\n\n${question}`,
+    stem: ask === 'next' ? question : `This code uses a **${S}**. ${question}`,
+    code: { lang: 'pseudocode', source: [lifo ? 'S = []' : 'Q = []', ...lines].join('\n') },
     answer: ans,
     answerValue: answer,
-    distractors: ds.map((d) => ({ text: m(num(d.v)), value: d.v, why: d.why })),
+    distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
     solution,
     keyIdea: lifo
       ? 'A stack is LIFO: every pop removes the most recently pushed item that is still there.'
@@ -284,9 +292,8 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
   const ask = rng.pick(['rear', 'front'] as const);
   const mod = (x: number) => ((x % N) + N) % N;
   const setup =
-    `A circular queue is stored in an array with indices 0 to ${N - 1} (capacity ${N}). Items occupy consecutive slots, wrapping from index ${N - 1} back to index 0. ` +
-    `The front item is at index ${f} and the queue holds ${k} items.\n\n` +
-    `Then ${d} item${d === 1 ? ' is' : 's are'} dequeued and ${e} new item${e === 1 ? ' is' : 's are'} enqueued.`;
+    `A circular queue of capacity ${N} (indices 0 to ${N - 1}) has its front item at index ${f} and holds ${k} items. ` +
+    `After ${d} dequeue${d === 1 ? '' : 's'} and ${e} enqueue${e === 1 ? '' : 's'},`;
   let answer: number;
   let pool: Cand[];
   let steps: string;
@@ -294,12 +301,12 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
   if (ask === 'rear') {
     const raw = f + k + e - 1;
     answer = mod(raw);
-    stem = `${setup}\n\nAt which index is the **last item that was enqueued** stored?`;
+    stem = `${setup} at which index is the **last item enqueued**?`;
     pool = [
       { v: raw, why: `This forgets to wrap round with mod ${N}: index ${raw} does not exist in an array of capacity ${N}.` },
       { v: mod(raw + 1), why: 'This is the next **free** slot (one past the last item), not the slot holding the last item.' },
       { v: mod(f + k - d + e - 1), why: 'This lets the dequeues pull the rear back. Dequeuing only moves the front; new items still go after the old rear.' },
-      { v: k - d + e - 1, why: 'This assumes the items shift down to start at index 0 after dequeuing (like a Python list). In a circular queue items never move; only the indices change.' },
+      { v: k - d + e - 1, why: 'This assumes the items shift down to start at index 0 after dequeuing. In a circular queue items never move; only the indices change.' },
     ];
     steps =
       `Dequeuing only moves the **front**; it does not change where new items go. Before the dequeues the rear item is at ${m(`(${f} + ${k} - 1) \\bmod ${N} = ${mod(f + k - 1)}`)}.\n\n` +
@@ -308,7 +315,7 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
   } else {
     const raw = f + d;
     answer = mod(raw);
-    stem = `${setup}\n\nAt which index is the **front** item now?`;
+    stem = `${setup} at which index is the **front** item?`;
     pool = [
       { v: raw, why: `This forgets to wrap round with mod ${N}: index ${raw} does not exist in an array of capacity ${N}.` },
       { v: mod(raw - 1), why: 'This is the index of the last item that was **dequeued**, not the new front (an off-by-one error).' },
@@ -341,7 +348,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-stacks-queues-trace',
     subtopic: 'stacks-queues',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     title: 'Trace push/pop or enqueue/dequeue operations',
     generate: (rng) => build(rng, traceAttempt),
   },

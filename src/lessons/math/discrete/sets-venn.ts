@@ -15,7 +15,7 @@ export const lesson: Lesson = {
     },
     {
       cue: 'Three groups with all the pair counts and the "all three" count',
-      method: 'Three-set inclusion-exclusion: add the singles, subtract the pairs, add back the triple. For "only" or "exactly one" regions, fill the diagram from the centre outwards.',
+      method: 'Three-set inclusion-exclusion: add the singles, subtract the pairs, add back the triple. For an "only" region, fill the diagram from the centre outwards.',
     },
     {
       cue: 'Region counts in a table, or an expression like $(A \\cup B) \\cap C\'$',
@@ -26,7 +26,7 @@ export const lesson: Lesson = {
       method: 'An $n$-element set has $2^{n}$ subsets. Subtract 1 for each excluded subset ($\\varnothing$ or the set itself); for "at least one" count the complement and subtract.',
     },
     {
-      cue: 'Unknown $x$ inside the Venn regions, or an unknown "all three" count',
+      cue: 'Unknown $x$ inside the Venn regions',
       method: 'Write every region in terms of $x$, make the regions add up to the total, solve for $x$, then read off the region asked for.',
     },
   ],
@@ -71,9 +71,7 @@ export const lesson: Lesson = {
     '3. Put the "neither" number outside the circles.\n' +
     '4. Check that all regions add up to the total.\n\n' +
     'If a number is unknown, call it $x$, write every region in terms of $x$, and make the regions add up to $n(U)$.\n\n' +
-    'Probability links straight in: $P(A) = \\frac{n(A)}{n(U)}$ when everyone is equally likely to be picked, so a Venn diagram of counts becomes a probability by dividing by the total.\n\n' +
-    '### Sets in Python\n\n' +
-    'Python has a built-in `set` type: `{1, 2, 3}`. Operators: `A | B` union, `A & B` intersection, `A - B` difference, `A ^ B` symmetric difference, `len(A)` cardinality, `x in A` membership. Duplicates are removed automatically, so `len({1, 1, 2})` is 2.',
+    'Probability links straight in: $P(A) = \\frac{n(A)}{n(U)}$ when everyone is equally likely to be picked, so a Venn diagram of counts becomes a probability by dividing by the total.',
   formulas: [
     { label: 'Union (two sets)', tex: 'n(A \\cup B) = n(A) + n(B) - n(A \\cap B)', note: 'Subtract the overlap once because it was counted twice.' },
     {
@@ -91,7 +89,6 @@ export const lesson: Lesson = {
     { label: 'Number of subsets', tex: '2^{n}', note: 'For a set with $n$ elements; includes $\\varnothing$ and the set itself.' },
     { label: 'Proper / non-empty proper subsets', tex: '2^{n} - 1, \\qquad 2^{n} - 2' },
     { label: 'Integers from a to b inclusive', tex: 'b - a + 1' },
-    { label: 'Over-count identity (three sets)', tex: 'n(A) + n(B) + n(C) = e_1 + 2e_2 + 3e_3', note: '$e_k$ = number of elements in exactly $k$ of the sets.' },
   ],
   examples: [
     {

@@ -324,31 +324,29 @@ export const questions: StaticQuestion[] = [
     id: 'number-bases-012',
     subtopic: 'number-bases',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'print(13 << 3, 200 >> 2)' },
-    options: ['`39 100`', '`16 198`', '`104 50`', '`1 800`'],
+    stem: 'A **left shift** by $k$ places moves every bit $k$ places left and fills the gaps with 0s. What is $1101_2$ shifted left by 3 places, in decimal?',
+    options: ['$39$', '$16$', '$104$', '$1$'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'A **left shift** by $k$ places multiplies by $2^k$; a **right shift** by $k$ places divides by $2^k$ (rounding down).\n\n' +
-        '- `13 << 3`: $13 \\times 2^3 = 13 \\times 8 = 104$. In binary, $1101_2$ becomes $1101000_2$ (three zeros added on the right).\n' +
-        '- `200 >> 2`: $200 \\div 2^2 = 200 \\div 4 = 50$. In binary, $11001000_2$ becomes $110010_2$ (the two rightmost bits are dropped).\n\n' +
-        '`print` separates its two values with a space, so the output is `104 50`.',
+        '1. Add three zeros on the right: $1101_2$ becomes $1101000_2$.\n' +
+        '2. Convert to decimal: $64 + 32 + 8 = 104$.\n\n' +
+        'Check: each place left doubles the number, and $1101_2 = 13$, so the result is $13 \\times 2^3 = 104$.',
       whyWrong: [
-        'This multiplies by 3 and divides by 2, i.e. uses the shift amount itself. Shifting by $k$ multiplies or divides by $2^k$, not by $k$.',
-        'This adds 3 and subtracts 2. A shift moves the bits, which multiplies or divides by a power of 2.',
+        'This multiplies 13 by the shift amount: $13 \\times 3 = 39$. Shifting by $k$ places multiplies by $2^k$, not by $k$.',
+        'This adds the shift amount: $13 + 3 = 16$. A shift moves the bits, which multiplies by a power of 2.',
         null,
-        'This shifts in the wrong directions: `<<` (arrows pointing left) moves bits left, making the number **bigger**; `>>` makes it smaller.',
+        'This shifts **right** by 3 places: $13 \\div 8$ rounded down is 1. A left shift makes the number bigger.',
       ],
-      keyIdea: '`x << k` is $x \\times 2^k$ and `x >> k` is $x \\div 2^k$ rounded down.',
+      keyIdea: 'A left shift by $k$ places multiplies by $2^k$; a right shift by $k$ places divides by $2^k$ and rounds down.',
     },
-    python: { stdout: '104 50' },
+    check: { optionValues: [39, 16, 104, 1], compute: () => fromBase('1101' + '000', 2) },
   },
   {
     id: 'number-bases-013',
     subtopic: 'number-bases',
     difficulty: 'exam',
-    stem: 'A sensor stores readings as **10-bit two\'s complement** integers. What is the range of values it can store?',
+    stem: 'What is the range of values of a **10-bit two\'s complement** integer?',
     options: ['$-511$ to $511$', '$-512$ to $511$', '$0$ to $1023$', '$-1024$ to $1023$'],
     correctIndex: 1,
     markScheme: {
@@ -378,17 +376,17 @@ export const questions: StaticQuestion[] = [
     id: 'number-bases-014',
     subtopic: 'number-bases',
     difficulty: 'exam',
-    stem: 'A school wants to give each of its $300$ students a different binary ID code, all of the same length. What is the **minimum** number of bits each code needs?',
+    stem: 'What is the **minimum** number of bits needed to give $300$ items different binary codes of the same length?',
     options: ['$8$', '$38$', '$512$', '$9$'],
     correctIndex: 3,
     markScheme: {
       solution:
         'With $n$ bits there are $2^n$ different codes. We need $2^n \\ge 300$.\n\n' +
-        '- $2^8 = 256$, which is **less** than 300, so 8 bits are not enough (44 students would have no code).\n' +
+        '- $2^8 = 256$, which is **less** than 300, so 8 bits are not enough (44 items would have no code).\n' +
         '- $2^9 = 512$, which is at least 300.\n\n' +
         'So the minimum is $9$ bits.',
       whyWrong: [
-        'This rounds $\\log_2 300 \\approx 8.2$ **down**. But 8 bits only give $2^8 = 256$ codes, fewer than 300 students; you must always round **up**.',
+        'This rounds $\\log_2 300 \\approx 8.2$ **down**. But 8 bits only give $2^8 = 256$ codes, fewer than 300 items; you must always round **up**.',
         'This divides 300 by 8 (as if converting bits to bytes) and rounds up. The number of codes grows as $2^n$, not $8n$.',
         'This is the number of codes available with 9 bits ($2^9 = 512$), not the number of bits.',
         null,
@@ -408,132 +406,37 @@ export const questions: StaticQuestion[] = [
     id: 'number-bases-015',
     subtopic: 'number-bases',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'What does this pseudocode print? Arrays are indexed from 1.',
     code: {
-      lang: 'python',
-      source: 'n = 0\nfor ch in "1101":\n    n = n * 2 + int(ch)\nprint(n, bin(n << 1), hex(n))',
+      lang: 'pseudocode',
+      source: 'A = [1, 1, 0, 1]\nn = 0\nfor i = 1 to length(A)\n   n = n * 2 + A[i]\nend for\nprint(n)',
     },
-    options: ['`11 0b10110 0xb`', '`13 0b11010 0xd`', '`13 0b110 0xd`', '`13 11010 d`'],
+    options: ['11', '13', '3', '26'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'The loop reads the binary string from **left to right**. Each step doubles the total so far (shifting it one place left) and adds the new digit.\n\n' +
-        '| `ch` | calculation | `n` |\n' +
+        'Each pass doubles the total so far and adds the next digit, reading the digits from left to right.\n\n' +
+        '| `i` | `A[i]` | `n` |\n' +
         '| --- | --- | --- |\n' +
-        '| (start) | | 0 |\n' +
-        '| `"1"` | $0 \\times 2 + 1$ | 1 |\n' +
-        '| `"1"` | $1 \\times 2 + 1$ | 3 |\n' +
-        '| `"0"` | $3 \\times 2$ | 6 |\n' +
-        '| `"1"` | $6 \\times 2 + 1$ | 13 |\n\n' +
-        'So `n` is 13 (indeed $1101_2 = 8 + 4 + 1 = 13$).\n\n' +
-        '- `n << 1` is $13 \\times 2 = 26 = 11010_2$, and `bin` writes it with the prefix `0b`: `0b11010`.\n' +
-        '- `hex(13)`: 13 is the hex digit d, and Python writes it in lower case with the prefix `0x`: `0xd`.\n\n' +
-        'Output: `13 0b11010 0xd`.',
+        '| 1 | 1 | 1 |\n' +
+        '| 2 | 1 | 3 |\n' +
+        '| 3 | 0 | 6 |\n' +
+        '| 4 | 1 | 13 |\n\n' +
+        'The loop ends and prints **13**. This is the value of $1101_2 = 8 + 4 + 1$.',
       whyWrong: [
-        'This reads the string from right to left, i.e. converts $1011_2 = 11$. The loop goes through `"1101"` from the first character, and doubling at each step makes the first character the most significant bit.',
+        'This reads the digits from right to left, which converts $1011_2 = 11$. The loop starts at `A[1]`, the leftmost digit.',
         null,
-        'This treats `<<` as halving: `13 >> 1` would be $6 = 110_2$. The arrows point left, so `n << 1` doubles 13 to 26.',
-        'This forgets that `bin()` and `hex()` return strings that start with the prefixes `0b` and `0x`.',
+        'This only adds up the digits and forgets the `n * 2`, which gives each digit its place value.',
+        'This doubles once more after the last digit. The last pass adds `A[4]` to $6 \\times 2$, and then the loop ends.',
       ],
-      keyIdea: 'The "multiply by the base and add the next digit" loop converts a digit string to a number; `bin` and `hex` return strings with `0b` and `0x` prefixes.',
-    },
-    python: { stdout: '13 0b11010 0xd' },
-  },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'number-bases-016',
-    subtopic: 'number-bases',
-    difficulty: 'challenge',
-    stem: 'Convert the octal number $725_8$ to hexadecimal.',
-    options: ['$\\mathrm{EA1}_{16}$', '$\\mathrm{2D5}_{16}$', '$725_{16}$', '$\\mathrm{1D5}_{16}$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Go through binary. Each octal digit is exactly **3 bits** ($2^3 = 8$) and each hex digit is exactly **4 bits** ($2^4 = 16$).\n\n' +
-        '1. Octal to binary, 3 bits per digit: $7 \\to 111$, $2 \\to 010$, $5 \\to 101$. So $725_8 = 111010101_2$.\n' +
-        '2. Regroup into 4s **starting from the right**: $1\\;1101\\;0101$, and pad the left group to $0001$.\n' +
-        '3. Each group to hex: $0001 \\to 1$, $1101 \\to 13 = \\mathrm{D}$, $0101 \\to 5$.\n\n' +
-        'Answer: $\\mathrm{1D5}_{16}$.\n\n' +
-        'Check via decimal: $725_8 = 7 \\times 64 + 2 \\times 8 + 5 = 469$ and $\\mathrm{1D5}_{16} = 256 + 13 \\times 16 + 5 = 256 + 208 + 5 = 469$.',
-      whyWrong: [
-        'This regroups the bits into 4s starting from the **left** ($1110\\;1010\\;1$). Groups must be made from the right, because the units bit is on the right; padding goes on the left.',
-        'This converts $725$ as if it were a **decimal** number ($725 = 2 \\times 256 + 13 \\times 16 + 5$). It is an octal number worth only 469.',
-        'This copies the digits unchanged, as if octal and hex digits matched one for one. They do not: an octal digit is 3 bits but a hex digit is 4 bits.',
-        null,
-      ],
-      keyIdea: 'Octal to hex: expand each octal digit into 3 bits, then regroup into 4-bit groups from the right.',
+      keyIdea: 'The loop "multiply by the base, then add the next digit" converts a list of digits to a number.',
     },
     check: {
-      optionValues: ['EA1', '2D5', '725', '1D5'],
+      optionValues: [11, 13, 3, 26],
       compute: () => {
-        const bits = [...'725'].map((d) => toBase(fromBase(d, 8), 2).padStart(3, '0')).join('');
-        return toBase(fromBase(bits, 2), 16);
-      },
-    },
-  },
-  {
-    id: 'number-bases-017',
-    subtopic: 'number-bases',
-    difficulty: 'challenge',
-    stem: 'A computer stores integers in **8-bit two\'s complement**. It adds $01100100_2$ and $00110010_2$ and keeps only 8 bits of the result. What decimal value does the stored result represent?',
-    options: ['$150$', '$-106$', '$-22$', '$-105$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '1. The inputs: $01100100_2 = 64 + 32 + 4 = 100$ and $00110010_2 = 32 + 16 + 2 = 50$.\n' +
-        '2. Binary addition gives $10010110_2$ (this is $150$ as an unsigned number, and it still fits in 8 bits, so nothing is cut off).\n' +
-        '3. But in 8-bit two\'s complement a leading 1 means negative. The leftmost bit is worth $-128$:\n\n' +
-        '$$-128 + 16 + 4 + 2 = -106$$\n\n' +
-        'This is **overflow**: the true answer 150 is bigger than the largest 8-bit two\'s complement value (127), so adding two positive numbers produced a negative result.',
-      whyWrong: [
-        'This is the true sum $100 + 50$, but 8-bit two\'s complement can only store up to 127, so 150 cannot be represented. The stored pattern $10010110_2$ is read as a negative number.',
-        null,
-        'This reads $10010110_2$ as **sign-and-magnitude** (sign bit 1, then $0010110_2 = 22$). In two\'s complement the leading bit is worth $-128$.',
-        'This flips the bits ($01101001_2 = 105$) but forgets to add 1 when decoding the negative number.',
-      ],
-      keyIdea: 'If two positive two\'s complement numbers add to more than $2^{n-1} - 1$, the result overflows and appears negative.',
-    },
-    check: {
-      optionValues: [150, -106, -22, -105],
-      compute: () => {
-        const sum = (fromBase('01100100', 2) + fromBase('00110010', 2)) % 256;
-        return twos(toBase(sum, 2).padStart(8, '0'));
-      },
-    },
-  },
-  {
-    id: 'number-bases-018',
-    subtopic: 'number-bases',
-    difficulty: 'challenge',
-    stem: 'In some base $b$, the sum $34_b + 25_b = 61_b$ is correct. What is $b$?',
-    options: ['$9$', '$10$', '$8$', '$6$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Write every number using place values in base $b$:\n\n' +
-        '- $34_b = 3b + 4$\n' +
-        '- $25_b = 2b + 5$\n' +
-        '- $61_b = 6b + 1$\n\n' +
-        'Set up the equation: $(3b + 4) + (2b + 5) = 6b + 1$, so $5b + 9 = 6b + 1$, giving $b = 8$.\n\n' +
-        'Check it is a valid base: the largest digit used is 6, and $6 < 8$. In decimal: $34_8 = 28$, $25_8 = 21$, $61_8 = 49$, and $28 + 21 = 49$. Correct.\n\n' +
-        'Quick column view: the units give $4 + 5 = 9$, which must be "write 1, carry 1", so $9 = b + 1$ and $b = 8$.',
-      whyWrong: [
-        'This drops the units digit of $61_b$, writing it as $6b$: then $5b + 9 = 6b$ gives $b = 9$. Check: $34_9 + 25_9 = 31 + 23 = 54$, but $61_9 = 55$.',
-        'This assumes the numbers are ordinary decimals, but $34 + 25 = 59$ in decimal, not 61.',
-        null,
-        'This takes the base to be the largest digit that appears. A base-$b$ number can only use digits $0$ to $b - 1$, so a base containing the digit 6 must be at least 7.',
-      ],
-      keyIdea: 'Turn base-$b$ numbers into expressions in $b$ using place values, then solve the equation (and check every digit is less than $b$).',
-    },
-    check: {
-      optionValues: [9, 10, 8, 6],
-      compute: () => {
-        for (let b = 2; b <= 16; b++) {
-          const digitsOk = [...'342561'].every((d) => fromBase(d, 16) < b);
-          if (digitsOk && fromBase('34', b) + fromBase('25', b) === fromBase('61', b)) return b;
-        }
-        return -1;
+        let n = 0;
+        for (const d of [1, 1, 0, 1]) n = n * 2 + d;
+        return n;
       },
     },
   },
@@ -565,28 +468,115 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'number-bases-020',
+    id: 'number-bases-021',
     subtopic: 'number-bases',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'print(-21 >> 2, -21 // 4, int(-21 / 4))' },
-    options: ['`-5 -5 -5`', '`-6 -6 -5`', '`-6 -5 -5`', '`-5 -6 -5`'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'How many bits are there in one **byte**?',
+    options: ['$8$', '$4$', '$16$', '$2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A **bit** is one binary digit, and a **byte** is a group of $8$ bits.',
+      whyWrong: [
+        null,
+        '4 bits is half a byte, sometimes called a nibble. It is the size of one hexadecimal digit.',
+        '16 bits is two bytes.',
+        '2 is the number of values one bit can take (0 or 1), not the number of bits in a byte.',
+      ],
+      keyIdea: 'One byte is 8 bits.',
+    },
+  },
+  {
+    id: 'number-bases-022',
+    subtopic: 'number-bases',
+    difficulty: 'foundation',
+    stem: 'What value does the hexadecimal digit $\\mathrm{F}$ represent?',
+    options: ['$15$', '$16$', '$6$', '$14$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Exactly: $-21 \\div 4 = -5.25$. The three expressions round this in different ways.\n\n' +
-        '- `-21 >> 2`: a right shift by 2 divides by $2^2 = 4$ and rounds **down** (towards $-\\infty$). Down from $-5.25$ is $-6$. (Python integers behave as two\'s complement with infinitely many sign bits, so the shift floors.)\n' +
-        '- `-21 // 4`: floor division also rounds **down**: $-6$.\n' +
-        '- `int(-21 / 4)`: `-21 / 4` is the float $-5.25$, and `int()` **chops off** the decimal part (rounds towards zero): $-5$.\n\n' +
-        'Output: `-6 -6 -5`.',
+        'Hexadecimal uses the digits $0$ to $9$, then the letters $\\mathrm{A} = 10$, $\\mathrm{B} = 11$, $\\mathrm{C} = 12$, $\\mathrm{D} = 13$, $\\mathrm{E} = 14$ and $\\mathrm{F} = 15$.\n\n' +
+        'So $\\mathrm{F}$ stands for $15$, the largest single hexadecimal digit.',
       whyWrong: [
-        'This assumes all three round towards zero. For negative numbers, `>>` and `//` round **down**, and down from $-5.25$ is $-6$, not $-5$.',
         null,
-        'This gets the shift right but thinks `//` chops towards zero like `int()`. Floor division always rounds down, so `-21 // 4` is $-6$.',
-        'This gets `//` right but thinks the right shift rounds towards zero. A right shift by $k$ is the same as `// 2**k`, so it also gives $-6$.',
+        '16 is the base itself. Digits in base 16 run from 0 up to one less than the base.',
+        'This is the position of F in the alphabet. The letters start at $\\mathrm{A} = 10$.',
+        'This is the value of E, the letter before F.',
       ],
-      keyIdea: '`x >> k` equals `x // 2**k` (rounding down), which differs from `int(x / 2**k)` (rounding towards zero) when $x$ is negative and not an exact multiple of $2^k$.',
+      keyIdea: 'The hexadecimal letters A to F stand for 10 to 15.',
     },
-    python: { stdout: '-6 -6 -5' },
+    check: { optionValues: [15, 16, 6, 14], compute: () => fromBase('F', 16) },
+  },
+  {
+    id: 'number-bases-023',
+    subtopic: 'number-bases',
+    difficulty: 'foundation',
+    stem: 'How many bits does one hexadecimal digit represent?',
+    options: ['$4$', '$8$', '$16$', '$2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A hexadecimal digit has 16 possible values, and $2^4 = 16$, so one hexadecimal digit corresponds to exactly $4$ bits.',
+      whyWrong: [
+        null,
+        '8 bits is one byte, which takes **two** hexadecimal digits.',
+        '16 is the number of values one digit can take, not the number of bits. You need $2^n = 16$, so $n = 4$.',
+        '2 bits give only $2^2 = 4$ values, which is not enough for 16 different digits.',
+      ],
+      keyIdea: 'Because $2^4 = 16$, one hexadecimal digit is exactly 4 bits.',
+    },
+    check: {
+      optionValues: [4, 8, 16, 2],
+      compute: () => {
+        let n = 0;
+        while (2 ** n < 16) n++;
+        return n;
+      },
+    },
+  },
+  {
+    id: 'number-bases-024',
+    subtopic: 'number-bases',
+    difficulty: 'foundation',
+    stem: 'What is the **radix** of the octal number system?',
+    options: ['$8$', '$16$', '$10$', '$2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Radix** is another word for the base of a number system: the number of different digits it uses.\n\n' +
+        'Octal uses the digits $0$ to $7$, which is 8 digits, so its radix is $8$.',
+      whyWrong: [
+        null,
+        'This is the radix of hexadecimal.',
+        'This is the radix of ordinary decimal numbers.',
+        'This is the radix of binary.',
+      ],
+      keyIdea: 'Radix means base: binary is 2, octal is 8, decimal is 10 and hexadecimal is 16.',
+    },
+  },
+  {
+    id: 'number-bases-025',
+    subtopic: 'number-bases',
+    difficulty: 'exam',
+    stem: 'Convert $101101_2$ to hexadecimal.',
+    options: ['$\\mathrm{2D}_{16}$', '$\\mathrm{B4}_{16}$', '$\\mathrm{D2}_{16}$', '$45_{16}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'One hexadecimal digit is 4 bits, so split the bits into groups of 4 **starting from the right**.\n\n' +
+        '1. The groups are $10$ and $1101$. Pad the left group: $0010$ and $1101$.\n' +
+        '2. $0010_2 = 2$ and $1101_2 = 13 = \\mathrm{D}$.\n\n' +
+        'So the answer is $\\mathrm{2D}_{16}$.\n\n' +
+        'Check: $101101_2 = 32 + 8 + 4 + 1 = 45$ and $\\mathrm{2D}_{16} = 2 \\times 16 + 13 = 45$.',
+      whyWrong: [
+        null,
+        'This groups from the **left** ($1011$, $01$) and pads on the right, which changes the value. Groups must start from the right.',
+        'This writes the two groups in the wrong order. The left group stays on the left.',
+        'This finds the decimal value, 45, and writes it with a base 16 label. $45_{16}$ is worth $4 \\times 16 + 5 = 69$.',
+      ],
+      keyIdea: 'Binary to hexadecimal: group the bits in 4s from the right, padding the left group with zeros.',
+    },
+    check: {
+      optionValues: ['2D', 'B4', 'D2', '45'],
+      compute: () => toBase(fromBase('101101', 2), 16),
+    },
   },
 ];

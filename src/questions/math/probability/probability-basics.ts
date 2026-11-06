@@ -19,7 +19,7 @@ export const questions: StaticQuestion[] = [
     id: 'probability-basics-001',
     subtopic: 'probability-basics',
     difficulty: 'foundation',
-    stem: 'A spinner can land on red, blue or green. The probability it lands on red is $0.3$ and the probability it lands on blue is $0.45$. What is the probability that it does **not** land on blue?',
+    stem: 'A spinner lands on red with probability $0.3$, on blue with probability $0.45$, and otherwise on green. What is the probability that it does **not** land on blue?',
     options: ['$0.25$', '$0.7$', '$0.55$', '$0.45$'],
     correctIndex: 2,
     markScheme: {
@@ -49,7 +49,7 @@ export const questions: StaticQuestion[] = [
     id: 'probability-basics-002',
     subtopic: 'probability-basics',
     difficulty: 'foundation',
-    stem: 'One card is drawn at random from a standard 52-card deck (4 suits of 13 cards: A, 2 to 10, J, Q, K). What is the probability that it is a **picture card** (a Jack, Queen or King)?',
+    stem: 'One card is drawn at random from a standard 52-card deck. What is the probability that it is a **picture card** (a Jack, Queen or King)?',
     options: ['$\\frac{1}{13}$', '$\\frac{3}{13}$', '$\\frac{4}{13}$', '$\\frac{3}{52}$'],
     correctIndex: 1,
     markScheme: {
@@ -107,10 +107,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'Which pair of events is **independent**?',
     options: [
-      'Two cards are drawn from a deck **without replacement**: "the first card is an Ace" and "the second card is an Ace"',
-      'One die is rolled: "the number is even" and "the number is 2"',
-      'A die is rolled and a coin is tossed: "the die shows 6" and "the coin shows heads"',
-      'One die is rolled: "the number is less than 3" and "the number is greater than 4"',
+      'Two cards, no replacement: "first is an Ace", "second is an Ace"',
+      'One die: "shows an even number", "shows 2"',
+      'A die and a coin: "die shows 6", "coin shows heads"',
+      'One die: "less than 3", "greater than 4"',
     ],
     correctIndex: 2,
     markScheme: {
@@ -126,7 +126,7 @@ export const questions: StaticQuestion[] = [
         null,
         'These events are **mutually exclusive**, which is not the same as independent. If one happens the other becomes impossible, so knowing one changes the other: $P(\\text{both}) = 0 \\ne \\frac{1}{3} \\times \\frac{1}{3}$.',
       ],
-      keyIdea: 'Independent means one event does not affect the other ($P(A \\cap B) = P(A)P(B)$); mutually exclusive means they cannot happen together, and such events are never independent.',
+      keyIdea: 'Independent means one event does not affect the other ($P(A \\cap B) = P(A)P(B)$); mutually exclusive means they cannot happen together, and two such events with non-zero probabilities are never independent.',
     },
   },
   {
@@ -308,7 +308,7 @@ export const questions: StaticQuestion[] = [
     id: 'probability-basics-011',
     subtopic: 'probability-basics',
     difficulty: 'exam',
-    stem: 'In a class of 30 students, 17 study French, 12 study Spanish and 4 study both. A student is chosen at random. What is the probability that the student studies **neither** language?',
+    stem: 'In a class of 30 students, 17 study French, 12 study Spanish and 4 study both. What is the probability that a randomly chosen student studies **neither** language?',
     options: ['$\\frac{1}{30}$', '$\\frac{3}{10}$', '$\\frac{2}{15}$', '$\\frac{1}{6}$'],
     correctIndex: 3,
     markScheme: {
@@ -400,12 +400,11 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'Mutually exclusive: $P(A \\cap B) = 0$. Independent: $P(A \\cap B) = P(A)P(B)$. Check each test separately.',
     },
   },
-  // ------------------------------------------------------------------ challenge
   {
     id: 'probability-basics-014',
     subtopic: 'probability-basics',
     difficulty: 'exam',
-    stem: 'A basketball player scores each free throw with probability $0.8$, independently of the other throws. She takes 3 free throws. What is the probability that she **misses at least one**?',
+    stem: 'A player scores each free throw with probability $0.8$, independently of the others. She takes 3 free throws. What is the probability that she **misses at least one**?',
     options: ['$0.488$', '$0.6$', '$0.008$', '$0.512$'],
     correctIndex: 0,
     markScheme: {
@@ -432,42 +431,9 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'probability-basics-015',
-    subtopic: 'probability-basics',
-    difficulty: 'challenge',
-    stem: 'A fair die is rolled $n$ times. What is the **smallest** value of $n$ for which the probability of getting **at least one six** is $0.5$ or more?',
-    options: ['$3$', '$4$', '$6$', '$1$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '$P(\\text{at least one six in } n \\text{ rolls}) = 1 - \\left(\\frac{5}{6}\\right)^n$. We need this to be at least $0.5$, which means $\\left(\\frac{5}{6}\\right)^n \\le 0.5$.\n\n' +
-        'Try values on a calculator:\n\n' +
-        '| $n$ | $\\left(\\frac{5}{6}\\right)^n$ | $1 - \\left(\\frac{5}{6}\\right)^n$ |\n' +
-        '|---|---|---|\n' +
-        '| 3 | $0.5787$ | $0.4213$ |\n' +
-        '| 4 | $0.4823$ | $0.5177$ |\n\n' +
-        'At $n = 3$ the probability is still below $0.5$; at $n = 4$ it first reaches $0.5$ (in fact it goes above it). So the smallest $n$ is $4$.',
-      whyWrong: [
-        'This adds $\\frac{1}{6}$ for each roll, so that 3 rolls seem to give $3 \\times \\frac{1}{6} = 0.5$. Chances do not simply add up like this (otherwise 7 rolls would give a probability above $1$): for 3 rolls the true probability is $1 - \\frac{125}{216} = \\frac{91}{216}$, which is below $0.5$.',
-        null,
-        'This assumes 6 rolls are needed because a six has probability $\\frac{1}{6}$. In fact 4 rolls already give more than a 50% chance ($1 - \\left(\\frac{5}{6}\\right)^4 \\approx 0.518$).',
-        'This uses $1 - \\left(\\frac{1}{6}\\right)^n$, the complement of "every roll is a six". The complement of "at least one six" is "no sixes", which uses $\\frac{5}{6}$.',
-      ],
-      keyIdea: 'Set $1 - (\\text{probability of none})^n$ against the target and test whole numbers $n$ until it is reached.',
-    },
-    check: {
-      optionValues: [3, 4, 6, 1],
-      compute: () => {
-        let n = 1;
-        while (1 - (5 / 6) ** n < 0.5) n++;
-        return n;
-      },
-    },
-  },
-  {
     id: 'probability-basics-016',
     subtopic: 'probability-basics',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Events $A$ and $B$ are **independent**. $P(A) = 0.4$ and $P(A \\cup B) = 0.7$. Find $P(B)$.',
     options: ['$0.3$', '$0.75$', '$0.25$', '$0.5$'],
     correctIndex: 3,
@@ -527,41 +493,74 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'probability-basics-018',
+    id: 'probability-basics-019',
     subtopic: 'probability-basics',
-    difficulty: 'challenge',
-    stem: 'Two cards are drawn at random from a standard 52-card deck **without replacement**. What is the probability that **at least one** of them is an Ace?',
-    options: ['$\\frac{2}{13}$', '$\\frac{1}{221}$', '$\\frac{25}{169}$', '$\\frac{33}{221}$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'Which of these values **cannot** be a probability?',
+    options: ['$1.2$', '$0$', '$1$', '$0.5$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Use the complement: at least one Ace $= 1 - P(\\text{no Aces})$.\n\n' +
-        '- First card not an Ace: $\\frac{48}{52}$\n' +
-        '- Second card not an Ace (one non-Ace and one card gone): $\\frac{47}{51}$\n' +
-        '- $P(\\text{no Aces}) = \\frac{48}{52} \\times \\frac{47}{51} = \\frac{2256}{2652} = \\frac{188}{221}$\n' +
-        '- $P(\\text{at least one Ace}) = 1 - \\frac{188}{221} = \\frac{33}{221}$',
+        'Every probability lies between $0$ and $1$ inclusive: $0$ means impossible and $1$ means certain.\n\n' +
+        'Since $1.2 > 1$, it cannot be a probability.',
       whyWrong: [
-        'This is $\\frac{1}{13} + \\frac{1}{13}$: adding double counts the case where both cards are Aces (and ignores that the cards are not replaced).',
-        'This is $\\frac{4}{52} \\times \\frac{3}{51}$, the probability that **both** cards are Aces.',
-        'This is $1 - \\left(\\frac{12}{13}\\right)^2$, which treats the draws as **with** replacement. Without replacement the second factor is $\\frac{47}{51}$.',
         null,
+        '$0$ is allowed: it is the probability of an impossible event.',
+        '$1$ is allowed: it is the probability of a certain event.',
+        '$0.5$ lies between $0$ and $1$: it is the probability of a fair coin landing heads.',
       ],
-      keyIdea: 'For "at least one", find $P(\\text{none})$ step by step (reducing the counts when there is no replacement) and subtract from $1$.',
+      keyIdea: 'For any event, $0 \\le P(A) \\le 1$.',
     },
     check: {
-      optionValues: [2 / 13, 1 / 221, 25 / 169, 33 / 221],
-      compute: () => {
-        // exact count over all ordered pairs of different cards
-        let atLeastOne = 0;
-        let total = 0;
-        for (let i = 0; i < DECK.length; i++)
-          for (let j = 0; j < DECK.length; j++) {
-            if (i === j) continue;
-            total++;
-            if (DECK[i].rank === 'A' || DECK[j].rank === 'A') atLeastOne++;
-          }
-        return new Frac(atLeastOne, total).value();
-      },
+      optionValues: [1.2, 0, 1, 0.5],
+      compute: () => [0, 0.5, 1, 1.2].filter((p) => p < 0 || p > 1)[0],
     },
   },
-];
+  {
+    id: 'probability-basics-020',
+    subtopic: 'probability-basics',
+    difficulty: 'foundation',
+    stem: 'Two events are **mutually exclusive** when:',
+    options: ['They cannot both happen', 'One does not affect the other', 'Their probabilities add up to $1$', 'They have equal probabilities'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Mutually exclusive means the events have no outcomes in common, so $P(A \\cap B) = 0$.\n\n' +
+        'For example, on one die roll, "shows 2" and "shows 5" cannot both happen.',
+      whyWrong: [
+        null,
+        'This describes **independent** events, which is a different idea.',
+        'This is true for an event and its complement, but mutually exclusive events need not add up to $1$: "shows 2" and "shows 5" add up to $\\frac{1}{3}$.',
+        'The size of the probabilities does not matter. Only whether the events can happen together matters.',
+      ],
+      keyIdea: 'Mutually exclusive events cannot happen together: $P(A \\cap B) = 0$.',
+    },
+  },
+  {
+    id: 'probability-basics-021',
+    subtopic: 'probability-basics',
+    difficulty: 'foundation',
+    stem: 'If $P(A) = p$, what is $P(A\')$, the probability that $A$ does **not** happen?',
+    options: ['$1 - p$', '$p - 1$', '$\\frac{1}{p}$', '$-p$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'An event either happens or it does not, so $P(A) + P(A\') = 1$.\n\n' +
+        'Rearranging gives $P(A\') = 1 - p$.',
+      whyWrong: [
+        null,
+        'This subtracts the wrong way round, and gives a negative value, which cannot be a probability.',
+        'A reciprocal has no place here: with $p = 0.5$ it would give $2$, which cannot be a probability.',
+        'This is negative, and a probability is never negative. The two probabilities add up to $1$, not to $0$.',
+      ],
+      keyIdea: 'The complement rule: $P(A\') = 1 - P(A)$.',
+    },
+    check: {
+      // p = 0.3
+      optionValues: [1 - 0.3, 0.3 - 1, 1 / 0.3, -0.3],
+      compute: () => {
+        const outcomes = Array.from({ length: 10 }, (_, i) => i);
+        return outcomes.filter((x) => !(x < 3)).length / outcomes.length;
+      },
+    },
+  },];

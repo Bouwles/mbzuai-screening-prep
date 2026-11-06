@@ -38,7 +38,7 @@ export const lesson: Lesson = {
     'For a **frequency table**, every squared deviation is counted $f$ times and you divide by the total frequency $\\sum f$, not by the number of rows.\n\n' +
     '### Population or sample? ($n$ or $n - 1$)\n\n' +
     'If your data is the **whole population** you care about, divide by $n$ (symbol $\\sigma^2$). If it is a **sample** used to estimate the spread of a bigger population, divide by $n - 1$ (symbol $s^2$). Sample values tend to sit closer to their own mean than to the true mean, so dividing by $n$ would underestimate the spread; $n - 1$ corrects this. So $s^2$ is always **larger** than $\\sigma^2$ (by the factor $\\frac{n}{n - 1}$), unless every value is the same and both are $0$. The difference is big for small samples and tiny for large ones.\n\n' +
-    'On a calculator\'s one-variable statistics screen, $\\sigma_x$ is the population SD and $s_x$ is the sample SD. In Python, `statistics.pvariance` and `statistics.pstdev` divide by $n$, while `statistics.variance` and `statistics.stdev` divide by $n - 1$.\n\n' +
+    'On a calculator\'s one-variable statistics screen, $\\sigma_x$ is the population SD and $s_x$ is the sample SD.\n\n' +
     '### Changing every value: shifting and scaling\n\n' +
     '| Change to every value | Mean | SD | Variance |\n' +
     '| --- | --- | --- | --- |\n' +

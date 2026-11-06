@@ -23,7 +23,7 @@ const TABLE_007: number[][] = [
   [1, 1, 1],
 ];
 
-const NOTATION = '($\\land$ = AND, $\\lor$ = OR, $\\neg$ = NOT, $\\oplus$ = XOR; 1 = TRUE, 0 = FALSE.)';
+const NOTATION = '($\\land$ AND, $\\lor$ OR, $\\neg$ NOT, $\\oplus$ XOR.)';
 
 export const questions: StaticQuestion[] = [
   // ======================================================================= FOUNDATION
@@ -184,9 +184,7 @@ export const questions: StaticQuestion[] = [
     id: 'boolean-logic-006',
     subtopic: 'boolean-logic',
     difficulty: 'exam',
-    stem:
-      'In a logic circuit, inputs $A$ and $B$ go into an AND gate. The output of the AND gate and input $C$ go into an OR gate. The output of the OR gate then passes through a NOT gate to give the final output $Q$.\n\n' +
-      'For how many of the 8 possible combinations of $A$, $B$ and $C$ is $Q = 1$?',
+    stem: 'Inputs $A$ and $B$ enter an AND gate; its output and $C$ enter an OR gate, followed by a NOT gate giving $Q$. For how many of the 8 input combinations is $Q = 1$?',
     options: ['5', '7', '3', '1'],
     correctIndex: 2,
     markScheme: {
@@ -281,7 +279,7 @@ export const questions: StaticQuestion[] = [
     id: 'boolean-logic-009',
     subtopic: 'boolean-logic',
     difficulty: 'exam',
-    stem: 'Which Python condition is equivalent to `not (x > 3 and y < 5)` for all integers `x` and `y`?',
+    stem: 'Which condition is equivalent to `not (x > 3 and y < 5)` for all integers `x` and `y`?',
     options: ['`x <= 3 or y >= 5`', '`x <= 3 and y >= 5`', '`x < 3 or y > 5`', '`x > 3 or y < 5`'],
     correctIndex: 0,
     markScheme: {
@@ -290,12 +288,12 @@ export const questions: StaticQuestion[] = [
         '1. The `and` becomes `or`.\n' +
         '2. Negate each comparison: the opposite of `x > 3` is `x <= 3` (3 itself makes `x > 3` false, so it belongs on the other side). The opposite of `y < 5` is `y >= 5`.\n\n' +
         'Result: `x <= 3 or y >= 5`.\n\n' +
-        'Quick test: `x = 3, y = 0`. The original: `x > 3` is False, so the `and` is False and `not` gives True. The answer: `x <= 3` is True, so True. They agree.',
+        'Quick test: `x = 3, y = 0`. The original: `x > 3` is false, so the `and` is false and `not` gives true. The answer: `x <= 3` is true, so true. They agree.',
       whyWrong: [
         null,
-        'This negates both comparisons but forgets that De Morgan also turns `and` into `or`. With `x = 3, y = 0` the original is True but this is False.',
-        'The opposite of `x > 3` is `x <= 3`, not `x < 3`: the value `x = 3` gets lost (and similarly `y = 5`). With `x = 3, y = 0` the original is True but this is False.',
-        'This changes `and` into `or` but does not negate the two comparisons. With `x = 4, y = 0` the original is False but this is True.',
+        'This negates both comparisons but forgets that De Morgan also turns `and` into `or`. With `x = 3, y = 0` the original is true but this is false.',
+        'The opposite of `x > 3` is `x <= 3`, not `x < 3`: the value `x = 3` gets lost (and similarly `y = 5`). With `x = 3, y = 0` the original is true but this is false.',
+        'This changes `and` into `or` but does not negate the two comparisons. With `x = 4, y = 0` the original is false but this is true.',
       ],
       keyIdea: 'not (P and Q) = (not P) or (not Q), and the negation of > is <= (not <).',
     },
@@ -319,64 +317,52 @@ export const questions: StaticQuestion[] = [
     id: 'boolean-logic-010',
     subtopic: 'boolean-logic',
     difficulty: 'exam',
-    stem: 'What does this Python code print? (All of the output appears on one line.)',
+    stem: 'Here `and` and `or` stop as soon as the result is known. What is printed, in order?',
     code: {
-      lang: 'python',
-      source: `def check(n):
-    print(n, end=' ')
-    return n > 2
-
-if check(1) and check(5):
-    print('A')
-if check(3) or check(0):
-    print('B')`,
+      lang: 'pseudocode',
+      source: `function check(n)
+   print(n)
+   return n > 2
+end function
+if check(1) and check(5)
+   print("A")
+end if
+if check(3) or check(0)
+   print("B")
+end if`,
     },
     options: ['`1 5 3 0 B`', '`1 5 3 B`', '`1 3 B`', '`1 3 0 B`'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Python uses **short-circuit evaluation**: it stops evaluating `and` / `or` as soon as the result is known.\n\n' +
+        'This is **short-circuit evaluation**: the right-hand side is skipped once the result is known.\n\n' +
         '| Step | Call | Prints | Returns | Effect |\n' +
         '| --- | --- | --- | --- | --- |\n' +
-        '| 1 | `check(1)` | `1` | `False` | `False and ...` is already False, so `check(5)` is **skipped**; no `A` |\n' +
-        '| 2 | `check(3)` | `3` | `True` | `True or ...` is already True, so `check(0)` is **skipped** |\n' +
-        '| 3 | `print(\'B\')` | `B` | | |\n\n' +
+        '| 1 | `check(1)` | `1` | false | false `and` anything is false, so `check(5)` is **skipped**; no `A` |\n' +
+        '| 2 | `check(3)` | `3` | true | true `or` anything is true, so `check(0)` is **skipped** |\n' +
+        '| 3 | `print("B")` | `B` | | |\n\n' +
         'Output: `1 3 B`.',
       whyWrong: [
-        'This assumes both sides of `and` and `or` are always evaluated. Python stops as soon as the answer is known, so `check(5)` and `check(0)` never run.',
-        'This short-circuits the `or` correctly but not the `and`: once `check(1)` returns False, `False and anything` is False, so `check(5)` is never called.',
+        'This assumes both sides of `and` and `or` are always evaluated. The stem says evaluation stops as soon as the result is known, so `check(5)` and `check(0)` never run.',
+        'This short-circuits the `or` correctly but not the `and`: once `check(1)` returns false, the `and` is already false, so `check(5)` is never called.',
         null,
-        'This short-circuits the `and` correctly but not the `or`: once `check(3)` returns True, `True or anything` is True, so `check(0)` is never called.',
+        'This short-circuits the `and` correctly but not the `or`: once `check(3)` returns true, the `or` is already true, so `check(0)` is never called.',
       ],
-      keyIdea: '`and` stops at the first False value and `or` stops at the first True value; the right-hand side is not evaluated.',
+      keyIdea: '`and` stops at the first false value and `or` stops at the first true value; the right-hand side is not evaluated.',
     },
-    python: { stdout: '1 3 B\n' },
-  },
-  {
-    id: 'boolean-logic-011',
-    subtopic: 'boolean-logic',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'print(3 and 7, 0 and 7, 0 or 4, not 5)' },
-    options: ['`True False True False`', '`7 0 4 False`', '`3 0 4 False`', '`7 0 4 -5`'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'In Python, `and` and `or` return **one of their operands**, not necessarily `True`/`False`. The number 0 is falsy; every other number is truthy.\n\n' +
-        '- `3 and 7`: 3 is truthy, so `and` must look at the right side and returns it: `7`.\n' +
-        '- `0 and 7`: 0 is falsy, so `and` stops and returns it: `0`.\n' +
-        '- `0 or 4`: 0 is falsy, so `or` moves on and returns the right side: `4`.\n' +
-        '- `not 5`: 5 is truthy, so `not` gives `False` (`not` always returns a real bool).\n\n' +
-        'Output: `7 0 4 False`.',
-      whyWrong: [
-        'This assumes `and`/`or` always return `True` or `False`. In Python they return one of the operands (here 7, 0 and 4).',
-        null,
-        'This treats `3 and 7` as stopping at the first truthy value, which is how `or` behaves. `and` stops only at a falsy value; since 3 is truthy it returns 7.',
-        'This treats `not` like a minus sign. `not` is logical negation: `not 5` is `False` because 5 is truthy.',
-      ],
-      keyIdea: '`a and b` returns a if a is falsy, else b; `a or b` returns a if a is truthy, else b.',
+    check: {
+      optionValues: ['1 5 3 0 B', '1 5 3 B', '1 3 B', '1 3 0 B'],
+      compute: () => {
+        const out: (number | string)[] = [];
+        const check = (n: number) => {
+          out.push(n);
+          return n > 2;
+        };
+        if (check(1) && check(5)) out.push('A');
+        if (check(3) || check(0)) out.push('B');
+        return out.join(' ');
+      },
     },
-    python: { stdout: '7 0 4 False\n' },
   },
   {
     id: 'boolean-logic-012',
@@ -453,245 +439,298 @@ if check(3) or check(0):
     id: 'boolean-logic-014',
     subtopic: 'boolean-logic',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'Here `not` is done first, then `and`, then `or`. What is printed, in order?',
     code: {
-      lang: 'python',
-      source: 'a, b, c = True, False, False\nprint(a or b and c, (a or b) and c, not b and c)',
+      lang: 'pseudocode',
+      source: 'a = true\nb = false\nc = false\nprint(a or b and c)\nprint((a or b) and c)\nprint(not b and c)',
     },
-    options: ['`False False False`', '`True False True`', '`True False False`', '`False False True`'],
+    options: ['`false false false`', '`true false true`', '`true false false`', '`false false true`'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Python precedence, from tightest to loosest: `not`, then `and`, then `or`.\n\n' +
-        '1. `a or b and c` means `a or (b and c)` = `True or False` = `True`.\n' +
-        '2. `(a or b) and c`: the bracket is `True`, then `True and False` = `False`.\n' +
-        '3. `not b and c` means `(not b) and c` = `True and False` = `False`.\n\n' +
-        'Output: `True False False`.',
+        'Apply the stated order: `not`, then `and`, then `or`. Brackets come first.\n\n' +
+        '1. `a or b and c` means `a or (b and c)`, which is true `or` false, so true.\n' +
+        '2. `(a or b) and c`: the bracket is true, then true `and` false is false.\n' +
+        '3. `not b and c` means `(not b) and c`, which is true `and` false, so false.\n\n' +
+        'Output: `true false false`.',
       whyWrong: [
-        'This evaluates `a or b and c` left to right as `(a or b) and c`. In Python `and` binds more tightly than `or`, so it is `a or (b and c)`, which is True.',
-        'This treats `not b and c` as `not (b and c)`. `not` binds most tightly, so it applies only to `b`: `(not b) and c` is False.',
+        'This evaluates `a or b and c` left to right as `(a or b) and c`. Because `and` is done before `or`, it is `a or (b and c)`, which is true.',
+        'This treats `not b and c` as `not (b and c)`. `not` is done first, so it applies only to `b`: `(not b) and c` is false.',
         null,
         'This makes both precedence mistakes: reading the first expression left to right and applying `not` to the whole of `b and c`.',
       ],
-      keyIdea: 'Precedence: not > and > or (like minus sign > multiplication > addition).',
+      keyIdea: 'Precedence: not, then and, then or (like minus sign, then multiplication, then addition).',
     },
-    python: { stdout: 'True False False\n' },
+    check: {
+      optionValues: ['false false false', 'true false true', 'true false false', 'false false true'],
+      compute: () => {
+        const [a, b, c] = [true, false, false];
+        return [a || (b && c), (a || b) && c, !b && c].join(' ');
+      },
+    },
   },
   {
     id: 'boolean-logic-015',
     subtopic: 'boolean-logic',
     difficulty: 'exam',
-    stem: 'What happens when this Python code runs?',
+    stem: 'Here `and` and `or` stop as soon as the result is known, and dividing by 0 is an error. What happens when this runs?',
     code: {
-      lang: 'python',
+      lang: 'pseudocode',
       source: 'x = 0\nprint(x != 0 and 10 / x > 1)\nprint(x == 0 or 10 / x > 1)\nprint(10 / x > 1 and x != 0)',
     },
-    options: [
-      'It raises `ZeroDivisionError` at the first `print`',
-      'It prints `False`, then `True`, then raises `ZeroDivisionError` at the last `print`',
-      'It prints `False`, then `True`, then `False`',
-      'It prints `False`, then raises `ZeroDivisionError` at the second `print`',
-    ],
+    options: ['An error at the first `print`', 'Prints `false`, `true`, then an error', 'Prints `false`, `true`, `false`', 'Prints `false`, then an error'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Python evaluates `and` / `or` **left to right** and stops as soon as the result is known.\n\n' +
-        '1. `x != 0` is `False`, so `False and ...` is False without evaluating `10 / x`. Prints `False`.\n' +
-        '2. `x == 0` is `True`, so `True or ...` is True without evaluating `10 / x`. Prints `True`.\n' +
-        '3. Now `10 / x` is on the **left**, so it is evaluated first: dividing by 0 raises `ZeroDivisionError` before `x != 0` is ever checked.\n\n' +
-        'This is why programmers write the "safety check" first: `x != 0 and 10 / x > 1`.',
+        'Each condition is evaluated **left to right** and stops as soon as the result is known.\n\n' +
+        '1. `x != 0` is false, so the `and` is false without evaluating `10 / x`. Prints `false`.\n' +
+        '2. `x == 0` is true, so the `or` is true without evaluating `10 / x`. Prints `true`.\n' +
+        '3. Now `10 / x` is on the **left**, so it is evaluated first: dividing by 0 is an error, before `x != 0` is ever checked.\n\n' +
+        'This is why the safety check goes first: `x != 0 and 10 / x > 1`.',
       whyWrong: [
-        'This ignores short-circuiting: `x != 0` is False, so Python never evaluates `10 / x` on that line.',
+        'This ignores short-circuiting: `x != 0` is false, so `10 / x` is never evaluated on that line.',
         null,
-        'This assumes Python checks `x != 0` first wherever it is written. `and` evaluates left to right, so on the last line `10 / x` runs first and crashes.',
-        'This assumes `or` always evaluates both sides. `x == 0` is True, so the `or` is already True and `10 / x` is skipped.',
+        'This assumes `x != 0` is checked first wherever it is written. `and` evaluates left to right, so on the last line `10 / x` runs first.',
+        'This assumes `or` always evaluates both sides. `x == 0` is true, so the `or` is already true and `10 / x` is skipped.',
       ],
       keyIdea: 'Short-circuiting lets a left-hand check (like x != 0) protect the right-hand side from an error, but only if the check comes first.',
     },
-    python: { error: 'ZeroDivisionError' },
-  },
-
-  // ======================================================================= CHALLENGE
-  {
-    id: 'boolean-logic-016',
-    subtopic: 'boolean-logic',
-    difficulty: 'challenge',
-    stem: `Simplify $(A \\lor B) \\land (A \\lor \\neg B) \\land (\\neg A \\lor B)$. ${NOTATION}`,
-    options: ['$A$', '$A \\lor B$', '$B$', '$A \\land B$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1** (first two brackets). Both contain "$A \\lor$", so use the distributive law in reverse:\n\n' +
-        '$$(A \\lor B) \\land (A \\lor \\neg B) = A \\lor (B \\land \\neg B)$$\n\n' +
-        '$B \\land \\neg B = 0$ (a thing and its opposite are never both true), and $A \\lor 0 = A$. So the first two brackets give $A$.\n\n' +
-        '**Step 2** (AND with the third bracket). Expand:\n\n' +
-        '$$A \\land (\\neg A \\lor B) = (A \\land \\neg A) \\lor (A \\land B)$$\n\n' +
-        '$A \\land \\neg A = 0$, so this is $A \\land B$.\n\n' +
-        '**Check** with a row: $A = 1, B = 0$ makes the third bracket $0 \\lor 0 = 0$, so the whole expression is 0, and $A \\land B = 0$ too. Only $A = B = 1$ makes all three brackets 1.',
-      whyWrong: [
-        'This simplifies the first two brackets to $A$ correctly but forgets to AND with the third bracket $(\\neg A \\lor B)$, which removes the row $A = 1, B = 0$.',
-        'This just keeps the first bracket. ANDing more brackets can only make the expression true in **fewer** rows, never the same or more.',
-        'This combines the first and third brackets, $(A \\lor B) \\land (\\neg A \\lor B) = B$, and then drops the middle bracket $(A \\lor \\neg B)$, which removes the row $A = 0, B = 1$.',
-        null,
-      ],
-      keyIdea: '$(A \\lor B) \\land (A \\lor \\neg B) = A$; then $A \\land (\\neg A \\lor B) = A \\land B$.',
-    },
     check: {
-      optionValues: [tt2((a) => a), tt2((a, b) => a || b), tt2((_a, b) => b), tt2((a, b) => a && b)],
-      compute: () => tt2((a, b) => (a || b) && (a || !b) && (!a || b)),
-    },
-  },
-  {
-    id: 'boolean-logic-017',
-    subtopic: 'boolean-logic',
-    difficulty: 'challenge',
-    stem:
-      `Find the Boolean values $(A, B, C)$ (each 0 or 1) that satisfy **all four** equations. ${NOTATION}\n\n` +
-      '$$A \\lor B = 1, \\quad A \\oplus C = 0, \\quad \\neg(B \\land C) = 1, \\quad A \\lor \\neg B = 1$$',
-    options: ['$(1, 0, 1)$', '$(1, 1, 1)$', '$(0, 1, 0)$', '$(1, 0, 0)$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Start with the two equations that involve only $A$ and $B$: $A \\lor B = 1$ and $A \\lor \\neg B = 1$. See what happens if $A = 0$.\n\n' +
-        '1. Suppose $A = 0$. Then $A \\lor B = 1$ forces $B = 1$, and $A \\lor \\neg B = 1$ forces $\\neg B = 1$, i.e. $B = 0$. Contradiction, so $A = 1$.\n' +
-        '2. $A \\oplus C = 0$ means $A$ and $C$ are the **same** (XOR is 0 for equal inputs), so $C = 1$.\n' +
-        '3. $\\neg(B \\land C) = 1$ means $B \\land C = 0$. With $C = 1$ this needs $B = 0$.\n\n' +
-        'So $(A, B, C) = (1, 0, 1)$. Check all four: $1 \\lor 0 = 1$; $1 \\oplus 1 = 0$; $\\neg(0 \\land 1) = 1$; $1 \\lor 1 = 1$.',
-      whyWrong: [
-        null,
-        'This satisfies three equations, but $B \\land C = 1 \\land 1 = 1$, so $\\neg(B \\land C) = 0$, failing the third equation.',
-        'This fails the last equation: $A \\lor \\neg B = 0 \\lor 0 = 0$.',
-        'This fails $A \\oplus C = 0$, because $1 \\oplus 0 = 1$. It comes from thinking "XOR = 0" means the inputs are different; XOR is 0 when they are the same.',
-      ],
-      keyIdea: 'Use the equations to force one variable at a time (try a value and look for a contradiction), then check every equation.',
-    },
-    check: {
-      optionValues: ['101', '111', '010', '100'],
+      optionValues: ['err1', 'ok-ok-err', 'all', 'ok-err'],
       compute: () => {
-        const sols: string[] = [];
-        for (const a of BITS)
-          for (const b of BITS)
-            for (const c of BITS)
-              if ((a || b) && !xor(a, c) && !(b && c) && (a || !b)) sols.push(bit(a) + bit(b) + bit(c));
-        return sols.join(',');
+        const x = 0 as number;
+        const div = () => {
+          if (x === 0) throw new Error('division by zero');
+          return 10 / x;
+        };
+        const out: boolean[] = [];
+        try {
+          out.push(x !== 0 && div() > 1);
+          out.push(x === 0 || div() > 1);
+          out.push(div() > 1 && x !== 0);
+        } catch {
+          return ['err1', 'ok-err', 'ok-ok-err'][out.length];
+        }
+        return 'all';
       },
     },
   },
   {
-    id: 'boolean-logic-018',
+    id: 'boolean-logic-021',
     subtopic: 'boolean-logic',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source: `count = 0
-
-def f(x):
-    global count
-    count += 1
-    return x
-
-r = f(0) and f(1) or f(2) and f(3)
-print(r, count)`,
-    },
-    options: ['`3 4`', '`True 3`', '`3 3`', '`0 1`'],
+    difficulty: 'foundation',
+    stem: 'How many rows does the truth table of an expression with $4$ inputs have?',
+    options: ['$4$', '$8$', '$16$', '$24$'],
     correctIndex: 2,
     markScheme: {
-      solution:
-        '`f` returns its argument unchanged but adds 1 to `count` every time it is **called**. Because `and` binds more tightly than `or`, the line means:\n\n' +
-        '`r = (f(0) and f(1)) or (f(2) and f(3))`\n\n' +
-        '| Step | What happens | `count` |\n' +
-        '| --- | --- | --- |\n' +
-        '| 1 | `f(0)` returns 0 (falsy), so `0 and f(1)` stops: value 0; `f(1)` is skipped | 1 |\n' +
-        '| 2 | Left side of `or` is 0 (falsy), so evaluate the right side | 1 |\n' +
-        '| 3 | `f(2)` returns 2 (truthy), so `and` continues | 2 |\n' +
-        '| 4 | `f(3)` returns 3, so `2 and 3` gives 3 | 3 |\n\n' +
-        'So `r = 3` and `count = 3`. Output: `3 3`.',
+      solution: 'Each input can be 0 or 1, so each input doubles the number of combinations. With $n$ inputs there are $2^n$ rows, and $2^4 = 16$.',
       whyWrong: [
-        'This assumes every call runs. `f(1)` is skipped, because `f(0)` returns 0 and `0 and ...` stops immediately.',
-        'This assumes `and`/`or` produce `True`/`False`. They return one of the operands, here the 3 returned by `f(3)`.',
+        'This gives one row per input. A truth table needs one row per **combination** of inputs.',
+        'This is $2 \\times 4$. The number of rows doubles for each input, so it is $2^4$, not $2 \\times 4$.',
         null,
-        'This assumes the whole line stops at the first falsy value. But `and` binds more tightly than `or`, so after `f(0) and f(1)` gives 0, Python still evaluates the right side of the `or`.',
+        'This is $4!$, the number of ways to order 4 things. The rows are combinations of 0s and 1s.',
       ],
-      keyIdea: 'Short-circuiting skips function calls entirely, and and/or return operands, not just True/False.',
+      keyIdea: 'A truth table with $n$ inputs has $2^n$ rows.',
     },
-    python: { stdout: '3 3\n' },
+    check: { optionValues: [4, 8, 16, 24], compute: () => 2 ** 4 },
   },
   {
-    id: 'boolean-logic-019',
+    id: 'boolean-logic-022',
     subtopic: 'boolean-logic',
-    difficulty: 'challenge',
-    stem:
-      `A circuit computes $Q = (A \\text{ NOR } B) \\oplus (B \\text{ NAND } C)$. ${NOTATION}\n\n` +
-      'List the inputs in the usual order $(A, B, C)$ = 000, 001, 010, 011, 100, 101, 110, 111. What is the output column for $Q$?',
-    options: ['1, 1, 1, 0, 1, 1, 1, 0', '0, 0, 1, 0, 1, 1, 1, 0', '1, 1, 0, 1, 0, 0, 0, 1', '1, 1, 0, 0, 0, 0, 0, 0'],
+    difficulty: 'foundation',
+    stem: 'An AND gate outputs 1 when:',
+    options: ['both inputs are 1', 'at least one input is 1', 'the inputs are different', 'both inputs are 0'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'AND is 1 in only one row of its truth table: $A = 1$, $B = 1$. In every other row it is 0.',
+      whyWrong: [
+        null,
+        'This describes OR, which is also 1 when only one input is 1.',
+        'This describes XOR.',
+        'This describes NOR. An AND gate gives 0 when both inputs are 0.',
+      ],
+      keyIdea: 'AND needs both inputs to be 1; OR needs at least one.',
+    },
+    check: {
+      optionValues: [tt2((a, b) => a && b), tt2((a, b) => a || b), tt2(xor), tt2(nor)],
+      compute: () => tt2((a, b) => (a ? 1 : 0) + (b ? 1 : 0) === 2),
+    },
+  },
+  {
+    id: 'boolean-logic-023',
+    subtopic: 'boolean-logic',
+    difficulty: 'foundation',
+    stem: 'Which gate has a single input and flips it?',
+    options: ['NOT', 'AND', 'OR', 'XOR'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A **NOT** gate has one input and outputs the opposite value: 0 becomes 1, and 1 becomes 0. AND, OR and XOR each have two inputs.',
+      whyWrong: [
+        null,
+        'AND has two inputs and outputs 1 only when both are 1.',
+        'OR has two inputs and outputs 1 when at least one is 1.',
+        'XOR has two inputs and outputs 1 when they are different.',
+      ],
+      keyIdea: 'NOT is the only one of the basic gates with a single input: it flips the value.',
+    },
+  },
+  {
+    id: 'boolean-logic-024',
+    subtopic: 'boolean-logic',
+    difficulty: 'foundation',
+    stem: 'What is $1 \\oplus 1$? ($\\oplus$ is XOR.)',
+    options: ['$0$', '$1$', '$2$', '$11$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'XOR outputs 1 only when its two inputs are **different**. Here both inputs are 1, so the output is $0$.',
+      whyWrong: [
+        null,
+        'This is $1 \\lor 1$. OR is 1 when both inputs are 1, but XOR is not.',
+        'This is ordinary addition. Boolean outputs can only be 0 or 1.',
+        'This writes the two inputs side by side. A gate outputs a single value, 0 or 1.',
+      ],
+      keyIdea: 'XOR is 1 exactly when the two inputs differ.',
+    },
+    check: { optionValues: [0, 1, 2, 11], compute: () => (xor(true, true) ? 1 : 0) },
+  },
+  {
+    id: 'boolean-logic-025',
+    subtopic: 'boolean-logic',
+    difficulty: 'exam',
+    stem: 'What does this code print?',
+    code: {
+      lang: 'pseudocode',
+      source: 'c = 0\nfor i = 1 to 10\n   if mod(i,2) == 0 and mod(i,3) != 0 // mod is the modulus operator\n      c = c + 1\n   end if\nend for\nprint(c)',
+    },
+    options: ['`5`', '`4`', '`1`', '`8`'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Let $P = A \\text{ NOR } B$ (1 only when $A = B = 0$) and $R = B \\text{ NAND } C$ (0 only when $B = C = 1$). Then $Q = P \\oplus R$ is 1 when $P$ and $R$ differ.\n\n' +
-        '| $A$ | $B$ | $C$ | $P$ | $R$ | $Q$ |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| 0 | 0 | 0 | 1 | 1 | 0 |\n' +
-        '| 0 | 0 | 1 | 1 | 1 | 0 |\n' +
-        '| 0 | 1 | 0 | 0 | 1 | 1 |\n' +
-        '| 0 | 1 | 1 | 0 | 0 | 0 |\n' +
-        '| 1 | 0 | 0 | 0 | 1 | 1 |\n' +
-        '| 1 | 0 | 1 | 0 | 1 | 1 |\n' +
-        '| 1 | 1 | 0 | 0 | 1 | 1 |\n' +
-        '| 1 | 1 | 1 | 0 | 0 | 0 |\n\n' +
-        'Output column: 0, 0, 1, 0, 1, 1, 1, 0.',
+        'The condition counts numbers that are even **and** not multiples of 3.\n\n' +
+        '| i | 2 | 4 | 6 | 8 | 10 |\n| --- | --- | --- | --- | --- | --- |\n| mod(i,3) | 2 | 1 | 0 | 2 | 1 |\n| counted? | yes | yes | no | yes | yes |\n\n' +
+        'Odd values of `i` fail the first part, so they are never counted. The count is $4$.',
       whyWrong: [
-        'This treats $\\oplus$ as ordinary OR. In the first two rows $P = R = 1$, and XOR of two 1s is 0, not 1.',
+        'This counts all the even numbers and ignores the second part of the `and`, which rules out 6.',
         null,
-        'This forgets the NOT in NOR and uses $A \\lor B$ for $P$. That flips $P$ in every row, so every output comes out flipped.',
-        'This treats $\\oplus$ as AND, giving 1 only where $P$ and $R$ are both 1. XOR is 1 where they are **different**.',
+        'This reads `mod(i,3) != 0` as `mod(i,3) == 0`, which leaves only 6.',
+        'This reads `and` as `or`: every number from 1 to 10 except 3 and 9 would then be counted.',
       ],
-      keyIdea: 'Work out each gate as its own column first, then combine the columns with the final gate.',
+      keyIdea: 'With `and`, a value is counted only if it passes every part of the condition.',
     },
     check: {
-      optionValues: ['11101110', '00101110', '11010001', '11000000'],
-      compute: () => tt3((a, b, c) => xor(nor(a, b), nand(b, c))),
+      optionValues: ['5', '4', '1', '8'],
+      compute: () => {
+        let c = 0;
+        for (let i = 1; i <= 10; i++) if (i % 2 === 0 && i % 3 !== 0) c++;
+        return String(c);
+      },
     },
   },
   {
-    id: 'boolean-logic-020',
+    id: 'boolean-logic-026',
     subtopic: 'boolean-logic',
-    difficulty: 'challenge',
-    stem: `Which expression is **NOT** logically equivalent to $\\neg(A \\lor (\\neg A \\land B))$? ${NOTATION}`,
-    options: ['$\\neg A \\land \\neg B$', '$\\neg(A \\lor B)$', '$\\neg A \\land (A \\lor \\neg B)$', '$\\neg A \\lor \\neg B$'],
+    difficulty: 'exam',
+    stem: 'What does this code print?',
+    code: {
+      lang: 'pseudocode',
+      source: 'x = 1\nwhile (x != 10 and x < 20)\n   x = x + 2\nend while\nprint(x)',
+    },
+    options: ['`10`', '`19`', '`21`', 'Infinite loop'],
+    correctIndex: 2,
+    markScheme: {
+      solution:
+        '`x` takes the odd values $1, 3, 5, \\dots$, so `x != 10` is always true. The loop is controlled by `x < 20`.\n\n' +
+        '| x at the test | `x != 10` | `x < 20` | loop runs? |\n| --- | --- | --- | --- |\n| 1 | true | true | yes |\n| ... | true | true | yes |\n| 19 | true | true | yes |\n| 21 | true | false | no |\n\n' +
+        'The loop stops at $x = 21$, and it prints `21`.',
+      whyWrong: [
+        '`x` goes up in 2s from 1, so it is always odd and never equals 10.',
+        'This forgets that 19 passes the test, so the body runs once more and makes `x` equal to 21.',
+        null,
+        'This reads `and` as `or`. With `and`, the loop stops as soon as either part is false, and `x < 20` eventually is.',
+      ],
+      keyIdea: 'A `while` loop with `and` stops as soon as one part of the condition becomes false.',
+    },
+    check: {
+      optionValues: ['10', '19', '21', 'Infinite loop'],
+      compute: () => {
+        let x = 1;
+        for (let n = 0; x !== 10 && x < 20; n++) {
+          if (n > 1000) return 'Infinite loop';
+          x += 2;
+        }
+        return String(x);
+      },
+    },
+  },
+  {
+    id: 'boolean-logic-027',
+    subtopic: 'boolean-logic',
+    difficulty: 'exam',
+    stem: 'What does this code print?',
+    code: {
+      lang: 'pseudocode',
+      source: 'x = 1\nwhile (x != 10 or x < 20)\n   x = x + 2\nend while\nprint(x)',
+    },
+    options: ['`10`', '`19`', '`21`', 'Infinite loop'],
     correctIndex: 3,
     markScheme: {
       solution:
-        '**Simplify the given expression.** Inside the NOT, distribute the OR:\n\n' +
-        '$$A \\lor (\\neg A \\land B) = (A \\lor \\neg A) \\land (A \\lor B) = 1 \\land (A \\lor B) = A \\lor B$$\n\n' +
-        'So the expression is $\\neg(A \\lor B)$, which by De Morgan is $\\neg A \\land \\neg B$ (1 only when $A = B = 0$).\n\n' +
-        '**Test each option:**\n\n' +
-        '- $\\neg A \\land \\neg B$: equivalent (shown above).\n' +
-        '- $\\neg(A \\lor B)$: equivalent (shown above).\n' +
-        '- $\\neg A \\land (A \\lor \\neg B) = (\\neg A \\land A) \\lor (\\neg A \\land \\neg B) = \\neg A \\land \\neg B$: equivalent.\n' +
-        '- $\\neg A \\lor \\neg B$: with $A = 1, B = 0$ it gives $0 \\lor 1 = 1$, but the original gives $\\neg(1 \\lor 0) = 0$. **Not equivalent.**',
+        'An `or` condition is false only when **both** parts are false, so the loop stops only when `x == 10` and `x >= 20` at the same time. That can never happen.\n\n' +
+        '| x at the test | `x != 10` | `x < 20` | loop runs? |\n| --- | --- | --- | --- |\n| 1 | true | true | yes |\n| 19 | true | true | yes |\n| 21 | true | false | yes |\n| 23 | true | false | yes |\n\n' +
+        '`x` stays odd, so `x != 10` is always true. The answer is **Infinite loop**.',
       whyWrong: [
-        'This one is equivalent: the original simplifies to $\\neg(A \\lor B)$, and De Morgan turns that into $\\neg A \\land \\neg B$. It can look wrong if you misremember De Morgan as keeping the OR, but $\\neg(A \\lor B)$ really is $\\neg A \\land \\neg B$.',
-        'This one is equivalent: $A \\lor (\\neg A \\land B)$ simplifies to $A \\lor B$ (absorption), so the original is exactly $\\neg(A \\lor B)$.',
-        'This one is equivalent: expanding gives $(\\neg A \\land A) \\lor (\\neg A \\land \\neg B)$, and $\\neg A \\land A = 0$, leaving $\\neg A \\land \\neg B$. It only looks different.',
+        '`x` goes up in 2s from 1, so it is always odd and never equals 10.',
+        'This treats the loop as ending when `x` is about to reach 20, but the `or` keeps it running while `x != 10` is true.',
+        'This reads `or` as `and`. With `and` the loop would stop at 21, but with `or` one true part is enough to keep going.',
         null,
       ],
-      keyIdea: 'Simplify the target first ($A \\lor (\\neg A \\land B) = A \\lor B$), then test options with a row such as $A = 1, B = 0$.',
+      keyIdea: 'A `while` loop with `or` keeps running while either part is true.',
     },
     check: {
-      optionValues: ['0', '1', '2', '3'],
+      optionValues: ['10', '19', '21', 'Infinite loop'],
       compute: () => {
-        const target = tt2((a, b) => !(a || (!a && b)));
-        const opts = [
-          tt2((a, b) => !a && !b),
-          tt2((a, b) => !(a || b)),
-          tt2((a, b) => !a && (a || !b)),
-          tt2((a, b) => !a || !b),
-        ];
-        return opts
-          .map((t, i) => (t !== target ? String(i) : ''))
-          .filter(Boolean)
-          .join(',');
+        let x = 1;
+        for (let n = 0; x !== 10 || x < 20; n++) {
+          if (n > 1000) return 'Infinite loop';
+          x += 2;
+        }
+        return String(x);
+      },
+    },
+  },
+  {
+    id: 'boolean-logic-028',
+    subtopic: 'boolean-logic',
+    difficulty: 'exam',
+    stem: 'A loop runs `while (x > 0 and y > 0)`. Which condition is true when it stops?',
+    options: ['`x <= 0 or y <= 0`', '`x <= 0 and y <= 0`', '`x < 0 or y < 0`', '`x > 0 or y > 0`'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The loop stops when its condition is false, so we need `not (x > 0 and y > 0)`.\n\n' +
+        "By De Morgan's law, `and` becomes `or` and each comparison is negated. The opposite of `x > 0` is `x <= 0`, and the opposite of `y > 0` is `y <= 0`.\n\n" +
+        'So when the loop stops, `x <= 0 or y <= 0`.',
+      whyWrong: [
+        null,
+        'This negates both comparisons but keeps the `and`. The loop stops as soon as **one** of them fails, for example `x = 0, y = 5`.',
+        'The opposite of `x > 0` is `x <= 0`, not `x < 0`. This misses the case `x = 0`.',
+        'This does not negate the comparisons at all. With `x = 5, y = 5` it is true, but the loop would still be running.',
+      ],
+      keyIdea: 'A loop exits when its condition is false: use De Morgan to write that as a condition.',
+    },
+    check: {
+      optionValues: (() => {
+        const grid = (f: (x: number, y: number) => boolean) => {
+          let s = '';
+          for (let x = -3; x <= 3; x++) for (let y = -3; y <= 3; y++) s += f(x, y) ? '1' : '0';
+          return s;
+        };
+        return [grid((x, y) => x <= 0 || y <= 0), grid((x, y) => x <= 0 && y <= 0), grid((x, y) => x < 0 || y < 0), grid((x, y) => x > 0 || y > 0)];
+      })(),
+      compute: () => {
+        let s = '';
+        for (let x = -3; x <= 3; x++) for (let y = -3; y <= 3; y++) s += !(x > 0 && y > 0) ? '1' : '0';
+        return s;
       },
     },
   },

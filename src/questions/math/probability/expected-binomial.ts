@@ -86,10 +86,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'Which of the following random variables can be modelled by a **binomial distribution**?',
     options: [
-      'The number of aces when 5 cards are dealt from a standard pack of 52 cards, without replacement',
-      'The number of times a die is rolled until the first six appears',
-      'The total score when three fair dice are rolled',
-      'The number of heads when a fair coin is tossed 10 times',
+      'Number of aces in 5 cards dealt without replacement',
+      'Number of rolls of a die until the first six',
+      'Total score on three fair dice',
+      'Number of heads in 10 tosses of a fair coin',
     ],
     correctIndex: 3,
     markScheme: {
@@ -139,8 +139,8 @@ export const questions: StaticQuestion[] = [
   {
     id: 'expected-binomial-005',
     subtopic: 'expected-binomial',
-    difficulty: 'foundation',
-    stem: 'A game costs AED 4 to play. A fair six-sided die is rolled once. If it shows a six, the player receives a prize of AED $x$; otherwise the player receives nothing. The AED 4 is never returned. For what value of $x$ is the game **fair** (the player\'s expected gain is zero)?',
+    difficulty: 'exam',
+    stem: 'A game costs AED 4. A fair die is rolled once: a six wins a prize of AED $x$, and anything else wins nothing. For what value of $x$ is the game **fair** (expected gain zero)?',
     options: ['AED 20', 'AED 24', 'AED 28', 'AED 4'],
     correctIndex: 1,
     markScheme: {
@@ -315,7 +315,7 @@ export const questions: StaticQuestion[] = [
     id: 'expected-binomial-010',
     subtopic: 'expected-binomial',
     difficulty: 'exam',
-    stem: 'A multiple-choice quiz has 25 questions. A student guesses every answer and is correct on each with probability $0.2$, independently. Let $X$ be the number of correct answers. What is the **standard deviation** of $X$?',
+    stem: 'A student guesses all 25 questions on a quiz, each correct with probability $0.2$, independently. If $X$ is the number correct, what is the **standard deviation** of $X$?',
     options: ['$4$', '$5$', '$\\sqrt{5}$', '$2$'],
     correctIndex: 3,
     markScheme: {
@@ -347,7 +347,7 @@ export const questions: StaticQuestion[] = [
     id: 'expected-binomial-011',
     subtopic: 'expected-binomial',
     difficulty: 'exam',
-    stem: 'A game costs AED 10 per play. A spinner then gives a prize of AED 0 with probability $0.5$, AED 10 with probability $0.3$, and AED 40 with probability $0.2$. What is the player\'s expected gain (prize minus cost) per game?',
+    stem: 'A game costs AED 10 per play. The prize is AED 0 with probability $0.5$, AED 10 with probability $0.3$ and AED 40 with probability $0.2$. What is the expected gain (prize minus cost) per game?',
     options: ['A gain of AED 1', 'A gain of AED 11', 'A gain of AED 6', 'A loss of AED 1'],
     correctIndex: 0,
     markScheme: {
@@ -440,11 +440,10 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-  // ------------------------------------------------------------------ challenge
   {
     id: 'expected-binomial-014',
     subtopic: 'expected-binomial',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A random variable $X \\sim \\text{B}(n, p)$ has mean $E(X) = 12$ and variance $\\text{Var}(X) = 3$. Find $n$.',
     options: ['$48$', '$16$', '$9$', '$4$'],
     correctIndex: 1,
@@ -479,52 +478,10 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'expected-binomial-015',
-    subtopic: 'expected-binomial',
-    difficulty: 'challenge',
-    stem: 'The random variable $X$ has the probability distribution below, where $a$ and $b$ are constants. Given that $E(X) = 2.4$, find $\\text{Var}(X)$.',
-    table: {
-      headers: ['$x$', '$1$', '$2$', '$5$'],
-      rows: [['$P(X = x)$', '$a$', '$b$', '$0.2$']],
-    },
-    options: ['$1.84$', '$7.6$', '$5.2$', '$0.64$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '**Two equations for two unknowns.**\n\n' +
-        '- Probabilities sum to 1: $a + b + 0.2 = 1$, so $a + b = 0.8$.\n' +
-        '- Mean: $a + 2b + 5(0.2) = 2.4$, so $a + 2b = 1.4$.\n\n' +
-        'Subtract the first from the second: $b = 0.6$, then $a = 0.2$.\n\n' +
-        '**Variance.** $E(X^2) = 1^2(0.2) + 2^2(0.6) + 5^2(0.2) = 0.2 + 2.4 + 5 = 7.6$.\n\n' +
-        '$$\\text{Var}(X) = E(X^2) - [E(X)]^2 = 7.6 - 2.4^2 = 7.6 - 5.76 = 1.84$$',
-      whyWrong: [
-        null,
-        'This is $E(X^2)$ only; $[E(X)]^2 = 5.76$ still has to be subtracted.',
-        'This subtracts $E(X)$ instead of $[E(X)]^2$: $7.6 - 2.4 = 5.2$.',
-        'This swaps $a$ and $b$ ($a = 0.6$, $b = 0.2$), giving $E(X^2) = 6.4$ and $6.4 - 5.76 = 0.64$. Those values would make the mean 2, not 2.4.',
-      ],
-      keyIdea: 'Use "probabilities sum to 1" and the given mean as two simultaneous equations, then $\\text{Var}(X) = E(X^2) - [E(X)]^2$.',
-    },
-    check: {
-      optionValues: [1.84, 7.6, 5.2, 0.64],
-      compute: () => {
-        // a + b = 1 - 0.2 ; 1a + 2b = 2.4 - 5(0.2)  -> solve by elimination
-        const s1 = 1 - 0.2;
-        const s2 = 2.4 - 5 * 0.2;
-        const b = s2 - s1;
-        const a = s1 - b;
-        const xs = [1, 2, 5];
-        const ps = [a, b, 0.2];
-        const mu = ev(xs, ps);
-        return sumOf(xs.map((x, i) => (x - mu) ** 2 * ps[i]));
-      },
-    },
-  },
-  {
     id: 'expected-binomial-016',
     subtopic: 'expected-binomial',
     difficulty: 'exam',
-    stem: 'Each item made by a machine is defective with probability $0.1$, independently of the others. A random sample of 5 items is checked. What is the exact probability that **at least two** of them are defective?',
+    stem: 'Each item from a machine is defective with probability $0.1$, independently of the others. In a random sample of 5 items, what is the exact probability that **at least two** are defective?',
     options: ['$0.40951$', '$0.0729$', '$0.08146$', '$0.67195$'],
     correctIndex: 2,
     markScheme: {
@@ -548,62 +505,76 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'expected-binomial-017',
+    id: 'expected-binomial-019',
     subtopic: 'expected-binomial',
-    difficulty: 'challenge',
-    stem: 'A test has 25 multiple-choice questions, each with 5 options and one correct answer. A correct answer scores $+4$ and a wrong answer scores $-1$. A student guesses all 25 answers at random. What is the student\'s expected total score?',
-    options: ['$5$', '$0$', '$20$', '$-5$'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'What must the probabilities in a discrete probability distribution add up to?',
+    options: ['$1$', '$0$', '$100$', '$E(X)$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Let $X$ be the number of correct answers: $X \\sim \\text{B}(25, 0.2)$, so $E(X) = 25 \\times 0.2 = 5$.\n\n' +
-        'The number wrong is $25 - X$, so the score is\n\n' +
-        '$$S = 4X - (25 - X) = 5X - 25$$\n\n' +
-        '$$E(S) = 5E(X) - 25 = 5(5) - 25 = 0$$\n\n' +
-        'Quick check per question: expected score $= 4(0.2) + (-1)(0.8) = 0.8 - 0.8 = 0$. So random guessing gains nothing on average with this marking.',
+        'The listed values cover every possible outcome, and exactly one of them must happen. So the total probability is $1$, which is how an unknown $k$ in a table is found.',
       whyWrong: [
-        'This is $E(X) = np = 5$, the expected number of **correct answers**, not the score.',
         null,
-        'This scores the 5 expected correct answers ($4 \\times 5 = 20$) but forgets the $-1$ penalty for the 20 expected wrong answers.',
-        'This subtracts 1 for **all** 25 questions ($20 - 25$), but only the wrong answers lose a mark.',
+        'A total of $0$ would mean that nothing can happen. Probabilities are never negative, so they cannot cancel out.',
+        '$100$ would be the total if the probabilities were written as percentages. As decimals or fractions, the total is $1$.',
+        '$E(X)$ is the sum of each value times its probability. The sum of the probabilities alone is always $1$.',
       ],
-      keyIdea: 'Write the score as a linear function of the binomial count, then use $E(aX + b) = aE(X) + b$.',
-    },
-    check: {
-      optionValues: [5, 0, 20, -5],
-      compute: () => sumOf(Array.from({ length: 26 }, (_, r) => (4 * r - (25 - r)) * pmf(25, r, 0.2))),
+      keyIdea: 'In any probability distribution, $\\sum P(X = x) = 1$.',
     },
   },
   {
-    id: 'expected-binomial-018',
+    id: 'expected-binomial-020',
     subtopic: 'expected-binomial',
-    difficulty: 'challenge',
-    stem: 'A test has 25 multiple-choice questions, each with 5 options and one correct answer. A correct answer scores $+4$ and a wrong answer scores $-1$. A student guesses all 25 answers at random, independently. What is the **variance** of the student\'s total score?',
-    options: ['$20$', '$4$', '$100$', '$75$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'For $X \\sim \\text{B}(n, p)$, which expression gives the mean $E(X)$?',
+    options: ['$np$', '$np(1-p)$', '$n + p$', '$\\frac{n}{p}$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Number correct: $X \\sim \\text{B}(25, 0.2)$, so $\\text{Var}(X) = 25 \\times 0.2 \\times 0.8 = 4$.\n\n' +
-        'Score: $S = 4X - (25 - X) = 5X - 25$.\n\n' +
-        'Use $\\text{Var}(aX + b) = a^2 \\, \\text{Var}(X)$ with $a = 5$, $b = -25$:\n\n' +
-        '$$\\text{Var}(S) = 5^2 \\times 4 = 25 \\times 4 = 100$$\n\n' +
-        '(So the standard deviation of the score is $\\sqrt{100} = 10$ marks.)',
+        'There are $n$ trials, and each succeeds with probability $p$, so on average there are $np$ successes.\n\n' +
+        'For example, 10 tosses of a fair coin give $10 \\times 0.5 = 5$ heads on average.',
       whyWrong: [
-        'This multiplies the variance by $5$ instead of $5^2 = 25$.',
-        'This is $\\text{Var}(X)$, the variance of the **number correct**, not of the score $S = 5X - 25$.',
         null,
-        'This computes $25 \\times 4$ and then also subtracts the constant 25. Adding or subtracting a constant never changes the variance.',
+        'This is the **variance** of $X$, not the mean.',
+        '$n$ counts trials and $p$ is a probability, so adding them has no meaning. Multiply them.',
+        'This divides by $p$, so the mean would fall as $p$ rises. More likely successes must give a larger mean.',
       ],
-      keyIdea: '$\\text{Var}(aX + b) = a^2 \\, \\text{Var}(X)$, and for a binomial count $\\text{Var}(X) = np(1-p)$.',
+      keyIdea: 'For a binomial distribution, the mean is $np$.',
     },
     check: {
-      optionValues: [20, 4, 100, 75],
-      compute: () => {
-        const scores = Array.from({ length: 26 }, (_, r) => 4 * r - (25 - r));
-        const ps = scores.map((_, r) => pmf(25, r, 0.2));
-        const mu = ev(scores, ps);
-        return sumOf(scores.map((s, i) => (s - mu) ** 2 * ps[i]));
-      },
+      // n = 5, p = 0.2
+      optionValues: [5 * 0.2, 5 * 0.2 * 0.8, 5 + 0.2, 5 / 0.2],
+      compute: () => sumOf([0, 1, 2, 3, 4, 5].map((r) => r * pmf(5, r, 0.2))),
     },
   },
-];
+  {
+    id: 'expected-binomial-021',
+    subtopic: 'expected-binomial',
+    difficulty: 'foundation',
+    stem: 'For $X \\sim \\text{B}(n, p)$, which expression gives the variance $\\text{Var}(X)$?',
+    options: ['$np(1-p)$', '$np$', '$\\sqrt{np(1-p)}$', '$np^2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The variance of a binomial distribution is\n\n' +
+        '$$\\text{Var}(X) = np(1-p)$$\n\n' +
+        'For example, 10 tosses of a fair coin give $10 \\times 0.5 \\times 0.5 = 2.5$.',
+      whyWrong: [
+        null,
+        'This is the **mean**. The variance has the extra factor $(1-p)$.',
+        'This is the **standard deviation**, the square root of the variance.',
+        'This squares $p$, but the second factor should be $(1-p)$, the probability of failure.',
+      ],
+      keyIdea: 'For a binomial distribution, the variance is $np(1-p)$ and the standard deviation is its square root.',
+    },
+    check: {
+      // n = 5, p = 0.2
+      optionValues: [5 * 0.2 * 0.8, 5 * 0.2, Math.sqrt(5 * 0.2 * 0.8), 5 * 0.2 ** 2],
+      compute: () => {
+        const rs = [0, 1, 2, 3, 4, 5];
+        const mu = sumOf(rs.map((r) => r * pmf(5, r, 0.2)));
+        return sumOf(rs.map((r) => (r - mu) ** 2 * pmf(5, r, 0.2)));
+      },
+    },
+  },];

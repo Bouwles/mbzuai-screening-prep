@@ -59,7 +59,7 @@ export const lesson: Lesson = {
     '- **Numbers:** even or odd; multiples of 3, 5, 7; prime; perfect square; cube; triangular ($1, 3, 6, 10, 15, 21, 28, \\ldots$); digit sums; a pattern inside each pair.\n' +
     '- **Words:** palindromes (read the same backwards), anagrams (same letters rearranged, so sort the letters), category (e.g. one is not a programming language).\n' +
     '- **Shapes described in words:** number of sides, right angles, equal sides, pairs of parallel sides, lines of symmetry, 2D or 3D.\n' +
-    '- **Code expressions:** evaluate each one exactly as Python 3 would. Remember that `int(3.9)` chops off the decimals (giving `3`), `7 // 2` rounds down (giving `3`), and `round(2.5)` sends an exact half to the nearest **even** whole number (giving `2`).\n\n' +
+    '- **Code expressions:** evaluate each one exactly. Remember that `div(7,2)` is whole-number division (giving `3`) and `mod(7,2)` is the remainder (giving `1`).\n\n' +
     'Beware of "fake primes": $51 = 3 \\times 17$, $57 = 3 \\times 19$, $87 = 3 \\times 29$ and $91 = 7 \\times 13$.\n\n' +
     '### Analogies\n\n' +
     'Find the change that turns the first item into the second, then apply exactly the same change to the third. With letters, use alphabet positions ($A = 1$, $B = 2$, ..., $Z = 26$). With numbers, a single pair is often ambiguous ($3 \\to 27$ could be "times 9" or "cubed"), so use every pair you are given and choose the rule that fits all of them.',

@@ -504,155 +504,36 @@ export const questions: StaticQuestion[] = [
     id: 'letter-symbol-patterns-016',
     subtopic: 'letter-symbol-patterns',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'Letters are numbered A = 0 to Z = 25. Arrays are indexed from 1. This code shifts Z, O, O forward by 2 places. What does it print, in order?',
     code: {
-      lang: 'python',
-      source:
-        'word = "ZOO"\nout = ""\nfor ch in word:\n    pos = ord(ch) - ord("A")\n    out += chr((pos + 2) % 26 + ord("A"))\nprint(out)',
+      lang: 'pseudocode',
+      source: 'L = [25, 14, 14]\nfor i = 1 to 3\n   print(mod(L[i] + 2, 26)) // mod is the modulus operator\nend for',
     },
-    options: ['`AQQ`', '`XMM`', '`CRR`', '`BQQ`'],
+    options: ['`0 16 16`', '`23 12 12`', '`27 16 16`', '`1 16 16`'],
     correctIndex: 3,
     markScheme: {
       solution:
-        '`ord` gives a character\'s code number and `chr` turns a number back into a character. `ord("A")` is 65, so `ord(ch) - ord("A")` gives a **0-based** position: A = 0, B = 1, ..., Z = 25.\n\n' +
-        'The loop is a shift cipher with shift 2, and `% 26` wraps round the alphabet.\n\n' +
-        '| `ch` | `pos` | `(pos + 2) % 26` | new letter | `out` |\n|---|---|---|---|---|\n' +
-        '| `Z` | 25 | $27 \\bmod 26 = 1$ | `B` | `B` |\n| `O` | 14 | 16 | `Q` | `BQ` |\n| `O` | 14 | 16 | `Q` | `BQQ` |\n\n' +
-        'It prints `BQQ`.',
+        '`mod(x, 26)` gives the remainder after dividing by 26, which wraps a position back round to the start of the alphabet.\n\n' +
+        '| i | `L[i]` | `L[i] + 2` | `mod(L[i] + 2, 26)` |\n|---|---|---|---|\n| 1 | 25 | 27 | 1 |\n| 2 | 14 | 16 | 16 |\n| 3 | 14 | 16 | 16 |\n\n' +
+        'It prints `1 16 16`, which are the letters B, Q, Q.',
       whyWrong: [
-        'This shifts O correctly but moves Z only one step, to A. Shifting Z by 2 goes Z to A (one step) and then A to B (second step).',
+        'This moves Z only one step, to position 0. Shifting by 2 goes from Z to A and then from A to B, which is position 1.',
         'This shifts each letter 2 places **backwards**. The code adds 2 to the position.',
-        'This is what you get if you use A = 1 positions (Z = 26, O = 15) but still add `ord("A")` at the end: every letter lands one place too far. The code subtracts `ord("A")`, so A = 0.',
+        'This forgets the wrap-around: $27$ is not a position, and `mod(27, 26)` is 1.',
         null,
       ],
-      keyIdea: 'In code, a shift cipher is `chr((ord(ch) - ord("A") + k) % 26 + ord("A"))`: positions are 0-based and `% 26` does the wrap-around.',
-    },
-    python: { stdout: 'BQQ\n' },
-  },
-
-  // ================================================================ challenge
-  {
-    id: 'letter-symbol-patterns-017',
-    subtopic: 'letter-symbol-patterns',
-    difficulty: 'challenge',
-    stem: 'What letter comes next?\n\n**B, C, E, G, K, M, ?**',
-    options: ['O', 'P', 'Q', 'S'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Positions: B = 2, C = 3, E = 5, G = 7, K = 11, M = 13.\n\n' +
-        'The gaps are 1, 2, 2, 4, 2, which do not follow a simple arithmetic rule, so look at the positions themselves:\n\n' +
-        '$$2, 3, 5, 7, 11, 13$$\n\n' +
-        'These are the **prime numbers** in order. The next prime after 13 is 17 (14, 15 and 16 are not prime).\n\n' +
-        'Position 17 is Q (O = 15, P = 16, Q = 17). Answer: Q.',
-      whyWrong: [
-        'O is position 15: this repeats the last gap of 2. But 15 is not prime ($15 = 3 \\times 5$), and the gaps do not simply repeat.',
-        'P is M + 3. This happens if you try to add 4 but count M itself as the first step (M, N, O, P).',
-        null,
-        'S is position 19. It is prime, but it skips 17, which is the next prime after 13.',
-      ],
-      keyIdea: 'When the gaps look irregular, check whether the positions themselves form a famous sequence: primes, squares, Fibonacci, triangular numbers.',
+      keyIdea: 'With positions starting at 0, a shift with wrap-around is `mod(position + k, 26)`.',
     },
     check: {
-      optionValues: ['O', 'P', 'Q', 'S'],
-      compute: () => {
-        const isPrime = (n: number) => n > 1 && Array.from({ length: n - 2 }, (_, i) => i + 2).every((d) => n % d !== 0);
-        const seq = 'BCEGKM'.split('').map(pos);
-        if (!seq.every(isPrime)) throw new Error('not primes');
-        let n = seq[seq.length - 1] + 1;
-        while (!isPrime(n)) n++;
-        return letter(n);
-      },
-    },
-  },
-  {
-    id: 'letter-symbol-patterns-018',
-    subtopic: 'letter-symbol-patterns',
-    difficulty: 'challenge',
-    stem: 'Every row of the table follows the same rule, which turns the first two numbers into the third. What number replaces the question mark?',
-    table: {
-      headers: ['First', 'Second', 'Third'],
-      rows: [
-        [2, 3, 13],
-        [4, 1, 17],
-        [1, 5, 26],
-        [5, 2, '?'],
-      ],
-    },
-    options: ['27', '29', '49', '21'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Adding or multiplying does not work ($2 + 3 = 5$, $2 \\times 3 = 6$). The third numbers 13, 17, 26 are bigger, which suggests **squares**.\n\n' +
-        'Try "square both numbers and add":\n\n' +
-        '- Row 1: $2^2 + 3^2 = 4 + 9 = 13$ ✓\n' +
-        '- Row 2: $4^2 + 1^2 = 16 + 1 = 17$ ✓\n' +
-        '- Row 3: $1^2 + 5^2 = 1 + 25 = 26$ ✓\n\n' +
-        'Last row: $5^2 + 2^2 = 25 + 4 = 29$.\n\n' +
-        'Answer: 29.',
-      whyWrong: [
-        'This is $5^2 + 2$: it squares only the first number. Check row 1: $2^2 + 3 = 7$, not 13.',
-        null,
-        'This is $(5 + 2)^2$: adding first and then squaring. Check row 1: $(2 + 3)^2 = 25$, not 13.',
-        'This is $5^2 - 2^2$: subtracting the squares instead of adding them. Check row 1: $4 - 9 = -5$, not 13.',
-      ],
-      keyIdea: 'If the outputs grow faster than sums or products, try squares; then confirm the rule on every complete row.',
-    },
-    check: {
-      optionValues: [27, 29, 49, 21],
-      compute: () => {
-        const rule = (a: number, b: number) => a * a + b * b;
-        const rows = [
-          [2, 3, 13],
-          [4, 1, 17],
-          [1, 5, 26],
-        ];
-        if (!rows.every(([a, b, c]) => rule(a, b) === c)) throw new Error('rule fails');
-        return rule(5, 2);
-      },
-    },
-  },
-  {
-    id: 'letter-symbol-patterns-019',
-    subtopic: 'letter-symbol-patterns',
-    difficulty: 'challenge',
-    stem: 'In a code language, **CAT** is written as **XZG**. How is **DOG** written in the same code?',
-    options: ['WLT', 'VKS', 'YJB', 'TLW'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Compare positions:\n\n' +
-        '| Original | C (3) | A (1) | T (20) |\n|---|---|---|---|\n| Code | X (24) | Z (26) | G (7) |\n| Sum | 27 | 27 | 27 |\n\n' +
-        'The shifts are not all the same (C goes back 5 but A goes back 1), so this is **not** a shift cipher. Instead, each pair of positions adds up to 27: the alphabet is reversed (A swaps with Z, B with Y, and so on).\n\n' +
-        'Rule: code position $= 27 - \\text{original position}$.\n\n' +
-        '- D (4): $27 - 4 = 23$, W\n- O (15): $27 - 15 = 12$, L\n- G (7): $27 - 7 = 20$, T\n\n' +
-        'So DOG is written **WLT**.',
-      whyWrong: [
-        null,
-        'This uses $26 - \\text{position}$ instead of $27 - \\text{position}$. Check with the example: $26 - 3 = 23$ gives W for C, but the code gives X.',
-        'This assumes a shift cipher, taking the shift from C to X (back 5) and applying it to every letter. It does not fit the example: A shifted back 5 is V, not Z.',
-        'This applies the correct reverse-alphabet swap but then also writes the word backwards. Nothing in the example is reversed: C, A, T map to X, Z, G in the same order.',
-      ],
-      keyIdea: 'If the shift changes from letter to letter, test the "reverse alphabet" code, where original and code positions always add to 27.',
-    },
-    check: {
-      optionValues: ['WLT', 'VKS', 'YJB', 'TLW'],
-      compute: () => {
-        const code = (w: string) =>
-          w
-            .split('')
-            .map((c) => letter(27 - pos(c)))
-            .join('');
-        if (code('CAT') !== 'XZG') throw new Error('rule does not fit');
-        return code('DOG');
-      },
+      optionValues: ['0 16 16', '23 12 12', '27 16 16', '1 16 16'],
+      compute: () => [pos('Z') - 1, pos('O') - 1, pos('O') - 1].map((p) => (p + 2) % 26).join(' '),
     },
   },
   {
     id: 'letter-symbol-patterns-020',
     subtopic: 'letter-symbol-patterns',
     difficulty: 'exam',
-    stem: 'In a code, the 1st letter of a word moves **1** place forward in the alphabet, the 2nd letter moves **2** places, the 3rd letter moves **3** places, and so on. For example, **BAD** becomes **CCG**. What does **CODE** become?',
+    stem: 'In a code, the $k$th letter of a word moves $k$ places forward in the alphabet, so **BAD** becomes **CCG**. What does **CODE** become?',
     options: ['DPEF', 'CPFH', 'GSHI', 'DQGI'],
     correctIndex: 3,
     markScheme: {
@@ -715,5 +596,80 @@ export const questions: StaticQuestion[] = [
         return prod('HIDE');
       },
     },
+  },
+  {
+    id: 'letter-symbol-patterns-022',
+    subtopic: 'letter-symbol-patterns',
+    difficulty: 'foundation',
+    stem: 'With A = 1, what is the position of the letter **M** in the alphabet?',
+    options: ['12', '13', '14', '15'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'Count on from the anchor J = 10: K = 11, L = 12, M = 13. So M is at position **13**, the last letter of the first half of the alphabet.',
+      whyWrong: [
+        'This is L, or M counted from A = 0. The question says A = 1.',
+        null,
+        'This is N, the letter after M.',
+        'This is O, the anchor letter. M comes two letters before it.',
+      ],
+      keyIdea: 'Use the anchors E = 5, J = 10, O = 15, T = 20, Y = 25, and remember that M = 13 and N = 14.',
+    },
+    check: { optionValues: [12, 13, 14, 15], compute: () => pos('M') },
+  },
+  {
+    id: 'letter-symbol-patterns-023',
+    subtopic: 'letter-symbol-patterns',
+    difficulty: 'foundation',
+    stem: 'A shift cipher replaces each letter using:',
+    options: ['the same shift for every letter', 'a different shift for each letter', 'the reversed alphabet', 'its position as a number'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A shift (Caesar) cipher moves **every** letter the same number of places along the alphabet, wrapping round from Z to A.',
+      whyWrong: [
+        null,
+        'That is a position-dependent code. In a shift cipher the shift never changes.',
+        'That is the reverse-alphabet code, where A swaps with Z and B with Y.',
+        'That is a letter-to-number code, such as DOG = 4, 15, 7.',
+      ],
+      keyIdea: 'In a shift cipher, every letter moves by the same number of places.',
+    },
+  },
+  {
+    id: 'letter-symbol-patterns-024',
+    subtopic: 'letter-symbol-patterns',
+    difficulty: 'foundation',
+    stem: 'In the reverse-alphabet code, A becomes Z, B becomes Y, and so on. What does **D** become?',
+    options: ['W', 'X', 'V', 'E'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Each letter and its code add to position 27. D is position 4, and $27 - 4 = 23$, which is **W**.',
+      whyWrong: [
+        null,
+        'This is the code for C. Counting along A to Z, B to Y, C to X, D goes one further, to W.',
+        'This is the code for E, which uses $27 - 5$. D is position 4.',
+        'This is the next letter after D, which is a shift by 1, not a reversal.',
+      ],
+      keyIdea: 'In the reverse-alphabet code, code position $= 27 -$ position.',
+    },
+    check: { optionValues: ['W', 'X', 'V', 'E'], compute: () => letter(27 - pos('D')) },
+  },
+  {
+    id: 'letter-symbol-patterns-025',
+    subtopic: 'letter-symbol-patterns',
+    difficulty: 'foundation',
+    stem: 'A block of $5$ symbols repeats forever. Which place in the block does the 23rd symbol occupy?',
+    options: ['1st', '2nd', '3rd', '4th'],
+    correctIndex: 2,
+    markScheme: {
+      solution: 'Divide by the block length: $23 = 4 \\times 5 + 3$. After 4 complete blocks, the remainder 3 gives the **3rd** place in the block.',
+      whyWrong: [
+        'This is the place of the 21st symbol, which comes straight after 4 complete blocks.',
+        'This is the place of the 22nd symbol: an off-by-one slip.',
+        null,
+        'This is the place of the 24th symbol: an off-by-one slip.',
+      ],
+      keyIdea: 'For a repeating block of length $L$, the remainder when $n$ is divided by $L$ gives the place in the block.',
+    },
+    check: { optionValues: [1, 2, 3, 4], compute: () => ((23 - 1) % 5) + 1 },
   },
 ];

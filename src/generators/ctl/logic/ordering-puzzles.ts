@@ -8,8 +8,8 @@ const NAMES = [
   'Musa', 'Nour', 'Omar', 'Priya', 'Quinn', 'Ravi', 'Sara', 'Tariq', 'Uma', 'Yara', 'Zaid',
 ];
 
-const NUM_WORD = ['', '', '', 'Three', 'Four', 'Five', 'Six', 'Seven'];
-const ORD = ['', '1st', '2nd', '3rd', '4th', '5th', '6th'];
+const NUM_WORD = ['', '', '', 'Three', 'Four'];
+const ORD = ['', '1st', '2nd', '3rd', '4th'];
 const ord = (k: number) => ORD[k];
 
 // ================================================================ 1. ranking from a chain of comparison clues
@@ -45,7 +45,7 @@ const RANK_CTX: RankCtx[] = [
     topWord: 'first finisher',
     bottomWord: 'last finisher',
     askTop: (k) => `Who finished **${ord(k)}**?`,
-    askBottom: (k) => `Who finished **${ord(k)} from last**? (The runner who finished last is 1st from last.)`,
+    askBottom: (k) => `Who finished **${ord(k)} from last**?`,
     sym: 'finished before',
   },
   {
@@ -72,7 +72,7 @@ const RANK_CTX: RankCtx[] = [
 
 function rankGenerate(rng: Rng): GeneratedCore {
   const ctx = rng.pick(RANK_CTX);
-  const n = rng.int(4, 5);
+  const n = 4;
   const order = rng.sample(NAMES, n); // true order, top (rank 1) first
   // clues link consecutive people; some phrased "above", some "below"; shown in a shuffled order
   const clues = rng.shuffle(
@@ -110,15 +110,6 @@ function rankGenerate(rng: Rng): GeneratedCore {
     used.add(c.p);
     distractors.push({ text: order[c.p - 1], value: order[c.p - 1], why: c.why });
   }
-  for (let p = 1; distractors.length < 3 && p <= n; p++) {
-    if (used.has(p)) continue;
-    used.add(p);
-    distractors.push({
-      text: order[p - 1],
-      value: order[p - 1],
-      why: `This person is ${ord(p)} counted from the ${ctx.topWord} end, not the position asked for. Rewrite every clue in the same direction and recount.`,
-    });
-  }
 
   const rewritten = order
     .slice(0, -1)
@@ -148,33 +139,18 @@ function rankGenerate(rng: Rng): GeneratedCore {
 }
 
 // ================================================================ 2. counting arrangements under a constraint
-type CountKind = 'row' | 'rowTogether' | 'rowApart' | 'rowBefore' | 'rowEnd' | 'circle' | 'circleTogether' | 'circleApart';
+type CountKind = 'row' | 'rowTogether' | 'rowApart' | 'rowBefore' | 'rowEnd' | 'rowNotFirst';
 
-interface CountCase {
-  kind: CountKind;
-  nMin: number;
-  nMax: number;
-}
-const COUNT_CASES: CountCase[] = [
-  { kind: 'row', nMin: 4, nMax: 7 },
-  { kind: 'rowTogether', nMin: 4, nMax: 7 },
-  { kind: 'rowApart', nMin: 4, nMax: 7 },
-  { kind: 'rowBefore', nMin: 4, nMax: 7 },
-  { kind: 'rowEnd', nMin: 4, nMax: 7 },
-  { kind: 'circle', nMin: 4, nMax: 7 },
-  { kind: 'circleTogether', nMin: 5, nMax: 7 },
-  { kind: 'circleApart', nMin: 5, nMax: 7 },
-];
+const COUNT_KINDS: CountKind[] = ['row', 'rowTogether', 'rowApart', 'rowBefore', 'rowEnd', 'rowNotFirst'];
 
 const f = factorial;
 const fx = (k: number) => `${k}!`;
 
 function countGenerate(rng: Rng): GeneratedCore {
-  const { kind, nMin, nMax } = rng.pick(COUNT_CASES);
-  const n = rng.int(nMin, nMax);
+  const kind = rng.pick(COUNT_KINDS);
+  const n = rng.int(3, 4);
   const [a, b] = rng.sample(NAMES, 2);
   const people = `${NUM_WORD[n]} people, including ${a} and ${b},`;
-  const roundRule = 'Seatings that are rotations of each other count as the same.';
 
   let stem = '';
   let ans = 0;
@@ -191,7 +167,7 @@ function countGenerate(rng: Rng): GeneratedCore {
       pool.push(
         { v: (n * (n + 1)) / 2, why: `This is ${m(Array.from({ length: n }, (_, i) => n - i).join(' + '))}: the choices were added instead of multiplied.` },
         { v: n ** n, why: `This is ${m(`${n}^{${n}}`)}: it lets the same person fill more than one place.` },
-        { v: f(n - 1), why: `This is ${m(fx(n - 1))}, the formula for a round table. In a straight line every position is different, so use ${m(fx(n))}.` },
+        { v: f(n - 1), why: `This is ${m(fx(n - 1))}: it fixes one person in place and arranges only the others. All ${n} places are free, so use ${m(fx(n))}.` },
         { v: n * n, why: `This is ${m(`${n} \\times ${n}`)}: multiplying people by places is not a counting rule.` },
       );
       break;
@@ -223,7 +199,7 @@ function countGenerate(rng: Rng): GeneratedCore {
         { v: tog, why: `This is ${m(`2 \\times ${fx(n - 1)}`)}, the number of seatings where they **are** together. It still has to be subtracted from the total.` },
         { v: f(n) - f(n - 1), why: `This is ${m(`${fx(n)} - ${fx(n - 1)}`)}: it forgot that the "together" block can be in 2 orders, so only half of the together cases were removed.` },
         { v: f(n), why: `This is ${m(fx(n))}, every seating, ignoring the condition.` },
-        { v: f(n - 1) - 2 * f(n - 2), why: `This uses the round-table counts ${m(`${fx(n - 1)} - 2 \\times ${fx(n - 2)}`)}, but the chairs are in a straight row.` },
+        { v: 2 * f(n - 2), why: `This is ${m(`2 \\times ${fx(n - 2)}`)}: it miscounts the units left after gluing the pair, and it never subtracts from the total.` },
       );
       break;
     }
@@ -243,7 +219,7 @@ function countGenerate(rng: Rng): GeneratedCore {
       break;
     }
     case 'rowEnd': {
-      stem = `${people} stand in a line for a photo. In how many ways can they stand if ${a} must be at one of the two **ends** of the line?`;
+      stem = `${people} stand in a line. In how many ways can they stand if ${a} must be at one of the two **ends** of the line?`;
       ans = 2 * f(n - 1);
       steps =
         `${a} has 2 choices of position (left end or right end).\n\n` +
@@ -259,50 +235,17 @@ function countGenerate(rng: Rng): GeneratedCore {
       );
       break;
     }
-    case 'circle': {
-      stem = `${NUM_WORD[n]} people sit around a round table with ${n} equally spaced seats. ${roundRule} How many different seatings are there?`;
-      ans = f(n - 1);
+    case 'rowNotFirst': {
+      stem = `${people} stand in a line. In how many orders is ${a} **not** first?`;
+      ans = f(n) - f(n - 1);
       steps =
-        `Fix one person in a seat to remove the rotations. The other ${n - 1} people are then arranged in the remaining seats:\n\n` +
-        m(`(${n} - 1)! = ${fx(n - 1)} = ${ans}`) +
-        `\n\nCheck: ${m(`\\frac{${fx(n)}}{${n}} = \\frac{${f(n)}}{${n}} = ${ans}`)}.`;
+        `All orders: ${m(`${fx(n)} = ${f(n)}`)}.\n\n` +
+        `Orders with ${a} first: the other ${n - 1} people fill the remaining places in ${m(`${fx(n - 1)} = ${f(n - 1)}`)} ways.\n\n` +
+        `${a} not first ${m(`= ${f(n)} - ${f(n - 1)} = ${ans}`)}.`;
       pool.push(
-        { v: f(n), why: `This is ${m(fx(n))}, the count for a straight row. Around a table each seating has been counted ${n} times, once per rotation.` },
-        { v: f(n - 1) / 2, why: `This is ${m(`\\frac{${fx(n - 1)}}{2}`)}: it also treats mirror images as the same, but the question only says rotations are the same.` },
-        { v: n - 1, why: `This is ${m(`${n} - 1`)}: it fixes one person correctly but forgets the factorial for arranging the others.` },
-        { v: f(n - 2), why: `This is ${m(fx(n - 2))}: after fixing one person there are ${n - 1} people left to arrange, not ${n - 2}.` },
-      );
-      break;
-    }
-    case 'circleTogether': {
-      stem = `${people} sit around a round table with ${n} equally spaced seats. ${roundRule} In how many seatings do ${a} and ${b} sit **next to each other**?`;
-      ans = 2 * f(n - 2);
-      steps =
-        `Glue ${a} and ${b} into one block. Around the table there are now ${n - 1} units, which can be arranged in ${m(`(${n - 1} - 1)! = ${fx(n - 2)} = ${f(n - 2)}`)} ways.\n\n` +
-        `The block can be in 2 orders.\n\n` +
-        m(`2 \\times ${fx(n - 2)} = 2 \\times ${f(n - 2)} = ${ans}`);
-      pool.push(
-        { v: f(n - 2), why: `This is ${m(fx(n - 2))}: it forgets that ${a} and ${b} can swap places inside the block.` },
-        { v: 2 * f(n - 1), why: `This is ${m(`2 \\times ${fx(n - 1)}`)}, the count for a straight **row**. Around a table, ${n - 1} units give ${m(fx(n - 2))} arrangements, not ${m(fx(n - 1))}.` },
-        { v: f(n - 1), why: `This is ${m(fx(n - 1))}, all circular seatings, ignoring the condition.` },
-        { v: f(n - 1) - 2 * f(n - 2), why: `This is ${m(`${fx(n - 1)} - 2 \\times ${fx(n - 2)}`)}, the number of seatings where they are **not** together: the opposite question.` },
-      );
-      break;
-    }
-    case 'circleApart': {
-      stem = `${people} sit around a round table with ${n} equally spaced seats. ${roundRule} In how many seatings are ${a} and ${b} **not** next to each other?`;
-      const tog = 2 * f(n - 2);
-      ans = f(n - 1) - tog;
-      steps =
-        `All circular seatings: ${m(`(${n} - 1)! = ${fx(n - 1)} = ${f(n - 1)}`)}.\n\n` +
-        `Seatings with ${a} and ${b} together: glue them into a block, giving ${n - 1} units around the table, so ${m(`2 \\times ${fx(n - 2)} = ${tog}`)}.\n\n` +
-        `Not together ${m(`= ${f(n - 1)} - ${tog} = ${ans}`)}.\n\n` +
-        `Check: fix ${a}. ${b} can use any of the ${n - 1} other seats except the 2 next to ${a}: ${n - 3} choices, and the rest fill in ${m(fx(n - 2))} ways, so ${m(`${n - 3} \\times ${f(n - 2)} = ${ans}`)}.`;
-      pool.push(
-        { v: tog, why: `This is ${m(`2 \\times ${fx(n - 2)}`)}, the number of seatings where they **are** together. Subtract it from the total.` },
-        { v: f(n - 1) - f(n - 2), why: `This is ${m(`${fx(n - 1)} - ${fx(n - 2)}`)}: it forgot that the "together" block can be in 2 orders.` },
-        { v: f(n) - 2 * f(n - 1), why: `This is ${m(`${fx(n)} - 2 \\times ${fx(n - 1)}`)}, the answer for a straight **row**, not a round table.` },
-        { v: f(n - 1), why: `This is ${m(fx(n - 1))}, all circular seatings, ignoring the condition.` },
+        { v: f(n - 1), why: `This is ${m(fx(n - 1))}, the number of orders where ${a} **is** first. It still has to be subtracted from the total.` },
+        { v: f(n), why: `This is ${m(fx(n))}, every order, ignoring the condition.` },
+        { v: f(n) / 2, why: `This assumes ${a} is first in half of all orders, but ${a} is first in only 1 of every ${n}.` },
       );
       break;
     }
@@ -320,7 +263,7 @@ function countGenerate(rng: Rng): GeneratedCore {
   const fallbacks = [
     { v: ans * 2, why: 'This doubles the correct count, as if every arrangement could also be reversed or swapped once more. Nothing in the question allows that extra factor of 2.' },
     { v: ans / 2, why: 'This halves the correct count, as if each arrangement had been counted twice. Each arrangement is counted exactly once in the method shown.' },
-    { v: ans * n, why: `This multiplies the correct count by ${n} for no reason, like counting every rotation or position again.` },
+    { v: ans * n, why: `This multiplies the correct count by ${n} for no reason, like counting every position again.` },
   ];
   for (const c of fallbacks) {
     if (distractors.length === 3) break;
@@ -336,10 +279,7 @@ function countGenerate(rng: Rng): GeneratedCore {
     answerValue: ans,
     distractors,
     solution: `${steps}\n\nAnswer: ${answer}`,
-    keyIdea:
-      kind.startsWith('circle')
-        ? 'Around a round table fix one person first ($(n - 1)!$ arrangements); for "together" glue the pair into a block and multiply by 2.'
-        : 'In a row, $n$ people give $n!$ orders; glue "together" pairs into a block (times 2), and get "not together" by subtracting from the total.',
+    keyIdea: 'In a row, $n$ people give $n!$ orders; glue "together" pairs into a block (times 2), and get "not" conditions by subtracting from the total.',
   };
 }
 
@@ -355,7 +295,7 @@ export const generators: Generator[] = [
     id: 'gen-ordering-puzzles-count-arrangements',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    title: 'Count arrangements in a row or circle',
+    title: 'Count arrangements in a row',
     generate: countGenerate,
   },
 ];

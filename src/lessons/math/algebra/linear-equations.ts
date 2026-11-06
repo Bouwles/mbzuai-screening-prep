@@ -5,13 +5,13 @@ export const lesson: Lesson = {
   simple:
     'An equation is like a balanced see-saw: whatever you do to one side, you must do to the other to keep it level. To find the unknown $x$, undo what has been done to it, one step at a time and in reverse order (undo "add 7" by subtracting 7, undo "times 3" by dividing by 3). An inequality works the same way, except that multiplying or dividing by a negative number flips the sign. The absolute value $|x|$ is the distance of $x$ from 0, so it is never negative.',
   methods: [
-    { cue: 'Brackets, or $x$ on **both sides**, e.g. $5(x - 2) = 3x + 4$', method: 'Expand every bracket (the number outside multiplies every term inside), collect the $x$ terms on one side and the numbers on the other, then divide.' },
+    { cue: 'Brackets, or $x$ on **both sides**, e.g. $5(x - 2) = 3x + 4$, or for which $k$ there is **no solution**', method: 'Expand every bracket (the number outside multiplies every term inside), collect the $x$ terms on one side and the numbers on the other, then divide. In the form $ax = b$ there is no solution exactly when $a = 0$ but $b \\ne 0$.' },
+    { cue: '**Slope** (gradient) or $y$-intercept of $ax + by = c$, or a **parallel** or **perpendicular** line', method: 'Slope $= -\\frac{a}{b}$ and $y$-intercept $= \\frac{c}{b}$ (rearrange to $y = mx + c$ to see why). Parallel lines have equal slopes; perpendicular slopes multiply to $-1$.' },
     { cue: 'The equation contains **fractions**, e.g. $\\frac{x + 3}{4} - \\frac{x - 1}{3} = 1$', method: 'Multiply every term on both sides by the lowest common denominator, keeping each numerator in a bracket so a minus sign in front applies to all of it.' },
     { cue: 'An **inequality** ($<$, $>$, $\\le$, $\\ge$), or "how many **integers** satisfy..."', method: 'Solve it like an equation, but flip the sign whenever you multiply or divide by a negative. For a double inequality do the same thing to all three parts; when counting integers, $\\le$ includes the end value and $<$ does not.' },
     { cue: '**Make a letter the subject** of a formula, e.g. $v = u + at$', method: 'Treat it as an equation and undo the operations around that letter in reverse order. If it appears twice, collect its terms on one side and factorise it out.' },
     { cue: '**Absolute value**: $|A| = c$, $|A| < c$ or $|A| > c$', method: '$|A| = c$ gives $A = c$ or $A = -c$; $|A| < c$ gives $-c < A < c$ (between); $|A| > c$ gives $A > c$ or $A < -c$ (outside). If the other side contains $x$, check every answer.' },
     { cue: 'A **word problem**: a fixed fee plus a rate, or "when is plan P **cheaper**?"', method: 'Write total $=$ fixed part $+$ rate $\\times$ amount, set up the equation or inequality, solve it, then round in the direction the question demands.' },
-    { cue: 'For which $k$ is there **no solution**?', method: 'Collect the equation into the form $ax = b$. There is no solution exactly when $a = 0$ but $b \\ne 0$.' },
   ],
   know:
     '### What is a linear equation?\n\n' +

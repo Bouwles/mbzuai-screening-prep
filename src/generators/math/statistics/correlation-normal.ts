@@ -143,7 +143,7 @@ function band(a: number, b: number): number {
 
 const RULE_CONTEXTS = [
   { what: 'The lifetimes of a type of light bulb', unit: 'hours', things: 'bulbs', pre: 'last', preB: 'last', mus: [800, 1000, 1200, 1500], sds: [50, 100, 150, 200] },
-  { what: 'The heights of adult women in a city', unit: 'cm', things: 'women', pre: 'have a height of', preB: 'have a height', mus: [160, 162, 164, 165], sds: [5, 6, 7, 8] },
+  { what: 'The heights of adult women', unit: 'cm', things: 'women', pre: 'have a height of', preB: 'have a height', mus: [160, 162, 164, 165], sds: [5, 6, 7, 8] },
   { what: 'Scores in a national test', unit: 'marks', things: 'candidates', pre: 'score', preB: 'score', mus: [50, 55, 60, 65, 70], sds: [5, 8, 10, 12] },
   { what: 'The masses of bags of rice', unit: 'g', things: 'bags', pre: 'have a mass of', preB: 'have a mass', mus: [500, 1000, 2000], sds: [5, 10, 20, 25] },
   { what: 'Reaction times in a driving test', unit: 'ms', things: 'drivers', pre: 'have a reaction time of', preB: 'have a reaction time', mus: [250, 300, 350, 400], sds: [20, 25, 30, 40] },

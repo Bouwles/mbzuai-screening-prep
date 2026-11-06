@@ -33,7 +33,7 @@ export const generators: Generator[] = [
         const a = rng.int(1, 6);
         const p = rng.pick([2, 3]);
         const q = rng.intNonZero(-5, 5);
-        const steps = rng.pick([3, 4]);
+        const steps = rng.pick([2, 3]);
         const k = start + steps;
         // Reject a start value equal to the fixed point (a = pa + q): the sequence would be constant.
         if (a * (1 - p) === q) continue;
@@ -93,121 +93,6 @@ export const generators: Generator[] = [
             lines.join('\n') +
             `\n\nAnswer: ${ans}`,
           keyIdea: 'Apply the recurrence one step at a time in the order written (multiply, then add), counting steps from the first given term.',
-        };
-      }
-    },
-  },
-
-  // ---------------------------------------------------------------- closed form: far-away term
-  {
-    id: 'gen-recurrence-relations-closed-form-term',
-    subtopic: 'recurrence-relations',
-    difficulty: 'exam',
-    title: 'Far-away term of an arithmetic or geometric recurrence (closed form)',
-    generate(rng) {
-      for (;;) {
-        const start = rng.pick([0, 1]);
-        const geometric = rng.bool(0.4);
-
-        if (!geometric) {
-          const a = rng.intNonZero(-10, 25);
-          const d = rng.intNonZero(-9, 9);
-          const N = rng.int(15, 60);
-          const e = N - start; // number of steps
-          const answer = a + e * d;
-          const rule = sum([
-            [1, 'a_{n-1}'],
-            [d, ''],
-          ]);
-          const pool: Cand[] = [
-            start === 1
-              ? {
-                  v: a + N * d,
-                  why: `This uses ${m(`a_1 + nd`)} instead of ${m(`a_1 + (n-1)d`)}. From ${m('a_1')} to ${m(`a_{${N}}`)} the difference is added only ${N - 1} times.`,
-                }
-              : {
-                  v: a + (N - 1) * d,
-                  why: `This uses the formula ${m('a_1 + (n-1)d')}, but this sequence starts at ${m('a_0')}, so from ${m('a_0')} to ${m(`a_{${N}}`)} the difference is added ${N} times.`,
-                },
-            {
-              v: e * d,
-              why: `This is ${m(`${e} \\times ${paren(d)}`)}: it counts the changes but forgets to start from the first term ${m(`a_{${start}} = ${a}`)}.`,
-            },
-            ...(d < 0
-              ? [
-                  {
-                    v: a - e * d,
-                    why: `This adds ${-d} each time instead of subtracting it: the common difference is ${m(`d = ${d}`)}, which is negative.`,
-                  },
-                ]
-              : []),
-            {
-              v: start === 1 ? a + (N - 2) * d : a + (N + 1) * d,
-              why:
-                start === 1
-                  ? `This adds the difference only ${N - 2} times: one too few. From ${m('a_1')} to ${m(`a_{${N}}`)} there are ${N - 1} steps.`
-                  : `This adds the difference ${N + 1} times: one too many. From ${m('a_0')} to ${m(`a_{${N}}`)} there are exactly ${N} steps.`,
-            },
-          ];
-          const distractors = pickDistinct(answer, pool);
-          if (distractors.length < 3) continue;
-          const ans = m(num(answer));
-          return {
-            stem: `A sequence is defined by ${m(`a_{${start}} = ${a}`)} and ${m(`a_n = ${rule}`)} for ${m(`n \\ge ${start + 1}`)}. What is ${m(`a_{${N}}`)}?`,
-            answer: ans,
-            answerValue: answer,
-            distractors: distractors.map((x) => ({ text: m(num(x.v)), value: x.v, why: x.why })),
-            solution:
-              `The rule ${d > 0 ? 'adds' : 'subtracts'} the same amount every time, so the sequence is **arithmetic** with first term ${m(`a_{${start}} = ${a}`)} and common difference ${m(`d = ${d}`)}.\n\n` +
-              `From ${m(`a_{${start}}`)} to ${m(`a_{${N}}`)} there are ${start === 0 ? e : m(`${N} - 1 = ${e}`)} steps, so the difference is added ${e} times:` +
-              `\n\n$$a_{${N}} = ${a} + ${e} \\times ${paren(d)} = ${a}${signed(e * d)} = ${num(answer)}$$\n\n` +
-              `Answer: ${ans}`,
-            keyIdea: 'An "add d" recurrence is arithmetic: the term is the first term plus d times the number of steps from the first term.',
-          };
-        }
-
-        const a = rng.pick([2, 3, 5]);
-        const r = rng.pick([2, 3]);
-        const e = r === 2 ? rng.int(6, 10) : rng.int(4, 7); // steps from the first term
-        const N = e + start;
-        const answer = a * r ** e;
-        const pool: Cand[] = [
-          start === 1
-            ? {
-                v: a * r ** (e + 1),
-                why: `This uses ${m(`a_1 r^{n}`)} instead of ${m(`a_1 r^{n-1}`)}. From ${m('a_1')} to ${m(`a_{${N}}`)} you multiply by ${r} only ${e} times.`,
-              }
-            : {
-                v: a * r ** (e - 1),
-                why: `This uses ${m('a_1 r^{n-1}')}, but this sequence starts at ${m('a_0')}, so from ${m('a_0')} to ${m(`a_{${N}}`)} you multiply by ${r} exactly ${e} times.`,
-              },
-          {
-            v: (a * r) ** e,
-            why: `This is ${m(`(${a} \\times ${r})^{${e}}`)}: it raises the first term to the power as well. Only the ratio ${r} is repeated; the first term ${a} is used once.`,
-          },
-          {
-            v: r ** e,
-            why: `This is ${m(`${r}^{${e}}`)}: it forgets to multiply by the first term ${a}.`,
-          },
-          {
-            v: a + e * r,
-            why: `This adds ${r} at each step (an arithmetic sequence) instead of multiplying by ${r}.`,
-          },
-        ];
-        const distractors = pickDistinct(answer, pool);
-        if (distractors.length < 3) continue;
-        const ans = m(num(answer));
-        return {
-          stem: `A sequence is defined by ${m(`a_{${start}} = ${a}`)} and ${m(`a_n = ${r}a_{n-1}`)} for ${m(`n \\ge ${start + 1}`)}. What is ${m(`a_{${N}}`)}?`,
-          answer: ans,
-          answerValue: answer,
-          distractors: distractors.map((x) => ({ text: m(num(x.v)), value: x.v, why: x.why })),
-          solution:
-            `The rule multiplies by the same number every time, so the sequence is **geometric** with first term ${m(`a_{${start}} = ${a}`)} and ratio ${m(`r = ${r}`)}.\n\n` +
-            `From ${m(`a_{${start}}`)} to ${m(`a_{${N}}`)} there are ${start === 0 ? e : m(`${N} - 1 = ${e}`)} steps, so we multiply by ${r} exactly ${e} times:` +
-            `\n\n$$a_{${N}} = ${a} \\times ${r}^{${e}} = ${a} \\times ${r ** e} = ${num(answer)}$$\n\n` +
-            `Answer: ${ans}`,
-          keyIdea: 'A "multiply by r" recurrence is geometric: the term is the first term times r to the power of the number of steps from the first term.',
         };
       }
     },

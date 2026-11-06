@@ -30,6 +30,8 @@ interface LoopCase {
   code: string;
   count: number;
   pool: NumCand[];
+  /** When set, "Infinite loop" replaces the last distractor, with this explanation. */
+  infiniteWhy?: string;
   steps: string;
   idea: string;
 }
@@ -51,72 +53,73 @@ function loopCase(rng: Rng): LoopCase {
     const B = rng.int(3, 12);
     const count = (A - 1) * B;
     return {
-      code: `count = 0\nfor i in range(1, ${A}):\n    for j in range(${B}):\n        count += 1\nprint(count)`,
+      code: `count = 0\nfor i = 2 to ${A}\n   for j = 1 to ${B}\n      count = count + 1\n   end for\nend for\nprint(count)`,
       count,
       pool: [
-        { v: A * B, why: `This assumes \`range(1, ${A})\` runs ${A} times. It starts at 1 and stops **before** ${A}, so it gives ${A - 1} values.` },
+        { v: A * B, why: `This assumes \`for i = 2 to ${A}\` runs ${A} times. It starts at 2, so it gives ${A - 1} values.` },
         { v: A - 1 + B, why: `This adds the two loop sizes (${m(`${A - 1} + ${B}`)}). Nested loops **multiply**: the inner loop runs completely for every pass of the outer loop.` },
-        { v: (A - 1) * (B - 1), why: `This assumes \`range(${B})\` runs ${B - 1} times. It gives $0, 1, \\dots, ${B - 1}$, which is ${B} values.` },
-        { v: A * (B - 1), why: `This gets both loop lengths wrong by one: \`range(1, ${A})\` runs ${A - 1} times and \`range(${B})\` runs ${B} times.` },
+        { v: (A - 2) * B, why: `This stops the outer loop before ${A}. Both ends of \`for i = 2 to ${A}\` are included, so it runs ${A - 1} times.` },
+        { v: (A - 1) * (B - 1), why: `This assumes \`for j = 1 to ${B}\` runs ${B - 1} times. Both ends are included, so it runs ${B} times.` },
       ],
       steps:
-        `- The outer loop \`range(1, ${A})\` gives $i = 1, 2, \\dots, ${A - 1}$: that is ${A - 1} passes.\n` +
-        `- For each pass, the inner loop \`range(${B})\` gives $j = 0, 1, \\dots, ${B - 1}$: that is ${B} runs.\n` +
+        `- The outer loop \`for i = 2 to ${A}\` gives $i = 2, 3, \\dots, ${A}$: that is ${A - 1} passes.\n` +
+        `- For each pass, the inner loop \`for j = 1 to ${B}\` runs ${B} times.\n` +
         `- Nested loops multiply: ${m(`${A - 1} \\times ${B} = ${count}`)}.`,
-      idea: 'Nested loops multiply: (outer passes) times (inner runs per pass); remember `range(a, b)` gives $b - a$ values.',
+      idea: 'Nested loops multiply: (outer passes) times (inner runs per pass); remember `for i = a to b` gives $b - a + 1$ values.',
     };
   }
   if (kind === 'tri') {
     const N = rng.int(5, 16);
     const fromI = rng.bool();
     const count = fromI ? (N * (N + 1)) / 2 : (N * (N - 1)) / 2;
-    const inner = fromI ? `range(i, ${N})` : 'range(i)';
+    const start = fromI ? 'i' : 'i + 1';
+    const inner = `for j = ${start} to ${N}`;
     const pool: NumCand[] = fromI
       ? [
-          { v: N * N, why: `This assumes the inner loop always runs ${N} times. \`range(i, ${N})\` gets shorter as $i$ grows.` },
-          { v: (N * (N - 1)) / 2, why: `This is $\\frac{${N} \\times ${N - 1}}{2}$, which counts the inner loop as ${m(`${N - 1}, ${N - 2}, \\dots, 0`)} runs. For $i = 0$ it actually runs ${N} times, so the runs are ${m(`${N}, ${N - 1}, \\dots, 1`)}.` },
+          { v: N * N, why: `This assumes the inner loop always runs ${N} times. It starts at \`j = i\`, so it gets shorter as $i$ grows.` },
+          { v: (N * (N - 1)) / 2, why: `This is $\\frac{${N} \\times ${N - 1}}{2}$, which counts the inner loop as ${m(`${N - 1}, ${N - 2}, \\dots, 0`)} runs. For $i = 1$ it actually runs ${N} times, so the runs are ${m(`${N}, ${N - 1}, \\dots, 1`)}.` },
           { v: N, why: 'This counts only the outer loop. The counted line is inside the inner loop, which runs several times per outer pass.' },
           { v: N * (N + 1), why: `This forgets to divide by 2 in $\\frac{n(n+1)}{2}$.` },
         ]
       : [
-          { v: N * N, why: `This assumes the inner loop always runs ${N} times. \`range(i)\` runs only $i$ times, which starts at 0.` },
-          { v: (N * (N + 1)) / 2, why: `This counts the inner loop as $i + 1$ runs. \`range(i)\` gives $0, 1, \\dots, i - 1$, which is only $i$ values, so the runs are ${m(`0, 1, \\dots, ${N - 1}`)}.` },
+          { v: N * N, why: `This assumes the inner loop always runs ${N} times. It starts at \`j = i + 1\`, so it gets shorter as $i$ grows.` },
+          { v: (N * (N + 1)) / 2, why: `This counts the inner loop as starting at \`j = i\`. It starts at \`j = i + 1\`, so the runs are ${m(`${N - 1}, ${N - 2}, \\dots, 0`)}.` },
           { v: N, why: 'This counts only the outer loop. The counted line is inside the inner loop, which runs several times per outer pass.' },
           { v: N * (N - 1), why: `This forgets to divide by 2 in $\\frac{n(n-1)}{2}$.` },
         ];
-    const runs = fromI ? `${N}, ${N - 1}, ${N - 2}, \\dots, 1` : `0, 1, 2, \\dots, ${N - 1}`;
+    const runs = fromI ? `${N}, ${N - 1}, ${N - 2}, \\dots, 1` : `${N - 1}, ${N - 2}, \\dots, 1, 0`;
     const formula = fromI ? `\\frac{${N} \\times ${N + 1}}{2}` : `\\frac{${N} \\times ${N - 1}}{2}`;
     return {
-      code: `count = 0\nfor i in range(${N}):\n    for j in ${inner}:\n        count += 1\nprint(count)`,
+      code: `count = 0\nfor i = 1 to ${N}\n   ${inner}\n      count = count + 1\n   end for\nend for\nprint(count)`,
       count,
       pool,
       steps:
-        `- The outer loop gives $i = 0, 1, \\dots, ${N - 1}$.\n` +
-        `- The inner loop \`${inner}\` runs ${fromI ? `$${N} - i$` : '$i$'} times, so the runs are ${m(runs)}.\n` +
+        `- The outer loop gives $i = 1, 2, \\dots, ${N}$.\n` +
+        `- The inner loop \`${inner}\` gets shorter each time, so the runs are ${m(runs)}. A loop whose start is past its end runs 0 times.\n` +
         `- Add them with the triangular-number formula: ${m(`${formula} = ${count}`)}.\n` +
         '- In general this is about $\\frac{n^2}{2}$, so the algorithm is $O(n^2)$.',
       idea: 'A triangular nested loop runs $1 + 2 + \\dots$ times, given by $\\frac{n(n+1)}{2}$ or $\\frac{n(n-1)}{2}$: still $O(n^2)$.',
     };
   }
   if (kind === 'halve') {
-    const N = rng.int(20, 3000);
+    const N = rng.int(20, 1000);
     const strict1 = rng.bool(); // condition n > 1 (true) or n > 0 (false)
     const trace = halvingTrace(N, strict1 ? 1 : 0);
     const count = trace.length - 1;
     const cond = strict1 ? 'n > 1' : 'n > 0';
     return {
-      code: `n = ${N}\ncount = 0\nwhile ${cond}:\n    n = n // 2\n    count += 1\nprint(count)`,
+      code: `n = ${N}\ncount = 0\nwhile (${cond})\n   n = div(n,2) // div is integer division\n   count = count + 1\nend while\nprint(count)`,
       count,
       pool: [
         strict1
           ? { v: count + 1, why: 'This counts one pass too many, as if the condition were `n > 0`. With `n > 1` the loop stops as soon as `n` reaches 1.' }
           : { v: count - 1, why: 'This stops when `n` reaches 1, as if the condition were `n > 1`. With `n > 0` the pass that turns 1 into 0 also runs.' },
-        { v: Math.floor(N / 2), why: `This is the value of \`n\` after the first pass (\`${N} // 2\`), not the number of passes.` },
+        { v: Math.floor(N / 2), why: `This is the value of \`n\` after the first pass (\`div(${N},2)\`), not the number of passes.` },
         { v: strict1 ? N - 1 : N, why: 'This assumes `n` goes down by 1 each pass, as in `n = n - 1`. Halving shrinks `n` much faster.' },
-        { v: Math.ceil(Math.log2(N)) + (strict1 ? 0 : 1), why: `This rounds $\\log_2 ${N}$ up. Integer division \`//\` rounds down at every step, so count the passes exactly.` },
       ],
+      infiniteWhy: `\`div(n,2)\` makes \`n\` smaller on every pass, so \`${cond}\` eventually fails and the loop stops.`,
       steps:
-        '`n // 2` halves `n` and rounds down. The values of `n` are:\n\n' +
+        '`div(n,2)` halves `n` and rounds down. The values of `n` are:\n\n' +
         `${m(trace.map((v) => texBig(v)).join(' \\to '))}\n\n` +
         `- That is ${count} arrows, so ${count} passes; then \`${cond}\` is false and the loop stops.\n` +
         `- Check: ${m(`2^{${Math.floor(Math.log2(N))}} \\le ${texBig(N)} < 2^{${Math.floor(Math.log2(N)) + 1}}`)}, so it takes ${Math.floor(Math.log2(N))} halvings to reach 1${strict1 ? '' : ', plus one more pass to reach 0'}.\n` +
@@ -125,7 +128,7 @@ function loopCase(rng: Rng): LoopCase {
     };
   }
   if (kind === 'double') {
-    const N = rng.int(10, 3000);
+    const N = rng.int(10, 1000);
     const le = rng.bool(); // i <= N (true) or i < N (false)
     const cond = le ? `i <= ${N}` : `i < ${N}`;
     const vals = [1];
@@ -145,7 +148,7 @@ function loopCase(rng: Rng): LoopCase {
       return c;
     })();
     return {
-      code: `i = 1\ncount = 0\nwhile ${cond}:\n    i = i * 2\n    count += 1\nprint(count)`,
+      code: `i = 1\ncount = 0\nwhile (${cond})\n   i = i * 2\n   count = count + 1\nend while\nprint(count)`,
       count,
       pool: [
         { v: i, why: `This is the final value of \`i\` (${i}), not the number of passes stored in \`count\`.` },
@@ -153,6 +156,7 @@ function loopCase(rng: Rng): LoopCase {
         { v: le ? N : N - 1, why: 'This assumes `i` goes up by 1 each pass, as in `i = i + 1`. Doubling grows `i` much faster.' },
         { v: count - 1, why: 'This misses the last pass: count every time the loop body runs, including the one that takes `i` past the limit.' },
       ],
+      infiniteWhy: `\`i\` doubles on every pass, so it passes ${N} and \`${cond}\` fails.`,
       steps:
         'Each pass doubles `i`. The values of `i` are:\n\n' +
         `${m(vals.map((v) => texBig(v)).join(' \\to '))}\n\n` +
@@ -168,7 +172,7 @@ function loopCase(rng: Rng): LoopCase {
   const h = trace.length - 1;
   const count = A * h;
   return {
-    code: `count = 0\nfor k in range(${A}):\n    n = ${N}\n    while n > 1:\n        n = n // 2\n        count += 1\nprint(count)`,
+    code: `count = 0\nfor k = 1 to ${A}\n   n = ${N}\n   while (n > 1)\n      n = div(n,2) // div is integer division\n      count = count + 1\n   end while\nend for\nprint(count)`,
     count,
     pool: [
       { v: A * N, why: `This assumes the inner loop runs ${N} times. It halves \`n\`, so it runs only ${h} times.` },
@@ -179,7 +183,7 @@ function loopCase(rng: Rng): LoopCase {
     steps:
       `- Inner loop: \`n\` goes ${m(trace.map((v) => texBig(v)).join(' \\to '))}, which is ${h} passes (then \`n > 1\` is false).\n` +
       `- \`n\` is reset to ${N} at the start of every outer pass, so the inner loop does ${h} passes every time.\n` +
-      `- Outer loop: \`range(${A})\` runs ${A} times. Nested loops multiply: ${m(`${A} \\times ${h} = ${count}`)}.`,
+      `- Outer loop: \`for k = 1 to ${A}\` runs ${A} times. Nested loops multiply: ${m(`${A} \\times ${h} = ${count}`)}.`,
     idea: 'A halving loop inside an outer loop: multiply the outer count by the number of halvings (about $\\log_2 n$).',
   };
 }
@@ -221,16 +225,17 @@ export const generators: Generator[] = [
         { v: c.count * 2, why: 'This doubles the true count, as if the counted line ran twice per pass.' },
       ];
       const ds = pickNums(c.count, c.pool, fallbacks);
-      const answer = `\`${c.count}\``;
+      const distractors: { text: string; value: number | string; why: string }[] = ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why }));
+      if (c.infiniteWhy) distractors[2] = { text: 'Infinite loop', value: 'Infinite loop', why: c.infiniteWhy };
+      const answer = String(c.count);
       return {
-        stem: 'What does this Python code print?',
-        code: { lang: 'python', source: c.code },
+        stem: 'What is printed?',
+        code: { lang: 'pseudocode', source: c.code },
         answer,
         answerValue: c.count,
-        distractors: ds.map((d) => ({ text: `\`${d.v}\``, value: d.v, why: d.why })),
+        distractors,
         solution: `${c.steps}\n\nThe code prints the final value of \`count\`.\n\nAnswer: ${answer}`,
         keyIdea: c.idea,
-        python: { stdout: `${c.count}\n` },
       };
     },
   },

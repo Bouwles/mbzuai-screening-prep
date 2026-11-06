@@ -8,11 +8,11 @@ export const lesson: Lesson = {
     'Picture stretching a rubber sheet: most arrows drawn on it rotate, but a few just get longer or shorter.',
   methods: [
     { cue: 'Find the **rank** of a given matrix', method: 'Row reduce (subtract multiples of row 1 to clear the first column, and so on) and count the non-zero rows left. A diagonal matrix: count the non-zero diagonal entries.' },
-    { cue: 'For which $k$ is the rank **less than full** (rank 1 for a $2 \\times 2$, rank 2 for a $3 \\times 3$)', method: 'Set the determinant equal to $0$ and solve for $k$.' },
+    { cue: 'For which $k$ does a $2 \\times 2$ matrix have rank $1$ (rank **less than full**)', method: 'Set the determinant equal to $0$ and solve for $k$.' },
     { cue: 'Find the **eigenvalues** of a $2 \\times 2$ matrix', method: 'Solve $\\lambda^{2} - (\\text{trace})\\lambda + \\det = 0$. A triangular or diagonal matrix: the eigenvalues are the diagonal entries. Check: sum = trace, product = det.' },
     { cue: '"Which vector is an **eigenvector**" or "find an eigenvector for $\\lambda$"', method: 'Multiply each option by $A$ and see which comes out as a multiple of itself, or solve $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$. The zero vector never counts.' },
     { cue: 'Eigenvalues given; asked for the trace, the determinant, an unknown entry, or invertibility', method: 'Trace = sum of the eigenvalues, $\\det$ = product. An eigenvalue $0$ means $\\det = 0$, so no inverse. If one eigenvalue is given, use $\\det(A - \\lambda I) = 0$ to find the unknown.' },
-    { cue: 'Eigenvalues of $A^{2}$ or $A + cI$, or a **repeated** eigenvalue', method: '$A^{k}$ has eigenvalues $\\lambda^{k}$ and $A + cI$ has $\\lambda + c$. A repeated eigenvalue needs $(\\text{trace})^{2} - 4\\det = 0$ (discriminant zero).' },
+    { cue: 'Eigenvalues of $A^{2}$ or $A + cI$', method: '$A^{k}$ has eigenvalues $\\lambda^{k}$ and $A + cI$ has $\\lambda + c$.' },
   ],
   know:
     '### Rank: how much "real information" a matrix holds\n\n' +
@@ -106,12 +106,24 @@ export const lesson: Lesson = {
       ],
       answer: '$k = 5$; the other eigenvalue is $1$',
     },
+    {
+      title: 'Symbolic rank: a product equal to the unit matrix',
+      problem: 'Let $A$ be a $m \\times n$ matrix and $B$ a $n \\times m$ matrix with $m < n$, such that $AB = I_{m}$, the unit matrix of order $m$. Find $r(A)$ and $r(B)$, where $r(X)$ is the rank of $X$.',
+      steps: [
+        'The unit matrix of order $m$ is the $m \\times m$ identity. All $m$ of its rows are independent, so $r(I_{m}) = m$.',
+        'A product cannot have a higher rank than either factor: $r(AB) \\le \\min(r(A), r(B))$. So $m \\le r(A)$ and $m \\le r(B)$.',
+        'A rank cannot exceed the smaller dimension. $A$ has $m$ rows and $B$ has $m$ columns, so $r(A) \\le m$ and $r(B) \\le m$.',
+        'Both limits together give $r(A) = m$ and $r(B) = m$.',
+      ],
+      answer: '$r(A) = r(B) = m$',
+    },
   ],
   traps: [
     'Reading eigenvalues off the diagonal when the matrix is **not** triangular. For $\\begin{bmatrix} 5 & 2 \\\\ 1 & 4 \\end{bmatrix}$ the eigenvalues are $3$ and $6$, not $5$ and $4$.',
     'Sign slips in the characteristic equation: it is $\\lambda^2 - (\\text{trace})\\lambda + \\det = 0$ with a **minus** before the trace term, and $\\det = ad - bc$ (minus, not plus).',
     'Subtracting $\\lambda$ from every entry, or from only one diagonal entry. $A - \\lambda I$ changes the **diagonal entries only**, and all of them.',
     'Thinking $\\det(A) = 0$ means rank $0$. It only means the rank is less than full; only the zero matrix has rank $0$.',
+    'Picking $n$ "because $A$ has $n$ columns". If $A$ is $m \\times n$ with $m < n$, the rank is at most $m$, the smaller dimension.',
     'Mixing up the eigenvectors of different eigenvalues, or giving the zero vector. Always check $A\\mathbf{v} = \\lambda\\mathbf{v}$ for the eigenvalue you were asked about.',
     'Squaring negative eigenvalues carelessly: if $\\lambda = -3$, then $A^2$ has eigenvalue $(-3)^2 = 9$, not $-9$.',
   ],

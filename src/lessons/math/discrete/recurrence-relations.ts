@@ -3,31 +3,27 @@ import type { Lesson } from '../../../types';
 export const lesson: Lesson = {
   subtopic: 'recurrence-relations',
   simple:
-    'A **recurrence relation** is a recipe for a sequence that tells you how to get the next term from the ones before it, like "start with 4 and keep adding 3" ($4, 7, 10, 13, \\dots$). To use it, start from the given first term and apply the rule one step at a time. A **closed form** is a shortcut formula that jumps straight to any term without working through all the earlier ones.',
+    'A **recurrence relation** is a recipe for a sequence that tells you how to get the next term from the ones before it, like "start with 4 and keep adding 3" ($4, 7, 10, 13, \\dots$). To use it, start from the given first term and apply the rule one step at a time.',
   methods: [
     {
-      cue: 'Starting value(s) and a rule given; asked for a nearby term such as $a_4$ or $a_5$',
+      cue: 'Starting value(s) and a rule given; asked for a nearby term such as $a_4$ or $a_5$, or the first few terms',
       method: 'Apply the rule one step at a time in a list or table, in the order written (multiply before adding). Check whether the sequence starts at $a_0$ or $a_1$ to count the steps.',
     },
     {
-      cue: 'The rule uses **two** earlier terms ($a_{n-1}$ and $a_{n-2}$), or a staircase / binary-string counting story',
-      method: 'You need two starting values; build a table term by term. Counting stories give $S_n = S_{n-1} + S_{n-2}$ by splitting on the last move.',
+      cue: 'The rule uses **two** earlier terms ($a_{n-1}$ and $a_{n-2}$)',
+      method: 'You need two starting values; build a table term by term, matching each coefficient to the right earlier term.',
     },
     {
-      cue: '"Which **closed-form** formula?" for an add-a-constant or multiply-by-a-constant rule',
-      method: 'Add $d$ each time: $a_n = a_1 + (n - 1)d$. Multiply by $r$: $a_n = a_0 r^{n}$ (or $a_1 r^{n-1}$). Test your formula at $n = 0$ or $1$ and at $n = 2$.',
-    },
-    {
-      cue: 'A **far-away** term (like $a_{10}$) of $a_n = r a_{n-1} + d$',
-      method: 'Find the fixed point $L$ from $L = rL + d$; then $a_n = L + (a_1 - L)r^{n-1}$.',
+      cue: 'A list of terms is given: "Which recurrence generates them?"',
+      method: 'Test each option on **every** consecutive pair of terms. Several rules may fit the first step, but usually only one fits them all.',
     },
     {
       cue: 'A later term is given and an **earlier** term is asked for',
       method: 'Run the rule backwards by undoing the operations in reverse order (undo the $+d$ first, then the $\\times r$), then check forwards.',
     },
     {
-      cue: 'Recursive code, divide-and-conquer $T(n) = aT(\\frac{n}{2}) + \\dots$, or a money/population story',
-      method: 'Write down the base case and the rule, then work up from the base case in a table ($n = 1, 2, 4, 8, \\dots$ for halving recurrences).',
+      cue: 'A recursive function or a loop in pseudocode that repeats a rule',
+      method: 'Write down the base case or starting value and the rule, then work up from there in a table.',
     },
   ],
   know:
@@ -42,38 +38,16 @@ export const lesson: Lesson = {
     '- **Follow the order of operations.** $a_n = 3a_{n-1} - 1$ means multiply by 3 **first**, then subtract 1.\n\n' +
     'To go **backwards** (given a later term, find an earlier one), undo the operations in reverse order. For $a_n = 2a_{n-1} + 3$, undo the $+3$ first, then halve: $a_{n-1} = \\frac{a_n - 3}{2}$.\n\n' +
     '### Fibonacci-type recurrences\n\n' +
-    'Some rules use the **two** previous terms. The famous one is the Fibonacci sequence: $F_1 = 1$, $F_2 = 1$, $F_n = F_{n-1} + F_{n-2}$, which gives $1, 1, 2, 3, 5, 8, 13, 21, \\dots$ Because each term needs two earlier terms, you need **two** starting values. With coefficients, such as $a_n = a_{n-1} + 2a_{n-2}$, be careful to multiply the right term: $a_{n-1}$ is one place back, $a_{n-2}$ is two places back. A small table of $n$ and $a_n$ keeps everything tidy.\n\n' +
-    '### From recurrence to closed form\n\n' +
-    'A **closed form** is a direct formula for $a_n$, which is much faster for a far-away term like $a_{50}$. Three types are worth knowing:\n\n' +
-    '| Recurrence | Type | Closed form (starting at $a_1$) |\n' +
-    '| --- | --- | --- |\n' +
-    '| $a_n = a_{n-1} + d$ | arithmetic | $a_n = a_1 + (n-1)d$ |\n' +
-    '| $a_n = ra_{n-1}$ | geometric | $a_n = a_1 r^{n-1}$ |\n' +
-    '| $a_n = ra_{n-1} + d$ | "multiply then add" | $a_n = L + (a_1 - L)r^{n-1}$ |\n\n' +
-    'If the sequence starts at $a_0$ instead, replace $n - 1$ by $n$: for example $a_n = a_0 r^{n}$.\n\n' +
-    'For the third type, $L$ is the **fixed point**: the number the rule leaves unchanged. Solve $L = rL + d$, which gives $L = \\frac{d}{1 - r}$. The trick is that the **distance from $L$** gets multiplied by $r$ each step. For instance, with $a_n = 3a_{n-1} - 4$: $L = 3L - 4$ gives $L = 2$. Starting from $a_1 = 5$ (distance 3), the distances are $3, 9, 27, \\dots$ so $a_n = 2 + 3^{n}$.\n\n' +
-    '### Recurrences from counting problems\n\n' +
-    'Many counting questions are solved by asking: **how does the last step happen?** To climb $n$ stairs taking 1 or 2 at a time, your final move came either from stair $n - 1$ or from stair $n - 2$, so $S_n = S_{n-1} + S_{n-2}$. Binary strings with no two 1s next to each other follow the same idea (split on whether the string ends in 0 or in 01). Other examples: Tower of Hanoi ($H_n = 2H_{n-1} + 1$) and regions made by $n$ lines ($R_n = R_{n-1} + n$).\n\n' +
-    '### Step counts of recursive algorithms\n\n' +
-    'A recursive function is a recurrence in code. Its running time $T(n)$ is "work done in this call" plus "work done by the recursive calls":\n\n' +
-    '- Binary search: $T(n) = T\\left(\\frac{n}{2}\\right) + 1$, about $\\log_2 n$ steps.\n' +
-    '- Merge sort: $T(n) = 2T\\left(\\frac{n}{2}\\right) + n$, about $n\\log_2 n$ steps.\n' +
-    '- A function that calls itself twice on $n - 1$: $T(n) = 2T(n-1) + 1$, about $2^{n}$ steps.\n\n' +
-    'To evaluate these, work **up** from the base case (such as $T(1)$) in a table.',
+    'Some rules use the **two** previous terms. The famous one is the Fibonacci sequence: $F_1 = 1$, $F_2 = 1$, $F_n = F_{n-1} + F_{n-2}$, which gives $1, 1, 2, 3, 5, 8, 13, 21, \\dots$ Because each term needs two earlier terms, you need **two** starting values. Such a rule is called **second-order**. With coefficients, such as $a_n = a_{n-1} + 2a_{n-2}$, be careful to multiply the right term: $a_{n-1}$ is one place back, $a_{n-2}$ is two places back. A small table of $n$ and $a_n$ keeps everything tidy.\n\n' +
+    '### Recurrences in code\n\n' +
+    'A recursive function is a recurrence in code. In `f(n - 1) + 2 * f(n - 2)` the base case gives the starting values and the `return` line gives the rule, so build a table from the bottom up. A loop that repeats a line such as `a = 2 * a - 1` does the same job: each pass computes the next term.',
   formulas: [
-    { label: 'Arithmetic recurrence', tex: 'a_n = a_{n-1} + d \\implies a_n = a_1 + (n-1)d', note: 'Starting at $a_0$: $a_n = a_0 + nd$.' },
-    { label: 'Geometric recurrence', tex: 'a_n = r\\,a_{n-1} \\implies a_n = a_1 r^{n-1}', note: 'Starting at $a_0$: $a_n = a_0 r^{n}$.' },
-    { label: 'Fixed point of a "multiply then add" rule', tex: 'L = rL + d \\implies L = \\frac{d}{1 - r} \\quad (r \\ne 1)' },
-    {
-      label: '"Multiply then add" closed form',
-      tex: 'a_n = r\\,a_{n-1} + d \\implies a_n = L + (a_1 - L)\\,r^{n-1}',
-      note: 'Starting at $a_0$: $a_n = L + (a_0 - L)r^{n}$.',
-    },
+    { label: 'Add a constant', tex: 'a_n = a_{n-1} + d', note: 'The same amount is added at every step.' },
+    { label: 'Multiply by a constant', tex: 'a_n = r\\,a_{n-1}', note: 'The same multiplier is used at every step.' },
+    { label: 'Multiply then add', tex: 'a_n = r\\,a_{n-1} + d', note: 'Multiply first, then add.' },
+    { label: 'Running the rule backwards', tex: 'a_n = r\\,a_{n-1} + d \\implies a_{n-1} = \\frac{a_n - d}{r}', note: 'Undo the operations in reverse order.' },
+    { label: 'Number of steps', tex: '\\text{from } a_1 \\text{ to } a_k: \\; k - 1 \\text{ steps}, \\qquad \\text{from } a_0 \\text{ to } a_k: \\; k \\text{ steps}' },
     { label: 'Fibonacci sequence', tex: 'F_1 = F_2 = 1, \\quad F_n = F_{n-1} + F_{n-2}', note: '$1, 1, 2, 3, 5, 8, 13, 21, 34, \\dots$' },
-    { label: 'Tower of Hanoi', tex: 'H_1 = 1, \\quad H_n = 2H_{n-1} + 1 \\implies H_n = 2^{n} - 1' },
-    { label: 'Binary search step count', tex: 'T(1) = 1, \\quad T(n) = T\\left(\\tfrac{n}{2}\\right) + 1 \\implies T(n) = \\log_2 n + 1' },
-    { label: 'Merge sort step count', tex: 'T(1) = 0, \\quad T(n) = 2T\\left(\\tfrac{n}{2}\\right) + n \\implies T(n) = n\\log_2 n' },
-    { label: 'Regions made by n lines', tex: 'R_0 = 1, \\quad R_n = R_{n-1} + n \\implies R_n = 1 + \\frac{n(n+1)}{2}' },
   ],
   examples: [
     {
@@ -100,41 +74,37 @@ export const lesson: Lesson = {
       answer: '$a_5 = 41$',
     },
     {
-      title: 'Closed form of a "multiply then add" recurrence',
-      problem: 'A sequence has $a_0 = 1$ and $a_n = 3a_{n-1} + 4$ for $n \\ge 1$. Find a closed form and use it to find $a_6$.',
+      title: 'Working backwards',
+      problem: 'A sequence satisfies $a_n = 3a_{n-1} - 2$ for $n \\ge 2$, and $a_4 = 28$. Find $a_1$.',
       steps: [
-        'Find the fixed point: $L = 3L + 4$, so $-2L = 4$ and $L = -2$.',
-        'Starting distance from $L$: $a_0 - L = 1 - (-2) = 3$.',
-        'Each step multiplies the distance by 3, so $a_n - (-2) = 3 \\times 3^{n}$, which gives $a_n = 3^{n+1} - 2$.',
-        'Check: $a_0 = 3 - 2 = 1$ and $a_1 = 9 - 2 = 7 = 3 \\times 1 + 4$. Correct.',
-        '$a_6 = 3^{7} - 2 = 2187 - 2 = 2185$.',
+        'Undo the rule: add 2 first, then divide by 3, so $a_{n-1} = \\frac{a_n + 2}{3}$.',
+        '$a_3 = \\frac{28 + 2}{3} = 10$',
+        '$a_2 = \\frac{10 + 2}{3} = 4$',
+        '$a_1 = \\frac{4 + 2}{3} = 2$',
+        'Check forwards: $2 \\to 4 \\to 10 \\to 28$. Correct.',
       ],
-      answer: '$a_n = 3^{n+1} - 2$, so $a_6 = 2185$',
+      answer: '$a_1 = 2$',
     },
     {
-      title: 'Counting with a recurrence',
-      problem: 'A path of length $n$ metres is covered with tiles that are 1 m or 2 m long. Let $W_n$ be the number of ways to tile it. Find $W_7$.',
+      title: 'Which rule fits?',
+      problem: 'A sequence begins $2, 5, 11, 23$. Which rule generates it: $a_n = a_{n-1} + 3$ or $a_n = 2a_{n-1} + 1$?',
       steps: [
-        'Look at the last tile. If it is 1 m long, the remaining $n - 1$ metres can be tiled in $W_{n-1}$ ways. If it is 2 m long, the rest can be tiled in $W_{n-2}$ ways.',
-        'So $W_n = W_{n-1} + W_{n-2}$.',
-        'Starting values: $W_1 = 1$ (one 1 m tile) and $W_2 = 2$ (two 1 m tiles, or one 2 m tile).',
-        '$W_3 = 3$, $W_4 = 5$, $W_5 = 8$, $W_6 = 13$, $W_7 = 13 + 8 = 21$.',
+        'Test $a_n = a_{n-1} + 3$: $2 \\to 5$ works, but $5 \\to 8$, not 11. It fails.',
+        'Test $a_n = 2a_{n-1} + 1$: $2 \\to 5$, $5 \\to 11$, $11 \\to 23$. Every step works.',
       ],
-      answer: '$W_7 = 21$',
+      answer: '$a_n = 2a_{n-1} + 1$',
     },
   ],
   traps: [
-    '**Off-by-one with the starting index.** If the first term is $a_0$, the closed forms use $n$ (for example $a_0 r^{n}$); if it is $a_1$, they use $n - 1$. Always test your formula at the first index.',
+    '**Off-by-one with the starting index.** If the first term is $a_0$, reaching $a_5$ takes 5 steps; if it is $a_1$, it takes 4. Count the steps from the first term you are given.',
     '**Wrong order of operations.** $a_n = 3a_{n-1} - 1$ means multiply first, then subtract. Working out $3(a_{n-1} - 1)$ gives a completely different sequence.',
     '**Mixing up the coefficients in a two-term rule.** In $a_n = a_{n-1} + 2a_{n-2}$ the 2 belongs to the term **two** places back, not the previous term.',
     '**Guessing a pattern from too few terms.** $2, 4, \\dots$ looks like doubling, but the next term might be 7. Check any rule on **every** given pair of terms.',
-    '**Forgetting the constant in "multiply then add".** $a_n = 3a_{n-1} - 4$ is not geometric: its closed form is $L + (a_1 - L)r^{n-1}$, not $a_1 r^{n-1}$, and not $a_1 r^{n-1} - 4$.',
-    '**Counting calls instead of work.** For a recursive procedure, decide exactly what is being counted (prints, comparisons, or calls) and include the base case correctly.',
+    '**Undoing in the wrong order.** To reverse "double, then add 3", subtract 3 first and then halve.',
   ],
   examTip:
-    'Expect questions like "find $a_5$", "find a closed form", "how many ways..." or "how many steps does this recursive algorithm take". The wrong options are usually the term one before or one after the right one, or the result of a common slip (wrong operation order, swapped coefficients, forgetting the constant).\n\n' +
-    '- For small terms, just compute in a quick table; it takes under 30 seconds and avoids risky shortcuts. Your calculator can do the repetition: type the start value, press =, then type the rule using Ans (for example $3 \\times \\text{Ans} - 1$) and press = repeatedly.\n' +
-    '- To choose between closed-form options, **plug in** $n = 0$, $1$ or $2$ and compare with the terms you know. Usually only one option survives.\n' +
-    '- If two options differ by exactly one step of the rule, re-count the steps from the starting index.\n' +
-    '- For far-away terms, use the closed form, then sanity-check the size: geometric terms grow fast, arithmetic terms grow steadily.',
+    'Expect questions like "find $a_5$", "what are the first four terms?" or "which rule generates this sequence?". The wrong options are usually the term one before or one after the right one, or the result of a common slip (wrong operation order, swapped coefficients, forgetting the constant).\n\n' +
+    '- Compute in a quick table; it takes under 30 seconds and avoids risky shortcuts. Your calculator can do the repetition: type the start value, press =, then type the rule using Ans (for example $3 \\times \\text{Ans} - 1$) and press = repeatedly.\n' +
+    '- To choose between rules, test each option on the terms you know. Usually only one option survives.\n' +
+    '- If two options differ by exactly one step of the rule, re-count the steps from the starting index.',
 };

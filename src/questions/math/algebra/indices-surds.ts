@@ -152,6 +152,146 @@ export const questions: StaticQuestion[] = [
       compute: () => S(3) * S(12),
     },
   },
+  {
+    id: 'indices-surds-020',
+    subtopic: 'indices-surds',
+    difficulty: 'foundation',
+    stem: 'For any non-zero number $a$, what is $a^{0}$?',
+    options: ['$1$', '$0$', '$a$', 'Undefined'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Divide a power by itself: $\\frac{a^{n}}{a^{n}} = 1$. The index law gives $\\frac{a^{n}}{a^{n}} = a^{n-n} = a^{0}$.\n\n' +
+        'So $a^{0} = 1$ for every non-zero $a$.',
+      whyWrong: [
+        null,
+        'This treats the power 0 as multiplying by 0. An index is not a multiplier.',
+        '$a$ is what you get from the power 1, not the power 0.',
+        'Only $0^{0}$ causes difficulty, and the question says $a$ is not zero.',
+      ],
+      keyIdea: 'Any non-zero number to the power 0 is 1.',
+    },
+    check: {
+      // each option evaluated at a = 5
+      optionValues: [1, 0, 5, null],
+      compute: () => 5 ** 3 / 5 ** 3,
+    },
+  },
+  {
+    id: 'indices-surds-021',
+    subtopic: 'indices-surds',
+    difficulty: 'foundation',
+    stem: 'Which expression is equal to $x^{-3}$?',
+    options: ['$\\frac{1}{x^{3}}$', '$-x^{3}$', '$-3x$', '$x^{\\frac{1}{3}}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A negative index means "one over": $x^{-n} = \\frac{1}{x^{n}}$.\n\n' +
+        'So $x^{-3} = \\frac{1}{x^{3}}$. Check with $x = 2$: $2^{-3} = \\frac{1}{8}$.',
+      whyWrong: [
+        null,
+        'A negative index gives a reciprocal, not a negative number.',
+        'This multiplies $x$ by the index. An index is not a multiplier.',
+        'The index $\\frac{1}{3}$ means a cube root. A root comes from a fractional index, not a negative one.',
+      ],
+      keyIdea: '$x^{-n} = \\frac{1}{x^{n}}$: a negative index means "one over".',
+    },
+    check: {
+      // each option evaluated at x = 2
+      optionValues: [1 / 8, -8, -6, 2 ** (1 / 3)],
+      compute: () => 2 ** -3,
+    },
+  },
+  {
+    id: 'indices-surds-022',
+    subtopic: 'indices-surds',
+    difficulty: 'foundation',
+    stem: 'For $x > 0$, which expression is equal to $x^{\\frac{1}{2}}$?',
+    options: ['$\\sqrt{x}$', '$\\frac{x}{2}$', '$\\frac{1}{x^{2}}$', '$x^{2}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The index $\\frac{1}{2}$ means square root, because adding the indices gives $x^{\\frac{1}{2}} \\times x^{\\frac{1}{2}} = x$.\n\n' +
+        'So $x^{\\frac{1}{2}} = \\sqrt{x}$. Check with $x = 9$: $9^{\\frac{1}{2}} = 3$.',
+      whyWrong: [
+        null,
+        'This multiplies $x$ by the index. An index is not a multiplier.',
+        'This is $x^{-2}$. A fraction in the index means a root; only a minus sign means "one over".',
+        'This flips the index from $\\frac{1}{2}$ to 2, which squares $x$ instead of square-rooting it.',
+      ],
+      keyIdea: '$x^{\\frac{1}{n}}$ is the $n$th root of $x$, so $x^{\\frac{1}{2}} = \\sqrt{x}$.',
+    },
+    check: {
+      // each option evaluated at x = 9
+      optionValues: [3, 4.5, 1 / 81, 81],
+      compute: () => 9 ** (1 / 2),
+    },
+  },
+  {
+    id: 'indices-surds-023',
+    subtopic: 'indices-surds',
+    difficulty: 'foundation',
+    stem: 'Which of the following is a surd?',
+    options: ['$\\sqrt{7}$', '$\\sqrt{9}$', '$\\sqrt{\\frac{1}{4}}$', '$\\sqrt[3]{8}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **surd** is a root that cannot be written as a whole number or a fraction, so it is left in root form.\n\n' +
+        '$\\sqrt{9} = 3$, $\\sqrt{\\frac{1}{4}} = \\frac{1}{2}$ and $\\sqrt[3]{8} = 2$ are all exact. No whole number or fraction squares to 7, so $\\sqrt{7}$ is a surd.',
+      whyWrong: [
+        null,
+        '$\\sqrt{9} = 3$ exactly, so it is a whole number written as a root.',
+        '$\\sqrt{\\frac{1}{4}} = \\frac{1}{2}$ exactly, so it is a fraction written as a root.',
+        '$\\sqrt[3]{8} = 2$ exactly, because $2^{3} = 8$. A root is not a surd if it comes out exact.',
+      ],
+      keyIdea: 'A surd is a root that does not simplify to a whole number or a fraction.',
+    },
+  },
+  {
+    id: 'indices-surds-024',
+    subtopic: 'indices-surds',
+    difficulty: 'foundation',
+    stem: 'What is the conjugate of $3 - \\sqrt{5}$?',
+    options: ['$3 + \\sqrt{5}$', '$-3 + \\sqrt{5}$', '$\\frac{1}{3 - \\sqrt{5}}$', '$-3 - \\sqrt{5}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **conjugate** of $a - \\sqrt{b}$ is $a + \\sqrt{b}$: the same two terms with the opposite sign between them.\n\n' +
+        'Multiplying the pair removes the surd: $(3 - \\sqrt{5})(3 + \\sqrt{5}) = 9 - 5 = 4$.',
+      whyWrong: [
+        null,
+        'This changes both signs, which gives the negative of the number, not its conjugate.',
+        'This is the reciprocal of the number. The conjugate is what you multiply by to clear the surd.',
+        'This changes the sign of the first term and keeps the sign of the surd. Only the sign between the terms changes.',
+      ],
+      keyIdea: 'A conjugate keeps both terms and changes the sign between them, so the product has no surd.',
+    },
+  },
+  {
+    id: 'indices-surds-025',
+    subtopic: 'indices-surds',
+    difficulty: 'foundation',
+    stem: 'Which expression is equal to $(a^{m})^{n}$?',
+    options: ['$a^{mn}$', '$a^{m + n}$', '$na^{m}$', '$a^{m^{n}}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$(a^{m})^{n}$ means $a^{m}$ multiplied by itself $n$ times, so the index $m$ is added $n$ times, giving $mn$.\n\n' +
+        'For example, $(2^{3})^{2} = 8^{2} = 64 = 2^{6}$.',
+      whyWrong: [
+        null,
+        'Adding the indices is the rule for $a^{m} \\times a^{n}$. A power of a power multiplies them.',
+        'This multiplies by $n$ instead of raising to the power $n$.',
+        'This raises $m$ to the power $n$. The indices should be multiplied: for $(2^{3})^{2}$ the index is $3 \\times 2 = 6$, not $3^{2} = 9$.',
+      ],
+      keyIdea: 'Power of a power: multiply the indices, $(a^{m})^{n} = a^{mn}$.',
+    },
+    check: {
+      // each option evaluated at a = 2, m = 3, n = 2
+      optionValues: [2 ** 6, 2 ** 5, 2 * 2 ** 3, 2 ** 9],
+      compute: () => (2 ** 3) ** 2,
+    },
+  },
 
   // ------------------------------------------------------------------ exam
   {
@@ -377,189 +517,27 @@ export const questions: StaticQuestion[] = [
     id: 'indices-surds-014',
     subtopic: 'indices-surds',
     difficulty: 'exam',
-    stem:
-      'Light travels at $3 \\times 10^{8}$ metres per second. Take the distance from the Sun to the Earth to be $1.5 \\times 10^{11}$ metres. Using these values, how long does light take to travel from the Sun to the Earth?',
-    options: ['$4.5 \\times 10^{19}$ seconds', '$5 \\times 10^{2}$ seconds', '$5 \\times 10^{3}$ seconds', '$2 \\times 10^{-3}$ seconds'],
+    stem: 'Calculate $(1.5 \\times 10^{11}) \\div (3 \\times 10^{8})$, giving your answer in standard form.',
+    options: ['$4.5 \\times 10^{19}$', '$5 \\times 10^{2}$', '$5 \\times 10^{3}$', '$2 \\times 10^{-3}$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Time = distance $\\div$ speed.\n\n' +
+        'Divide the front numbers and the powers of 10 separately, then check that the front number is between 1 and 10.\n\n' +
         '1. $\\frac{1.5 \\times 10^{11}}{3 \\times 10^{8}} = \\frac{1.5}{3} \\times 10^{11 - 8}$ (divide the numbers, subtract the indices).\n' +
         '2. $\\frac{1.5}{3} = 0.5$ and $10^{11-8} = 10^{3}$, giving $0.5 \\times 10^{3}$.\n' +
-        '3. $0.5$ is not between 1 and 10, so write $0.5 = 5 \\times 10^{-1}$: $0.5 \\times 10^{3} = 5 \\times 10^{2}$ seconds.\n\n' +
-        'That is 500 seconds, a little over 8 minutes.',
+        '3. $0.5$ is not between 1 and 10, so write $0.5 = 5 \\times 10^{-1}$: $0.5 \\times 10^{3} = 5 \\times 10^{2}$.\n\n' +
+        'As a check, $5 \\times 10^{2} = 500$, and $500 \\times (3 \\times 10^{8}) = 1.5 \\times 10^{11}$.',
       whyWrong: [
-        'This multiplies distance by speed. Time is distance divided by speed.',
+        'This multiplies the two numbers instead of dividing them, adding the indices as well.',
         null,
         'This gets $0.5 \\times 10^{3}$ and then changes 0.5 into 5 without lowering the power. Multiplying the front number by 10 means the power must go down by 1.',
-        'This divides the wrong way round (speed $\\div$ distance). That gives one over the time, not the time itself.',
+        'This divides the wrong way round, giving one over the correct answer.',
       ],
       keyIdea: 'Dividing in standard form: divide the numbers, subtract the powers of 10, then fix the front number so it is between 1 and 10.',
     },
     check: {
       optionValues: [4.5e19, 5e2, 5e3, 2e-3],
       compute: () => 1.5e11 / 3e8,
-    },
-  },
-
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'indices-surds-015',
-    subtopic: 'indices-surds',
-    difficulty: 'challenge',
-    stem: 'Rationalise the denominator and simplify $\\frac{\\sqrt{5} + \\sqrt{3}}{\\sqrt{5} - \\sqrt{3}}$.',
-    options: ['$8 + 2\\sqrt{15}$', '$4 + 2\\sqrt{15}$', '$4 + \\sqrt{15}$', '$1 + \\frac{\\sqrt{15}}{4}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Multiply top and bottom by the conjugate of the denominator, $\\sqrt{5} + \\sqrt{3}$.\n\n' +
-        '1. Denominator: $(\\sqrt{5} - \\sqrt{3})(\\sqrt{5} + \\sqrt{3}) = 5 - 3 = 2$.\n' +
-        '2. Numerator: $(\\sqrt{5} + \\sqrt{3})^{2} = 5 + 2\\sqrt{5}\\sqrt{3} + 3 = 8 + 2\\sqrt{15}$.\n' +
-        '3. Divide **every** term by 2: $\\frac{8 + 2\\sqrt{15}}{2} = 4 + \\sqrt{15}$.\n\n' +
-        'Calculator check: the original is about $\\frac{3.968}{0.504} \\approx 7.873$ and $4 + \\sqrt{15} \\approx 7.873$.',
-      whyWrong: [
-        'This finds the numerator $8 + 2\\sqrt{15}$ but forgets to divide by the denominator, which is 2.',
-        'This divides only the 8 by 2. Both terms on top must be divided: $\\frac{2\\sqrt{15}}{2} = \\sqrt{15}$.',
-        null,
-        'This uses $5 + 3 = 8$ for the denominator. The conjugate product is a difference of two squares: $5 - 3 = 2$.',
-      ],
-      keyIdea: 'Multiplying by the conjugate turns the denominator into a whole number via $(a - b)(a + b) = a^{2} - b^{2}$; then divide every term on top.',
-    },
-    check: {
-      optionValues: [8 + 2 * S(15), 4 + 2 * S(15), 4 + S(15), 1 + S(15) / 4],
-      compute: () => (S(5) + S(3)) / (S(5) - S(3)),
-    },
-  },
-  {
-    id: 'indices-surds-016',
-    subtopic: 'indices-surds',
-    difficulty: 'challenge',
-    stem: 'For every positive integer $n$, the expression $\\frac{2^{n+3} - 2^{n+1}}{2^{n}}$ is equal to which of the following?',
-    options: ['$6$', '$2^{2-n}$', '$8 - 2^{n+1}$', '$6 \\times 2^{n}$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Split each power using $a^{m+n} = a^{m} \\times a^{n}$.\n\n' +
-        '1. $2^{n+3} = 2^{n} \\times 2^{3} = 8 \\times 2^{n}$ and $2^{n+1} = 2^{n} \\times 2 = 2 \\times 2^{n}$.\n' +
-        '2. Numerator: $8 \\times 2^{n} - 2 \\times 2^{n} = 6 \\times 2^{n}$ (just like $8y - 2y = 6y$).\n' +
-        '3. Divide by $2^{n}$: $\\frac{6 \\times 2^{n}}{2^{n}} = 6$.\n\n' +
-        'Check with $n = 1$: $\\frac{16 - 4}{2} = 6$. With $n = 3$: $\\frac{64 - 16}{8} = 6$.',
-      whyWrong: [
-        null,
-        'This treats $2^{n+3} - 2^{n+1}$ as $2^{(n+3)-(n+1)} = 2^{2}$. Subtracting indices is a rule for **dividing** powers, not for subtracting them. Then dividing by $2^{n}$ gives $2^{2-n}$.',
-        'This divides only the first term by $2^{n}$. Every term on top must be divided: $\\frac{2^{n+1}}{2^{n}} = 2$ as well.',
-        'This factorises the top correctly as $6 \\times 2^{n}$ but forgets to divide by the $2^{n}$ on the bottom.',
-      ],
-      keyIdea: 'Factor out the common power: $2^{n+3} - 2^{n+1} = 2^{n}(2^{3} - 2)$.',
-    },
-    check: {
-      // evaluate every option at n = 3
-      optionValues: [6, 2 ** (2 - 3), 8 - 2 ** (3 + 1), 6 * 2 ** 3],
-      compute: () => {
-        const n = 3;
-        return (2 ** (n + 3) - 2 ** (n + 1)) / 2 ** n;
-      },
-    },
-  },
-  {
-    id: 'indices-surds-017',
-    subtopic: 'indices-surds',
-    difficulty: 'challenge',
-    stem: 'Given that $\\frac{5 + \\sqrt{3}}{2 - \\sqrt{3}} = a + b\\sqrt{3}$, where $a$ and $b$ are integers, find $a + b$.',
-    options: ['$17$', '$\\frac{20}{7}$', '$-4$', '$20$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Multiply top and bottom by the conjugate $2 + \\sqrt{3}$.\n\n' +
-        '1. Denominator: $(2 - \\sqrt{3})(2 + \\sqrt{3}) = 4 - 3 = 1$.\n' +
-        '2. Numerator, expanded term by term: $(5 + \\sqrt{3})(2 + \\sqrt{3}) = 10 + 5\\sqrt{3} + 2\\sqrt{3} + 3$.\n' +
-        '3. Collect: $10 + 3 = 13$ and $5\\sqrt{3} + 2\\sqrt{3} = 7\\sqrt{3}$, so the numerator is $13 + 7\\sqrt{3}$.\n' +
-        '4. Dividing by 1 changes nothing: $a = 13$, $b = 7$, so $a + b = 20$.\n\n' +
-        'Calculator check: $\\frac{5 + \\sqrt{3}}{2 - \\sqrt{3}} \\approx 25.12$ and $13 + 7\\sqrt{3} \\approx 25.12$.',
-      whyWrong: [
-        'This forgets the last term of the expansion, $\\sqrt{3} \\times \\sqrt{3} = 3$, giving $10 + 7\\sqrt{3}$.',
-        'This uses $4 + 3 = 7$ for the denominator, giving $\\frac{13 + 7\\sqrt{3}}{7}$. The conjugate product is $4 - 3 = 1$ (and $a$, $b$ must be integers anyway).',
-        'This takes $(\\sqrt{3})^{2}$ as 9, so the denominator becomes $4 - 9 = -5$ and $a + b = \\frac{13 + 7}{-5} = -4$. But $(\\sqrt{3})^{2} = 3$.',
-        null,
-      ],
-      keyIdea: 'Rationalise with the conjugate, expand carefully (four terms), then match the whole-number part and the $\\sqrt{3}$ part.',
-    },
-    check: {
-      optionValues: [17, 20 / 7, -4, 20],
-      compute: () => {
-        const v = (5 + S(3)) / (2 - S(3));
-        for (let b = -50; b <= 50; b++) {
-          const a = v - b * S(3);
-          if (Math.abs(a - Math.round(a)) < 1e-9) return Math.round(a) + b;
-        }
-        return NaN;
-      },
-    },
-  },
-  {
-    id: 'indices-surds-018',
-    subtopic: 'indices-surds',
-    difficulty: 'challenge',
-    stem: 'Solve the simultaneous equations $2^{x} \\times 4^{y} = 32$ and $\\frac{3^{x}}{9^{y}} = \\frac{1}{3}$.',
-    options: ['$x = 3$, $y = 1$', '$x = 2$, $y = \\frac{3}{2}$', '$x = 2$, $y = 3$', '$x = 2$, $y = 1$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Write everything as a power of the same base, then compare indices.\n\n' +
-        '1. First equation: $4^{y} = (2^{2})^{y} = 2^{2y}$ and $32 = 2^{5}$, so $2^{x} \\times 2^{2y} = 2^{5}$, i.e. $x + 2y = 5$.\n' +
-        '2. Second equation: $9^{y} = (3^{2})^{y} = 3^{2y}$ and $\\frac{1}{3} = 3^{-1}$, so $3^{x - 2y} = 3^{-1}$, i.e. $x - 2y = -1$.\n' +
-        '3. Add the two equations: $2x = 4$, so $x = 2$.\n' +
-        '4. Substitute: $2 + 2y = 5$, so $2y = 3$ and $y = \\frac{3}{2}$.\n\n' +
-        'Check: $2^{2} \\times 4^{\\frac{3}{2}} = 4 \\times 8 = 32$ and $\\frac{3^{2}}{9^{\\frac{3}{2}}} = \\frac{9}{27} = \\frac{1}{3}$.',
-      whyWrong: [
-        'This drops the minus sign, treating $\\frac{1}{3}$ as $3$ instead of $3^{-1}$, so the second equation becomes $x - 2y = 1$. Check: $\\frac{3^{3}}{9} = 3$, not $\\frac{1}{3}$.',
-        null,
-        'This treats $4^{y}$ as $2^{y}$ and $9^{y}$ as $3^{y}$, solving $x + y = 5$ and $x - y = -1$. But $4^{y} = 2^{2y}$ and $9^{y} = 3^{2y}$.',
-        'This writes $4^{y}$ as $2^{y+2}$ (adding instead of multiplying the indices), giving $x + y = 3$ and $x - y = 1$. The correct rule is $(2^{2})^{y} = 2^{2y}$.',
-      ],
-      keyIdea: 'Rewrite each side as a power of one base; equal powers of the same base have equal indices.',
-    },
-    check: {
-      optionValues: ['3,1', '2,1.5', '2,3', '2,1'],
-      compute: () => {
-        for (let x = -6; x <= 6; x += 0.5)
-          for (let y = -6; y <= 6; y += 0.5)
-            if (Math.abs(2 ** x * 4 ** y - 32) < 1e-9 && Math.abs(3 ** x / 9 ** y - 1 / 3) < 1e-9) return `${x},${y}`;
-        return 'none';
-      },
-    },
-  },
-  {
-    id: 'indices-surds-019',
-    subtopic: 'indices-surds',
-    difficulty: 'challenge',
-    stem: 'Given $x > 0$ and $y > 0$, simplify $\\left(\\frac{8x^{6}}{27y^{-3}}\\right)^{-\\frac{2}{3}}$.',
-    options: ['$\\frac{4x^{4}y^{2}}{9}$', '$\\frac{9y^{2}}{4x^{4}}$', '$\\frac{9}{4x^{4}y^{2}}$', '$\\frac{3}{2x^{2}y}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Work from the inside out: first tidy up the $y^{-3}$ on the bottom, then deal with the three parts of the index (minus sign, root, power).\n\n' +
-        '1. Tidy the inside first: $\\frac{1}{y^{-3}} = y^{3}$, so $\\frac{8x^{6}}{27y^{-3}} = \\frac{8x^{6}y^{3}}{27}$.\n' +
-        '2. The minus sign in the index flips the fraction: $\\left(\\frac{8x^{6}y^{3}}{27}\\right)^{-\\frac{2}{3}} = \\left(\\frac{27}{8x^{6}y^{3}}\\right)^{\\frac{2}{3}}$.\n' +
-        '3. Cube root of each part: $\\sqrt[3]{27} = 3$, $\\sqrt[3]{8} = 2$, $(x^{6})^{\\frac{1}{3}} = x^{2}$, $(y^{3})^{\\frac{1}{3}} = y$. This gives $\\frac{3}{2x^{2}y}$.\n' +
-        '4. Square: $\\left(\\frac{3}{2x^{2}y}\\right)^{2} = \\frac{9}{4x^{4}y^{2}}$.\n\n' +
-        'Check with $x = 2$, $y = 3$: inside is $\\frac{8 \\times 64}{27 \\times \\frac{1}{27}} = 512$, and $512^{-\\frac{2}{3}} = \\frac{1}{64}$; also $\\frac{9}{4 \\times 16 \\times 9} = \\frac{1}{64}$.',
-      whyWrong: [
-        'This ignores the minus sign in the index, so the fraction is never flipped.',
-        'This moves $y^{-3}$ from the bottom to the top without changing the sign of its index. In fact $\\frac{1}{y^{-3}} = y^{3}$, so after the flip $y$ belongs on the bottom.',
-        null,
-        'This takes the cube root but forgets to square, which is the power $-\\frac{1}{3}$ instead of $-\\frac{2}{3}$.',
-      ],
-      keyIdea: 'Handle a fractional negative index in order: flip, take the root, then the power, applying it to every factor.',
-    },
-    check: {
-      // evaluate every option at x = 2, y = 3
-      optionValues: [(4 * 16 * 9) / 9, (9 * 9) / (4 * 16), 9 / (4 * 16 * 9), 3 / (2 * 4 * 3)],
-      compute: () => {
-        const x = 2;
-        const y = 3;
-        return ((8 * x ** 6) / (27 * y ** -3)) ** (-2 / 3);
-      },
     },
   },
 ];

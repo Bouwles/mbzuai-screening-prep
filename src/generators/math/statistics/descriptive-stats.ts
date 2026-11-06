@@ -185,7 +185,7 @@ const iqrFence: Generator = {
     const half = (n - 1) / 2;
     const qPos = (n + 1) / 4; // 1-indexed position of Q1 (an integer for n = 7, 11)
     const ask = rng.bool() ? 'iqr' : 'fence';
-    const methodNote = 'Find the quartiles as the medians of the lower and upper halves (the median itself is not in either half).';
+    const methodNote = 'Take the quartiles as the medians of the lower and upper halves, leaving out the median.';
     const lower = sorted.slice(0, half);
     const upper = sorted.slice(half + 1);
     const steps =
@@ -206,7 +206,7 @@ const iqrFence: Generator = {
       const distractors = pickDistractors(iqr, pool);
       const answer = m(num(iqr));
       return {
-        stem: `Find the **interquartile range** of these ${n} values. ${methodNote}\n\n${raw.join(', ')}`,
+        stem: `Find the **interquartile range** of these ${n} values. ${methodNote}\n\n${m(raw.join(', '))}`,
         answer,
         answerValue: iqr,
         distractors,
@@ -228,8 +228,8 @@ const iqrFence: Generator = {
     const answer = m(num(fence));
     return {
       stem:
-        `For the data below, a value is an outlier if it is more than ${m('1.5 \\times \\text{IQR}')} above the upper quartile. ` +
-        `Above what value would a data point count as an outlier? ${methodNote}\n\n${raw.join(', ')}`,
+        `An outlier is more than ${m('1.5 \\times \\text{IQR}')} above the upper quartile. ` +
+        `Above what value is a data point an outlier? ${methodNote}\n\n${m(raw.join(', '))}`,
       answer,
       answerValue: fence,
       distractors,

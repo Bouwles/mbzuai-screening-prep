@@ -337,7 +337,7 @@ export const questions: StaticQuestion[] = [
     id: 'function-families-010',
     subtopic: 'function-families',
     difficulty: 'exam',
-    stem: 'A car is bought for AED 80,000. Its value falls by 15% each year (so each year it is worth 15% less than the year before). What is the car worth after 3 years?',
+    stem: 'A car worth AED 80,000 loses 15% of its value each year. What is it worth after 3 years?',
     options: ['AED 49,130', 'AED 44,000', 'AED 270', 'AED 121,670'],
     correctIndex: 0,
     markScheme: {
@@ -557,7 +557,6 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ---------------------------------------------------------------- challenge
   {
     id: 'function-families-016',
     subtopic: 'function-families',
@@ -595,7 +594,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'function-families-017',
     subtopic: 'function-families',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The graph of $y = a \\cdot b^x$ (with $b > 0$) passes through $(1, 6)$ and $(3, 54)$. What is the value of $y$ when $x = 4$?',
     options: ['$486$', '$4374$', '$78$', '$162$'],
     correctIndex: 3,
@@ -659,7 +658,7 @@ export const questions: StaticQuestion[] = [
     id: 'function-families-019',
     subtopic: 'function-families',
     difficulty: 'exam',
-    stem: 'The graph shows a function of the form $y = a \\cdot b^x + c$, plotted for $x$ from $0$ to $6$. As $x$ increases, the values level off towards a horizontal asymptote. Which equation matches the graph?',
+    stem: 'The graph shows a function of the form $y = a \\cdot b^x + c$ for $x$ from $0$ to $6$, levelling off towards a horizontal asymptote. Which equation matches the graph?',
     chart: {
       kind: 'line',
       title: 'Exponential decay towards an asymptote',
@@ -702,38 +701,91 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'function-families-020',
+    id: 'function-families-021',
     subtopic: 'function-families',
-    difficulty: 'challenge',
-    stem: 'The points $A(1, 2)$ and $B(5, 10)$ are joined by a line segment. The line that is perpendicular to $AB$ and passes through the midpoint of $AB$ is drawn. Where does this line cross the $x$-axis?',
-    options: ['$x = 0$', '$x = 6$', '$x = 5$', '$x = 15$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'Two perpendicular lines, neither of them vertical, have slopes $m_1$ and $m_2$. What is $m_1 m_2$?',
+    options: ['$-1$', '$1$', '$0$', '$m_1^2$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'You need a point and a gradient: the line goes through the **midpoint** of $AB$ and its gradient is the **negative reciprocal** of the gradient of $AB$.\n\n' +
-        '1. **Midpoint** of $AB$: $\\left(\\frac{1 + 5}{2}, \\frac{2 + 10}{2}\\right) = (3, 6)$.\n' +
-        '2. **Gradient** of $AB$: $\\frac{10 - 2}{5 - 1} = \\frac{8}{4} = 2$.\n' +
-        '3. **Perpendicular gradient**: negative reciprocal of 2, which is $-\\frac{1}{2}$.\n' +
-        '4. **Equation** through $(3, 6)$: $y - 6 = -\\frac{1}{2}(x - 3)$, so $y = -\\frac{1}{2}x + \\frac{3}{2} + 6 = -\\frac{1}{2}x + \\frac{15}{2}$.\n' +
-        '5. **$x$-axis**: set $y = 0$: $\\frac{1}{2}x = \\frac{15}{2}$, so $x = 15$.\n\n' +
-        'The line crosses the $x$-axis at $x = 15$.',
+        'The slope (gradient) of a line perpendicular to one with slope $m$ is the **negative reciprocal**, $-\\frac{1}{m}$.\n\n' +
+        'So $m_2 = -\\frac{1}{m_1}$, and $m_1 m_2 = m_1 \\times \\left(-\\frac{1}{m_1}\\right) = -1$.\n\n' +
+        'For example, slopes $3$ and $-\\frac{1}{3}$ give a product of $-1$.',
       whyWrong: [
-        'This uses the gradient of $AB$ itself (2) through the midpoint, giving $y = 2x$, which is just the line $AB$ again. The new line must be perpendicular.',
-        'This uses gradient $-2$: the sign was changed but the gradient was not flipped, giving $y = -2x + 12$.',
-        'This uses the correct gradient $-\\frac{1}{2}$ but through point $A(1, 2)$ instead of the midpoint, giving $y = -\\frac{1}{2}x + \\frac{5}{2}$.',
         null,
+        'This takes the reciprocal but forgets the minus sign. One slope must be positive and the other negative.',
+        'A product of $0$ needs one slope to be $0$. That is only one special case, and its perpendicular partner would be vertical.',
+        'This is what **parallel** lines give: they have equal slopes, so $m_1 m_2 = m_1^2$.',
       ],
-      keyIdea: 'A perpendicular bisector goes through the midpoint and has the negative reciprocal gradient.',
+      keyIdea: 'Perpendicular slopes multiply to $-1$; parallel slopes are equal.',
     },
     check: {
-      optionValues: [0, 6, 5, 15],
+      optionValues: [-1, 1, 0, null],
       compute: () => {
-        const [x1, y1, x2, y2] = [1, 2, 5, 10];
-        const [mx, my] = [(x1 + x2) / 2, (y1 + y2) / 2];
-        const m = -1 / ((y2 - y1) / (x2 - x1));
-        // y - my = m(x - mx); y = 0  ->  x = mx - my / m
-        return mx - my / m;
+        const m1 = 3;
+        // the direction (-m1, 1) is at right angles to the direction (1, m1)
+        const m2 = 1 / -m1;
+        return m1 * m2;
       },
     },
   },
-];
+  {
+    id: 'function-families-022',
+    subtopic: 'function-families',
+    difficulty: 'foundation',
+    stem: 'The parabola $y = ax^2 + bx + c$ opens downwards exactly when:',
+    options: ['$a < 0$', '$a > 0$', '$b < 0$', '$c < 0$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'For large $x$ the $ax^2$ term dominates, so its sign decides the shape.\n\n' +
+        'If $a < 0$, the values fall away on both sides and the parabola opens downwards, with a maximum point. If $a > 0$, it opens upwards, with a minimum point.',
+      whyWrong: [
+        null,
+        'This is the condition for opening **upwards**, as $y = x^2$ does.',
+        '$b$ moves the axis of symmetry sideways, but it does not change which way the parabola opens.',
+        '$c$ is the $y$-intercept. It moves the graph up or down, but it does not change which way it opens.',
+      ],
+      keyIdea: 'The sign of $a$ decides the shape: $a > 0$ opens up, $a < 0$ opens down.',
+    },
+  },
+  {
+    id: 'function-families-023',
+    subtopic: 'function-families',
+    difficulty: 'foundation',
+    stem: 'What is the slope (gradient) of a horizontal line?',
+    options: ['$0$', '$1$', 'Undefined', '$-1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Slope is the change in $y$ divided by the change in $x$.\n\n' +
+        'Along a horizontal line $y$ never changes, so the top of the fraction is $0$ and the slope is $0$. Its equation has the form $y = c$.',
+      whyWrong: [
+        null,
+        'A slope of $1$ means the line rises $1$ unit for every $1$ unit across, as $y = x$ does.',
+        'Undefined slope belongs to a **vertical** line, where the change in $x$ is $0$.',
+        'A slope of $-1$ means the line falls $1$ unit for every $1$ unit across, as $y = -x$ does.',
+      ],
+      keyIdea: 'Horizontal lines have slope $0$; a vertical line has no defined slope.',
+    },
+  },
+  {
+    id: 'function-families-024',
+    subtopic: 'function-families',
+    difficulty: 'foundation',
+    stem: 'Which of these functions has a **vertical** asymptote?',
+    options: ['$y = \\ln x$', '$y = e^x$', '$y = x^2$', '$y = 2x + 1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'As $x$ gets close to $0$ from the right, $\\ln x$ falls without limit, so the graph runs down alongside the line $x = 0$. That line is a vertical asymptote.',
+      whyWrong: [
+        null,
+        '$y = e^x$ has a **horizontal** asymptote, $y = 0$, and no vertical one: it is defined for every $x$.',
+        'A parabola is defined for every $x$ and has no asymptotes.',
+        'A straight line is defined for every $x$ and has no asymptotes.',
+      ],
+      keyIdea: 'Log graphs have a vertical asymptote; exponential graphs have a horizontal one.',
+    },
+  },];

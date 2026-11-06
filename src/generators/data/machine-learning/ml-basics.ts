@@ -119,7 +119,7 @@ function taskSolution(t: Task): string {
 
 // ---------------------------------------------------------------- approval-rate gap (fairness)
 interface GapCtx {
-  intro: string;
+  model: string; // "a loan-approval model"
   decided: string; // column header, e.g. "Approved by the model"
   verbed: string; // "approved"
   rateWord: string; // "approval rate"
@@ -128,7 +128,7 @@ interface GapCtx {
 
 const GAP_CTX: GapCtx[] = [
   {
-    intro: 'A bank tests a loan-approval model on applicants from two groups.',
+    model: 'a loan-approval model',
     decided: 'Approved by the model',
     verbed: 'approved',
     rateWord: 'approval rate',
@@ -139,7 +139,7 @@ const GAP_CTX: GapCtx[] = [
     ],
   },
   {
-    intro: 'A company uses a model to shortlist job applicants for interview. It checks the results for two groups of applicants.',
+    model: 'a job-shortlisting model',
     decided: 'Shortlisted by the model',
     verbed: 'shortlisted',
     rateWord: 'shortlisting rate',
@@ -150,7 +150,7 @@ const GAP_CTX: GapCtx[] = [
     ],
   },
   {
-    intro: 'A scholarship fund uses a model to decide which applications to accept. It checks the results for two groups of students.',
+    model: 'a scholarship model',
     decided: 'Accepted by the model',
     verbed: 'accepted',
     rateWord: 'acceptance rate',
@@ -192,11 +192,7 @@ export const generators: Generator[] = [
     title: 'Identify the type of machine learning task',
     generate(rng) {
       const t = rng.pick(TASKS);
-      const frame = rng.int(0, 1);
-      const stem =
-        frame === 0
-          ? `A team wants to build a system to ${t.desc}. Which description of this machine learning task is correct?`
-          : `An AI system is being designed to ${t.desc}. What type of machine learning problem is this?`;
+      const stem = `A system is being built to ${t.desc}. What type of machine learning task is this?`;
       const others = (['reg', 'cls', 'clu', 'rl'] as TaskType[]).filter((x) => x !== t.type);
       return {
         stem,
@@ -268,7 +264,7 @@ export const generators: Generator[] = [
 
         const fracLine = (a: number, n: number, r: number) => m(`\\frac{${a}}{${n}} = ${r / 100} = ${r}\\%`);
         return {
-          stem: `${ctx.intro} The results are shown in the table. A fairness check compares the **${ctx.rateWord}s** of the two groups. By how many percentage points do the two groups' ${ctx.rateWord}s differ?`,
+          stem: `The table shows how ${ctx.model} treated two groups of applicants. By how many percentage points do the two groups' **${ctx.rateWord}s** differ?`,
           table: {
             headers: ['Group', 'Applicants', ctx.decided],
             rows: [
@@ -304,10 +300,7 @@ export const generators: Generator[] = [
       const c = colour ? 3 : 1;
       const pixels = W * H;
       const answer = pixels * c;
-      const kind = colour
-        ? '**colour** images, where every pixel is stored as three values (red, green and blue)'
-        : '**grayscale** images, where every pixel is stored as one brightness value';
-      const object = rng.pick(['a road sign', 'an animal', 'a piece of fruit', 'a handwritten letter', 'a type of leaf', 'a clothing item']);
+      const kind = colour ? '**colour** images (three values per pixel: red, green, blue)' : '**grayscale** images (one brightness value per pixel)';
 
       const pool: NumCand[] = [
         {
@@ -338,7 +331,7 @@ export const generators: Generator[] = [
         ? `${m(`${W} \\times ${H} = ${pixels}`)} pixels, and each pixel has 3 values, so ${m(`${pixels} \\times 3 = ${answer}`)} features.`
         : `${m(`${W} \\times ${H} = ${pixels}`)} pixels, and each pixel has 1 value, so there are ${m(String(answer))} features.`;
       return {
-        stem: `A model is trained to recognise ${object} in small ${kind}. Each image is ${W} pixels wide and ${H} pixels tall, and comes with a label saying what it shows. Every stored pixel value is one input feature. How many **input features** does each image give the model?`,
+        stem: `A model reads labelled ${W} by ${H} pixel ${kind}. Every stored pixel value is one input feature. How many **input features** does each image give the model?`,
         answer: m(String(answer)),
         answerValue: answer,
         distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),

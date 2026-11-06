@@ -299,4 +299,65 @@ export const generators: Generator[] = [
       }
     },
   },
+
+  // ============================================================ 4. slope of a line from ax + by = c
+  {
+    id: 'gen-slope-standard-form',
+    subtopic: 'linear-equations',
+    difficulty: 'exam',
+    title: 'Find the slope of a line from ax + by = c',
+    generate(rng) {
+      for (;;) {
+        const b = rng.pick([1, 2, 3, 4, 5, 6, 8, -1, -2, -3, -4, -5, -6]);
+        // a whole-number slope about half the time, otherwise usually a simple fraction
+        const a = rng.bool(0.5) ? b * rng.intNonZero(-4, 4) : rng.intNonZero(-9, 9);
+        const c = rng.intNonZero(-12, 12);
+        if (Math.abs(a) > 12 || (a < 0 && b < 0)) continue;
+        const slope = new Frac(-a, b);
+        if (slope.d > 5) continue;
+        const intercept = new Frac(c, b);
+        const answer = m(slope.tex());
+
+        const cand = (f: Frac, why: string): Cand => ({ key: f.toString(), text: m(f.tex()), why, value: f.value() });
+        const ds = pickThree(slope.toString(), answer, [
+          cand(
+            new Frac(a, b),
+            `This loses the minus sign. Moving ${m(term(a, 'x', true))} across the equals sign changes its sign, so the slope is ${m('-\\frac{a}{b}')}, not ${m('\\frac{a}{b}')}.`,
+          ),
+          ...rng.shuffle([
+            cand(new Frac(-b, a), `This puts the fraction upside down. After rearranging you divide by the coefficient of ${m('y')}, which is ${m(num(b))}.`),
+            cand(new Frac(b, a), `This puts the fraction upside down and also loses the minus sign. The slope is ${m('-\\frac{a}{b}')}.`),
+            cand(intercept, `This is ${m('\\frac{c}{b}')}, the ${m('y')}-intercept, not the slope. The slope is the number multiplying ${m('x')}.`),
+            cand(
+              new Frac(0),
+              a + b === 0
+                ? `This adds the coefficients of ${m('x')} and ${m('y')}. The slope is a ratio of the coefficients, not their sum.`
+                : `A slope of 0 means a horizontal line, which has no ${m('x')} term. This line has one, so its slope is not 0.`,
+            ),
+          ]),
+        ]);
+        if (ds.length < 3) continue;
+
+        const rearranged = `${term(b, 'y', true)} = ${sum([[-a, 'x'], [c, '']])}`;
+        const steps = [
+          `${a > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(a), 'x', true))} ${a > 0 ? 'from' : 'to'} both sides: ${m(rearranged)}.`,
+          ...(b === 1 ? [] : [`Divide every term by ${m(num(b))}: ${m(`y = ${sum([[slope, 'x'], [intercept, '']])}`)}.`]),
+        ];
+        const solution =
+          `Rearrange into the form ${m('y = mx + c')}, where ${m('m')} is the slope (also called the gradient).\n\n` +
+          steps.map((s, i) => `${i + 1}. ${s}`).join('\n') +
+          `\n\nThe number multiplying ${m('x')} is the slope.\n\n` +
+          `Shortcut: for ${m('ax + by = c')} the slope is ${m('-\\frac{a}{b}')}${b === 1 ? '' : `, which here is ${m(`-\\frac{${a}}{${b}}`)}`}.\n\n` +
+          `Answer: ${answer}`;
+        return {
+          stem: `Find the ${rng.pick(['slope', 'slope', 'gradient'])} of the line ${m(`${sum([[a, 'x'], [b, 'y']])} = ${num(c)}`)}.`,
+          answer,
+          answerValue: slope.value(),
+          distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          solution,
+          keyIdea: 'The slope of $ax + by = c$ is $-\\frac{a}{b}$: rearrange to $y = mx + c$ and read off the number multiplying $x$.',
+        };
+      }
+    },
+  },
 ];

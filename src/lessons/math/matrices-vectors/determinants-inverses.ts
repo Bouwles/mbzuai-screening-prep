@@ -14,7 +14,7 @@ export const lesson: Lesson = {
     { cue: 'Determinant of a $3 \\times 3$ matrix', method: 'Expand along the first row with signs $+, -, +$: each entry times the $2 \\times 2$ determinant left when you cover its row and column. A triangular matrix: just multiply the diagonal.' },
     { cue: '"**Singular**" or "**not invertible**" with an unknown $k$', method: 'Write the determinant in terms of $k$ and set it equal to $0$. It may be a quadratic in $k$ with two answers.' },
     { cue: '$\\det(2A)$, $\\det(AB)$, $\\det(A^{-1})$ or $\\det(A^{T})$ when only $\\det A$ is given', method: 'Use the rules, never multiply matrices out: $\\det(kA) = k^{n}\\det A$ for an $n \\times n$ matrix, $\\det(AB) = \\det A \\det B$, $\\det(A^{-1}) = \\frac{1}{\\det A}$, $\\det(A^{T}) = \\det A$.' },
-    { cue: 'Solve $AX = B$ or $XA = B$', method: '$AX = B$ gives $X = A^{-1}B$ (inverse on the left); $XA = B$ gives $X = BA^{-1}$ (inverse on the right).' },
+    { cue: 'Solve $AX = B$', method: '$AX = B$ gives $X = A^{-1}B$, with the inverse on the left.' },
     { cue: '"**No solution**" / "how many solutions" for a system with a parameter', method: '$\\det \\ne 0$ means exactly one solution. $\\det = 0$ means none or infinitely many: substitute that value and compare the equations (a contradiction means none, a multiple means infinitely many).' },
   ],
   know: L(
@@ -71,7 +71,6 @@ export const lesson: Lesson = {
     t`- $\det(AB) = \det(A)\det(B)$ (but $\det(A + B)$ has **no** simple rule)`,
     t`- $\det(kA) = k^{n}\det(A)$, because each of the $n$ rows is multiplied by $k$`,
     t`- $\det\left(A^{-1}\right) = \frac{1}{\det(A)}$ and $\det\left(A^{T}\right) = \det(A)$`,
-    t`- Multiplying **one** row by $k$ multiplies the determinant by $k$; adding a multiple of one row to another changes nothing; swapping two rows changes the sign.`,
     '',
     t`### Solving linear systems: $AX = B$`,
     '',
@@ -79,7 +78,7 @@ export const lesson: Lesson = {
     '',
     t`$$X = A^{-1}B$$`,
     '',
-    t`Order matters because matrix multiplication is not commutative: $XA = B$ gives $X = BA^{-1}$ instead.`,
+    t`Order matters because matrix multiplication is not commutative, so the inverse must go on the left.`,
     '',
     '### How many solutions?',
     '',
@@ -104,7 +103,7 @@ export const lesson: Lesson = {
     { label: 'Scalar multiple (n by n matrix)', tex: t`\det(kA) = k^{n}\det(A)` },
     { label: 'Inverse and transpose', tex: t`\det\left(A^{-1}\right) = \frac{1}{\det(A)}, \qquad \det\left(A^{T}\right) = \det(A)` },
     { label: 'Inverse of a product', tex: t`(AB)^{-1} = B^{-1}A^{-1}`, note: 'The order reverses.' },
-    { label: 'Solving a linear system', tex: t`AX = B \;\Rightarrow\; X = A^{-1}B, \qquad XA = B \;\Rightarrow\; X = BA^{-1}` },
+    { label: 'Solving a linear system', tex: t`AX = B \;\Rightarrow\; X = A^{-1}B` },
     { label: 'Number of solutions', tex: t`\det(A) \ne 0 \Rightarrow \text{exactly one}; \qquad \det(A) = 0 \Rightarrow \text{none or infinitely many}` },
   ],
   examples: [
@@ -133,14 +132,12 @@ export const lesson: Lesson = {
     },
     {
       title: 'Using the determinant rules',
-      problem: t`$A$ and $B$ are $3 \times 3$ matrices with $\det(A) = 3$ and $\det(B) = -6$. Find $\det\left(2A^{T}B^{-1}\right)$.`,
+      problem: t`$A$ and $B$ are $3 \times 3$ matrices with $\det(A) = 3$ and $\det(B) = -2$. Find $\det(2A)$ and $\det(AB)$.`,
       steps: [
-        t`The scalar $2$ multiplies all three rows, giving a factor $2^{3} = 8$.`,
-        t`Transposing does not change the determinant: $\det\left(A^{T}\right) = 3$.`,
-        t`The inverse gives the reciprocal: $\det\left(B^{-1}\right) = -\frac{1}{6}$.`,
-        t`Multiply everything: $8 \times 3 \times \left(-\frac{1}{6}\right) = -4$.`,
+        t`The scalar $2$ multiplies all three rows, giving a factor $2^{3} = 8$, so $\det(2A) = 8 \times 3 = 24$.`,
+        t`The determinant of a product is the product of the determinants: $\det(AB) = 3 \times \left(-2\right) = -6$.`,
       ],
-      answer: t`$-4$`,
+      answer: t`$\det(2A) = 24$ and $\det(AB) = -6$`,
     },
     {
       title: 'A system with a parameter',
@@ -163,7 +160,7 @@ export const lesson: Lesson = {
     t`**Putting the inverse on the wrong side.** $AX = B$ gives $X = A^{-1}B$, not $BA^{-1}$. Matrix multiplication does not commute.`,
   ],
   examTip: L(
-    t`Expect questions like "find $\det(A)$", "find $A^{-1}$", "for which $k$ is $A$ singular?", "find $\det(2A^{-1}B)$" or "how many solutions does this system have?". Fast moves:`,
+    t`Expect questions like "find $\det(A)$", "find $A^{-1}$", "for which $k$ is $A$ singular?", "find $\det(2A)$" or "how many solutions does this system have?". Fast moves:`,
     '',
     t`- **Inverse options:** multiply one option by $A$ in your head (just the top-left entry is often enough to rule it out). The right one gives $I$.`,
     t`- **"Find $k$ so it is singular":** plug each option into $\det$ and see which gives $0$. That is often faster than solving.`,

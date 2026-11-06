@@ -128,7 +128,6 @@ export function BankBrowser() {
           <option value="">All difficulties</option>
           <option value="foundation">Foundation</option>
           <option value="exam">Exam</option>
-          <option value="challenge">Challenge</option>
         </select>
         <select
           value={status}

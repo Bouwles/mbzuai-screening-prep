@@ -1,608 +1,647 @@
 import type { StaticQuestion } from '../../../types';
 
+/** Join source lines into one code string. */
+const L = (...lines: string[]) => lines.join('\n');
+
+const INDEXED = 'Arrays are indexed from 1.';
+const PRINTS = `${INDEXED} What does this pseudocode print?`;
+
+/** How the interpreter prints an array, used to compare checks with the options. */
+const show = (a: number[]) => `[${a.join(', ')}]`;
+
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------------ foundation
-  {
-    id: 'lists-tuples-001',
-    subtopic: 'lists-tuples',
-    difficulty: 'foundation',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'a = [10, 20, 30, 40, 50]\nprint(a[1], a[-1])' },
-    options: ['`10 50`', '`20 40`', '`20 50`', '`10 40`'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Python counts list positions (indices) from **0**, and negative indices count back from the end, with `-1` meaning the last item.\n\n' +
-        '| Value | 10 | 20 | 30 | 40 | 50 |\n| --- | --- | --- | --- | --- | --- |\n| Index | 0 | 1 | 2 | 3 | 4 |\n| Negative index | -5 | -4 | -3 | -2 | -1 |\n\n' +
-        '1. `a[1]` is the item at index 1, which is the **second** item: 20.\n' +
-        '2. `a[-1]` is the last item: 50.\n\n' +
-        '`print` separates its two arguments with a space, so the output is `20 50`.',
-      whyWrong: [
-        'This counts from 1 instead of 0, so it treats `a[1]` as the first item (10). In Python the first item is `a[0]`.',
-        'This treats `a[-1]` as one step back from the last item. In fact `a[-1]` is the last item itself (50); the second-to-last item is `a[-2]`.',
-        null,
-        'This makes both mistakes: it counts from 1 (giving 10) and treats `-1` as the second-to-last item (giving 40).',
-      ],
-      keyIdea: 'Indices start at 0, and index `-1` is the last item of the list.',
-    },
-    check: {
-      optionValues: ['10 50', '20 40', '20 50', '10 40'],
-      compute: () => {
-        const a = [10, 20, 30, 40, 50];
-        return `${a[1]} ${a[a.length - 1]}`;
-      },
-    },
-    python: { stdout: '20 50\n' },
-  },
-  {
-    id: 'lists-tuples-002',
-    subtopic: 'lists-tuples',
-    difficulty: 'foundation',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'nums = [3, 6, 9, 12, 15, 18]\nprint(nums[1:4])' },
-    options: ['`[6, 9, 12]`', '`[6, 9, 12, 15]`', '`[3, 6, 9, 12]`', '`[3, 6, 9]`'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'A slice `nums[start:stop]` starts at index `start` and goes **up to but not including** index `stop`.\n\n' +
-        '| Value | 3 | 6 | 9 | 12 | 15 | 18 |\n| --- | --- | --- | --- | --- | --- | --- |\n| Index | 0 | 1 | 2 | 3 | 4 | 5 |\n\n' +
-        '1. `nums[1:4]` takes indices 1, 2 and 3 (index 4 is excluded).\n' +
-        '2. Those items are 6, 9 and 12.\n' +
-        '3. A slice of a list is a new list, so it prints with square brackets: `[6, 9, 12]`.\n\n' +
-        'Quick check: the slice has $4 - 1 = 3$ items.',
-      whyWrong: [
-        null,
-        'This includes the item at the stop index 4 (which is 15). The stop index is always excluded, so the slice has $4 - 1 = 3$ items, not 4.',
-        'This counts positions from 1 and includes the stop, so it takes the 1st to the 4th items. Python indices start at 0 and the stop is excluded.',
-        'This counts positions from 1 (taking the 1st, 2nd and 3rd items). Index 1 is the second item, 6, so the slice starts at 6, not 3.',
-      ],
-      keyIdea: '`nums[a:b]` contains the items at indices $a, a + 1, \\ldots, b - 1$, so it has $b - a$ items.',
-    },
-    python: { stdout: '[6, 9, 12]\n' },
-  },
-  {
-    id: 'lists-tuples-003',
-    subtopic: 'lists-tuples',
-    difficulty: 'foundation',
-    stem: 'What happens when this Python code is run?',
-    code: { lang: 'python', source: 't = (1, 2, 3)\nt[0] = 9\nprint(t)' },
-    options: ['It prints `(9, 2, 3)`', 'It prints `(1, 2, 3)`', 'It prints `[9, 2, 3]`', 'An error is raised (a `TypeError`)'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'First ask: what kind of object is `t`, and can that kind of object be changed after it is created?\n\n' +
-        '1. `t = (1, 2, 3)` creates a **tuple** (round brackets).\n' +
-        '2. Tuples are **immutable**: once created, their items cannot be replaced, added or removed.\n' +
-        '3. So the line `t[0] = 9` fails with `TypeError: \'tuple\' object does not support item assignment`.\n' +
-        '4. The program stops at that line, so `print(t)` never runs.\n\n' +
-        'If you need a changed version, build a new tuple, for example `t = (9,) + t[1:]`, or use a list instead.',
-      whyWrong: [
-        'This treats the tuple like a list. Lists can be changed with `a[0] = 9`, but tuples are immutable, so the assignment raises an error instead.',
-        'This assumes Python silently ignores the assignment. Python never ignores it: trying to change a tuple item raises a `TypeError` and the program stops.',
-        'This assumes Python converts the tuple into a list so it can be changed. Python never changes the type automatically; it raises a `TypeError`.',
-        null,
-      ],
-      keyIdea: 'Tuples are immutable: assigning to `t[i]` raises a `TypeError`.',
-    },
-    python: { error: 'TypeError' },
-  },
-  {
-    id: 'lists-tuples-004',
-    subtopic: 'lists-tuples',
-    difficulty: 'foundation',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'a = [1, 2]\na.append([3, 4])\nprint(a, len(a))' },
-    options: ['`[1, 2, 3, 4] 4`', '`[1, 2, [3, 4]] 3`', '`[1, 2, [3, 4]] 4`', 'An error is raised, because `append` only accepts a single number'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The key question is how many items `append` adds when its argument is itself a list.\n\n' +
-        '1. `a.append(x)` adds **one** item, `x`, to the end of the list, whatever `x` is.\n' +
-        '2. Here `x` is the list `[3, 4]`, so the whole list is added as a single item: `a` becomes `[1, 2, [3, 4]]`.\n' +
-        '3. `len(a)` counts the top-level items: `1`, `2` and `[3, 4]`, which is 3 items.\n\n' +
-        'Output: `[1, 2, [3, 4]] 3`.\n\n' +
-        '(If the code had used `a.extend([3, 4])`, each item would be added separately, giving `[1, 2, 3, 4]` with length 4.)',
-      whyWrong: [
-        'This is what `extend` does. `append` adds its argument as one single item, so the list `[3, 4]` goes in as a nested list.',
-        null,
-        'The list is right, but `len` only counts the top-level items. The nested list `[3, 4]` counts as one item, so the length is 3.',
-        'This assumes `append` only takes numbers. A list can hold any objects, including other lists, so `append([3, 4])` works fine.',
-      ],
-      keyIdea: '`append` adds its argument as ONE item (even a list); `extend` adds each item of an iterable separately.',
-    },
-    python: { stdout: '[1, 2, [3, 4]] 3\n' },
-  },
   {
     id: 'lists-tuples-005',
     subtopic: 'lists-tuples',
     difficulty: 'foundation',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'grid = [[1, 2, 3],\n        [4, 5, 6],\n        [7, 8, 9]]\nprint(grid[1][2])' },
-    options: ['`8`', '`2`', '`5`', '`6`'],
+    stem: `${INDEXED} \`G[r][c]\` is row \`r\`, column \`c\`. What does this pseudocode print?`,
+    code: { lang: 'pseudocode', source: L('G = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]', 'print(G[2][3])') },
+    options: ['8', '3', '5', '6'],
     correctIndex: 3,
     markScheme: {
       solution:
-        '`grid` is a list of three lists (the rows). `grid[1][2]` is read left to right:\n\n' +
-        '1. `grid[1]` picks the row at index 1, which is the **second** row: `[4, 5, 6]`.\n' +
-        '2. `[2]` then picks the item at index 2 of that row, which is the **third** item: 6.\n\n' +
-        'So the first index chooses the row and the second index chooses the column. Output: `6`.',
+        '`G` is an array of three rows. `G[2][3]` is read left to right:\n\n' +
+        '1. `G[2]` is the second row: `[4, 5, 6]`.\n' +
+        '2. `[3]` then picks the third item of that row: 6.\n\n' +
+        'Output: 6.',
       whyWrong: [
-        'This swaps rows and columns, reading `grid[2][1]` (row 2, column 1) instead. The first index chooses the row.',
-        'This counts from 1, reading "row 1, column 2" as the first row and second item. Python indices start at 0.',
-        'This counts the row from 0 correctly but the column from 1, landing on the second item of the row. Both indices start at 0, so index 2 is the third item.',
+        'This swaps rows and columns, reading row 3, column 2. The first index chooses the row.',
+        'This reads the first row instead of the second, as if the row index counted from 0.',
+        'This reads the second item of the row instead of the third, as if the column index counted from 0.',
         null,
       ],
-      keyIdea: 'For a nested list, `grid[r][c]` means: take row `r`, then item `c` of that row (both counted from 0).',
+      keyIdea: 'For a two-dimensional array, `G[r][c]` means row `r`, then item `c` of that row, both counted from 1.',
     },
     check: {
-      optionValues: [8, 2, 5, 6],
+      optionValues: [8, 3, 5, 6],
       compute: () => {
-        const grid = [
+        const G = [
           [1, 2, 3],
           [4, 5, 6],
           [7, 8, 9],
         ];
-        return grid[1][2];
+        return G[2 - 1][3 - 1];
       },
     },
-    python: { stdout: '6\n' },
+  },
+  {
+    id: 'lists-tuples-021',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: 'An array of length $n$ is indexed from 1. What is the index of its last element?',
+    options: ['$n$', '$n - 1$', '$n + 1$', '$1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'The indices run $1, 2, \\ldots, n$, so the last element is at index $n$.',
+      whyWrong: [
+        null,
+        'This is the last index when counting starts from 0. Here counting starts from 1.',
+        'Index $n + 1$ is one place past the end of the array.',
+        'Index 1 holds the first element, not the last.',
+      ],
+      keyIdea: 'In a 1-based array of length $n$, the indices run from 1 to $n$.',
+    },
+  },
+  {
+    id: 'lists-tuples-022',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: 'What does `length(A)` give for an array `A`?',
+    options: ['The number of elements', 'The largest element', 'The sum of the elements', 'The last element'],
+    correctIndex: 0,
+    markScheme: {
+      solution: '`length(A)` counts how many elements `A` holds. With indices starting from 1, this is also the index of the last element.',
+      whyWrong: [
+        null,
+        'Finding the largest element needs a loop that compares the values. `length` does not look at the values.',
+        'Adding the elements needs a loop with a running total. `length` only counts them.',
+        'The last element is the one stored at the last index. `length` gives that position, not the value there.',
+      ],
+      keyIdea: '`length(A)` is the number of elements, which is also the last index in a 1-based array.',
+    },
+  },
+  {
+    id: 'lists-tuples-023',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: 'Why does swapping two array elements need a temporary variable?',
+    options: ['To keep a value before it is overwritten', 'To make the array longer', 'To sort the array', 'To count the swaps'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'After `A[i] = A[j]`, the old value of `A[i]` is gone. Saving it first in a temporary variable lets you put it into `A[j]` afterwards:\n\n' +
+        '```pseudocode\nt = A[i]\nA[i] = A[j]\nA[j] = t\n```',
+      whyWrong: [
+        null,
+        'A swap never changes the length of the array. It only exchanges two values.',
+        'A single swap does not sort anything, though sorting algorithms use many swaps.',
+        'Counting needs a counter that goes up by 1. The temporary variable only holds a value for a moment.',
+      ],
+      keyIdea: 'An assignment overwrites, so save one value before swapping.',
+    },
+  },
+  {
+    id: 'lists-tuples-024',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: 'How long does reading `A[i]` take for an array of $n$ elements?',
+    options: ['$O(1)$', '$O(n)$', '$O(\\log n)$', '$O(n^2)$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'An array stores its elements side by side, so the position of `A[i]` can be calculated straight away. The time does not depend on $n$: it is constant, $O(1)$.',
+      whyWrong: [
+        null,
+        'This is the time to **search** an unsorted array. Reading a known index needs no search.',
+        'This is the time for binary search on a sorted array. Reading a known index needs no search.',
+        'Quadratic time comes from nested loops over the array. One read is a single step.',
+      ],
+      keyIdea: 'Reading an array element by index takes constant time.',
+    },
+  },
+  {
+    id: 'lists-tuples-025',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: 'A two-dimensional array has order $m \\times n$. How many elements does it hold?',
+    options: ['$mn$', '$m + n$', '$m^n$', '$2(m + n)$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'An array of **order** $m \\times n$ has $m$ rows and $n$ columns. Each of the $m$ rows holds $n$ elements, so there are $mn$ elements.',
+      whyWrong: [
+        null,
+        'This adds the number of rows and columns. Each row holds $n$ elements, so multiply.',
+        'This is a power. The number of elements is rows times columns.',
+        'This is the perimeter of an $m$ by $n$ rectangle, not the number of elements inside it.',
+      ],
+      keyIdea: 'An $m \\times n$ array holds $mn$ elements.',
+    },
+  },
+  {
+    id: 'lists-tuples-026',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [7, 2, 9, 4]', 'print(A[2] + A[4])') },
+    options: ['6', '13', '11', 'Error'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Counting from 1: `A[2]` is 2 and `A[4]` is 4.\n\n' +
+        '| Index | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Value | 7 | 2 | 9 | 4 |\n\n' +
+        'So $2 + 4 = 6$.',
+      whyWrong: [
+        null,
+        'This reads `A[2]` as the third element, 9, as if counting from 0, and then adds the last element, 4.',
+        'This adds `A[2]` and `A[3]`: $2 + 9$. The second index is 4, not 3.',
+        'Counting from 0 there would be no index 4. Here counting starts from 1, so `A[4]` is the last element.',
+      ],
+      keyIdea: 'In a 1-based array, `A[1]` is the first element and `A[length]` is the last.',
+    },
+    check: {
+      optionValues: [6, 13, 11, 'Error'],
+      compute: () => {
+        const A = [7, 2, 9, 4];
+        return A[2 - 1] + A[4 - 1];
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-027',
+    subtopic: 'lists-tuples',
+    difficulty: 'foundation',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [4, 7, 9]', 't = A[1]', 'A[1] = A[3]', 'A[3] = t', 'print(A)') },
+    options: ['`[9, 7, 4]`', '`[9, 7, 9]`', '`[4, 7, 4]`', '`[7, 4, 9]`'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '| Line | `A` | `t` |\n|---|---|---|\n' +
+        '| `t = A[1]` | `[4, 7, 9]` | 4 |\n' +
+        '| `A[1] = A[3]` | `[9, 7, 9]` | 4 |\n' +
+        '| `A[3] = t` | `[9, 7, 4]` | 4 |\n\n' +
+        'The first and last elements have swapped. Output: `[9, 7, 4]`.',
+      whyWrong: [
+        null,
+        'This stops before the last line. `A[3] = t` puts the saved 4 into position 3.',
+        'This copies `t` into position 3 but forgets that `A[1]` was changed to 9.',
+        'This swaps positions 1 and 2. The code uses indices 1 and 3.',
+      ],
+      keyIdea: 'A swap saves one value, overwrites it, then writes the saved value to the other position.',
+    },
+    check: {
+      optionValues: ['[9, 7, 4]', '[9, 7, 9]', '[4, 7, 4]', '[7, 4, 9]'],
+      compute: () => {
+        const A = [4, 7, 9];
+        const t = A[0];
+        A[0] = A[2];
+        A[2] = t;
+        return show(A);
+      },
+    },
   },
 
   // ------------------------------------------------------------------ exam
   {
-    id: 'lists-tuples-006',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'nums = [4, 1, 3]\nresult = nums.sort()\nprint(nums, result)' },
-    options: ['`[1, 3, 4] [1, 3, 4]`', '`[4, 1, 3] [1, 3, 4]`', '`[1, 3, 4] None`', '`[4, 1, 3] None`'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Two things to work out: what `sort()` does to `nums` itself, and what value it hands back to be stored in `result`.\n\n' +
-        '1. `nums.sort()` sorts the list **in place**: the list `nums` itself is changed to `[1, 3, 4]`.\n' +
-        '2. Methods that change a list in place (`sort`, `append`, `reverse`, ...) return `None`. So `result` is `None`.\n' +
-        '3. `print(nums, result)` shows `[1, 3, 4] None`.\n\n' +
-        'Compare: `sorted(nums)` would leave `nums` unchanged and **return** a new sorted list.',
-      whyWrong: [
-        'This assumes `sort()` also returns the sorted list. It sorts in place and returns `None`; only `sorted()` returns a list.',
-        'This mixes up `nums.sort()` with `sorted(nums)`. `sorted` returns a new list and leaves the original alone; `sort` changes the original and returns `None`.',
-        null,
-        'This assumes the sorted result is thrown away because it was not stored. `sort()` changes `nums` itself, so `nums` is now `[1, 3, 4]`.',
-      ],
-      keyIdea: '`nums.sort()` changes the list in place and returns `None`; `sorted(nums)` returns a new sorted list.',
-    },
-    python: { stdout: '[1, 3, 4] None\n' },
-  },
-  {
-    id: 'lists-tuples-007',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'a = [1, 2, 3]\nb = a\nc = a[:]\nb.append(4)\nc.append(5)\nprint(a, len(c))' },
-    options: ['`[1, 2, 3] 4`', '`[1, 2, 3, 4] 4`', '`[1, 2, 3, 4, 5] 5`', '`[1, 2, 3, 4] 5`'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The key question for each name is: does it point to the **same** list object, or to a **copy**?\n\n' +
-        '| Line | What happens | `a` | `c` |\n| --- | --- | --- | --- |\n' +
-        '| `a = [1, 2, 3]` | one list is created | `[1, 2, 3]` | |\n' +
-        '| `b = a` | `b` is another name for the **same** list (an alias) | `[1, 2, 3]` | |\n' +
-        '| `c = a[:]` | a full slice makes a **new** list (a copy) | `[1, 2, 3]` | `[1, 2, 3]` |\n' +
-        '| `b.append(4)` | changes the shared list, so `a` changes too | `[1, 2, 3, 4]` | `[1, 2, 3]` |\n' +
-        '| `c.append(5)` | changes only the copy | `[1, 2, 3, 4]` | `[1, 2, 3, 5]` |\n\n' +
-        'So `a` is `[1, 2, 3, 4]` and `len(c)` is 4. Output: `[1, 2, 3, 4] 4`.',
-      whyWrong: [
-        'This thinks `b = a` makes a copy. Assignment never copies a list: `b` and `a` are two names for one list, so appending through `b` changes `a`.',
-        null,
-        'This thinks `c = a[:]` is also an alias. A full slice `[:]` builds a brand-new list, so appending 5 to `c` does not affect `a`.',
-        'This thinks `c` also picks up the 4. `c` was copied **before** the 4 was appended, and it is a separate list, so it has 3 + 1 = 4 items.',
-      ],
-      keyIdea: '`b = a` creates an alias (the same list); `a[:]` creates a new copy.',
-    },
-    python: { stdout: '[1, 2, 3, 4] 4\n' },
-  },
-  {
     id: 'lists-tuples-008',
     subtopic: 'lists-tuples',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'a = [5, 3, 8, 3, 1]\na.remove(3)\na.insert(1, 7)\nx = a.pop()\nprint(a, x)' },
-    options: ['`[5, 7, 8] 1`', '`[5, 7, 3, 8] 1`', '`[7, 8, 3, 1] 5`', '`[5, 7, 8, 3] 1`'],
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [5, 3, 8, 1]', 'for i = 1 to length(A) - 1', '   A[i] = A[i + 1]', 'end for', 'print(A)') },
+    options: ['`[3, 8, 1, 5]`', '`[3, 8, 1]`', '`[5, 5, 5, 5]`', '`[3, 8, 1, 1]`'],
     correctIndex: 3,
     markScheme: {
       solution:
-        'Trace the list one line at a time, remembering that `remove` works by **value**, while `insert` and `pop` work by **index**.\n\n' +
-        '| Line | Rule | `a` afterwards |\n| --- | --- | --- |\n' +
-        '| `a = [5, 3, 8, 3, 1]` | start | `[5, 3, 8, 3, 1]` |\n' +
-        '| `a.remove(3)` | removes the **first** item equal to 3 (by value) | `[5, 8, 3, 1]` |\n' +
-        '| `a.insert(1, 7)` | puts 7 **at** index 1, shifting the rest right | `[5, 7, 8, 3, 1]` |\n' +
-        '| `x = a.pop()` | removes and returns the **last** item | `[5, 7, 8, 3]`, `x` is 1 |\n\n' +
-        'Output: `[5, 7, 8, 3] 1`.',
+        'Each element is overwritten by the one on its right.\n\n' +
+        '| i | Assignment | `A` afterwards |\n|---|---|---|\n' +
+        '| 1 | `A[1] = 3` | `[3, 3, 8, 1]` |\n' +
+        '| 2 | `A[2] = 8` | `[3, 8, 8, 1]` |\n' +
+        '| 3 | `A[3] = 1` | `[3, 8, 1, 1]` |\n\n' +
+        'The last element is never overwritten, so it appears twice. Output: `[3, 8, 1, 1]`.',
       whyWrong: [
-        'This thinks `remove(3)` deletes every 3. It only deletes the **first** matching item, so the second 3 stays.',
-        'This treats `remove(3)` as "delete the item at index 3". `remove` works by **value**; deleting by index is `pop(3)` or `del a[3]`.',
-        'This thinks `pop()` takes the first item. With no argument, `pop()` removes and returns the **last** item; `pop(0)` would take the first.',
+        'This treats the shift as a rotation, with the first value moved to the end. The first value 5 is overwritten and lost.',
+        'This assumes the array gets shorter. Assignments change values, never the length.',
+        'This copies each value to its right, `A[i + 1] = A[i]`. The code copies from right to left.',
         null,
       ],
-      keyIdea: '`remove(x)` deletes the first item equal to `x`; `insert(i, x)` puts `x` at index `i`; `pop()` removes and returns the last item.',
+      keyIdea: 'Shifting left overwrites the first value and leaves the last value in place twice.',
     },
-    python: { stdout: '[5, 7, 8, 3] 1\n' },
-  },
-  {
-    id: 'lists-tuples-009',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'squares = [x * x for x in range(1, 8) if x % 2 == 0]\nprint(squares)' },
-    options: ['`[4, 16, 36]`', '`[1, 9, 25, 49]`', '`[4, 16, 36, 64]`', '`[0, 4, 16, 36]`'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Read a list comprehension as: **for each** `x` in the range, **if** the condition holds, put `x * x` in the new list.\n\n' +
-        '1. `range(1, 8)` gives 1, 2, 3, 4, 5, 6, 7 (the stop value 8 is excluded).\n' +
-        '2. `x % 2 == 0` keeps only the even numbers: 2, 4, 6.\n' +
-        '3. Squaring each gives $2^2 = 4$, $4^2 = 16$, $6^2 = 36$.\n\n' +
-        'Output: `[4, 16, 36]`.',
-      whyWrong: [
-        null,
-        'These are the squares of the **odd** numbers. `x % 2 == 0` means the remainder on dividing by 2 is 0, which is true for even numbers.',
-        'This includes 8 in the range. `range(1, 8)` stops **before** 8, so the last even number is 6.',
-        'This starts the range at 0. `range(1, 8)` starts at 1, so 0 is never tested.',
-      ],
-      keyIdea: '`[expr for x in seq if cond]` applies `expr` to each item that passes `cond`; `range(a, b)` excludes `b`.',
+    check: {
+      optionValues: ['[3, 8, 1, 5]', '[3, 8, 1]', '[5, 5, 5, 5]', '[3, 8, 1, 1]'],
+      compute: () => {
+        const A = [5, 3, 8, 1];
+        for (let i = 0; i < A.length - 1; i++) A[i] = A[i + 1];
+        return show(A);
+      },
     },
-    python: { stdout: '[4, 16, 36]\n' },
   },
   {
     id: 'lists-tuples-010',
     subtopic: 'lists-tuples',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'a, b, c = 1, 2, 3\na, b = b, a + b\nc, a = a, c\nprint(a, b, c)' },
-    options: ['`2 4 2`', '`2 3 2`', '`3 3 2`', '`3 4 2`'],
-    correctIndex: 2,
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [4, 7, 9]', 'A[1] = A[3]', 'A[3] = A[1]', 'print(A)') },
+    options: ['`[9, 7, 4]`', '`[9, 7, 9]`', '`[4, 7, 4]`', '`[4, 7, 9]`'],
+    correctIndex: 1,
     markScheme: {
       solution:
-        'In a multiple assignment like `a, b = b, a + b`, Python works out **every value on the right first**, using the old values, and only then assigns them.\n\n' +
-        '1. `a, b, c = 1, 2, 3` gives $a = 1$, $b = 2$, $c = 3$.\n' +
-        '2. `a, b = b, a + b`: the right side is $(2, 1 + 2) = (2, 3)$. So $a = 2$, $b = 3$.\n' +
-        '3. `c, a = a, c`: the right side is $(2, 3)$ using the current $a = 2$ and $c = 3$. So $c = 2$, $a = 3$.\n\n' +
-        'Output: `3 3 2`.',
+        'Each line uses the **current** values.\n\n' +
+        '| Line | `A` afterwards |\n|---|---|\n' +
+        '| `A[1] = A[3]` | `[9, 7, 9]` |\n' +
+        '| `A[3] = A[1]` | `[9, 7, 9]` |\n\n' +
+        'The first line has already overwritten the 4, so the second line copies 9 back onto itself. Output: `[9, 7, 9]`.',
       whyWrong: [
-        'This does both lines one assignment at a time. First line: $a = 2$, then $b = 2 + 2 = 4$. Second line: $c = 2$, then $a = 2$. But the right-hand side is evaluated fully before any name changes.',
-        'The first line is right, but the second line is done one assignment at a time ($c = 2$, then $a = c = 2$). Both values on the right are taken before assigning, so $a$ gets the old $c = 3$.',
+        'This assumes the two lines swap the values. The 4 is lost on the first line because it was not saved in a temporary variable.',
         null,
-        'This does the first line one assignment at a time ($a = 2$, then $b = 2 + 2 = 4$). Python computes $a + b$ with the old $a = 1$, so $b = 3$.',
+        'This does the two lines in the opposite order.',
+        'This assumes the lines cancel out. The first line really changes `A[1]`, and the 4 cannot come back.',
       ],
-      keyIdea: 'Tuple unpacking evaluates the whole right-hand side first, then assigns, so `a, b = b, a` swaps values.',
+      keyIdea: 'Without a temporary variable, two assignments copy one value instead of swapping.',
     },
     check: {
-      optionValues: ['2 4 2', '2 3 2', '3 3 2', '3 4 2'],
+      optionValues: ['[9, 7, 4]', '[9, 7, 9]', '[4, 7, 4]', '[4, 7, 9]'],
       compute: () => {
-        let a = 1;
-        let b = 2;
-        let c = 3;
-        [a, b] = [b, a + b];
-        [c, a] = [a, c];
-        return `${a} ${b} ${c}`;
+        const A = [4, 7, 9];
+        A[0] = A[2];
+        A[2] = A[0];
+        return show(A);
       },
     },
-    python: { stdout: '3 3 2\n' },
-  },
-  {
-    id: 'lists-tuples-011',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: "words = ['pear', 'fig', 'banana', 'kiwi']\nprint(sorted(words, key=len))" },
-    options: [
-      "`['banana', 'fig', 'kiwi', 'pear']`",
-      "`['fig', 'pear', 'kiwi', 'banana']`",
-      "`['fig', 'kiwi', 'pear', 'banana']`",
-      "`['banana', 'pear', 'kiwi', 'fig']`",
-    ],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '`key=len` means the words are compared by their **length**, not alphabetically.\n\n' +
-        '| Word | `len` |\n| --- | --- |\n| pear | 4 |\n| fig | 3 |\n| banana | 6 |\n| kiwi | 4 |\n\n' +
-        '1. Shortest first: fig (3).\n' +
-        '2. Then the two words of length 4. Python\'s sort is **stable**: items with equal keys keep their original order. In `words`, pear comes before kiwi, so pear stays first.\n' +
-        '3. Then banana (6).\n\n' +
-        "Output: `['fig', 'pear', 'kiwi', 'banana']`.",
-      whyWrong: [
-        'This is plain alphabetical order, which is what `sorted(words)` would give without a key. With `key=len` the words are ordered by length.',
-        null,
-        'This breaks the tie between pear and kiwi alphabetically. Python only compares the key (the length), and equal keys keep their original order, so pear stays before kiwi.',
-        'This sorts from longest to shortest. Sorting is ascending (smallest key first) unless you add `reverse=True`.',
-      ],
-      keyIdea: '`sorted(..., key=f)` orders by `f(item)`, ascending, and keeps the original order for ties (stable sort).',
-    },
-    python: { stdout: "['fig', 'pear', 'kiwi', 'banana']\n" },
-  },
-  {
-    id: 'lists-tuples-012',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 's = [0, 1, 2, 3, 4, 5, 6, 7]\nprint(s[::-2], s[-3:])' },
-    options: ['`[6, 4, 2, 0] [5, 6, 7]`', '`[7, 5, 3, 1] [7, 6, 5]`', '`[0, 2, 4, 6] [5, 6, 7]`', '`[7, 5, 3, 1] [5, 6, 7]`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'A slice has the form `s[start:stop:step]`. Missing values take sensible defaults.\n\n' +
-        '1. `s[::-2]`: a **negative step** walks backwards. With no start given, it starts at the **last** item (7) and takes every 2nd item going left: 7, 5, 3, 1. So `[7, 5, 3, 1]`.\n' +
-        '2. `s[-3:]`: start at index -3 (the third item from the end, which is 5) and go to the end, in the normal left-to-right order: `[5, 6, 7]`.\n\n' +
-        'Output: `[7, 5, 3, 1] [5, 6, 7]`.',
-      whyWrong: [
-        'This starts the backwards walk at the second-to-last item. With a negative step and no start, the slice starts at the very last item (7).',
-        'The first slice is right, but `s[-3:]` is not reversed: it has no negative step, so it runs left to right, giving `[5, 6, 7]`.',
-        'This ignores the minus sign in the step and walks forwards from the start. A negative step means the slice runs from the end backwards.',
-        null,
-      ],
-      keyIdea: 'A negative step walks backwards starting from the last item; `s[-k:]` gives the last `k` items in their normal order.',
-    },
-    python: { stdout: '[7, 5, 3, 1] [5, 6, 7]\n' },
-  },
-  {
-    id: 'lists-tuples-013',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: 'What does this Python code print? (If it raises an error, choose the error option.)',
-    code: { lang: 'python', source: 't = (1, [2, 3])\nt[1].append(4)\nprint(t)' },
-    options: [
-      'An error is raised (a `TypeError`), because tuples cannot be changed',
-      '`(1, [2, 3])`',
-      '`(1, [2, 3, 4])`',
-      '`(1, [2, 3], 4)`',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Ask what `t[1]` actually is, and whether `append` changes the tuple itself or the object stored inside it.\n\n' +
-        '1. The tuple `t` holds two things: the number 1 and a **list** `[2, 3]`.\n' +
-        '2. Tuple immutability means you cannot replace which objects the tuple holds (for example `t[1] = [9]` would fail).\n' +
-        '3. But `t[1].append(4)` does not replace anything in the tuple. It reaches the list stored at `t[1]` and changes **that list**, which is mutable.\n' +
-        '4. The tuple still holds the same list object, which is now `[2, 3, 4]`.\n\n' +
-        'Output: `(1, [2, 3, 4])`.',
-      whyWrong: [
-        'This assumes nothing inside a tuple can ever change. The tuple cannot be given different items, but a mutable item inside it (here a list) can still be changed in place.',
-        'This assumes `append` worked on a copy of the list. `t[1]` is the actual list stored in the tuple, so appending changes it.',
-        null,
-        'This adds 4 to the tuple itself. `append` was called on the list `t[1]`, so 4 goes inside the inner list, and the tuple still has 2 items.',
-      ],
-      keyIdea: 'A tuple cannot be given different items, but a mutable object inside it (like a list) can still be modified.',
-    },
-    python: { stdout: '(1, [2, 3, 4])\n' },
-  },
-  {
-    id: 'lists-tuples-014',
-    subtopic: 'lists-tuples',
-    difficulty: 'exam',
-    stem: '`data` is a Python list containing 50 numbers. How many items are in the slice `data[5:40:5]`?',
-    options: ['$8$', '$7$', '$35$', '$10$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The slice `data[5:40:5]` starts at index 5, adds 5 each time, and stops **before** index 40.\n\n' +
-        '1. Indices taken: 5, 10, 15, 20, 25, 30, 35. The next one would be 40, which is excluded.\n' +
-        '2. Count them: 7 items.\n\n' +
-        'Shortcut: the number of items is $\\frac{40 - 5}{5} = 7$ (when the step divides the gap exactly; otherwise round **up**).',
-      whyWrong: [
-        'This includes index 40. The stop index is never included in a slice.',
-        null,
-        'This is $40 - 5 = 35$, which ignores the step of 5. Only every 5th index is taken.',
-        'This is $\\frac{50}{5} = 10$, which counts every 5th item of the whole list, ignoring the start 5 and stop 40.',
-      ],
-      keyIdea: '`data[a:b:s]` takes the indices $a, a + s, a + 2s, \\ldots$ for as long as they are less than $b$.',
-    },
-    check: {
-      optionValues: [8, 7, 35, 10],
-      compute: () => {
-        const n = 50;
-        let count = 0;
-        for (let i = 5; i < Math.min(40, n); i += 5) count++;
-        return count;
-      },
-    },
-  },
-
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'lists-tuples-015',
-    subtopic: 'lists-tuples',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source: 'import copy\n\na = [[1, 2], [3, 4]]\nb = a.copy()\nc = copy.deepcopy(a)\nb[0].append(5)\nb.append([6])\nc[1][0] = 9\nprint(a)',
-    },
-    options: ['`[[1, 2, 5], [3, 4]]`', '`[[1, 2], [3, 4]]`', '`[[1, 2, 5], [3, 4], [6]]`', '`[[1, 2, 5], [9, 4]]`'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '- `a.copy()` makes a **shallow copy**: `b` is a new outer list, but its items are the **same inner lists** as in `a`.\n' +
-        '- `copy.deepcopy(a)` makes a **deep copy**: `c` gets new copies of the inner lists too, so it shares nothing with `a`.\n\n' +
-        'Now trace the changes:\n\n' +
-        '1. `b[0].append(5)`: `b[0]` is the very same inner list as `a[0]`, so `a[0]` becomes `[1, 2, 5]`.\n' +
-        '2. `b.append([6])`: this changes only the outer list `b`. `a` is a different outer list, so it does not get `[6]`.\n' +
-        '3. `c[1][0] = 9`: `c` is completely independent, so `a` is unaffected.\n\n' +
-        'Output: `[[1, 2, 5], [3, 4]]`.',
-      whyWrong: [
-        null,
-        'This treats `a.copy()` as a full independent copy. A shallow copy only copies the outer list; the inner lists are shared, so changing `b[0]` changes `a[0]`.',
-        'This treats `b` as an alias of `a`. `b` is a new outer list, so appending `[6]` to `b` does not affect `a`; only the shared inner lists are linked.',
-        'This assumes the deep copy still shares inner lists with `a`. `deepcopy` copies every level, so changing `c[1][0]` cannot affect `a`.',
-      ],
-      keyIdea: 'A shallow copy duplicates only the outer list (inner lists are shared); a deep copy duplicates every level.',
-    },
-    python: { stdout: '[[1, 2, 5], [3, 4]]\n' },
-  },
-  {
-    id: 'lists-tuples-016',
-    subtopic: 'lists-tuples',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'grid = [[0] * 3] * 2\ngrid[0][1] = 5\nprint(grid)' },
-    options: ['`[[0, 5, 0], [0, 0, 0]]`', '`[[5, 5, 5], [5, 5, 5]]`', '`[[0, 5, 0, 0, 5, 0]]`', '`[[0, 5, 0], [0, 5, 0]]`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Focus on what `* 2` does to the row: does it make two separate rows, or repeat the same row object?\n\n' +
-        '1. `[0] * 3` builds one row: `[0, 0, 0]`.\n' +
-        '2. `[row] * 2` builds an outer list containing that **same row object twice**. It does not copy the row. So `grid[0]` and `grid[1]` are two names for one list.\n' +
-        '3. `grid[0][1] = 5` changes index 1 of that one shared row.\n' +
-        '4. Printing shows the shared row twice: `[[0, 5, 0], [0, 5, 0]]`.\n\n' +
-        'The safe way to build independent rows is a comprehension: `[[0] * 3 for _ in range(2)]`, which creates a new row on each pass.',
-      whyWrong: [
-        'This assumes the two rows are separate lists. Multiplying a list of lists repeats references to the same inner list, so both rows change together.',
-        'This assumes all six cells are linked. Inside a row, `grid[0][1] = 5` replaces just one position; only the two rows are the same object, not the cells.',
-        'This assumes `* 2` joins the rows into one long list. `[[0, 0, 0]] * 2` repeats the single item (the row), giving a list of 2 rows.',
-        null,
-      ],
-      keyIdea: '`[[0] * 3] * 2` repeats a reference to ONE inner list, so changing one row changes both.',
-    },
-    python: { stdout: '[[0, 5, 0], [0, 5, 0]]\n' },
-  },
-  {
-    id: 'lists-tuples-017',
-    subtopic: 'lists-tuples',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'a = [1, 2]\nb = a\na += [3]\nc = a\na = a + [4]\nprint(b, c, a)' },
-    options: [
-      '`[1, 2] [1, 2, 3] [1, 2, 3, 4]`',
-      '`[1, 2, 3] [1, 2, 3] [1, 2, 3, 4]`',
-      '`[1, 2, 3, 4] [1, 2, 3, 4] [1, 2, 3, 4]`',
-      '`[1, 2, 3] [1, 2, 3, 4] [1, 2, 3, 4]`',
-    ],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'For lists, `a += [3]` and `a = a + [4]` are **not** the same:\n\n' +
-        '- `a += [3]` extends the existing list **in place** (same object).\n' +
-        '- `a = a + [4]` builds a **new** list and then points the name `a` at it.\n\n' +
-        '| Line | Effect | `b` | `c` | `a` |\n| --- | --- | --- | --- | --- |\n' +
-        '| `a = [1, 2]`, `b = a` | one list, two names | `[1, 2]` | | `[1, 2]` |\n' +
-        '| `a += [3]` | the shared list grows in place | `[1, 2, 3]` | | `[1, 2, 3]` |\n' +
-        '| `c = a` | third name for the same list | `[1, 2, 3]` | `[1, 2, 3]` | `[1, 2, 3]` |\n' +
-        '| `a = a + [4]` | new list; only `a` moves to it | `[1, 2, 3]` | `[1, 2, 3]` | `[1, 2, 3, 4]` |\n\n' +
-        'Output: `[1, 2, 3] [1, 2, 3] [1, 2, 3, 4]`.',
-      whyWrong: [
-        'This treats `a += [3]` like `a = a + [3]`, making a new list. For lists, `+=` changes the existing list in place, so `b` sees the 3 as well.',
-        null,
-        'This treats `a = a + [4]` as an in-place change. The `+` operator builds a new list, and only the name `a` is moved to it; `b` and `c` keep the old list.',
-        'This assumes `c = a` ties the name `c` to the name `a`, so `c` follows `a` wherever it goes. Assignment ties `c` to the object `a` pointed to at that moment, which is the same list as `b`.',
-      ],
-      keyIdea: 'For lists, `a += x` modifies the list in place (aliases see it), while `a = a + x` creates a new list.',
-    },
-    python: { stdout: '[1, 2, 3] [1, 2, 3] [1, 2, 3, 4]\n' },
-  },
-  {
-    id: 'lists-tuples-018',
-    subtopic: 'lists-tuples',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'm = [[1, 2, 3],\n     [4, 5, 6]]\nt = [[row[i] for row in m] for i in range(3)]\nprint(t)' },
-    options: ['`[[1, 2, 3], [4, 5, 6]]`', '`[1, 4, 2, 5, 3, 6]`', '`[[1, 4], [2, 5], [3, 6]]`', '`[[1, 2], [3, 4], [5, 6]]`'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Work from the **outer** comprehension inwards. The outer one runs `i = 0, 1, 2`, and for each `i` it builds the inner list `[row[i] for row in m]`, which takes item `i` from every row.\n\n' +
-        '| `i` | `row[i]` for each row | Inner list |\n| --- | --- | --- |\n' +
-        '| 0 | `1` from the first row, `4` from the second | `[1, 4]` |\n' +
-        '| 1 | `2`, `5` | `[2, 5]` |\n' +
-        '| 2 | `3`, `6` | `[3, 6]` |\n\n' +
-        'So `t` is `[[1, 4], [2, 5], [3, 6]]`: the columns of `m` have become rows. This is the **transpose** of the $2 \\times 3$ matrix, which is $3 \\times 2$.\n\n' +
-        'Output: `[[1, 4], [2, 5], [3, 6]]`.',
-      whyWrong: [
-        'This assumes the comprehension copies `m` unchanged. The inner list collects item `i` from each row, so each new row is a column of `m`.',
-        'This loses the inner brackets. The inner comprehension is itself in square brackets, so it produces a separate list for each `i`.',
-        null,
-        'This keeps the numbers in reading order and just regroups them in pairs. The new rows are the **columns** of `m` (1 with 4, 2 with 5, 3 with 6).',
-      ],
-      keyIdea: '`[[row[i] for row in m] for i in range(cols)]` builds the transpose: column `i` of `m` becomes row `i`.',
-    },
-    python: { stdout: '[[1, 4], [2, 5], [3, 6]]\n' },
-  },
-  {
-    id: 'lists-tuples-019',
-    subtopic: 'lists-tuples',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source:
-        'def process(items):\n    items.append(0)\n    items = sorted(items)\n    items.append(99)\n    return items\n\ndata = [3, 1, 2]\nresult = process(data)\nprint(data, result)',
-    },
-    options: [
-      '`[3, 1, 2] [0, 1, 2, 3, 99]`',
-      '`[0, 1, 2, 3, 99] [0, 1, 2, 3, 99]`',
-      '`[3, 1, 2, 0, 99] [0, 1, 2, 3]`',
-      '`[3, 1, 2, 0] [0, 1, 2, 3, 99]`',
-    ],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'When a list is passed to a function, the parameter `items` is a second name for the **same** list as `data` (no copy is made).\n\n' +
-        '1. `items.append(0)`: changes the shared list, so `data` becomes `[3, 1, 2, 0]`.\n' +
-        '2. `items = sorted(items)`: `sorted` returns a **new** list `[0, 1, 2, 3]`, and the local name `items` now points to it. `data` still points to the old list.\n' +
-        '3. `items.append(99)`: changes only the new list: `[0, 1, 2, 3, 99]`.\n' +
-        '4. That new list is returned, so `result` is `[0, 1, 2, 3, 99]`.\n\n' +
-        'Output: `[3, 1, 2, 0] [0, 1, 2, 3, 99]`.',
-      whyWrong: [
-        'This assumes the function works on a copy of `data`. The parameter refers to the same list, so the first `append(0)` changes `data`.',
-        'This assumes `items = sorted(items)` changes `data` too, as if the list were sorted in place. `sorted` builds a new list and assignment only moves the local name `items`, so `data` keeps the old, unsorted list.',
-        'This assumes `items.append(99)` still adds to the original list `data`. After `items = sorted(items)`, the name `items` refers to the new sorted list, so 99 goes onto that new list (which is returned), and `data` does not get it.',
-        null,
-      ],
-      keyIdea: 'Mutating a parameter (`append`) changes the caller\'s list; reassigning the parameter (`items = ...`) does not.',
-    },
-    python: { stdout: '[3, 1, 2, 0] [0, 1, 2, 3, 99]\n' },
   },
   {
     id: 'lists-tuples-020',
     subtopic: 'lists-tuples',
     difficulty: 'exam',
-    stem: 'A student wants to reverse an array in place. Arrays are indexed from 0, and `for i = 0 to k` includes both 0 and $k$. What is printed by this pseudocode?',
+    stem: PRINTS,
     code: {
       lang: 'pseudocode',
-      source:
-        'A = [2, 4, 6, 8, 10]\nn = length(A)\nfor i = 0 to n - 1\n    temp = A[i]\n    A[i] = A[n - 1 - i]\n    A[n - 1 - i] = temp\nend for\nprint(A)',
+      source: L('A = [2, 4, 6, 8]', 'n = length(A)', 'for i = 1 to n', '   t = A[i]', '   A[i] = A[n - i + 1]', '   A[n - i + 1] = t', 'end for', 'print(A)'),
     },
-    options: ['`[2, 4, 6, 8, 10]`', '`[10, 8, 6, 4, 2]`', '`[10, 4, 6, 8, 2]`', '`[10, 8, 6, 8, 10]`'],
+    options: ['`[2, 4, 6, 8]`', '`[8, 6, 4, 2]`', '`[8, 4, 6, 2]`', '`[8, 6, 6, 8]`'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Each pass swaps `A[i]` with its mirror position `A[n - 1 - i]` (using `temp`, so it is a true swap). Here $n = 5$ and the loop runs $i = 0, 1, 2, 3, 4$.\n\n' +
-        '| `i` | Swap positions | `A` afterwards |\n| --- | --- | --- |\n' +
-        '| 0 | 0 and 4 | `[10, 4, 6, 8, 2]` |\n' +
-        '| 1 | 1 and 3 | `[10, 8, 6, 4, 2]` |\n' +
-        '| 2 | 2 and 2 | `[10, 8, 6, 4, 2]` |\n' +
-        '| 3 | 3 and 1 | `[10, 4, 6, 8, 2]` |\n' +
-        '| 4 | 4 and 0 | `[2, 4, 6, 8, 10]` |\n\n' +
-        'Halfway through, the array is reversed, but the loop keeps going and swaps every pair **back**. Output: `[2, 4, 6, 8, 10]`.\n\n' +
-        'To reverse correctly, the loop should only run over the first half: `for i = 0 to (n div 2) - 1`.',
+        'Each pass swaps `A[i]` with its mirror position `A[n - i + 1]`. Here $n = 4$.\n\n' +
+        '| i | Swap positions | `A` afterwards |\n|---|---|---|\n' +
+        '| 1 | 1 and 4 | `[8, 4, 6, 2]` |\n' +
+        '| 2 | 2 and 3 | `[8, 6, 4, 2]` |\n' +
+        '| 3 | 3 and 2 | `[8, 4, 6, 2]` |\n' +
+        '| 4 | 4 and 1 | `[2, 4, 6, 8]` |\n\n' +
+        'Halfway through, the array is reversed, but the loop keeps going and swaps every pair back. Output: `[2, 4, 6, 8]`.\n\n' +
+        'To reverse the array, the loop should only run over the first half: `for i = 1 to div(n,2)`.',
       whyWrong: [
         null,
-        'This is the array after $i = 1$ (or $i = 2$). The loop does not stop halfway; passes $i = 3$ and $i = 4$ swap each pair back again.',
-        'This is what you get if you stop one pass early (after $i = 3$), as if `to n - 1` excluded $n - 1$. The loop includes $i = 4$, which undoes the first swap too.',
-        'This treats each pass as a one-way copy `A[i] = A[n - 1 - i]` and forgets that `temp` puts the old value back into the mirror position, so nothing is lost and every step is a real swap.',
+        'This is the array after $i = 2$. The loop does not stop halfway; passes 3 and 4 swap each pair back again.',
+        'This stops one pass early, after $i = 3$. The loop includes $i = 4$, which undoes the first swap too.',
+        'This treats each pass as a one-way copy and forgets that `t` puts the old value back, so every step is a real swap.',
       ],
-      keyIdea: 'Swapping mirror pairs over the WHOLE array reverses it twice; only loop over the first half.',
+      keyIdea: 'Swapping mirror pairs over the whole array reverses it twice; only loop over the first half.',
     },
     check: {
-      optionValues: ['2,4,6,8,10', '10,8,6,4,2', '10,4,6,8,2', '10,8,6,8,10'],
+      optionValues: ['[2, 4, 6, 8]', '[8, 6, 4, 2]', '[8, 4, 6, 2]', '[8, 6, 6, 8]'],
       compute: () => {
-        const A = [2, 4, 6, 8, 10];
+        const A = [2, 4, 6, 8];
         const n = A.length;
-        for (let i = 0; i <= n - 1; i++) {
-          const temp = A[i];
-          A[i] = A[n - 1 - i];
-          A[n - 1 - i] = temp;
+        for (let i = 1; i <= n; i++) {
+          const t = A[i - 1];
+          A[i - 1] = A[n - i];
+          A[n - i] = t;
         }
-        return A.join(',');
+        return show(A);
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-028',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [3, 5, 2, 6]', 's = 0', 'for i = 1 to length(A)', '   s = s + A[i]', 'end for', 'print(s)') },
+    options: ['16', '10', '13', '6'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '| i | A[i] | s |\n|---|---|---|\n' +
+        '| 1 | 3 | 3 |\n' +
+        '| 2 | 5 | 8 |\n' +
+        '| 3 | 2 | 10 |\n' +
+        '| 4 | 6 | 16 |\n\n' +
+        'Output: 16.',
+      whyWrong: [
+        null,
+        'This stops at $i = 3$, leaving out the last element. The loop runs up to and including the length.',
+        'This starts at $i = 2$, leaving out the first element.',
+        'This is only the last element, as if the line were `s = A[i]`. The running total keeps every value.',
+      ],
+      keyIdea: 'A running total starts at 0 and adds each element once.',
+    },
+    check: {
+      optionValues: [16, 10, 13, 6],
+      compute: () => {
+        const A = [3, 5, 2, 6];
+        let s = 0;
+        for (const x of A) s = s + x;
+        return s;
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-029',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: {
+      lang: 'pseudocode',
+      source: L('A = [4, 9, 2, 9, 1]', 'p = 1', 'for i = 2 to length(A)', '   if A[i] > A[p]', '      p = i', '   end if', 'end for', 'print(p)'),
+    },
+    options: ['2', '9', '4', '5'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '`p` holds the **position** of the largest value so far.\n\n' +
+        '| i | A[i] | A[p] before | A[i] > A[p]? | p |\n|---|---|---|---|---|\n' +
+        '| 2 | 9 | 4 | yes | 2 |\n' +
+        '| 3 | 2 | 9 | no | 2 |\n' +
+        '| 4 | 9 | 9 | no | 2 |\n' +
+        '| 5 | 1 | 9 | no | 2 |\n\n' +
+        'The second 9 does not replace the first, because the test is strictly greater. Output: 2.',
+      whyWrong: [
+        null,
+        'This is the largest **value**. The code prints `p`, its position.',
+        'This would need the test `A[i] >= A[p]`. With `>`, an equal value does not replace the current one.',
+        'This is the last index. `p` only changes when a larger value is found.',
+      ],
+      keyIdea: 'Track the position of the maximum separately from its value, and note whether ties replace it.',
+    },
+    check: {
+      optionValues: [2, 9, 4, 5],
+      compute: () => {
+        const A = [4, 9, 2, 9, 1];
+        let p = 0;
+        for (let i = 1; i < A.length; i++) if (A[i] > A[p]) p = i;
+        return p + 1;
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-030',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: {
+      lang: 'pseudocode',
+      source: L('A = [6, 3, 8]', 'm = 0', 'for i = 1 to length(A)', '   if A[i] < m', '      m = A[i]', '   end if', 'end for', 'print(m)'),
+    },
+    options: ['0', '3', '6', '8'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '`m` starts at 0, and every element is greater than 0.\n\n' +
+        '| i | A[i] | A[i] < m? | m |\n|---|---|---|---|\n' +
+        '| 1 | 6 | no | 0 |\n' +
+        '| 2 | 3 | no | 0 |\n' +
+        '| 3 | 8 | no | 0 |\n\n' +
+        '`m` never changes, so 0 is printed. To find the minimum, start with `m = A[1]`.',
+      whyWrong: [
+        null,
+        'This is the true minimum, which is what the code would find if it started with `m = A[1]`. Starting from 0, the test is never true.',
+        'This assumes `m` starts as the first element. The code sets it to 0.',
+        'This is the maximum. Besides, the test uses `<`, so `m` could only go down.',
+      ],
+      keyIdea: 'A minimum search must start from a real element of the array, not from 0.',
+    },
+    check: {
+      optionValues: [0, 3, 6, 8],
+      compute: () => {
+        const A = [6, 3, 8];
+        let m = 0;
+        for (const x of A) if (x < m) m = x;
+        return m;
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-031',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [1, 2, 3, 4]', 'i = 4', 'while (i > 1)', '   A[i] = A[i - 1]', '   i = i - 1', 'end while', 'print(A)') },
+    options: ['`[1, 1, 2, 3]`', '`[1, 1, 1, 1]`', '`[4, 1, 2, 3]`', 'Infinite loop'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The loop works from the right, so each value is copied before it is overwritten.\n\n' +
+        '| i | Assignment | `A` afterwards |\n|---|---|---|\n' +
+        '| 4 | `A[4] = 3` | `[1, 2, 3, 3]` |\n' +
+        '| 3 | `A[3] = 2` | `[1, 2, 2, 3]` |\n' +
+        '| 2 | `A[2] = 1` | `[1, 1, 2, 3]` |\n\n' +
+        'At $i = 1$ the loop stops. Output: `[1, 1, 2, 3]`.',
+      whyWrong: [
+        null,
+        'This is what happens when the loop runs from the left. Running from the right keeps each value until it has been copied.',
+        'This treats the shift as a rotation. The last value 4 is overwritten and lost, and `A[1]` is never changed.',
+        '`i` goes down by 1 on each pass, so it reaches 1, the condition `i > 1` becomes false and the loop stops.',
+      ],
+      keyIdea: 'To shift right without losing values, work from the last index down.',
+    },
+    check: {
+      optionValues: ['[1, 1, 2, 3]', '[1, 1, 1, 1]', '[4, 1, 2, 3]', 'Infinite loop'],
+      compute: () => {
+        const A = [1, 2, 3, 4];
+        let i = 4;
+        let passes = 0;
+        while (i > 1) {
+          if (++passes > 1000) return 'Infinite loop';
+          A[i - 1] = A[i - 2];
+          i = i - 1;
+        }
+        return show(A);
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-032',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [1, 2, 3, 4]', 'for i = 2 to length(A)', '   A[i] = A[i - 1]', 'end for', 'print(A)') },
+    options: ['`[1, 1, 2, 3]`', '`[1, 1, 1, 1]`', '`[2, 3, 4, 4]`', '`[4, 1, 2, 3]`'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'The loop runs from the left, so each pass copies a value that was **just** overwritten.\n\n' +
+        '| i | Assignment | `A` afterwards |\n|---|---|---|\n' +
+        '| 2 | `A[2] = 1` | `[1, 1, 3, 4]` |\n' +
+        '| 3 | `A[3] = 1` | `[1, 1, 1, 4]` |\n' +
+        '| 4 | `A[4] = 1` | `[1, 1, 1, 1]` |\n\n' +
+        'Output: `[1, 1, 1, 1]`.',
+      whyWrong: [
+        'This uses the old values on every pass. By the time $i = 3$, `A[2]` has already been changed to 1.',
+        null,
+        'This shifts left. The code copies `A[i - 1]` into `A[i]`, so values move to the right.',
+        'This treats the shift as a rotation. Nothing here moves the last value to the front.',
+      ],
+      keyIdea: 'Shifting right from the left end spreads the first value through the whole array.',
+    },
+    check: {
+      optionValues: ['[1, 1, 2, 3]', '[1, 1, 1, 1]', '[2, 3, 4, 4]', '[4, 1, 2, 3]'],
+      compute: () => {
+        const A = [1, 2, 3, 4];
+        for (let i = 1; i < A.length; i++) A[i] = A[i - 1];
+        return show(A);
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-033',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: {
+      lang: 'pseudocode',
+      source: L('A = [4, 7, 10, 3, 8]', 'c = 0', 'for i = 1 to length(A)', '   if mod(A[i],2) == 0 // mod is the modulus operator', '      c = c + 1', '   end if', 'end for', 'print(c)'),
+    },
+    options: ['3', '2', '22', '5'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '`mod(x,2) == 0` is true for even numbers, and each one adds 1 to `c`.\n\n' +
+        '| i | A[i] | even? | c |\n|---|---|---|---|\n' +
+        '| 1 | 4 | yes | 1 |\n' +
+        '| 2 | 7 | no | 1 |\n' +
+        '| 3 | 10 | yes | 2 |\n' +
+        '| 4 | 3 | no | 2 |\n' +
+        '| 5 | 8 | yes | 3 |\n\n' +
+        'Output: 3.',
+      whyWrong: [
+        null,
+        'This counts the odd numbers. A remainder of 0 on dividing by 2 means even.',
+        'This adds the even values: $4 + 10 + 8$. The code adds 1 each time, not the value.',
+        'This counts every element and ignores the `if`.',
+      ],
+      keyIdea: 'A counter adds 1 for each element that passes the test.',
+    },
+    check: {
+      optionValues: [3, 2, 22, 5],
+      compute: () => {
+        const A = [4, 7, 10, 3, 8];
+        let c = 0;
+        for (const x of A) if (x % 2 === 0) c = c + 1;
+        return c;
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-034',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [2, 4, 6]', 's = 0', 'i = 1', 'while (i <= length(A))', '   s = s + A[i]', 'end while', 'print(s)') },
+    options: ['12', '2', '6', 'Infinite loop'],
+    correctIndex: 3,
+    markScheme: {
+      solution:
+        'Check that the loop variable changes inside the loop. Nothing in the body changes `i`, so it stays 1.\n\n' +
+        '| Pass | i | i <= 3? | s |\n|---|---|---|---|\n' +
+        '| 1 | 1 | yes | 2 |\n' +
+        '| 2 | 1 | yes | 4 |\n' +
+        '| 3 | 1 | yes | 6 |\n\n' +
+        'The condition is always true, so the loop never ends and nothing is printed: **Infinite loop**.',
+      whyWrong: [
+        'This is the sum the loop was meant to find. Without `i = i + 1`, the loop never moves past the first element.',
+        'This assumes the loop runs once. The condition is tested again after each pass and is still true.',
+        'This stops after three passes, as if the loop counted them. The `while` only stops when `i` passes the length, and `i` never changes.',
+        null,
+      ],
+      keyIdea: 'A `while` loop over an array must update its index, or it never ends.',
+    },
+    check: {
+      optionValues: [12, 2, 6, 'Infinite loop'],
+      compute: () => {
+        const A = [2, 4, 6];
+        let s = 0;
+        const i = 1;
+        let passes = 0;
+        while (i <= A.length) {
+          if (++passes > 1000) return 'Infinite loop';
+          s = s + A[i - 1];
+        }
+        return s;
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-035',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: { lang: 'pseudocode', source: L('A = [5, 8, 2, 8]', 'i = 1', 'while (A[i] != 8)', '   i = i + 1', 'end while', 'print(i)') },
+    options: ['2', '4', '1', '8'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The loop moves along until it reaches the first 8.\n\n' +
+        '| i | A[i] | A[i] != 8? |\n|---|---|---|\n' +
+        '| 1 | 5 | yes, move on |\n' +
+        '| 2 | 8 | no, stop |\n\n' +
+        'Output: 2.',
+      whyWrong: [
+        null,
+        'This is the position of the last 8. The loop stops at the first one it meets.',
+        'This counts from 0, where the first 8 would be at index 1. Here the first element is at index 1, so the 8 is at index 2.',
+        'This is the value being searched for. The code prints the position `i`.',
+      ],
+      keyIdea: 'A linear search stops at the first match and reports its position.',
+    },
+    check: {
+      optionValues: [2, 4, 1, 8],
+      compute: () => {
+        const A = [5, 8, 2, 8];
+        let i = 1;
+        while (A[i - 1] !== 8) i = i + 1;
+        return i;
+      },
+    },
+  },
+  {
+    id: 'lists-tuples-036',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    stem: PRINTS,
+    code: {
+      lang: 'pseudocode',
+      source: L('A = [5, 1, 4, 2]', 'for i = 1 to 3', '   if A[i] > A[i + 1]', '      t = A[i]', '      A[i] = A[i + 1]', '      A[i + 1] = t', '   end if', 'end for', 'print(A)'),
+    },
+    options: ['`[1, 4, 2, 5]`', '`[1, 2, 4, 5]`', '`[1, 5, 2, 4]`', '`[5, 4, 2, 1]`'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Each pass compares neighbours and swaps them if they are out of order.\n\n' +
+        '| i | Compare | `A` afterwards |\n|---|---|---|\n' +
+        '| 1 | 5 > 1, swap | `[1, 5, 4, 2]` |\n' +
+        '| 2 | 5 > 4, swap | `[1, 4, 5, 2]` |\n' +
+        '| 3 | 5 > 2, swap | `[1, 4, 2, 5]` |\n\n' +
+        'The largest value has moved to the end, but the array is not yet sorted. Output: `[1, 4, 2, 5]`.',
+      whyWrong: [
+        null,
+        'This is the fully sorted array, which needs more passes. One pass only carries the largest value to the end.',
+        'This swaps the separate pairs at positions 1 and 2, then 3 and 4. The loop also compares positions 2 and 3.',
+        'This uses `<` instead of `>`, which moves the smallest value to the end.',
+      ],
+      keyIdea: 'One pass of neighbour swaps carries the largest value to the end.',
+    },
+    check: {
+      optionValues: ['[1, 4, 2, 5]', '[1, 2, 4, 5]', '[1, 5, 2, 4]', '[5, 4, 2, 1]'],
+      compute: () => {
+        const A = [5, 1, 4, 2];
+        for (let i = 0; i < 3; i++) {
+          if (A[i] > A[i + 1]) {
+            const t = A[i];
+            A[i] = A[i + 1];
+            A[i + 1] = t;
+          }
+        }
+        return show(A);
       },
     },
   },

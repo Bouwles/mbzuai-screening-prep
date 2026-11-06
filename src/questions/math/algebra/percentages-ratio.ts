@@ -1,4 +1,5 @@
 import type { StaticQuestion } from '../../../types';
+import { Frac } from '../../../lib/frac';
 
 export const questions: StaticQuestion[] = [
   // ---------------------------------------------------------------- foundation
@@ -6,7 +7,7 @@ export const questions: StaticQuestion[] = [
     id: 'percentages-ratio-001',
     subtopic: 'percentages-ratio',
     difficulty: 'foundation',
-    stem: 'A phone costs AED 240. To reserve it, you pay a deposit of 35% of the price. How much is the deposit?',
+    stem: 'What is 35% of AED 240?',
     options: ['AED 156', 'AED 8.40', 'AED 84', 'AED 840'],
     correctIndex: 2,
     markScheme: {
@@ -15,12 +16,12 @@ export const questions: StaticQuestion[] = [
         '"Of" means multiply:\n\n' +
         '$$0.35 \\times 240 = 84$$\n\n' +
         'Sense check: 10% of 240 is 24, so 30% is 72 and 5% is 12. Then 35% is $72 + 12 = 84$.\n\n' +
-        'The deposit is AED 84.',
+        'So 35% of AED 240 is AED 84.',
       whyWrong: [
-        'This is $240 - 84 = 156$, the amount still left to pay (65% of the price), not the deposit.',
-        'This uses $0.035$ instead of $0.35$: that is 3.5% of the price, a decimal-place slip when converting the percentage.',
+        'This is $240 - 84 = 156$, the amount left after taking 35% off (65% of AED 240), not 35% of it.',
+        'This uses $0.035$ instead of $0.35$: that is 3.5% of the amount, a decimal-place slip when converting the percentage.',
         null,
-        'This multiplies by $3.5$ instead of $0.35$. A deposit of 35% must be smaller than the price itself.',
+        'This multiplies by $3.5$ instead of $0.35$. 35% of an amount must be smaller than the amount itself.',
       ],
       keyIdea: 'To find $p\\%$ of an amount, multiply the amount by $\\frac{p}{100}$.',
     },
@@ -56,9 +57,149 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'percentages-ratio-003',
+    id: 'percentages-ratio-005',
     subtopic: 'percentages-ratio',
     difficulty: 'foundation',
+    stem: 'A value rises from 80 to 92. What is the percentage increase?',
+    options: ['12%', '15%', '13.0% (to 3 s.f.)', '115%'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'Step 1: find the actual change: $92 - 80 = 12$.\n\n' +
+        'Step 2: divide by the **original** value (80), then multiply by 100:\n\n' +
+        '$$\\frac{12}{80} \\times 100 = 0.15 \\times 100 = 15\\%$$\n\n' +
+        'Check with a multiplier: $80 \\times 1.15 = 92$. ✓\n\n' +
+        'The increase is 15%.',
+      whyWrong: [
+        'This is the actual increase (12), not the **percentage** increase. You still need to divide by the original 80.',
+        null,
+        'This divides the change by the **new** value: $\\frac{12}{92} \\times 100 \\approx 13.0\\%$. Percentage change is always measured against the original value.',
+        'This is $\\frac{92}{80} \\times 100$: the new value as a percentage of the old one. The increase is $115\\% - 100\\% = 15\\%$.',
+      ],
+      keyIdea: 'Percentage change $= \\frac{\\text{new} - \\text{original}}{\\text{original}} \\times 100\\%$.',
+    },
+    check: {
+      optionValues: [12, 15, 1200 / 92, 115],
+      compute: () => ((92 - 80) / 80) * 100,
+    },
+  },
+  {
+    id: 'percentages-ratio-021',
+    subtopic: 'percentages-ratio',
+    difficulty: 'foundation',
+    stem: 'What does "per cent" mean?',
+    options: ['Out of 100', 'Out of 10', 'Out of 1000', 'For each unit'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '"Per cent" means "out of 100", so a percentage is a fraction with denominator 100.\n\n' +
+        'For example, $35\\% = \\frac{35}{100} = 0.35$.',
+      whyWrong: [
+        null,
+        'Out of 10 would make 35% equal to 3.5, a decimal-place slip.',
+        'Out of 1000 would make 35% equal to 0.035, a decimal-place slip.',
+        'This describes a unit rate, such as a price per gram, not a percentage.',
+      ],
+      keyIdea: 'A percentage is a number out of 100.',
+    },
+  },
+  {
+    id: 'percentages-ratio-022',
+    subtopic: 'percentages-ratio',
+    difficulty: 'foundation',
+    stem: 'What is the multiplier for an increase of 8%?',
+    options: ['$1.08$', '$0.08$', '$1.8$', '$0.92$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The original is 100% of itself. After an 8% increase the new value is $100\\% + 8\\% = 108\\%$ of the original.\n\n' +
+        'As a decimal, $108\\% = 1.08$.',
+      whyWrong: [
+        null,
+        'Multiplying by $0.08$ gives only the size of the increase, not the new value.',
+        'This is the multiplier for an **80%** increase: 8% is $0.08$, not $0.8$.',
+        'This is the multiplier for an 8% **decrease**, $1 - 0.08$.',
+      ],
+      keyIdea: 'An increase of $p\\%$ has multiplier $1 + \\frac{p}{100}$.',
+    },
+    check: {
+      optionValues: [1.08, 0.08, 1.8, 0.92],
+      compute: () => 1 + 8 / 100,
+    },
+  },
+  {
+    id: 'percentages-ratio-023',
+    subtopic: 'percentages-ratio',
+    difficulty: 'foundation',
+    stem: 'Simplify the ratio $12 : 18$.',
+    options: ['$2 : 3$', '$6 : 9$', '$3 : 2$', '$1 : 6$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Divide both numbers by their highest common factor, which is 6:\n\n' +
+        '$$12 \\div 6 = 2, \\qquad 18 \\div 6 = 3$$\n\n' +
+        'So $12 : 18 = 2 : 3$.',
+      whyWrong: [
+        null,
+        'This divides by 2 only. 6 and 9 still share the factor 3, so the ratio is not in its simplest form.',
+        'This reverses the order. The first number in the ratio must stay first.',
+        'This uses the difference, $18 - 12 = 6$. Simplifying divides both numbers by the same factor.',
+      ],
+      keyIdea: 'Simplify a ratio by dividing every part by the highest common factor, keeping the order.',
+    },
+    check: {
+      optionValues: ['2:3', '6:9', '3:2', '1:6'],
+      compute: () => {
+        const f = new Frac(12, 18);
+        return `${f.n}:${f.d}`;
+      },
+    },
+  },
+  {
+    id: 'percentages-ratio-024',
+    subtopic: 'percentages-ratio',
+    difficulty: 'foundation',
+    stem: 'If $y$ is inversely proportional to $x$, then for some constant $k$:',
+    options: ['$y = \\frac{k}{x}$', '$y = kx$', '$y = x + k$', '$y = kx^{2}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Inversely proportional** means the product $xy$ stays the same: if $x$ doubles, $y$ halves.\n\n' +
+        'Writing $xy = k$ gives $y = \\frac{k}{x}$.',
+      whyWrong: [
+        null,
+        'This is **direct** proportion: $y$ doubles when $x$ doubles.',
+        'This keeps a fixed difference between $y$ and $x$. Proportion works by multiplying, not by adding.',
+        'This is direct proportion to the square of $x$.',
+      ],
+      keyIdea: 'Inverse proportion: $y = \\frac{k}{x}$, so $xy$ is constant.',
+    },
+  },
+  {
+    id: 'percentages-ratio-025',
+    subtopic: 'percentages-ratio',
+    difficulty: 'foundation',
+    stem: 'Compound interest for each year is calculated on:',
+    options: ['The original amount plus earlier interest', 'The original amount only', 'The earlier interest only', 'The final amount'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'With **compound** interest, each year\'s interest is worked out on the balance at the start of that year, which is the original amount plus all the interest earned so far.\n\n' +
+        'So the interest itself earns interest.',
+      whyWrong: [
+        null,
+        'Interest on the original amount only is **simple** interest.',
+        'The original amount stays in the account, so it keeps earning interest too.',
+        'The final amount is not known until the end. Each year uses the balance at the start of that year.',
+      ],
+      keyIdea: 'Compound interest is calculated on the current balance; simple interest on the original amount only.',
+    },
+  },
+  // ---------------------------------------------------------------- exam
+  {
+    id: 'percentages-ratio-003',
+    subtopic: 'percentages-ratio',
+    difficulty: 'exam',
     stem: 'Huda and Karim share AED 360 in the ratio $4 : 5$. How much does the person with the **larger** share receive?',
     options: ['AED 160', 'AED 180', 'AED 72', 'AED 200'],
     correctIndex: 3,
@@ -85,7 +226,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'percentages-ratio-004',
     subtopic: 'percentages-ratio',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     stem: 'A 750 g bag of rice costs AED 12. At the same price per gram, how much would **2 kg** of rice cost?',
     options: ['AED 32', 'AED 24', 'AED 0.032', 'AED 16'],
     correctIndex: 0,
@@ -111,34 +252,6 @@ export const questions: StaticQuestion[] = [
       compute: () => (12 / 750) * (2 * 1000),
     },
   },
-  {
-    id: 'percentages-ratio-005',
-    subtopic: 'percentages-ratio',
-    difficulty: 'foundation',
-    stem: 'The number of students in a coding club rises from 80 to 92. What is the percentage increase?',
-    options: ['12%', '15%', '13.0% (to 3 s.f.)', '115%'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Step 1: find the actual change: $92 - 80 = 12$.\n\n' +
-        'Step 2: divide by the **original** value (80), then multiply by 100:\n\n' +
-        '$$\\frac{12}{80} \\times 100 = 0.15 \\times 100 = 15\\%$$\n\n' +
-        'Check with a multiplier: $80 \\times 1.15 = 92$. ✓\n\n' +
-        'The increase is 15%.',
-      whyWrong: [
-        'This is the actual increase (12 students), not the **percentage** increase. You still need to divide by the original 80.',
-        null,
-        'This divides the change by the **new** value: $\\frac{12}{92} \\times 100 \\approx 13.0\\%$. Percentage change is always measured against the original value.',
-        'This is $\\frac{92}{80} \\times 100$: the new value as a percentage of the old one. The increase is $115\\% - 100\\% = 15\\%$.',
-      ],
-      keyIdea: 'Percentage change $= \\frac{\\text{new} - \\text{original}}{\\text{original}} \\times 100\\%$.',
-    },
-    check: {
-      optionValues: [12, 15, 1200 / 92, 115],
-      compute: () => ((92 - 80) / 80) * 100,
-    },
-  },
-  // ---------------------------------------------------------------- exam
   {
     id: 'percentages-ratio-006',
     subtopic: 'percentages-ratio',
@@ -200,7 +313,7 @@ export const questions: StaticQuestion[] = [
     id: 'percentages-ratio-008',
     subtopic: 'percentages-ratio',
     difficulty: 'exam',
-    stem: 'A share price rises by 30% on Monday and then falls by 30% on Tuesday. What is the overall percentage change from the start of Monday to the end of Tuesday?',
+    stem: 'A price rises by 30% and then falls by 30%. What is the overall percentage change?',
     options: ['no change', 'a 9% decrease', 'a 9% increase', 'a 91% decrease'],
     correctIndex: 1,
     markScheme: {
@@ -211,10 +324,10 @@ export const questions: StaticQuestion[] = [
         'Overall multiplier:\n\n' +
         '$$1.3 \\times 0.7 = 0.91$$\n\n' +
         'A multiplier of $0.91$ means the final price is 91% of the starting price, which is $100\\% - 91\\% = 9\\%$ less.\n\n' +
-        'Check with numbers: start at 100. After Monday: $100 \\times 1.3 = 130$. After Tuesday: $130 \\times 0.7 = 91$. That is 9 less than 100.\n\n' +
+        'Check with numbers: start at 100. After the rise: $100 \\times 1.3 = 130$. After the fall: $130 \\times 0.7 = 91$. That is 9 less than 100.\n\n' +
         'Overall: a 9% decrease.',
       whyWrong: [
-        'This adds the percentages: $+30\\% - 30\\% = 0$. But the 30% fall is taken from the **bigger** Monday price, so more is lost than was gained.',
+        'This adds the percentages: $+30\\% - 30\\% = 0$. But the 30% fall is taken from the **bigger** price after the rise, so more is lost than was gained.',
         null,
         'The size (9%) is right, but the direction is wrong: the overall multiplier $0.91$ is less than 1, so the price went **down**.',
         'This reads the overall multiplier $0.91$ as the change. The final price is 91% **of** the start, so the decrease is only 9%.',
@@ -423,12 +536,11 @@ export const questions: StaticQuestion[] = [
       compute: () => Math.round(80000 * (1 - 15 / 100) ** 2),
     },
   },
-  // ---------------------------------------------------------------- challenge
   {
     id: 'percentages-ratio-016',
     subtopic: 'percentages-ratio',
     difficulty: 'exam',
-    stem: 'A shop increases the price of a watch by 20%. Later it offers 10% off the new price, and the watch then costs AED 540. What was the price **before** the 20% increase? (Give the answer to 2 decimal places if needed.)',
+    stem: 'A price rises by 20%, then falls by 10% to AED 540. What was the price **before** the rise?',
     options: ['AED 490.91', 'AED 475.20', 'AED 500', 'AED 496.80'],
     correctIndex: 2,
     markScheme: {
@@ -452,148 +564,6 @@ export const questions: StaticQuestion[] = [
     check: {
       optionValues: [490.91, 475.2, 500, 496.8],
       compute: () => 540 / ((1 + 20 / 100) * (1 - 10 / 100)),
-    },
-  },
-  {
-    id: 'percentages-ratio-017',
-    subtopic: 'percentages-ratio',
-    difficulty: 'challenge',
-    stem: 'AED 2000 is invested at 5% per year compound interest (compounded annually). After how many **whole** years will the value of the investment first be **more than** AED 3000?',
-    options: ['10', '19', '8', '9'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'We need the smallest whole number $n$ with\n\n' +
-        '$$2000 \\times 1.05^{n} > 3000 \\quad\\Longleftrightarrow\\quad 1.05^{n} > 1.5$$\n\n' +
-        '**Method 1 (logs):** $n > \\frac{\\ln 1.5}{\\ln 1.05} \\approx \\frac{0.4055}{0.04879} \\approx 8.31$. The smallest whole number above 8.31 is 9.\n\n' +
-        '**Method 2 (test the options on a calculator):**\n\n' +
-        '- $n = 8$: $2000 \\times 1.05^{8} \\approx 2954.91$, still less than 3000\n' +
-        '- $n = 9$: $2000 \\times 1.05^{9} \\approx 3102.66$, more than 3000 ✓\n\n' +
-        'So the value first exceeds AED 3000 after 9 years.',
-      whyWrong: [
-        'This uses **simple** interest: 5% of 2000 is AED 100 per year, so $1000 \\div 100 = 10$ years to gain AED 1000 (and even then the value only equals AED 3000, it is not more). Compound interest also earns interest on earlier interest, so it grows faster and passes AED 3000 sooner.',
-        'This treats AED 3000 as the **interest** wanted, so it solves $2000 \\times 1.05^{n} > 5000$ (that is, $1.05^{n} > 2.5$, giving $n = 19$). The question is about the total value.',
-        'This rounds $8.31$ **down**. After 8 years the value is only about AED 2954.91, which is not yet more than 3000.',
-        null,
-      ],
-      keyIdea: 'To find when a compound amount passes a target, solve $\\left(1 + \\frac{r}{100}\\right)^{n} > \\frac{\\text{target}}{P}$ and round UP to a whole year.',
-    },
-    check: {
-      optionValues: [10, 19, 8, 9],
-      compute: () => {
-        let n = 0;
-        let value = 2000;
-        while (value <= 3000) {
-          value *= 1.05;
-          n++;
-        }
-        return n;
-      },
-    },
-  },
-  {
-    id: 'percentages-ratio-018',
-    subtopic: 'percentages-ratio',
-    difficulty: 'challenge',
-    stem: 'Three numbers $a$, $b$ and $c$ satisfy $a : b = 2 : 3$ and $b : c = 4 : 5$. If $a + b + c = 175$, what is the value of $c$?',
-    options: ['$60$', '$75$', '$62.5$', '$87.5$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The two ratios share $b$, but $b$ is "3" in one and "4" in the other. Make the $b$ parts equal first.\n\n' +
-        'Step 1: the lowest common multiple of 3 and 4 is 12.\n\n' +
-        '- $a : b = 2 : 3 = 8 : 12$ (multiply by 4)\n' +
-        '- $b : c = 4 : 5 = 12 : 15$ (multiply by 3)\n\n' +
-        'Step 2: so $a : b : c = 8 : 12 : 15$, which is $8 + 12 + 15 = 35$ parts.\n\n' +
-        'Step 3: one part is $175 \\div 35 = 5$.\n\n' +
-        'Step 4: $c = 15 \\times 5 = 75$.\n\n' +
-        'Check: $a = 40$, $b = 60$, $c = 75$; $40 : 60 = 2 : 3$ ✓, $60 : 75 = 4 : 5$ ✓, total 175 ✓.\n\n' +
-        'So $c = 75$.',
-      whyWrong: [
-        'This is the value of $b$ ($12 \\times 5$), not $c$.',
-        null,
-        'This adds all four ratio numbers ($2 + 3 + 4 + 5 = 14$) and takes $\\frac{5}{14}$ of 175. The ratios must be combined through $b$ first.',
-        'This joins the ratios as $2 : 3 : 5$ without making the $b$ parts match, giving $\\frac{5}{10} \\times 175$.',
-      ],
-      keyIdea: 'To combine $a : b$ and $b : c$, scale both so the shared quantity $b$ has the same number of parts.',
-    },
-    check: {
-      optionValues: [60, 75, 62.5, 87.5],
-      compute: () => {
-        // brute force: integer a, b, c with a + b + c = 175 and 3a = 2b, 5b = 4c
-        for (let a = 1; a < 175; a++)
-          for (let b = 1; a + b < 175; b++) {
-            const c = 175 - a - b;
-            if (3 * a === 2 * b && 5 * b === 4 * c) return c;
-          }
-        return -1;
-      },
-    },
-  },
-  {
-    id: 'percentages-ratio-019',
-    subtopic: 'percentages-ratio',
-    difficulty: 'challenge',
-    stem: 'The brightness $I$ of a lamp is **inversely proportional to the square** of the distance $d$ from the lamp. If the distance is increased by 25%, by what percentage does the brightness **decrease**?',
-    options: ['36%', '20%', '25%', '56.25%'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Write the relationship: $I = \\frac{k}{d^2}$.\n\n' +
-        'Step 1: a 25% increase in distance means the new distance is $1.25d$.\n\n' +
-        'Step 2: substitute:\n\n' +
-        '$$I_{\\text{new}} = \\frac{k}{(1.25d)^2} = \\frac{k}{1.5625d^2} = \\frac{1}{1.5625} \\times \\frac{k}{d^2} = 0.64 \\, I$$\n\n' +
-        'Step 3: the new brightness is 64% of the old, so it has fallen by $100\\% - 64\\% = 36\\%$.\n\n' +
-        'Check with numbers: take $k = 100$, $d = 1$: $I = 100$. Then $d = 1.25$ gives $I = \\frac{100}{1.5625} = 64$, a fall of 36.\n\n' +
-        'The brightness decreases by 36%.',
-      whyWrong: [
-        null,
-        'This uses plain inverse proportion ($I = \\frac{k}{d}$): $\\frac{1}{1.25} = 0.8$, a 20% fall. The square has been forgotten.',
-        'This assumes the brightness falls by the same percentage as the distance rises. Proportion does not work that way, especially with a square.',
-        'This works out $1.25^2 = 1.5625$ and reads the 56.25% as the decrease. In fact the brightness is **divided** by $1.5625$, leaving 64%.',
-      ],
-      keyIdea: 'For proportion questions with percentage changes, replace $d$ by (multiplier $\\times\\, d$) and see what multiplier comes out for the other variable.',
-    },
-    check: {
-      optionValues: [36, 20, 25, 56.25],
-      compute: () => {
-        const I = (d: number) => 100 / d ** 2;
-        return (1 - I(1.25) / I(1)) * 100;
-      },
-    },
-  },
-  {
-    id: 'percentages-ratio-020',
-    subtopic: 'percentages-ratio',
-    difficulty: 'challenge',
-    stem: 'A jug contains juice and water in the ratio $3 : 2$. After 10 litres of water are added, the ratio of juice to water becomes $2 : 3$. How many litres of liquid were in the jug **before** the water was added?',
-    options: ['30 litres', '12 litres', '50 litres', '20 litres'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Let the original amounts be juice $= 3k$ and water $= 2k$ litres.\n\n' +
-        'Step 1: after adding 10 litres of water, the juice is still $3k$ and the water is $2k + 10$.\n\n' +
-        'Step 2: the new ratio is $2 : 3$, so\n\n' +
-        '$$\\frac{3k}{2k + 10} = \\frac{2}{3}$$\n\n' +
-        'Step 3: cross-multiply: $9k = 2(2k + 10) = 4k + 20$, so $5k = 20$ and $k = 4$.\n\n' +
-        'Step 4: original total $= 3k + 2k = 5k = 20$ litres (12 litres of juice and 8 litres of water).\n\n' +
-        'Check: after adding water there are 12 litres of juice and 18 of water, and $12 : 18 = 2 : 3$. ✓\n\n' +
-        'There were 20 litres before.',
-      whyWrong: [
-        'This is the total **after** the water was added ($12 + 18$), not before.',
-        'This is the amount of **juice** only ($3k = 12$), not the total liquid.',
-        'This compares the two ratios directly: water went from "2" to "3", so it says 1 part is 10 litres and the total is $5 \\times 10$. But the size of a part changes because the juice number also changes (3 to 2).',
-        null,
-      ],
-      keyIdea: 'When a ratio changes, use a letter for one part, keep the quantity that does NOT change, and set up an equation.',
-    },
-    check: {
-      optionValues: [30, 12, 50, 20],
-      compute: () => {
-        // juice 3k, water 2k; need 3 * (3k) = 2 * (2k + 10)
-        for (let k = 1; k <= 100; k++) if (3 * (3 * k) === 2 * (2 * k + 10)) return 5 * k;
-        return -1;
-      },
     },
   },
 ];

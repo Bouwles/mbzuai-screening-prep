@@ -9,8 +9,8 @@ export const lesson: Lesson = {
   methods: [
     { cue: 'Substituting the value gives an ordinary number', method: 'That number is the limit (polynomials, and fractions whose bottom is not $0$).' },
     { cue: 'Substituting gives $\\frac{0}{0}$ (polynomials or square roots)', method: 'Factorise top and bottom and cancel the common factor $(x - a)$, or multiply by the conjugate when there is a root. Then substitute again.' },
-    { cue: '$x \\to \\infty$ in a fraction', method: 'Compare the highest powers: equal degrees give the ratio of the leading coefficients, a higher power on the bottom gives $0$, a higher power on top gives $\\pm\\infty$. Under a root, $\\sqrt{4x^{2} + 1}$ behaves like $2x$.' },
-    { cue: '$\\sin$ or $\\cos$ with $x \\to 0$', method: 'Use $\\frac{\\sin x}{x} \\to 1$ (radians), so $\\frac{\\sin ax}{bx} \\to \\frac{a}{b}$. For $1 - \\cos x$, multiply top and bottom by $1 + \\cos x$.' },
+    { cue: '$x \\to \\infty$ in a fraction', method: 'Compare the highest powers: equal degrees give the ratio of the leading coefficients, a higher power on the bottom gives $0$, a higher power on top gives $\\pm\\infty$.' },
+    { cue: '$\\sin$ with $x \\to 0$', method: 'Use $\\frac{\\sin x}{x} \\to 1$ (radians), so $\\frac{\\sin ax}{bx} \\to \\frac{a}{b}$.' },
     { cue: '$\\left(1 + \\frac{k}{n}\\right)^{n}$ as $n \\to \\infty$', method: 'The limit is $e^{k}$ (not $1$).' },
     { cue: 'Piecewise function, $|x|$, or a one-sided limit $x \\to a^{+}$ / $x \\to a^{-}$', method: 'Find the left-hand and right-hand limits separately. The two-sided limit exists only if they are equal.' },
     { cue: '$\\lim_{h \\to 0} \\frac{f(a + h) - f(a)}{h}$', method: "This is the derivative $f'(a)$: expand and cancel the $h$, or simply differentiate $f$ and substitute $x = a$." },
@@ -40,7 +40,7 @@ export const lesson: Lesson = {
     '| top = bottom | ratio of leading coefficients | $\\frac{6x^2 + 1}{3x^2 - x} \\to 2$ |\n' +
     '| top < bottom | $0$ | $\\frac{5x}{x^2 + 1} \\to 0$ |\n' +
     '| top > bottom | $\\infty$ or $-\\infty$ (no finite limit) | $\\frac{x^3}{2x + 1} \\to \\infty$ |\n\n' +
-    'The **leading coefficient** is the number in front of the highest power, which is not always the first number written: in $\\frac{5 - 3x^2}{1 + 2x^2}$ it is $-3$ over $2$, so the limit is $-\\frac{3}{2}$. Under a square root, $x^2$ behaves like $x$ (for large positive $x$, $\\sqrt{x^2} = x$): $\\sqrt{9x^2 + 1} \\approx \\sqrt{9x^2} = 3x$.\n\n' +
+    'The **leading coefficient** is the number in front of the highest power, which is not always the first number written: in $\\frac{5 - 3x^2}{1 + 2x^2}$ it is $-3$ over $2$, so the limit is $-\\frac{3}{2}$.\n\n' +
     '### Two standard limits to memorise\n\n' +
     '- $\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1$, with $x$ in **radians**. More generally $\\frac{\\sin(ax)}{bx} \\to \\frac{a}{b}$, because $\\sin(ax) \\approx ax$ for small $x$.\n' +
     '- $\\lim_{n \\to \\infty} \\left(1 + \\frac{1}{n}\\right)^{n} = e \\approx 2.718$. More generally $\\left(1 + \\frac{k}{n}\\right)^{n} \\to e^{k}$. This is where continuous compound interest and the number $e$ come from.\n\n' +
@@ -63,7 +63,6 @@ export const lesson: Lesson = {
       note: 'If the top degree is lower the limit is 0; if higher there is no finite limit.',
     },
     { label: 'Standard trig limit', tex: '\\lim_{x \\to 0} \\frac{\\sin x}{x} = 1', note: 'Radians only. Also $\\lim_{x \\to 0} \\frac{\\sin(ax)}{bx} = \\frac{a}{b}$.' },
-    { label: 'Related trig limit', tex: '\\lim_{x \\to 0} \\frac{1 - \\cos x}{x^2} = \\frac{1}{2}' },
     { label: 'The number e', tex: '\\lim_{n \\to \\infty} \\left(1 + \\frac{1}{n}\\right)^{n} = e \\approx 2.71828' },
     { label: 'Generalised e limit', tex: '\\lim_{n \\to \\infty} \\left(1 + \\frac{k}{n}\\right)^{n} = e^{k}' },
     { label: 'Two-sided limit exists', tex: '\\lim_{x \\to a} f(x) = L \\iff \\lim_{x \\to a^{-}} f(x) = \\lim_{x \\to a^{+}} f(x) = L' },
@@ -126,6 +125,5 @@ export const lesson: Lesson = {
     'Limits appear as 4-option MCQs where the wrong options are the results of the classic mistakes: 0 (looked only at the top), 1 (treated $\\frac{0}{0}$ as 1), "does not exist" (gave up at $\\frac{0}{0}$), or the ratio of coefficients used the wrong way round. Fast checks:\n\n' +
     '- **Calculator check**: put in a value very close to the target, e.g. $x = 2.001$ for $x \\to 2$, or $x = 1000000$ for $x \\to \\infty$ (radian mode for trig). The result will be very close to exactly one option.\n' +
     '- **Degrees first** for $x \\to \\infty$: compare the highest powers before doing anything else. Lower on top means 0, equal means ratio of leading coefficients, higher on top means no finite limit.\n' +
-    "- **Spot the derivative**: $\\lim_{h \\to 0} \\frac{f(a + h) - f(a)}{h}$ is just $f'(a)$, so differentiate instead of expanding.\n" +
-    '- **Unknown constants**: if the bottom tends to 0 but the limit is finite, the top must also tend to 0. Use that equation first, then test the options.',
+    "- **Spot the derivative**: $\\lim_{h \\to 0} \\frac{f(a + h) - f(a)}{h}$ is just $f'(a)$, so differentiate instead of expanding.",
 };

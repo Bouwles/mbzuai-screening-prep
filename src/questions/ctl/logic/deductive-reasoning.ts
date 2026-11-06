@@ -509,18 +509,16 @@ Pattern: "No $B$ are $C$" and "All $A$ are $B$" give "No $A$ are $C$".`,
     id: 'deductive-reasoning-010',
     subtopic: 'deductive-reasoning',
     difficulty: 'exam',
-    stem: `Each argument below uses the same rule: "If a phone is in flight mode, then it cannot make calls."
+    stem: `Rule: "If $P$ then $Q$." How many of these four arguments are **valid**?
 
-1. The phone is in flight mode. So it cannot make calls.
-2. The phone cannot make calls. So it is in flight mode.
-3. The phone can make calls. So it is not in flight mode.
-4. The phone is not in flight mode. So it can make calls.
-
-How many of the four arguments are **valid**?`,
+1. $P$, so $Q$.
+2. $Q$, so $P$.
+3. Not $Q$, so not $P$.
+4. Not $P$, so not $Q$.`,
     options: [`1`, `2`, `3`, `4`],
     correctIndex: 1,
     markScheme: {
-      solution: `Let $P$ = "in flight mode" and $Q$ = "cannot make calls". The rule is "If $P$ then $Q$".
+      solution: `Match each argument to its pattern.
 
 | Argument | Pattern | Valid? |
 | --- | --- | --- |
@@ -529,30 +527,27 @@ How many of the four arguments are **valid**?`,
 | 3 | not $Q$, so not $P$ | Valid (modus tollens) |
 | 4 | not $P$, so not $Q$ | Invalid (denying the antecedent) |
 
-Counterexamples for the invalid ones:
-
-- Argument 2: a phone may be unable to call because it has no signal, not because of flight mode.
-- Argument 4: a phone that is not in flight mode might still be unable to call (flat battery).
+For example, with the rule "If a phone is in flight mode, then it cannot make calls", a phone may be unable to call because it has no signal. So argument 2 fails, and a phone not in flight mode might still be unable to call, so argument 4 fails.
 
 So exactly **2** arguments are valid.`,
       whyWrong: [
-        `This accepts only argument 1 and misses that argument 3 is **modus tollens**: if the phone can make calls, it cannot be in flight mode, otherwise the rule would be broken.`,
+        `This accepts only argument 1 and misses that argument 3 is **modus tollens**: if $Q$ fails, $P$ cannot have happened, otherwise the rule would be broken.`,
         null,
-        `This accepts one of the two fallacies as well, usually argument 2 (affirming the consequent). A phone can be unable to call for other reasons, such as having no signal.`,
-        `This accepts every argument, including both fallacies. Argument 4 denies the antecedent: a phone not in flight mode might still be unable to call because its battery is flat.`,
+        `This accepts one of the two fallacies as well, usually argument 2 (affirming the consequent). $Q$ can be true for some other reason.`,
+        `This accepts every argument, including both fallacies. Argument 4 denies the antecedent: the rule says nothing about what happens when $P$ is false.`,
       ],
       keyIdea: `Of the four "if-then" patterns, only modus ponens and modus tollens are valid; affirming the consequent and denying the antecedent are fallacies.`,
     },
     check: {
       optionValues: [1, 2, 3, 4],
       compute: () => {
-        const v = ['F', 'C']; // F: flight mode, C: can make calls
-        const rule: Prop = (e) => imp(e.F, !e.C);
+        const v = ['P', 'Q'];
+        const rule: Prop = (e) => imp(e.P, e.Q);
         const args: [Prop, Prop][] = [
-          [(e) => e.F, (e) => !e.C],
-          [(e) => !e.C, (e) => e.F],
-          [(e) => e.C, (e) => !e.F],
-          [(e) => !e.F, (e) => e.C],
+          [(e) => e.P, (e) => e.Q],
+          [(e) => e.Q, (e) => e.P],
+          [(e) => !e.Q, (e) => !e.P],
+          [(e) => !e.P, (e) => !e.Q],
         ];
         return args.filter(([given, concl]) => entails(v, [rule, given], concl)).length;
       },
@@ -610,14 +605,13 @@ Note that passing is **not** said to be enough: you could pass the interview and
     id: 'deductive-reasoning-012',
     subtopic: 'deductive-reasoning',
     difficulty: 'exam',
-    stem: `Ali, Bea, Chen and Dana each own exactly one pet. The four pets are a cat, a dog, a fish and a rabbit (one each).
+    stem: `Ali, Bea, Chen and Dana own one pet each: cat, dog, fish, rabbit.
 
-- Ali owns neither the cat nor the dog.
-- Bea owns either the rabbit or the fish.
+- Ali owns neither cat nor dog.
+- Bea owns the rabbit or fish.
 - Chen does not own the cat.
-- Dana owns neither the fish nor the rabbit.
 
-Which statement **must** be true?`,
+What **must** be true?`,
     options: [`Ali owns the fish.`, `Bea owns the rabbit.`, `Dana owns the cat.`, `Chen owns the rabbit.`],
     correctIndex: 2,
     markScheme: {
@@ -628,7 +622,7 @@ Which statement **must** be true?`,
 | Ali | fish, rabbit (not cat, not dog) |
 | Bea | fish, rabbit |
 | Chen | dog, fish, rabbit (not cat) |
-| Dana | cat, dog (not fish, not rabbit) |
+| Dana | cat, dog, fish, rabbit |
 
 **Step 1.** Ali and Bea can only have the fish or the rabbit, and there is one of each. So between them they take **both** the fish and the rabbit.
 
@@ -651,8 +645,7 @@ Ali and Bea could be either way round (Ali fish and Bea rabbit, or Ali rabbit an
         const pets = ['cat', 'dog', 'fish', 'rabbit'];
         // each solution is [Ali, Bea, Chen, Dana]
         const sols = perms(pets).filter(
-          ([a, b, c, d]) =>
-            a !== 'cat' && a !== 'dog' && (b === 'rabbit' || b === 'fish') && c !== 'cat' && d !== 'fish' && d !== 'rabbit',
+          ([a, b, c]) => a !== 'cat' && a !== 'dog' && (b === 'rabbit' || b === 'fish') && c !== 'cat',
         );
         if (sols.length === 0) return 'no solution';
         const opts: [string, (s: string[]) => boolean][] = [
@@ -817,23 +810,15 @@ None of the other statements puts Layla inside the managers group, so with any o
     },
   },
 
-  // ================================================================ challenge
   {
     id: 'deductive-reasoning-016',
     subtopic: 'deductive-reasoning',
     difficulty: 'exam',
-    stem: `Each of the statements $P$, $Q$, $R$ and $S$ is either true or false. You are told:
-
-- If $P$ is true, then $Q$ is true.
-- If $R$ is true, then $Q$ is false.
-- If $S$ is false, then $R$ is true.
-- $P$ is true.
-
-Which of the following must be true?`,
+    stem: `Given that $P$ is true, $P \\Rightarrow Q$, $R \\Rightarrow \\neg Q$ and $\\neg S \\Rightarrow R$, which of the following must be true?`,
     options: [`$R$ is true.`, `$R$ is false and $S$ is true.`, `$S$ is false.`, `$Q$ is true, but nothing can be said about $S$.`],
     correctIndex: 1,
     markScheme: {
-      solution: `Work forwards from the one fact you know for certain.
+      solution: `Here $A \\Rightarrow B$ means "if $A$ then $B$", and $\\neg A$ means "not $A$". Work forwards from the one fact you know for certain.
 
 **Step 1.** $P$ is true, and "if $P$ then $Q$", so $Q$ is **true** (modus ponens).
 
@@ -866,226 +851,109 @@ So "$R$ is false and $S$ is true" must be true.`,
     },
   },
   {
-    id: 'deductive-reasoning-017',
+    id: 'deductive-reasoning-021',
     subtopic: 'deductive-reasoning',
-    difficulty: 'challenge',
-    stem: `Omar, Priya and Hana each play a different sport (tennis, swimming, chess) and each come from a different city (Dubai, Abu Dhabi, Sharjah).
-
-1. The swimmer is from Abu Dhabi.
-2. The chess player is from Dubai.
-3. Omar is not from Abu Dhabi.
-4. Priya does not play tennis.
-5. Omar does not play tennis.
-
-Which statement **must** be true?`,
-    options: [`Priya is from Abu Dhabi.`, `Priya is from Dubai.`, `Omar is from Sharjah.`, `Hana is from Abu Dhabi.`],
+    difficulty: 'foundation',
+    stem: `What is the **contrapositive** of "If $P$ then $Q$"?`,
+    options: [`If not $Q$ then not $P$`, `If $Q$ then $P$`, `If not $P$ then not $Q$`, `$P$ and not $Q$`],
     correctIndex: 0,
     markScheme: {
-      solution: `**Step 1 (link the attributes).** Clues 1 and 2 tie sport to city: swimmer = Abu Dhabi, chess = Dubai. Since the cities are all different, the tennis player must be from the remaining city, **Sharjah**.
-
-**Step 2.** Clues 4 and 5: neither Priya nor Omar plays tennis, so **Hana plays tennis**, and from Step 1 Hana is from Sharjah.
-
-**Step 3.** Omar and Priya play swimming and chess in some order. Omar is not from Abu Dhabi (clue 3), so Omar is not the swimmer. So **Omar plays chess** (from Dubai) and **Priya swims** (from Abu Dhabi).
-
-| Person | Sport | City |
-| --- | --- | --- |
-| Omar | chess | Dubai |
-| Priya | swimming | Abu Dhabi |
-| Hana | tennis | Sharjah |
-
-So "Priya is from Abu Dhabi" must be true.`,
+      solution: `The contrapositive swaps the two parts **and** negates both: "If not $Q$ then not $P$". It always has the same truth value as the original rule.`,
       whyWrong: [
         null,
-        `This needs Priya to be the chess player. But Omar cannot swim (he is not from Abu Dhabi) and does not play tennis, so Omar is the chess player from Dubai.`,
-        `Sharjah belongs to the tennis player (the city left over after clues 1 and 2), and clue 5 says Omar does not play tennis.`,
-        `Hana must play tennis, since clues 4 and 5 rule out the other two. The tennis player is from the leftover city, Sharjah, not Abu Dhabi.`,
+        `This is the **converse**: it swaps the parts but does not negate them.`,
+        `This is the **inverse**: it negates both parts but does not swap them.`,
+        `This is the **negation** of the rule, which describes the one situation where the rule is broken.`,
       ],
-      keyIdea: `In a grid puzzle, use clues that link two attributes to merge them, then eliminate until each person has exactly one option.`,
+      keyIdea: `Contrapositive = swap and negate both; it is the only one of these forms equivalent to the rule.`,
     },
     check: {
-      optionValues: ['Priya Abu Dhabi', 'Priya Dubai', 'Omar Sharjah', 'Hana Abu Dhabi'],
-      compute: () => {
-        // people order: Omar, Priya, Hana
-        const sols: { sport: string[]; city: string[] }[] = [];
-        for (const sport of perms(['tennis', 'swimming', 'chess']))
-          for (const city of perms(['Dubai', 'Abu Dhabi', 'Sharjah'])) {
-            const ok =
-              [0, 1, 2].every((i) => sport[i] !== 'swimming' || city[i] === 'Abu Dhabi') &&
-              [0, 1, 2].every((i) => sport[i] !== 'chess' || city[i] === 'Dubai') &&
-              city[0] !== 'Abu Dhabi' &&
-              sport[1] !== 'tennis' &&
-              sport[0] !== 'tennis';
-            if (ok) sols.push({ sport, city });
-          }
-        if (sols.length === 0) return 'no solution';
-        const opts: [string, (s: { city: string[] }) => boolean][] = [
-          ['Priya Abu Dhabi', (s) => s.city[1] === 'Abu Dhabi'],
-          ['Priya Dubai', (s) => s.city[1] === 'Dubai'],
-          ['Omar Sharjah', (s) => s.city[0] === 'Sharjah'],
-          ['Hana Abu Dhabi', (s) => s.city[2] === 'Abu Dhabi'],
-        ];
-        const must = opts.filter(([, f]) => sols.every(f)).map(([k]) => k);
-        return must.length === 1 ? must[0] : `found:${must.join(',')}`;
-      },
-    },
-  },
-  {
-    id: 'deductive-reasoning-018',
-    subtopic: 'deductive-reasoning',
-    difficulty: 'challenge',
-    stem: `Assume all three statements are true:
-
-- All coders are logical.
-- Some logical people are musicians.
-- No musicians are impatient.
-
-Which statement **must** be true?`,
-    options: [
-      `Some coders are musicians.`,
-      `No coders are impatient.`,
-      `Some logical people are not impatient.`,
-      `Some impatient people are not logical.`,
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution: `**Step 1.** "Some logical people are musicians": there is at least one person who is logical and a musician. Call him Karim.
-
-**Step 2.** "No musicians are impatient": Karim is a musician, so Karim is **not** impatient.
-
-**Step 3.** So Karim is logical and not impatient. Therefore **some logical people are not impatient**.
-
-Why the coders drop out: "All coders are logical" puts coders inside the logical group, but the logical musicians (like Karim) might be completely different people from the coders. So nothing definite can be said about coders and musicians, or about coders and impatience.`,
-      whyWrong: [
-        `This is the "undistributed middle" mistake: coders are only part of the logical group, and the logical people who are musicians might not be coders at all.`,
-        `Only musicians are known to be patient. A coder who is not a musician could be impatient without breaking any statement.`,
-        null,
-        `Not forced: every impatient person could be logical (for example, an impatient coder who is not a musician), and all three statements would still be true.`,
-      ],
-      keyIdea: `With "some" premises, follow the one guaranteed individual through the other statements, and only claim what holds for that individual.`,
-    },
-    check: {
-      optionValues: ['some C M', 'no C I', 'some L not I', 'some I not L'],
+      optionValues: ['contrapositive', 'converse', 'inverse', 'negation'],
       compute: () =>
-        uniqueCat(
-          ['C', 'L', 'M', 'I'],
-          [
-            ['all', 'C', 'L'],
-            ['some', 'L', 'M'],
-            ['no', 'M', 'I'],
-          ],
-          [
-            ['some C M', ['some', 'C', 'M']],
-            ['no C I', ['no', 'C', 'I']],
-            ['some L not I', ['someNot', 'L', 'I']],
-            ['some I not L', ['someNot', 'I', 'L']],
-          ],
-        ),
+        uniqueEquivalent(['P', 'Q'], (e) => imp(e.P, e.Q), [
+          ['contrapositive', (e) => imp(!e.Q, !e.P)],
+          ['converse', (e) => imp(e.Q, e.P)],
+          ['inverse', (e) => imp(!e.P, !e.Q)],
+          ['negation', (e) => e.P && !e.Q],
+        ]),
     },
   },
   {
-    id: 'deductive-reasoning-019',
+    id: 'deductive-reasoning-022',
     subtopic: 'deductive-reasoning',
-    difficulty: 'challenge',
-    stem: `At a training centre, these rules always hold:
-
-- Passing the exam is **sufficient** for getting a certificate.
-- Getting a certificate is **necessary** for being hired.
-- Attending the course is **necessary** for passing the exam.
-
-Which statement must be true?`,
-    options: [
-      `Anyone who was hired attended the course.`,
-      `Anyone with a certificate passed the exam.`,
-      `Anyone who attended the course got a certificate.`,
-      `Anyone who passed the exam attended the course and got a certificate.`,
-    ],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: `In logic, "Some $A$ are $B$" means:`,
+    options: [`At least one $A$ is a $B$`, `Most $A$ are $B$`, `Not every $A$ is a $B$`, `Every $A$ is a $B$`],
+    correctIndex: 0,
     markScheme: {
-      solution: `Translate each rule into if-then form. "$X$ is sufficient for $Y$" means "if $X$ then $Y$"; "$X$ is necessary for $Y$" means "if $Y$ then $X$".
-
-1. Pass $\\Rightarrow$ Certificate
-2. Hired $\\Rightarrow$ Certificate
-3. Pass $\\Rightarrow$ Attend
-
-Now test the options:
-
-- "Passed $\\Rightarrow$ attended and got a certificate": rules 3 and 1 both start from Pass, so both follow. **Must be true.**
-- "Hired $\\Rightarrow$ attended": rule 2 takes Hired to Certificate, but no rule goes from Certificate back to Pass, so we cannot reach Attend.
-- "Certificate $\\Rightarrow$ passed": the converse of rule 1, not given.
-- "Attended $\\Rightarrow$ certificate": no rule starts from Attend (rule 3 ends there).
-
-So only the last statement is guaranteed.`,
+      solution: `In logic "some" simply means **at least one**. It does not say how many, and it does not rule out the possibility that all of them are.`,
       whyWrong: [
-        `Hired leads to Certificate, but a certificate need not come from passing the exam (passing is sufficient, not necessary), so the chain cannot reach the course.`,
-        `This is the converse of the first rule. Passing guarantees a certificate, but a certificate might be gained another way.`,
-        `This reads the third rule backwards (as "attend $\\Rightarrow$ pass") and then chains it with the first rule. But attending is necessary for passing, not sufficient: you can attend and still fail, and then no rule gives you a certificate.`,
         null,
+        `"Some" says nothing about a majority. One is enough.`,
+        `This is the everyday meaning of "some", which suggests "but not all". In logic, "some" is still true when every $A$ is a $B$.`,
+        `This upgrades "some" to "all". One $A$ that is a $B$ is enough for "some".`,
       ],
-      keyIdea: `Translate "sufficient" as "if $X$ then $Y$" and "necessary" as "if $Y$ then $X$", then only follow arrows in their given direction.`,
+      keyIdea: `In logic, "some" means "at least one", and it does not exclude "all".`,
+    },
+  },
+  {
+    id: 'deductive-reasoning-023',
+    subtopic: 'deductive-reasoning',
+    difficulty: 'foundation',
+    stem: `Which of these argument forms is always valid?`,
+    options: [`Modus tollens`, `Affirming the consequent`, `Denying the antecedent`, `Assuming the converse`],
+    correctIndex: 0,
+    markScheme: {
+      solution: `Modus tollens is the pattern "If $P$ then $Q$. Not $Q$. Therefore not $P$." If $P$ had been true, $Q$ would have been true as well, so the conclusion is forced.`,
+      whyWrong: [
+        null,
+        `"If $P$ then $Q$. $Q$. Therefore $P$." is a fallacy: $Q$ might be true for another reason.`,
+        `"If $P$ then $Q$. Not $P$. Therefore not $Q$." is a fallacy: the rule says nothing about what happens when $P$ is false.`,
+        `A rule does not imply its converse: "If $P$ then $Q$" does not give "If $Q$ then $P$".`,
+      ],
+      keyIdea: `Modus ponens and modus tollens are valid; affirming the consequent and denying the antecedent are not.`,
     },
     check: {
-      optionValues: ['H->A', 'C->P', 'A->C', 'P->(A and C)'],
+      optionValues: ['MT', 'AC', 'DA', null],
       compute: () => {
-        const v = ['P', 'C', 'H', 'A']; // pass, certificate, hired, attend
-        const prem: Prop[] = [(e) => imp(e.P, e.C), (e) => imp(e.H, e.C), (e) => imp(e.P, e.A)];
-        return uniqueEntailed(v, prem, [
-          ['H->A', (e) => imp(e.H, e.A)],
-          ['C->P', (e) => imp(e.C, e.P)],
-          ['A->C', (e) => imp(e.A, e.C)],
-          ['P->(A and C)', (e) => imp(e.P, e.A && e.C)],
-        ]);
+        const P: Prop = (e) => e.P;
+        const Q: Prop = (e) => e.Q;
+        const v = ['P', 'Q'];
+        const forms: [string, Prop, Prop][] = [
+          ['MT', (e) => !Q(e), (e) => !P(e)],
+          ['AC', Q, P],
+          ['DA', (e) => !P(e), (e) => !Q(e)],
+        ];
+        return forms.filter(([, given, concl]) => entails(v, [(e) => imp(P(e), Q(e)), given], concl)).map(([k]) => k).join('+');
       },
     },
   },
   {
-    id: 'deductive-reasoning-020',
+    id: 'deductive-reasoning-024',
     subtopic: 'deductive-reasoning',
-    difficulty: 'challenge',
-    stem: `In a school, every student who takes Physics also takes Maths, no student who takes Art takes Maths, and at least one student takes Art.
-
-How many of the following conclusions **must** be true?
-
-1. No student who takes Physics takes Art.
-2. Some students who take Art do not take Physics.
-3. Every student who takes Maths takes Physics.
-4. Some students take neither Art nor Maths.`,
-    options: [`1`, `2`, `3`, `4`],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: `"$P$ is **sufficient** for $Q$" means the same as:`,
+    options: [`If $P$ then $Q$`, `If $Q$ then $P$`, `If not $P$ then not $Q$`, `$P$ if and only if $Q$`],
+    correctIndex: 0,
     markScheme: {
-      solution: `Picture the groups: Physics sits **inside** Maths, and Art does **not overlap** Maths at all. The Art group has at least one member.
-
-1. A Physics student also takes Maths, and nobody in Maths takes Art. So no Physics student takes Art. **Must be true.**
-2. Pick an Art student (one exists). They do not take Maths, so they cannot take Physics (Physics is inside Maths). So some Art students do not take Physics. **Must be true.**
-3. This is the converse of "every Physics student takes Maths". There could be Maths students who do not take Physics. **Not forced.**
-4. Nothing says such a student exists: every student might take Art or Maths. **Not forced.**
-
-So **2** of the conclusions must be true.`,
+      solution: `"Sufficient" means enough: having $P$ guarantees $Q$. In if-then form this is "If $P$ then $Q$".`,
       whyWrong: [
-        `This usually misses conclusion 2: an Art student is guaranteed to exist, and since no Art student takes Maths, that student cannot take Physics either.`,
         null,
-        `This accepts one extra conclusion: either conclusion 3 (the converse of the first fact) or conclusion 4 (but no student is said to take neither subject).`,
-        `This accepts every conclusion, including conclusion 3 (a converse) and conclusion 4 (nothing guarantees a student outside both Art and Maths).`,
+        `This is "$P$ is **necessary** for $Q$". You cannot have $Q$ without $P$.`,
+        `This is the inverse, which has the same meaning as "If $Q$ then $P$", so it also describes "necessary".`,
+        `This says necessary **and** sufficient, which is more than the statement claims.`,
       ],
-      keyIdea: `Draw the groups as nested or separate circles, then accept a conclusion only if no arrangement of the circles allowed by the facts can break it.`,
+      keyIdea: `"$P$ is sufficient for $Q$" means "If $P$ then $Q$"; "$P$ is necessary for $Q$" means "If $Q$ then $P$".`,
     },
     check: {
-      optionValues: [1, 2, 3, 4],
-      compute: () => {
-        const terms = ['P', 'M', 'A'];
-        const prem: Cat[] = [
-          ['all', 'P', 'M'],
-          ['no', 'A', 'M'],
-          ['some', 'A', 'A'],
-        ];
-        const concl: Cat[] = [
-          ['no', 'P', 'A'],
-          ['someNot', 'A', 'P'],
-          ['all', 'M', 'P'],
-          ['some', '~A', '~M'],
-        ];
-        const res = concl.map((c) => catFollowsBoth(terms, prem, c));
-        return res.some((r) => r === null) ? -1 : res.filter((r) => r).length;
-      },
+      optionValues: ['P->Q', 'Q->P', 'notP->notQ', 'P<->Q'],
+      compute: () =>
+        uniqueEquivalent(['P', 'Q'], (e) => !(e.P && !e.Q), [
+          ['P->Q', (e) => imp(e.P, e.Q)],
+          ['Q->P', (e) => imp(e.Q, e.P)],
+          ['notP->notQ', (e) => imp(!e.P, !e.Q)],
+          ['P<->Q', (e) => e.P === e.Q],
+        ]),
     },
   },
 ];

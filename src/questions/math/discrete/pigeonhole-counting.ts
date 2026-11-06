@@ -20,15 +20,6 @@ function gridRoutes(x0: number, y0: number, x1: number, y1: number): number {
   return ways[w][h];
 }
 
-/** Every ordering of 0..n-1. */
-function allOrders(n: number): number[][] {
-  if (n === 0) return [[]];
-  const out: number[][] = [];
-  for (const rest of allOrders(n - 1))
-    for (let pos = 0; pos <= rest.length; pos++) out.push([...rest.slice(0, pos), n - 1, ...rest.slice(pos)]);
-  return out;
-}
-
 /** Smallest number of objects in k boxes that FORCES some box to hold at least r (checks the most even spread). */
 function minToForce(k: number, r: number): number {
   for (let n = 1; ; n++) {
@@ -43,7 +34,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-001',
     subtopic: 'pigeonhole-counting',
     difficulty: 'foundation',
-    stem: 'A café set menu lets you choose **one** starter from 4, **one** main course from 6 and **one** dessert from 3. How many different three-course meals are possible?',
+    stem: 'How many different meals can be made by choosing **one** starter from 4, **one** main course from 6 and **one** dessert from 3?',
     options: ['$13$', '$72$', '$24$', '$286$'],
     correctIndex: 1,
     markScheme: {
@@ -72,7 +63,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-002',
     subtopic: 'pigeonhole-counting',
     difficulty: 'foundation',
-    stem: 'You are allowed to take **exactly one** book on a flight. You own 5 novels, 7 comics and 3 textbooks, all different. How many different choices do you have?',
+    stem: 'In how many ways can you choose **exactly one** book from 5 novels, 7 comics and 3 textbooks, all different?',
     options: ['$105$', '$3$', '$455$', '$15$'],
     correctIndex: 3,
     markScheme: {
@@ -116,7 +107,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-004',
     subtopic: 'pigeonhole-counting',
     difficulty: 'foundation',
-    stem: 'At a meeting there are 10 people. Every person shakes hands **once** with every other person. How many handshakes take place?',
+    stem: 'Each of 10 people shakes hands **once** with every other person. How many handshakes take place?',
     options: ['$90$', '$100$', '$45$', '$9$'],
     correctIndex: 2,
     markScheme: {
@@ -146,7 +137,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-005',
     subtopic: 'pigeonhole-counting',
     difficulty: 'foundation',
-    stem: 'A phone PIN is made of 4 digits, each from 0 to 9, and digits **may repeat** (for example 0070 is allowed). How many different PINs are possible?',
+    stem: 'A PIN is made of 4 digits from 0 to 9, and digits **may repeat**. How many different PINs are possible?',
     options: ['$5040$', '$6561$', '$40$', '$10\\,000$'],
     correctIndex: 3,
     markScheme: {
@@ -253,7 +244,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-009',
     subtopic: 'pigeonhole-counting',
     difficulty: 'exam',
-    stem: 'A robot walks on a square grid from $(0, 0)$ to $(5, 3)$, one unit at a time, moving only **right** or **up**. How many different shortest routes can it take?',
+    stem: 'How many shortest routes go from $(0, 0)$ to $(5, 3)$ on a square grid, moving only **right** or **up**?',
     options: ['$15$', '$256$', '$56$', '$336$'],
     correctIndex: 2,
     markScheme: {
@@ -275,7 +266,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-010',
     subtopic: 'pigeonhole-counting',
     difficulty: 'exam',
-    stem: 'There are 50 students in a year group. What is the **largest** number $n$ for which we can be **certain** that at least $n$ of them were born on the same day of the week?',
+    stem: 'Among 50 students, what is the **largest** $n$ for which at least $n$ must have been born on the same day of the week?',
     options: ['$7$', '$2$', '$43$', '$8$'],
     correctIndex: 3,
     markScheme: {
@@ -308,7 +299,7 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-011',
     subtopic: 'pigeonhole-counting',
     difficulty: 'exam',
-    stem: 'A drawer contains plenty of socks in 5 different colours. In the dark, what is the **minimum** number of socks you must take out to be **certain** of having at least 3 socks of the same colour?',
+    stem: 'Socks come in 5 colours. What is the **minimum** number of socks you must take to be **certain** of having 3 of the same colour?',
     options: ['$15$', '$10$', '$11$', '$6$'],
     correctIndex: 2,
     markScheme: {
@@ -364,11 +355,12 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-013',
     subtopic: 'pigeonhole-counting',
     difficulty: 'exam',
-    stem: 'A **diagonal** of a polygon is a straight line joining two corners (vertices) that are **not** next to each other. How many diagonals does a decagon (10 sides) have?',
+    stem: 'How many diagonals does a decagon (a polygon with 10 sides) have?',
     options: ['$45$', '$35$', '$70$', '$25$'],
     correctIndex: 1,
     markScheme: {
       solution:
+        'A **diagonal** joins two vertices that are not next to each other.\n\n' +
         'Any two of the 10 vertices can be joined by a line segment, and the order of the two vertices does not matter:\n\n' +
         '$$\\binom{10}{2} = \\frac{10 \\times 9}{2} = 45 \\text{ segments}$$\n\n' +
         'Of these, 10 are the **sides** of the decagon (adjacent vertices), not diagonals.\n\n' +
@@ -400,20 +392,20 @@ export const questions: StaticQuestion[] = [
     id: 'pigeonhole-counting-014',
     subtopic: 'pigeonhole-counting',
     difficulty: 'exam',
-    stem: 'A toy lock has five buttons labelled A, B, C, D and E. A code is a sequence of **3 or 4** button presses, and a button may be pressed more than once. How many different codes are there?',
+    stem: 'A code is a sequence of **3 or 4** symbols chosen from 5 different symbols, and symbols may repeat. How many different codes are there?',
     options: ['$750$', '$625$', '$78\\,125$', '$180$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Split into the two separate cases, count each with the product rule, then **add** (a code is 3 presses **or** 4 presses, never both).\n\n' +
-        '- 3 presses: $5^3 = 125$\n' +
-        '- 4 presses: $5^4 = 625$\n\n' +
+        'Split into the two separate cases, count each with the product rule, then **add** (a code has 3 symbols **or** 4 symbols, never both).\n\n' +
+        '- 3 symbols: $5^3 = 125$\n' +
+        '- 4 symbols: $5^4 = 625$\n\n' +
         '$$125 + 625 = 750$$',
       whyWrong: [
         null,
-        'This is $5^4$: it only counts the 4-press codes and forgets the 125 codes of length 3.',
+        'This is $5^4$: it only counts the codes of length 4 and forgets the 125 codes of length 3.',
         'This is $125 \\times 625$: the product rule is for doing one thing **and then** another. A code has length 3 **or** length 4, so the cases are added.',
-        'This is $5 \\times 4 \\times 3 + 5 \\times 4 \\times 3 \\times 2 = 60 + 120$: it forbids pressing a button twice, but repeats are allowed.',
+        'This is $5 \\times 4 \\times 3 + 5 \\times 4 \\times 3 \\times 2 = 60 + 120$: it forbids using a symbol twice, but repeats are allowed.',
       ],
       keyIdea: 'Split into non-overlapping cases, count each with the product rule, and add the cases.',
     },
@@ -458,7 +450,6 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ================================================================ challenge
   {
     id: 'pigeonhole-counting-016',
     subtopic: 'pigeonhole-counting',
@@ -505,113 +496,83 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'pigeonhole-counting-017',
+    id: 'pigeonhole-counting-021',
     subtopic: 'pigeonhole-counting',
-    difficulty: 'challenge',
-    stem: 'How many integers from 1 to 210 inclusive are divisible by **at least one** of 2, 3 or 5?',
-    options: ['$154$', '$217$', '$147$', '$56$'],
+    difficulty: 'foundation',
+    stem: 'If $n + 1$ objects are placed in $n$ boxes, the pigeonhole principle says that:',
+    options: ['some box holds at least 2 objects', 'every box holds at least 2 objects', 'every box holds at least 1 object', 'exactly one box is empty'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Inclusion-exclusion for three sets:\n\n' +
-        '$$|A \\cup B \\cup C| = |A| + |B| + |C| - |A \\cap B| - |A \\cap C| - |B \\cap C| + |A \\cap B \\cap C|$$\n\n' +
-        '- Singles: $\\frac{210}{2} = 105$, $\\frac{210}{3} = 70$, $\\frac{210}{5} = 42$. Sum $= 217$.\n' +
-        '- Pairs (multiples of the LCM): by 6: $35$, by 10: $21$, by 15: $14$. Sum $= 70$.\n' +
-        '- All three (multiples of 30): $7$.\n\n' +
-        '$$217 - 70 + 7 = 154$$',
+        'If every box held at most 1 object, the $n$ boxes could hold at most $n$ objects. There are $n + 1$ objects, so some box must hold at least 2.\n\n' +
+        'The principle says nothing about the other boxes, and some of them may be empty.',
       whyWrong: [
         null,
-        'This is $105 + 70 + 42$: numbers such as 6 or 30 are divisible by more than one of 2, 3, 5 and get counted two or three times.',
-        'This is $217 - 70$: it subtracts the pairwise overlaps but forgets to add back the 7 multiples of 30. Those were added three times and then subtracted three times, so after this step they are not counted at all.',
-        'This is $210 - 154$, the count of numbers divisible by **none** of 2, 3 and 5.',
+        'That would need at least $2n$ objects. Only one box is forced to hold 2.',
+        'All the objects could go in one box, leaving the other boxes empty.',
+        'Nothing forces a box to be empty, and if some are empty there could be several.',
       ],
-      keyIdea: 'Three-set inclusion-exclusion: add singles, subtract pairs, add back the triple overlap.',
-    },
-    check: { optionValues: [154, 217, 147, 56], compute: () => countUpTo(210, (x) => x % 2 === 0 || x % 3 === 0 || x % 5 === 0) },
-  },
-  {
-    id: 'pigeonhole-counting-018',
-    subtopic: 'pigeonhole-counting',
-    difficulty: 'challenge',
-    stem: 'Six friends, including Ali and Bea, sit in a row of 6 seats. In how many arrangements are Ali and Bea **not** sitting next to each other?',
-    options: ['$240$', '$480$', '$600$', '$720$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Use complementary counting: (all arrangements) minus (arrangements where they **are** together).\n\n' +
-        '- All arrangements: $6! = 720$.\n' +
-        '- Together: glue Ali and Bea into one block. Now arrange 5 items: $5! = 120$. Inside the block they can sit as Ali-Bea or Bea-Ali: $\\times 2$. Total $120 \\times 2 = 240$.\n\n' +
-        '$$720 - 240 = 480$$',
-      whyWrong: [
-        'This is the number of arrangements where Ali and Bea **are** next to each other. Subtract it from the 720 total.',
-        null,
-        'This is $720 - 120$: when Ali and Bea are glued together it forgets that they can swap places inside the block, so it only removes half of the "together" arrangements.',
-        'This is $6!$, every arrangement, ignoring the condition.',
-      ],
-      keyIdea: '"Not together" = total minus "together"; for "together", glue the pair into one block and remember the pair can swap.',
-    },
-    check: {
-      optionValues: [240, 480, 600, 720],
-      compute: () => allOrders(6).filter((p) => Math.abs(p.indexOf(0) - p.indexOf(1)) !== 1).length,
+      keyIdea: 'Pigeonhole principle: more objects than boxes means some box holds at least 2.',
     },
   },
   {
-    id: 'pigeonhole-counting-019',
+    id: 'pigeonhole-counting-022',
     subtopic: 'pigeonhole-counting',
-    difficulty: 'challenge',
-    stem: 'Numbers are chosen from the integers 1 to 20 (each number at most once). What is the **smallest** number of integers you must choose to be **certain** that two of the chosen numbers add up to 21?',
-    options: ['$10$', '$21$', '$20$', '$11$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'Which rule counts **one** choice made from separate groups that do not overlap?',
+    options: ['Sum rule', 'Product rule', 'Pigeonhole principle', 'Inclusion-exclusion'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Make the **boxes** pairs that add to 21:\n\n' +
-        '$$\\{1, 20\\}, \\{2, 19\\}, \\{3, 18\\}, \\ldots, \\{10, 11\\}$$\n\n' +
-        'Every number from 1 to 20 is in exactly one pair, so there are 10 boxes.\n\n' +
-        '- With 10 numbers you might take one from each pair (for example 1, 2, ..., 10), and no two of those add to 21 (the largest sum is $10 + 9 = 19$). So 10 is not enough.\n' +
-        '- With 11 numbers in 10 boxes, two numbers must come from the same pair, and they add to 21.\n\n' +
-        'Answer: $10 + 1 = 11$.',
+        'For one choice from separate groups ("this **or** that"), you add the sizes of the groups. This is the **sum rule**.\n\n' +
+        'For example, one book from 5 novels or 7 comics gives $5 + 7 = 12$ choices.',
       whyWrong: [
-        'Ten numbers could be 1, 2, ..., 10, one from each pair, and no two of them add to 21. This is the worst case; one more number is needed.',
-        'This confuses the target sum 21 with the number of choices. There are only 20 integers to choose from, so 21 choices are impossible anyway.',
-        'Choosing all 20 numbers certainly works, but it is not the smallest number: 11 already forces a pair adding to 21.',
         null,
+        'The product rule is for choices made in stages ("this **and then** that").',
+        'The pigeonhole principle shows that something must happen. It does not count choices.',
+        'Inclusion-exclusion is for groups that **do** overlap. With no overlap there is nothing to subtract.',
       ],
-      keyIdea: 'Pigeonhole with clever boxes: group the numbers into pairs that add to the target, then choosing one more number than there are boxes forces a pair.',
-    },
-    check: {
-      optionValues: [10, 21, 20, 11],
-      compute: () => {
-        // boxes = pairs {i, j} from 1..20 with i + j = 21; the largest "safe" choice takes one from each box
-        let boxes = 0;
-        for (let i = 1; i <= 20; i++) for (let j = i + 1; j <= 20; j++) if (i + j === 21) boxes++;
-        return boxes + 1;
-      },
+      keyIdea: '"Or" from separate groups adds; "and then" multiplies.',
     },
   },
   {
-    id: 'pigeonhole-counting-020',
+    id: 'pigeonhole-counting-023',
     subtopic: 'pigeonhole-counting',
-    difficulty: 'challenge',
-    stem: 'How many 4-digit whole numbers (from 1000 to 9999) have **at least one** repeated digit (for example 1231 or 5500)?',
-    options: ['$4960$', '$4536$', '$4464$', '$3960$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Which rule counts a choice made in **stages**, one decision after another?',
+    options: ['Product rule', 'Sum rule', 'Complementary counting', 'Pigeonhole principle'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Complementary counting: (all 4-digit numbers) minus (those with all four digits different).\n\n' +
-        '- All 4-digit numbers: $9999 - 1000 + 1 = 9000$.\n' +
-        '- All digits different: the first digit cannot be 0, so it has 9 choices; the second can be 0 but not the first digit (9 choices); then 8; then 7. That is $9 \\times 9 \\times 8 \\times 7 = 4536$.\n\n' +
-        '$$9000 - 4536 = 4464$$',
+        'When a choice is made in stages ("this **and then** that"), multiply the number of options at each stage. This is the **product rule**.\n\n' +
+        'For example, a starter from 4 and then a main from 6 gives $4 \\times 6 = 24$ meals.',
       whyWrong: [
-        'This is $10\\,000 - 5040$, counting from 0000 to 9999. Codes like 0123 are not 4-digit numbers, so the leading digit cannot be 0.',
-        'This is the number of 4-digit numbers with **all digits different**, the complement. Subtract it from 9000.',
         null,
-        'This is $9000 - 10 \\times 9 \\times 8 \\times 7$: the "all different" count allows a leading 0, so it subtracts too much. The first digit has only 9 choices (1 to 9).',
+        'The sum rule is for **one** choice from separate groups.',
+        'Complementary counting means total minus the opposite case, as in "at least one" questions.',
+        'The pigeonhole principle shows that something must happen. It does not count choices.',
       ],
-      keyIdea: 'At least one repeat = total minus all-different; watch for the leading digit not being 0.',
+      keyIdea: 'Choices in stages multiply.',
     },
-    check: {
-      optionValues: [4960, 4536, 4464, 3960],
-      compute: () => countUpTo(9999, (x) => x >= 1000 && new Set(String(x)).size < 4),
+  },
+  {
+    id: 'pigeonhole-counting-024',
+    subtopic: 'pigeonhole-counting',
+    difficulty: 'foundation',
+    stem: 'What does $\\binom{n}{2}$ count?',
+    options: ['Unordered pairs from $n$ items', 'Ordered pairs from $n$ items', 'All subsets of $n$ items', 'Arrangements of $n$ items'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$\\binom{n}{2}$ is read "$n$ choose 2". It counts the ways to choose 2 items from $n$ when the order does not matter:\n\n' +
+        '$$\\binom{n}{2} = \\frac{n(n-1)}{2}$$',
+      whyWrong: [
+        null,
+        'Ordered pairs number $n(n-1)$. Dividing by 2 removes the order, since each pair is counted twice.',
+        'All the subsets number $2^n$. Here only subsets of size 2 are counted.',
+        'Arrangements of all $n$ items number $n!$.',
+      ],
+      keyIdea: '$\\binom{n}{2} = \\frac{n(n-1)}{2}$ counts unordered pairs, such as handshakes.',
     },
   },
 ];

@@ -11,9 +11,8 @@ export const lesson: Lesson = {
     { cue: '$e^{x}$, $\\frac{1}{x}$, $\\sin x$ or $\\cos x$', method: '$\\int e^{x}\\,dx = e^{x}$, $\\int \\frac{1}{x}\\,dx = \\ln|x|$, $\\int \\cos x\\,dx = \\sin x$, $\\int \\sin x\\,dx = -\\cos x$ (each $+ C$).' },
     { cue: 'A function of $ax + b$: $(2x + 1)^{4}$, $e^{2x}$, $\\cos 3x$, $\\frac{1}{2x + 5}$', method: 'Integrate as if the bracket were just $x$, then **divide** by $a$.' },
     { cue: 'A definite integral $\\int_{a}^{b}$', method: 'Integrate, then top limit minus bottom limit: $F(b) - F(a)$. Careful: $e^{0} = 1$ and $\\cos 0 = 1$, so a lower limit of $0$ does not always give $0$.' },
-    { cue: '**Area** between a curve and the $x$-axis, or **total distance** from a velocity', method: 'Find where the curve crosses the axis, integrate each piece separately, and add the sizes (a piece below the axis comes out negative).' },
+    { cue: '**Area** between a curve and the $x$-axis', method: 'Find where the curve crosses the axis, integrate each piece separately, and add the sizes (a piece below the axis comes out negative).' },
     { cue: "Given $f'(x)$ and one point, or an unknown limit $k$", method: 'Integrate with $+ C$ and use the point to find $C$. For an unknown limit, integrate, substitute the limits, and solve the equation for $k$.' },
-    { cue: 'Given $\\int f$ and $\\int g$, find $\\int (2f - 3g + 1)$', method: 'Split term by term with the constants in front. Swapping the limits flips the sign, and $\\int_{a}^{b} 1\\,dx = b - a$.' },
   ],
   know:
     '### What integration is\n\n' +
@@ -48,13 +47,13 @@ export const lesson: Lesson = {
     'This shortcut only works when the inside is **linear** (like $ax + b$). You can always check by differentiating your answer.\n\n' +
     '### Definite integrals\n\n' +
     'A **definite integral** has limits: $\\int_{a}^{b} f(x)\\,dx = F(b) - F(a)$. Integrate (no $+C$ needed, it cancels), substitute the **top** limit, then subtract the value at the **bottom** limit. The answer is a number, not a function. Watch out at a lower limit of $0$: $0^{2} = 0$, but $e^{0} = 1$ and $\\cos 0 = 1$, so those terms do not vanish.\n\n' +
-    'Two useful rules: swapping the limits changes the sign, $\\int_{b}^{a} f\\,dx = -\\int_{a}^{b} f\\,dx$, and integrating a constant gives the width times the constant, $\\int_{a}^{b} 1\\,dx = b - a$.\n\n' +
+    'If the two limits are equal, the integral is $0$, because $F(a) - F(a) = 0$.\n\n' +
     '### Area under a curve, and why area below the axis is negative\n\n' +
     'If $f(x) \\ge 0$ between $x = a$ and $x = b$, the area between the curve and the $x$-axis is $\\int_{a}^{b} f(x)\\,dx$. But where the curve is **below** the $x$-axis, the integral comes out **negative**. An area is always positive, so:\n\n' +
     '1. Find where the curve crosses the $x$-axis (solve $f(x) = 0$).\n' +
     '2. Integrate each piece separately.\n' +
     '3. Take the absolute value of each piece and add them.\n\n' +
-    'If you integrate straight across a crossing point, the positive and negative parts cancel and you get the **net** value, not the total area. The same idea gives displacement (net) versus total distance travelled when you integrate a velocity.',
+    'If you integrate straight across a crossing point, the positive and negative parts cancel and you get the **net** value, not the total area.',
   formulas: [
     { label: 'Indefinite integral', tex: '\\int f(x)\\,dx = F(x) + C \\quad \\text{where } F\'(x) = f(x)', note: 'Always include $+C$ in an indefinite integral.' },
     { label: 'Reverse power rule', tex: '\\int x^{n}\\,dx = \\frac{x^{n+1}}{n+1} + C \\quad (n \\ne -1)', note: 'Add 1 to the power, divide by the new power. Works for negative and fractional powers.' },
@@ -68,7 +67,6 @@ export const lesson: Lesson = {
     { label: 'Reciprocal of a linear expression', tex: '\\int \\frac{1}{ax + b}\\,dx = \\frac{1}{a}\\ln|ax + b| + C' },
     { label: 'Trig with a multiple', tex: '\\int \\cos kx\\,dx = \\frac{1}{k}\\sin kx + C \\qquad \\int \\sin kx\\,dx = -\\frac{1}{k}\\cos kx + C' },
     { label: 'Definite integral', tex: '\\int_{a}^{b} f(x)\\,dx = \\left[F(x)\\right]_{a}^{b} = F(b) - F(a)', note: 'Top limit minus bottom limit; no $+C$ needed.' },
-    { label: 'Swapping limits', tex: '\\int_{b}^{a} f(x)\\,dx = -\\int_{a}^{b} f(x)\\,dx' },
     { label: 'Area under a curve', tex: '\\text{Area} = \\int_{a}^{b} \\left|f(x)\\right|dx', note: 'Split at the $x$-axis crossings; a piece below the axis gives a negative integral, so take its size.' },
   ],
   examples: [

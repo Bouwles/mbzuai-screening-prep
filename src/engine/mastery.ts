@@ -22,7 +22,7 @@ export interface Mastery {
   /** Independent answers in the window. */
   n: number;
   correct: number;
-  /** Correct answers at Exam or Challenge level in the window. */
+  /** Correct answers at Exam level in the window. */
   examCorrect: number;
 }
 
@@ -32,14 +32,14 @@ export function difficultyOf(a: Pick<Attempt, 'sourceId'>): Difficulty | undefin
 
 /**
  * - fewer than 4 independent answers: started
- * - at least 80% right and at least 3 right at Exam level or above: mastered
+ * - at least 80% right and at least 3 right at Exam level: mastered
  * - at least 60% right: getting there
  * - otherwise: needs work
  */
 export function levelFor(window: { correct: boolean; diff?: Difficulty }[]): Mastery {
   const n = window.length;
   const correct = window.filter((a) => a.correct).length;
-  const examCorrect = window.filter((a) => a.correct && a.diff && a.diff !== 'foundation').length;
+  const examCorrect = window.filter((a) => a.correct && a.diff === 'exam').length;
   let level: MasteryLevel;
   if (n === 0) level = 'new';
   else if (n < 4) level = 'started';

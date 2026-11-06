@@ -3,6 +3,9 @@ import type { StaticQuestion } from '../../../types';
 // Helpers used only by the answer checks (they re-derive answers by actually running the rule).
 const log2 = (x: number) => Math.log(x) / Math.log(2);
 
+/** Join source lines into one code string. */
+const L = (...lines: string[]) => lines.join('\n');
+
 /** Worst-case number of items binary search inspects in a sorted list of n items. */
 function binaryWorst(n: number): number {
   let probes = 0;
@@ -21,7 +24,7 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-001',
     subtopic: 'complexity',
     difficulty: 'foundation',
-    stem: 'A program looks through an **unsorted** list of $n$ items one at a time, from the start, until it finds a target value. What is its **worst-case** time complexity (tightest Big-O)?',
+    stem: 'What is the **worst-case** time complexity of linear search on an unsorted list of $n$ items?',
     options: ['$O(1)$', '$O(\\log n)$', '$O(n)$', '$O(n^2)$'],
     correctIndex: 2,
     markScheme: {
@@ -44,7 +47,7 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-002',
     subtopic: 'complexity',
     difficulty: 'foundation',
-    stem: 'An algorithm performs $T(n) = 3n^2 + 5n + 7$ steps on an input of size $n$. What is the simplest, tightest Big-O description of its running time?',
+    stem: 'An algorithm performs $T(n) = 3n^2 + 5n + 7$ steps on an input of size $n$. Its running time is of the order:',
     options: ['$O(n)$', '$O(n^2)$', '$O(1)$', '$O(n^3)$'],
     correctIndex: 1,
     markScheme: {
@@ -52,7 +55,7 @@ export const questions: StaticQuestion[] = [
         'Two rules turn a step count into Big-O:\n\n' +
         '1. Keep only the **fastest-growing term**. Of $3n^2$, $5n$ and $7$, the term $3n^2$ grows fastest: for $n = 1000$ it is $3\\,000\\,000$, while $5n = 5000$ and $7$ stays $7$.\n' +
         '2. **Drop the constant multiplier**: $3n^2 \\to n^2$.\n\n' +
-        'So $T(n) = O(n^2)$.',
+        'So $T(n) = O(n^2)$, which is also read as "of the order of $n^2$".',
       whyWrong: [
         'This keeps the $5n$ term. For large $n$ the $n^2$ term is far bigger than $5n$, so $n^2$ is the dominant term.',
         null,
@@ -101,7 +104,7 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-004',
     subtopic: 'complexity',
     difficulty: 'foundation',
-    stem: 'What is the worst-case time complexity (tightest Big-O) of **binary search** on a sorted list of $n$ items?',
+    stem: 'What is the worst-case time complexity of **binary search** on a sorted list of $n$ items?',
     options: ['$O(\\log n)$', '$O(1)$', '$O(n)$', '$O(n\\log n)$'],
     correctIndex: 0,
     markScheme: {
@@ -145,18 +148,133 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'Merge sort splits the list in half repeatedly ($\\log_2 n$ levels) and does $O(n)$ merging per level: $O(n\\log n)$.',
     },
   },
+  {
+    id: 'complexity-010',
+    subtopic: 'complexity',
+    difficulty: 'foundation',
+    stem: 'Which data structure gives the fastest average lookup of a value from its key?',
+    options: ['An unsorted array of key-value pairs', 'A hash table', 'A stack', 'A queue'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'A **hash table** (also called a key-value map or dictionary) turns the key into a number that points straight to where the value is stored, so a lookup takes $O(1)$ time on average, however many items there are.\n\n' +
+        'The other structures have to look through their items, which takes $O(n)$ time.',
+      whyWrong: [
+        'This works, but each lookup is a linear search through the pairs: $O(n)$.',
+        null,
+        'A stack only gives access to its top item, so finding a key means removing items one by one.',
+        'A queue only gives access to its front item, so finding a key means removing items one by one.',
+      ],
+      keyIdea: 'To look up a value by its key, use a hash table: $O(1)$ on average.',
+    },
+  },
+  {
+    id: 'complexity-013',
+    subtopic: 'complexity',
+    difficulty: 'foundation',
+    stem: 'Which operation on an array of $n$ items takes $O(n)$ time rather than $O(1)$?',
+    options: ['Reading the item at index $i$', 'Reading the stored length', 'Adding at the end, with space free', 'Inserting at the front'],
+    correctIndex: 3,
+    markScheme: {
+      solution:
+        'An array stores its items in one block of memory, in order, and remembers its length.\n\n' +
+        '- Reading index $i$ jumps straight to that position: $O(1)$.\n' +
+        '- The length is stored, so reading it is one step: $O(1)$.\n' +
+        '- Adding at the end moves nothing: $O(1)$.\n' +
+        '- Inserting at the **front** forces all $n$ items to shift one place to the right first: $O(n)$.',
+      whyWrong: [
+        'Indexing jumps straight to a position in memory, so it does not walk through the array.',
+        'The length is stored as one number, so reading it does not count the items.',
+        'Adding at the end moves nothing, because the free slot is already there.',
+        null,
+      ],
+      keyIdea: 'Changing the front of an array shifts every item ($O(n)$); working at the end or indexing is $O(1)$.',
+    },
+  },
+  {
+    id: 'complexity-021',
+    subtopic: 'complexity',
+    difficulty: 'foundation',
+    stem: 'What does Big-O notation describe?',
+    options: ['The exact running time in seconds', 'How the work grows with input size', 'The number of lines of code', 'The speed of the computer'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'Big-O describes how the amount of work grows as the input size $n$ grows. It ignores constant factors and fixed details such as the speed of the computer.',
+      whyWrong: [
+        'Exact seconds depend on the computer. Big-O only describes the shape of the growth.',
+        null,
+        'A short program can do a huge amount of work, so the number of lines tells you little about growth.',
+        'Big-O does not depend on the machine, since it ignores constant factors.',
+      ],
+      keyIdea: 'Big-O describes how work grows with input size, ignoring constants.',
+    },
+  },
+  {
+    id: 'complexity-022',
+    subtopic: 'complexity',
+    difficulty: 'foundation',
+    stem: 'What is the time complexity of reading `A[i]` from an array of $n$ items?',
+    options: ['$O(n)$', '$O(1)$', '$O(\\log n)$', '$O(n^2)$'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'An array stores its items side by side in memory, so the position of `A[i]` can be calculated directly. That takes the same time whatever the size of the array: $O(1)$, called constant time.',
+      whyWrong: [
+        'This is the cost of searching for a **value**. Reading a known index needs no search.',
+        null,
+        'This is the cost of binary search, which looks for a value in a sorted list.',
+        'This would need nested loops. Reading one item needs no loop at all.',
+      ],
+      keyIdea: 'Reading an array item by index is $O(1)$.',
+    },
+  },
+  {
+    id: 'complexity-023',
+    subtopic: 'complexity',
+    difficulty: 'foundation',
+    stem: 'What is the worst-case time complexity of bubble sort on $n$ items?',
+    options: ['$O(n)$', '$O(\\log n)$', '$O(n\\log n)$', '$O(n^2)$'],
+    correctIndex: 3,
+    markScheme: {
+      solution: 'Bubble sort makes up to $n - 1$ passes. They compare $n-1, n-2, \\dots, 1$ neighbouring pairs, so $\\frac{n(n-1)}{2} \\approx \\frac{n^2}{2}$ comparisons in total, which is $O(n^2)$.',
+      whyWrong: [
+        'This is the **best** case with an early-exit check, on a list that is already sorted.',
+        'Sorting has to look at every item at least once, so it cannot be faster than $O(n)$.',
+        'This is the cost of merge sort, which splits the list in half.',
+        null,
+      ],
+      keyIdea: 'Bubble sort uses nested passes over the list, so its worst case is $O(n^2)$.',
+    },
+  },
+  {
+    id: 'complexity-024',
+    subtopic: 'complexity',
+    difficulty: 'foundation',
+    stem: 'What is the time complexity of two nested loops that each run $n$ times, with constant work inside?',
+    options: ['$O(n)$', '$O(n^2)$', '$O(2n)$', '$O(\\log n)$'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'The inner loop runs $n$ times for each of the $n$ passes of the outer loop. Nested loops multiply: $n \\times n = n^2$, so the complexity is $O(n^2)$.',
+      whyWrong: [
+        'This is the cost of a single loop. Here the inner loop repeats on every outer pass.',
+        null,
+        'This adds the two loops, which is right only when one follows the other. Nested loops multiply.',
+        'A logarithmic loop halves or doubles its counter. These loops each run $n$ times.',
+      ],
+      keyIdea: 'Nested loops multiply; loops one after another add.',
+    },
+  },
 
   // ------------------------------------------------------------------ exam
   {
     id: 'complexity-006',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'Consider this pseudocode with $n = 20$. How many times is the line `count = count + 1` executed?',
+    stem: 'How many times is the line `count = count + 1` executed?',
     code: {
       lang: 'pseudocode',
-      source: 'count = 0\nfor i = 1 to n\n    for j = i to n\n        count = count + 1\n    end for\nend for\nprint(count)',
+      source: L('n = 20', 'count = 0', 'for i = 1 to n', '   for j = i to n', '      count = count + 1', '   end for', 'end for', 'print(count)'),
     },
-    options: ['$400$', '$190$', '$210$', '$20$'],
+    options: ['400', '190', '210', '20'],
     correctIndex: 2,
     markScheme: {
       solution:
@@ -192,61 +310,84 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-007',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'What is printed?',
     code: {
-      lang: 'python',
-      source: 'n = 1000\nsteps = 0\nwhile n > 1:\n    n = n // 2\n    steps += 1\nprint(steps)',
+      lang: 'pseudocode',
+      source: L('n = 200', 'steps = 0', 'while (n > 1)', '   n = div(n,2) // div is integer division', '   steps = steps + 1', 'end while', 'print(steps)'),
     },
-    options: ['`10`', '`9`', '`500`', '`999`'],
+    options: ['8', '7', '199', 'Infinite loop'],
     correctIndex: 1,
     markScheme: {
       solution:
-        '`n // 2` is integer division (it rounds down). Trace the loop:\n\n' +
+        '`div(n,2)` is integer division, so it rounds down. Trace the loop:\n\n' +
         '| pass | `n` after the pass | `steps` |\n' +
         '| --- | --- | --- |\n' +
-        '| 1 | 500 | 1 |\n' +
-        '| 2 | 250 | 2 |\n' +
-        '| 3 | 125 | 3 |\n' +
-        '| 4 | 62 | 4 |\n' +
-        '| 5 | 31 | 5 |\n' +
-        '| 6 | 15 | 6 |\n' +
-        '| 7 | 7 | 7 |\n' +
-        '| 8 | 3 | 8 |\n' +
-        '| 9 | 1 | 9 |\n\n' +
-        'Now `n > 1` is false ($1 > 1$ is false), so the loop stops and `9` is printed.\n\n' +
-        'Check: $2^9 = 512 \\le 1000 < 1024 = 2^{10}$, so the number of halvings is $\\lfloor \\log_2 1000 \\rfloor = 9$. A loop that halves is $O(\\log n)$.',
+        '| 1 | 100 | 1 |\n' +
+        '| 2 | 50 | 2 |\n' +
+        '| 3 | 25 | 3 |\n' +
+        '| 4 | 12 | 4 |\n' +
+        '| 5 | 6 | 5 |\n' +
+        '| 6 | 3 | 6 |\n' +
+        '| 7 | 1 | 7 |\n\n' +
+        'Now `n > 1` is false ($1 > 1$ is false), so the loop stops and 7 is printed.\n\n' +
+        'Check: $2^7 = 128 \\le 200 < 256 = 2^8$, so the number of halvings is $\\lfloor \\log_2 200 \\rfloor = 7$. A loop that halves is $O(\\log n)$.',
       whyWrong: [
-        'This rounds $\\log_2 1000 \\approx 9.97$ **up** to 10. Integer division rounds down at each step, and the loop stops as soon as `n` reaches 1, after 9 passes.',
+        'This rounds $\\log_2 200 \\approx 7.6$ **up** to 8. Integer division rounds down at each step, and the loop stops as soon as `n` reaches 1, after 7 passes.',
         null,
-        'This is the value of `n` after the first pass, not the number of passes.',
         'This assumes `n` goes down by 1 each pass, as in `n = n - 1`. Halving shrinks `n` much faster.',
+        '`n` is halved on every pass, so it reaches 1 and the test `n > 1` fails.',
       ],
       keyIdea: 'A loop that halves $n$ until it reaches 1 runs about $\\log_2 n$ times: $O(\\log n)$.',
     },
-    python: { stdout: '9\n' },
+    check: {
+      optionValues: [8, 7, 199, 'Infinite loop'],
+      compute: () => {
+        let n = 200;
+        let steps = 0;
+        while (n > 1) {
+          if (steps > 1000) return 'Infinite loop';
+          n = Math.floor(n / 2);
+          steps++;
+        }
+        return steps;
+      },
+    },
   },
   {
     id: 'complexity-008',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'What is the time complexity (tightest Big-O) of this function, where $n$ is the length of `nums`?',
+    stem: 'What is the time complexity of `stats`, where $n$ is the length of `A`? Arrays are indexed from 1.',
     code: {
-      lang: 'python',
-      source:
-        'def stats(nums):\n    total = 0\n    for x in nums:\n        total += x\n    biggest = nums[0]\n    for x in nums:\n        if x > biggest:\n            biggest = x\n    return total, biggest',
+      lang: 'pseudocode',
+      source: L(
+        'function stats(A)',
+        '   total = 0',
+        '   for i = 1 to length(A)',
+        '      total = total + A[i]',
+        '   end for',
+        '   biggest = A[1]',
+        '   for i = 1 to length(A)',
+        '      if A[i] > biggest',
+        '         biggest = A[i]',
+        '      end if',
+        '   end for',
+        '   return total + biggest',
+        'end function',
+      ),
     },
     options: ['$O(n^2)$', '$O(1)$', '$O(\\log n)$', '$O(n)$'],
     correctIndex: 3,
     markScheme: {
       solution:
         'Count the work line by line:\n\n' +
-        '- `total = 0`, `biggest = nums[0]` and the `return`: a fixed number of steps, $O(1)$.\n' +
+        '- `total = 0`, `biggest = A[1]` and the `return`: a fixed number of steps, $O(1)$.\n' +
         '- The first `for` loop runs $n$ times with $O(1)$ work each time: $O(n)$.\n' +
         '- The second `for` loop is **after** the first one (not inside it): another $O(n)$.\n\n' +
         'Loops one after another **add**: $O(1) + O(n) + O(n) = O(2n + 1)$. Drop the constants: $O(n)$.',
       whyWrong: [
         'This multiplies the two loops. Loops only multiply when one is **inside** the other. These loops run one after the other, so their costs add: $n + n = 2n$, which is $O(n)$.',
-        'This assumes the function is constant time because it only returns two numbers. It still has to visit all $n$ items (twice) to compute them.',
+        'This assumes the function is constant time because it only returns one number. It still has to visit all $n$ items (twice) to compute it.',
         '$O(\\log n)$ needs the remaining work to be halved each step. Here every item is visited, so the work grows in proportion to $n$.',
         null,
       ],
@@ -257,63 +398,34 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-009',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'In Python, `x in data` checks whether `x` is in `data`. What is the average time complexity of this check when `data` is a **list** of $n$ items, and when it is a **set** of $n$ items?',
+    stem: 'What is the average time to check whether a value is present in an unsorted array of $n$ items, and in a hash table of $n$ items?',
     options: [
-      'List: $O(1)$; set: $O(1)$',
-      'List: $O(n)$; set: $O(n)$',
-      'List: $O(n)$; set: $O(1)$',
-      'List: $O(\\log n)$; set: $O(1)$',
+      'Array: $O(1)$; hash table: $O(1)$',
+      'Array: $O(n)$; hash table: $O(n)$',
+      'Array: $O(n)$; hash table: $O(1)$',
+      'Array: $O(\\log n)$; hash table: $O(1)$',
     ],
     correctIndex: 2,
     markScheme: {
       solution:
         'Think about how each structure finds a value: does it have to look through the items one by one, or can it jump straight to the right place?\n\n' +
-        '- **List:** Python has no shortcut, so `in` compares `x` with the items one by one from the start (a linear search). On average it checks about half the list, and in the worst case all of it: $O(n)$.\n' +
-        '- **Set:** a set is a **hash table**. Python computes `hash(x)`, which points straight to the place where `x` would be stored, so it checks only that place: $O(1)$ on average, whatever the size of the set.\n\n' +
-        'So: list $O(n)$, set $O(1)$. This is why a set (or a dict) is the right choice when you need many fast "is this already there?" checks.',
+        '- **Unsorted array:** there is no shortcut, so the value is compared with the items one by one. On average that checks about half the array, and in the worst case all of it: $O(n)$.\n' +
+        '- **Hash table:** the value is turned into a number (its **hash**) that points straight to where it would be stored, so only that place is checked: $O(1)$ on average, whatever the size.\n\n' +
+        'So: array $O(n)$, hash table $O(1)$. This is why a hash table is the right choice when you need many fast "is this already there?" checks.',
       whyWrong: [
-        'Indexing a list by position (`data[i]`) is $O(1)$, but searching a list for a **value** is not: `in` has to scan the items one by one.',
-        'This treats a set like a list. A set uses hashing to jump straight to where the item would be, so it does not scan.',
+        'Reading an array by position is $O(1)$, but searching for a **value** is not: the items have to be checked one by one.',
+        'This treats a hash table like an array. Hashing jumps straight to where the item would be, so it does not scan.',
         null,
-        '$O(\\log n)$ would need binary search, which requires sorted data and is not what `in` does. On a list, `in` is a plain linear scan.',
+        '$O(\\log n)$ would need binary search, which requires sorted data. This array is unsorted, so it needs a plain linear scan.',
       ],
-      keyIdea: 'Membership tests are $O(n)$ for a list (linear scan) but $O(1)$ on average for a set or dict (hashing).',
-    },
-  },
-  {
-    id: 'complexity-010',
-    subtopic: 'complexity',
-    difficulty: 'exam',
-    stem: 'A shop has 50,000 products, each with a unique product code such as `"QX-1932"`. A program must look up the **price** for a given code thousands of times per second. Which Python data structure is the best choice?',
-    options: [
-      'A list of `(code, price)` tuples, searched with a loop',
-      'A dict with product codes as keys and prices as values',
-      'A set of product codes',
-      'A list of prices, sorted from cheapest to most expensive',
-    ],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The task is: **given a key (the code), find its value (the price)**, many times.\n\n' +
-        '- A dict stores key-value pairs in a hash table, so `prices["QX-1932"]` finds the price in $O(1)$ time on average, no matter how many products there are.\n' +
-        '- Searching a list of tuples with a loop is a linear search: up to 50,000 comparisons per lookup, $O(n)$.\n' +
-        '- A set can tell you whether a code exists, but it stores no price.\n' +
-        '- A sorted list of prices has lost the link between each price and its code.\n\n' +
-        'So the dict is the right choice.',
-      whyWrong: [
-        'This works, but every lookup is a linear search ($O(n)$, up to 50,000 comparisons). With thousands of lookups per second that is far slower than a dict.',
-        null,
-        'A set gives fast $O(1)$ membership checks, but it only stores the codes. There is nowhere to keep the price that goes with each code.',
-        'Sorting by price does not help find a price **by code**; the codes are not stored at all, so the lookup is impossible.',
-      ],
-      keyIdea: 'For repeated "look up the value for this key" tasks, use a dict: $O(1)$ average lookup.',
+      keyIdea: 'Membership tests are $O(n)$ for an unsorted array (linear scan) but $O(1)$ on average for a hash table.',
     },
   },
   {
     id: 'complexity-011',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'An $O(n^2)$ sorting algorithm takes 4 seconds to sort $n = 1000$ items. Assuming the running time is proportional to $n^2$, roughly how long will it take to sort $n = 3000$ items?',
+    stem: 'A sort whose running time is proportional to $n^2$ takes 4 seconds for $n = 1000$. Roughly how long does it take for $n = 3000$?',
     options: ['12 seconds', '36 seconds', '108 seconds', '16 seconds'],
     correctIndex: 1,
     markScheme: {
@@ -344,11 +456,22 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-012',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'What is the time complexity (tightest Big-O) of this function in terms of $n$?',
+    stem: 'What is the time complexity of `f` in terms of $n$?',
     code: {
-      lang: 'python',
-      source:
-        'def f(n):\n    count = 0\n    for i in range(n):\n        j = n\n        while j > 1:\n            j = j // 2\n            count += 1\n    return count',
+      lang: 'pseudocode',
+      source: L(
+        'function f(n)',
+        '   count = 0',
+        '   for i = 1 to n',
+        '      j = n',
+        '      while (j > 1)',
+        '         j = div(j,2) // div is integer division',
+        '         count = count + 1',
+        '      end while',
+        '   end for',
+        '   return count',
+        'end function',
+      ),
     },
     options: ['$O(n^2)$', '$O(\\log n)$', '$O(n\\log n)$', '$O(n)$'],
     correctIndex: 2,
@@ -356,7 +479,7 @@ export const questions: StaticQuestion[] = [
       solution:
         'Work from the inside out.\n\n' +
         '1. **Inner loop:** `j` starts at $n$ and is halved each pass until it reaches 1, so it runs about $\\log_2 n$ times. That is $O(\\log n)$.\n' +
-        '2. **Outer loop:** `for i in range(n)` runs $n$ times, and each time the inner loop starts again from `j = n`.\n' +
+        '2. **Outer loop:** `for i = 1 to n` runs $n$ times, and each time the inner loop starts again from `j = n`.\n' +
         '3. Nested loops **multiply**: $n \\times \\log_2 n$.\n\n' +
         'So the complexity is $O(n\\log n)$. For example, with $n = 1024$ the inner loop runs 10 times, so `count` ends at $1024 \\times 10 = 10\\,240$, far fewer than $1024^2 \\approx 1$ million.',
       whyWrong: [
@@ -369,34 +492,10 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'complexity-013',
-    subtopic: 'complexity',
-    difficulty: 'exam',
-    stem: 'Let `a` be a Python list with $n$ items. Which of these operations takes $O(n)$ time rather than $O(1)$?',
-    options: ['`a.append(x)`', '`a[-1]`', '`len(a)`', '`a.insert(0, x)`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'A Python list stores its items in one block of memory, in order, and remembers its length.\n\n' +
-        '- `a.append(x)` puts `x` in the next free slot at the end: $O(1)$ (on average, counting the occasional resize).\n' +
-        '- `a[-1]` jumps straight to the last position: indexing is $O(1)$.\n' +
-        '- `len(a)` just reads the stored length: $O(1)$.\n' +
-        '- `a.insert(0, x)` puts `x` at the **front**, so every one of the $n$ existing items must shift one place to the right first: $O(n)$.\n\n' +
-        'So `a.insert(0, x)` is the $O(n)$ operation (and so is `a.pop(0)`, for the same reason).',
-      whyWrong: [
-        'Appending adds to the **end**, where nothing has to move, so it is $O(1)$ on average.',
-        'Indexing (including negative indexes) jumps straight to a position in memory: $O(1)$. It does not walk through the list.',
-        'Python stores the length of a list, so `len(a)` reads one number: $O(1)$. It does not count the items.',
-        null,
-      ],
-      keyIdea: 'Changing the front of a list shifts every item ($O(n)$); working at the end or indexing is $O(1)$.',
-    },
-  },
-  {
     id: 'complexity-014',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'A sorted list contains 1,000,000 items. In the **worst case**, how many items does binary search need to inspect to find a target (or decide it is not there)?',
+    stem: 'In the **worst case**, how many items does binary search inspect in a sorted list of 1,000,000 items?',
     options: ['$1\\,000\\,000$', '$20$', '$500\\,000$', '$1000$'],
     correctIndex: 1,
     markScheme: {
@@ -416,153 +515,6 @@ export const questions: StaticQuestion[] = [
     check: {
       optionValues: [1000000, 20, 500000, 1000],
       compute: () => binaryWorst(1000000),
-    },
-  },
-
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'complexity-015',
-    subtopic: 'complexity',
-    difficulty: 'challenge',
-    stem: 'Put these functions in order from **slowest-growing** to **fastest-growing** as $n$ becomes very large: $n^3$, $\\log_2 n$, $2^n$, $n\\log_2 n$, $\\sqrt{n}$.',
-    options: [
-      '$\\sqrt{n} < \\log_2 n < n\\log_2 n < n^3 < 2^n$',
-      '$\\log_2 n < \\sqrt{n} < n\\log_2 n < 2^n < n^3$',
-      '$\\log_2 n < \\sqrt{n} < n\\log_2 n < n^3 < 2^n$',
-      '$\\log_2 n < n\\log_2 n < \\sqrt{n} < n^3 < 2^n$',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Compare at a large value such as $n = 1024 = 2^{10}$:\n\n' +
-        '| Function | Value at $n = 1024$ |\n' +
-        '| --- | --- |\n' +
-        '| $\\log_2 n$ | $10$ |\n' +
-        '| $\\sqrt{n}$ | $32$ |\n' +
-        '| $n\\log_2 n$ | $10\\,240$ |\n' +
-        '| $n^3$ | about $1.07 \\times 10^{9}$ |\n' +
-        '| $2^n$ | about $1.8 \\times 10^{308}$ |\n\n' +
-        'Reasons that hold for all large $n$:\n\n' +
-        '- $\\log_2 n$ grows more slowly than any power of $n$, even $\\sqrt{n} = n^{0.5}$.\n' +
-        '- $\\sqrt{n}$ is smaller than $n$, so it is certainly smaller than $n\\log_2 n$.\n' +
-        '- $n\\log_2 n < n^3$ because $\\log_2 n$ is much smaller than $n^2$.\n' +
-        '- Any exponential beats any polynomial, so $n^3 < 2^n$ eventually (from $n = 10$ onwards: $1000 < 1024$).\n\n' +
-        'Order: $\\log_2 n < \\sqrt{n} < n\\log_2 n < n^3 < 2^n$.',
-      whyWrong: [
-        'This puts $\\sqrt{n}$ below $\\log_2 n$, which only looks true for small $n$ (at $n = 8$, $\\sqrt{8} \\approx 2.8 < 3$). Once $n$ is bigger than 16, $\\sqrt{n}$ is always bigger, and the gap keeps growing (at $n = 1024$: 32 versus 10).',
-        'This puts $2^n$ below $n^3$, which is only true for small $n$ (at $n = 8$: $256 < 512$). From $n = 10$ onwards $2^n$ is bigger, and exponentials always overtake polynomials.',
-        null,
-        'This puts $\\sqrt{n}$ above $n\\log_2 n$, which confuses the square **root** of $n$ with $n$ **squared**. $\\sqrt{n}$ is smaller than $n$, so it is smaller than $n\\log_2 n$.',
-      ],
-      keyIdea: 'Growth ladder: $\\log n < \\sqrt{n} < n < n\\log n < n^2 < n^3 < 2^n < n!$; small-$n$ comparisons can mislead.',
-    },
-    check: {
-      optionValues: ['sqrt<log<nlog<cube<exp', 'log<sqrt<nlog<exp<cube', 'log<sqrt<nlog<cube<exp', 'log<nlog<sqrt<cube<exp'],
-      compute: () => {
-        const n = 1000;
-        const fs: [string, (x: number) => number][] = [
-          ['cube', (x) => x ** 3],
-          ['log', (x) => log2(x)],
-          ['exp', (x) => 2 ** x],
-          ['nlog', (x) => x * log2(x)],
-          ['sqrt', (x) => Math.sqrt(x)],
-        ];
-        return fs
-          .map(([name, f]) => ({ name, v: f(n) }))
-          .sort((a, b) => a.v - b.v)
-          .map((x) => x.name)
-          .join('<');
-      },
-    },
-  },
-  {
-    id: 'complexity-016',
-    subtopic: 'complexity',
-    difficulty: 'challenge',
-    stem: 'For this pseudocode with $n = 64$, how many times does the line `j = j + 1` run, and what is the time complexity of the algorithm in terms of $n$?',
-    code: {
-      lang: 'pseudocode',
-      source: 'i = 1\nwhile i < n\n    j = 0\n    while j < i\n        j = j + 1\n    end while\n    i = i * 2\nend while',
-    },
-    options: [
-      '63 times; $O(n\\log n)$',
-      '63 times; $O(n)$',
-      '384 times; $O(n\\log n)$',
-      '6 times; $O(\\log n)$',
-    ],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The outer loop doubles `i`: it takes the values $1, 2, 4, 8, 16, 32$ (the next value, 64, fails `i < n`). That is 6 passes, about $\\log_2 n$.\n\n' +
-        'For each pass, the inner loop counts `j` from 0 up to `i`, so `j = j + 1` runs exactly `i` times:\n\n' +
-        '| `i` | inner runs |\n' +
-        '| --- | --- |\n' +
-        '| 1 | 1 |\n' +
-        '| 2 | 2 |\n' +
-        '| 4 | 4 |\n' +
-        '| 8 | 8 |\n' +
-        '| 16 | 16 |\n' +
-        '| 32 | 32 |\n\n' +
-        'Total $= 1 + 2 + 4 + 8 + 16 + 32 = 63$.\n\n' +
-        'In general the total is $1 + 2 + 4 + \\dots$ up to the largest power of 2 below $n$, which is less than $2n$ (each term is bigger than all the earlier terms put together). So the work is at most about $2n$: the algorithm is $O(n)$, **not** $O(n\\log n)$. The inner loop is not always $n$ long; it is short for most passes.',
-      whyWrong: [
-        'The count is right, but the complexity is not. $O(n\\log n)$ would need the inner loop to run about $n$ times on every one of the $\\log_2 n$ passes. Here the inner loop runs $1, 2, 4, \\dots$ times, and that doubling sum is less than $2n$, so it is $O(n)$.',
-        null,
-        'This is $n\\log_2 n = 64 \\times 6$: it assumes the inner loop runs $n = 64$ times on each of the 6 outer passes. The inner loop runs only `i` times, and `i` is small for most passes.',
-        'This counts only the outer loop (6 passes, $\\log_2 64$). The question asks about the line inside the inner loop, which runs `i` times per pass.',
-      ],
-      keyIdea: 'Doubling work $1 + 2 + 4 + \\dots$ up to $n$ sums to less than $2n$, so it is $O(n)$: always add up the actual inner-loop lengths.',
-    },
-    check: {
-      optionValues: ['63|O(nlogn)', '63|O(n)', '384|O(nlogn)', '6|O(logn)'],
-      compute: () => {
-        const run = (n: number) => {
-          let c = 0;
-          for (let i = 1; i < n; i *= 2) for (let j = 0; j < i; j++) c++;
-          return c;
-        };
-        // classify growth: compare how the count scales when n is multiplied by 256
-        const small = 256;
-        const big = 65536;
-        const ratio = run(big) / run(small);
-        const models: [string, number][] = [
-          ['O(logn)', Math.log(big) / Math.log(small)],
-          ['O(n)', big / small],
-          ['O(nlogn)', (big * Math.log(big)) / (small * Math.log(small))],
-          ['O(n^2)', (big / small) ** 2],
-        ];
-        const best = models.reduce((a, b) => (Math.abs(Math.log(ratio / b[1])) < Math.abs(Math.log(ratio / a[1])) ? b : a));
-        return `${run(64)}|${best[0]}`;
-      },
-    },
-  },
-  {
-    id: 'complexity-017',
-    subtopic: 'complexity',
-    difficulty: 'challenge',
-    stem: 'A print server must handle jobs **in the order they arrive** (first in, first out). New jobs are added at one end and the oldest job is removed from the other end, millions of times. Which choice does this correctly **and** in $O(1)$ time per operation?',
-    options: [
-      'A list: add with `append(job)`, remove with `pop(0)`',
-      'A list: add with `append(job)`, remove with `pop()`',
-      'A set: add with `add(job)`, remove with `pop()`',
-      'A `collections.deque`: add with `append(job)`, remove with `popleft()`',
-    ],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'We need a **queue** (first in, first out), and both operations must be $O(1)$.\n\n' +
-        '- `list.append` is $O(1)$, but `list.pop(0)` removes the **front** item, so every other item shifts left one place: $O(n)$. Correct order, too slow.\n' +
-        '- `list.pop()` removes the **last** item added. That is a stack (last in, first out): wrong order.\n' +
-        '- A set has **no order** at all, so `set.pop()` removes an arbitrary item: wrong order.\n' +
-        '- A `deque` (double-ended queue) is built so that adding or removing at **either** end is $O(1)$. `append` adds at the right, `popleft` removes from the left: first in, first out, $O(1)$ each.\n\n' +
-        'So the deque is the right choice.',
-      whyWrong: [
-        'The order is correct (first in, first out), but `pop(0)` shifts all the remaining items one place to the left, which is $O(n)$ per removal. With millions of jobs this is very slow.',
-        'Both operations are $O(1)$, but `pop()` removes the **newest** job. That is a stack (last in, first out), so jobs would be printed in the wrong order.',
-        'Sets are unordered, so `pop()` removes an arbitrary job, not the oldest one. (Identical jobs would also be merged into one.)',
-        null,
-      ],
-      keyIdea: 'Use a `deque` for a queue: `append` and `popleft` are both $O(1)$, whereas `list.pop(0)` is $O(n)$.',
     },
   },
   {
@@ -600,17 +552,30 @@ export const questions: StaticQuestion[] = [
     id: 'complexity-019',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'What is printed?',
     code: {
-      lang: 'python',
-      source:
-        'def count_ops(n):\n    ops = 0\n    i = n\n    while i > 0:\n        for j in range(n):\n            ops += 1\n        i //= 2\n    return ops\n\nprint(count_ops(16))',
+      lang: 'pseudocode',
+      source: L(
+        'function countOps(n)',
+        '   ops = 0',
+        '   i = n',
+        '   while (i > 0)',
+        '      for j = 1 to n',
+        '         ops = ops + 1',
+        '      end for',
+        '      i = div(i,2) // div is integer division',
+        '   end while',
+        '   return ops',
+        'end function',
+        '',
+        'print(countOps(16))',
+      ),
     },
-    options: ['`64`', '`80`', '`256`', '`31`'],
+    options: ['64', '80', '256', '31'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'The outer `while` loop halves `i` (rounding down) until it reaches 0. The inner `for` loop always runs `range(n)`, which is 16 times.\n\n' +
+        'The outer `while` loop halves `i` (rounding down) until it reaches 0. The inner `for` loop always runs from 1 to `n`, which is 16 times.\n\n' +
         '| `i` at start of pass | inner loop runs | `ops` after the pass |\n' +
         '| --- | --- | --- |\n' +
         '| 16 | 16 | 16 |\n' +
@@ -618,49 +583,166 @@ export const questions: StaticQuestion[] = [
         '| 4 | 16 | 48 |\n' +
         '| 2 | 16 | 64 |\n' +
         '| 1 | 16 | 80 |\n\n' +
-        'After the pass with `i = 1`, `i //= 2` makes `i` equal to 0, and `0 > 0` is false, so the loop stops.\n\n' +
+        'After the pass with `i = 1`, `div(i,2)` makes `i` equal to 0, and `0 > 0` is false, so the loop stops.\n\n' +
         'There are 5 outer passes ($\\lfloor \\log_2 16 \\rfloor + 1 = 5$), each doing 16 operations: $5 \\times 16 = 80$. In general this is about $n\\log_2 n$, so $O(n\\log n)$.\n\n' +
-        'Output: `80`.',
+        'It prints 80.',
       whyWrong: [
         'This stops the outer loop when `i` reaches 1, as if the condition were `i > 1`. The condition is `i > 0`, so the pass with `i = 1` also runs, adding another 16.',
         null,
         'This is $16^2$: it assumes the outer loop also runs 16 times. The outer loop halves `i`, so it runs only 5 times.',
-        'This is $16 + 8 + 4 + 2 + 1$, what you get if the inner loop were `range(i)`. The inner loop is `range(n)`, so it always runs 16 times.',
+        'This is $16 + 8 + 4 + 2 + 1$, what you get if the inner loop ran from 1 to `i`. It runs from 1 to `n`, so it always runs 16 times.',
       ],
       keyIdea: 'Halving outer loop ($\\log_2 n + 1$ passes) times a full inner loop ($n$) gives about $n\\log_2 n$ operations.',
     },
-    python: { stdout: '80\n' },
+    check: {
+      optionValues: [64, 80, 256, 31],
+      compute: () => {
+        const n = 16;
+        let ops = 0;
+        for (let i = n; i > 0; i = Math.floor(i / 2)) for (let j = 1; j <= n; j++) ops++;
+        return ops;
+      },
+    },
   },
   {
     id: 'complexity-020',
     subtopic: 'complexity',
     difficulty: 'exam',
-    stem: 'Both functions return `True` if two different items of `nums` add up to `target`. Using the average-case cost of set operations, what are their worst-case time complexities, where $n$ is the length of `nums`?',
-    code: {
-      lang: 'python',
-      source:
-        'def has_pair_v1(nums, target):\n    for i in range(len(nums)):\n        for j in range(i + 1, len(nums)):\n            if nums[i] + nums[j] == target:\n                return True\n    return False\n\n\ndef has_pair_v2(nums, target):\n    seen = set()\n    for x in nums:\n        if target - x in seen:\n            return True\n        seen.add(x)\n    return False',
-    },
+    stem: 'Finding a pair that sums to a target: method 1 checks every pair; method 2 makes one pass using a hash table with $O(1)$ lookups. What are their worst-case complexities?',
     options: [
-      'v1: $O(n^2)$; v2: $O(n)$',
-      'v1: $O(n^2)$; v2: $O(n^2)$',
-      'v1: $O(n\\log n)$; v2: $O(n)$',
-      'v1: $O(n^2)$; v2: $O(1)$',
+      'Method 1: $O(n^2)$; method 2: $O(n)$',
+      'Method 1: $O(n^2)$; method 2: $O(n^2)$',
+      'Method 1: $O(n\\log n)$; method 2: $O(n)$',
+      'Method 1: $O(n^2)$; method 2: $O(1)$',
     ],
     correctIndex: 0,
     markScheme: {
       solution:
-        'The worst case is when no pair adds up to `target`, so neither function returns early.\n\n' +
-        '**v1:** for each `i`, the inner loop checks every later item. The number of pairs checked is $(n - 1) + (n - 2) + \\dots + 2 + 1 =\\frac{n(n-1)}{2}$. That is about $\\frac{n^2}{2}$, so $O(n^2)$.\n\n' +
-        '**v2:** one loop over the $n$ items. Inside it, `target - x in seen` and `seen.add(x)` are set operations, each $O(1)$ on average because a set uses hashing. So the total is $n \\times O(1) = O(n)$.\n\n' +
-        'So v1 is $O(n^2)$ and v2 is $O(n)$: using a set trades a little extra memory for a big speed-up.',
+        'The worst case is when no pair adds up to the target, so neither method stops early.\n\n' +
+        '**Method 1:** the number of pairs checked is $(n - 1) + (n - 2) + \\dots + 2 + 1 = \\frac{n(n-1)}{2}$. That is about $\\frac{n^2}{2}$, so $O(n^2)$.\n\n' +
+        '**Method 2:** one pass over the $n$ items, with an $O(1)$ lookup and an $O(1)$ insert for each. So the total is $n \\times O(1) = O(n)$.\n\n' +
+        'So method 1 is $O(n^2)$ and method 2 is $O(n)$: a hash table trades a little extra memory for a big speed-up.',
       whyWrong: [
         null,
-        'This treats `in seen` as a linear scan, which would be true for a **list**. For a set the check uses hashing and is $O(1)$ on average, so v2 is $O(n)$.',
-        'The inner loop of v1 gets shorter each time, but the total is still $\\frac{n(n-1)}{2}$, which is $O(n^2)$. Shrinking by one each time is not the same as halving.',
-        'Each set operation is $O(1)$, but v2 still loops over all $n$ items in the worst case, so the total is $O(n)$, not $O(1)$.',
+        'This treats each lookup as a linear scan, which would be true for an array. A hash table lookup is $O(1)$ on average, so method 2 is $O(n)$.',
+        'The number of pairs to check shrinks by one each time, but the total is still $\\frac{n(n-1)}{2}$, which is $O(n^2)$. Shrinking by one each time is not the same as halving.',
+        'Each lookup is $O(1)$, but method 2 still loops over all $n$ items in the worst case, so the total is $O(n)$, not $O(1)$.',
       ],
-      keyIdea: 'Replacing an inner search loop with an $O(1)$ set lookup turns an $O(n^2)$ algorithm into an $O(n)$ one.',
+      keyIdea: 'Replacing an inner search loop with an $O(1)$ hash table lookup turns an $O(n^2)$ algorithm into an $O(n)$ one.',
+    },
+  },
+  {
+    id: 'complexity-025',
+    subtopic: 'complexity',
+    difficulty: 'exam',
+    stem: 'What is the time complexity of `g` in terms of $n$?',
+    code: {
+      lang: 'pseudocode',
+      source: L('function g(n)', '   i = 1', '   while (i < n)', '      i = i * 2', '   end while', '   return i', 'end function'),
+    },
+    options: ['$O(1)$', '$O(n)$', '$O(\\log n)$', '$O(n^2)$'],
+    correctIndex: 2,
+    markScheme: {
+      solution:
+        '`i` takes the values $1, 2, 4, 8, \\dots$ and the loop stops once $i \\ge n$.\n\n' +
+        'After $k$ passes $i = 2^k$, so the loop ends when $2^k \\ge n$, which is after about $\\log_2 n$ passes.\n\n' +
+        'Each pass does constant work, so the complexity is $O(\\log n)$.',
+      whyWrong: [
+        'The number of passes grows with $n$, although slowly, so the time is not constant.',
+        'This assumes `i` goes up by 1 on each pass. Doubling reaches $n$ much faster.',
+        null,
+        'This would need a loop nested inside another loop, or a counter that takes $n^2$ steps. There is one doubling loop here.',
+      ],
+      keyIdea: 'A loop that doubles its counter up to $n$ runs about $\\log_2 n$ times: $O(\\log n)$.',
+    },
+  },
+  {
+    id: 'complexity-026',
+    subtopic: 'complexity',
+    difficulty: 'exam',
+    stem: 'How many times in total is `count` increased?',
+    code: {
+      lang: 'pseudocode',
+      source: L(
+        'count = 0',
+        'for i = 1 to 4',
+        '   for j = 1 to 5',
+        '      count = count + 1',
+        '   end for',
+        'end for',
+        'for k = 1 to 6',
+        '   count = count + 1',
+        'end for',
+        'print(count)',
+      ),
+    },
+    options: ['26', '120', '15', '20'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The first two loops are nested, so they multiply: $4 \\times 5 = 20$.\n\n' +
+        'The third loop comes **after** them, so it adds: $20 + 6 = 26$.',
+      whyWrong: [
+        null,
+        'This multiplies all three loops, $4 \\times 5 \\times 6$. The third loop is not inside the others.',
+        'This adds all three loops, $4 + 5 + 6$. The first two are nested, so they multiply.',
+        'This counts only the nested loops and misses the 6 passes of the third loop.',
+      ],
+      keyIdea: 'Multiply the counts of nested loops; add the counts of loops that follow one another.',
+    },
+    check: {
+      optionValues: [26, 120, 15, 20],
+      compute: () => {
+        let c = 0;
+        for (let i = 1; i <= 4; i++) for (let j = 1; j <= 5; j++) c++;
+        for (let k = 1; k <= 6; k++) c++;
+        return c;
+      },
+    },
+  },
+  {
+    id: 'complexity-027',
+    subtopic: 'complexity',
+    difficulty: 'exam',
+    stem: 'Which list orders these growth rates from slowest to fastest for large $n$?',
+    options: [
+      '$\\log n,\\ n,\\ n\\log n,\\ n^2$',
+      '$n,\\ \\log n,\\ n\\log n,\\ n^2$',
+      '$\\log n,\\ n\\log n,\\ n,\\ n^2$',
+      '$\\log n,\\ n,\\ n^2,\\ n\\log n$',
+    ],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Compare at $n = 1024$, where $\\log_2 n = 10$:\n\n' +
+        '| Function | Value |\n| --- | --- |\n' +
+        '| $\\log_2 n$ | 10 |\n' +
+        '| $n$ | 1024 |\n' +
+        '| $n\\log_2 n$ | 10 240 |\n' +
+        '| $n^2$ | 1 048 576 |\n\n' +
+        'So the order is $\\log n$, $n$, $n\\log n$, $n^2$.',
+      whyWrong: [
+        null,
+        'This puts $n$ below $\\log n$. A logarithm grows far more slowly than $n$.',
+        'This puts $n\\log n$ below $n$. Multiplying $n$ by $\\log n$ makes it bigger once $\\log n > 1$.',
+        'This puts $n^2$ below $n\\log n$. Since $n$ is much bigger than $\\log n$, $n \\times n$ is bigger than $n \\times \\log n$.',
+      ],
+      keyIdea: 'Growth ladder: $\\log n < n < n\\log n < n^2$.',
+    },
+    check: {
+      optionValues: ['a', 'b', 'c', 'd'],
+      compute: () => {
+        const n = 2 ** 20;
+        const value: Record<string, number> = { log: log2(n), lin: n, nlog: n * log2(n), sq: n * n };
+        const orders: Record<string, string[]> = {
+          a: ['log', 'lin', 'nlog', 'sq'],
+          b: ['lin', 'log', 'nlog', 'sq'],
+          c: ['log', 'nlog', 'lin', 'sq'],
+          d: ['log', 'lin', 'sq', 'nlog'],
+        };
+        const ok = Object.keys(orders).filter((k) => orders[k].every((t, i, a) => i === 0 || value[a[i - 1]] < value[t]));
+        return ok.length === 1 ? ok[0] : 'none or several';
+      },
     },
   },
 ];

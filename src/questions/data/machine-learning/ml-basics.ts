@@ -11,10 +11,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'Which of the following best describes **machine learning**?',
     options: [
-      'A computer program that follows a fixed list of rules written by hand by a programmer',
-      'A computer system that gets better at a task by learning patterns from data, instead of being given every rule explicitly',
-      'Any computer system that can store and search very large amounts of data quickly',
-      'A robot with sensors and motors that can move around on its own',
+      'Following a fixed list of rules written by a programmer',
+      'Learning patterns from data instead of being given every rule',
+      'Storing and searching large amounts of data quickly',
+      'A robot that can move around on its own',
     ],
     correctIndex: 1,
     markScheme: {
@@ -37,7 +37,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-002',
     subtopic: 'ml-basics',
     difficulty: 'foundation',
-    stem: 'A company has 50,000 old emails, and a person has marked each one as "spam" or "not spam". The company uses these emails to train a model that marks **new** emails as spam or not spam. Which type of machine learning is this?',
+    stem: 'A model is trained on old emails, each marked "spam" or "not spam" by a person, so that it can mark **new** emails. Which type of machine learning is this?',
     options: ['Unsupervised learning', 'Reinforcement learning', 'Supervised learning', 'Rule-based programming (no learning)'],
     correctIndex: 2,
     markScheme: {
@@ -59,7 +59,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-003',
     subtopic: 'ml-basics',
     difficulty: 'foundation',
-    stem: 'A model predicts the selling price (in AED) of an apartment from its floor area, number of bedrooms and distance to the nearest metro station. It is trained on past sales whose prices are known. What kind of task is this?',
+    stem: 'A model predicts an apartment\'s selling price from its floor area and number of bedrooms, trained on past sales with known prices. What kind of task is this?',
     options: ['Regression', 'Classification', 'Clustering', 'Reinforcement learning'],
     correctIndex: 0,
     markScheme: {
@@ -80,7 +80,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-004',
     subtopic: 'ml-basics',
     difficulty: 'foundation',
-    stem: 'A teacher wants to train a model to predict whether a student will **pass** the final exam. Part of the training data is shown. Which column is the **label** (the target the model learns to predict)?',
+    stem: 'A model predicts whether a student will **pass** the final exam. Which column of the training data is the **label** (the target to predict)?',
     table: {
       caption: 'Training data (one row per past student)',
       headers: ['Hours studied per week', 'Hours of sleep per night', 'Attendance (%)', 'Passed'],
@@ -96,12 +96,12 @@ export const questions: StaticQuestion[] = [
       solution:
         '- **Features** are the inputs: the information we know *before* the outcome and give to the model.\n' +
         '- The **label** (target) is the output: the thing we want the model to predict.\n\n' +
-        'The teacher wants to predict **whether a student passes**, so the label is the "Passed" column (Yes / No).\n\n' +
+        'The aim is to predict **whether a student passes**, so the label is the "Passed" column (Yes / No).\n\n' +
         'Hours studied, hours of sleep and attendance are the three **features**. Because the label is a category (Yes / No), this is a classification task.',
       whyWrong: [
         'Hours studied is an **input** the model uses to make its prediction, so it is a feature, not the label.',
         'Hours of sleep is an **input** (feature). The model uses it to predict the outcome; it is not the thing being predicted.',
-        'Attendance is known before the exam and is used as an **input** (feature), not the outcome the teacher wants to predict.',
+        'Attendance is known before the exam and is used as an **input** (feature), not the outcome to be predicted.',
         null,
       ],
       keyIdea: 'Features are the inputs; the label is the answer the model is trained to predict.',
@@ -111,7 +111,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-005',
     subtopic: 'ml-basics',
     difficulty: 'foundation',
-    stem: 'A computer program learns to play a racing video game. It is **never shown** the correct moves. Instead it tries actions, gains points for finishing laps quickly, loses points when it crashes, and gradually learns to drive better. Which type of machine learning is this?',
+    stem: 'A program learns a racing game without being shown correct moves: it tries actions, gains points for fast laps and loses points for crashes. Which type of machine learning is this?',
     options: ['Supervised learning', 'Reinforcement learning', 'Unsupervised learning', 'Rule-based programming (no learning)'],
     correctIndex: 1,
     markScheme: {
@@ -136,7 +136,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-006',
     subtopic: 'ml-basics',
     difficulty: 'exam',
-    stem: 'A shop wants to predict whether a customer will stop shopping there ("churn"). Part of its dataset is shown. The Customer ID column is just a reference number and is **not** given to the model. Every other column except the label is used as an input. How many **features** does the model use?',
+    stem: 'A model predicts whether a customer will churn (the last column). The Customer ID is not given to it, and every other column except the label is an input. How many **features** does it use?',
     table: {
       headers: ['Customer ID', 'Age', 'Monthly spend (AED)', 'Visits per month', 'Has loyalty card', 'Churned'],
       rows: [
@@ -181,10 +181,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'exam',
     stem: 'Which of the following is a **clustering** task?',
     options: [
-      'Predicting tomorrow\'s maximum temperature in Abu Dhabi from today\'s weather readings',
-      'Deciding whether an X-ray shows a broken bone, using thousands of X-rays already labelled by doctors',
-      'Sorting new emails into the folders "Work", "Personal" and "Promotions", using emails the user has already filed',
-      'Splitting a supermarket\'s customers into groups with similar shopping habits, with no groups decided in advance',
+      'Predicting tomorrow\'s maximum temperature from today\'s readings',
+      'Detecting broken bones from X-rays labelled by doctors',
+      'Sorting emails into three fixed folders, using emails already filed',
+      'Grouping customers by shopping habits, with no groups decided in advance',
     ],
     correctIndex: 3,
     markScheme: {
@@ -208,14 +208,18 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-008',
     subtopic: 'ml-basics',
     difficulty: 'exam',
-    stem:
-      'How many of these six tasks are **classification** tasks?\n\n' +
-      '1. Predicting tomorrow\'s maximum temperature in degrees Celsius\n' +
-      '2. Deciding whether a tumour is benign or malignant from a scan\n' +
-      '3. Recognising which digit (0 to 9) has been handwritten\n' +
-      '4. Estimating the resale price of a used car in AED\n' +
-      '5. Grouping news articles by topic when no topics are given in advance\n' +
-      '6. Predicting whether a customer will cancel their phone contract next month',
+    stem: 'How many of the six tasks in the table are **classification** tasks?',
+    table: {
+      headers: ['Task', 'Description'],
+      rows: [
+        [1, 'Predict tomorrow\'s maximum temperature in degrees Celsius'],
+        [2, 'Decide whether a tumour is benign or malignant from a scan'],
+        [3, 'Recognise which digit (0 to 9) has been handwritten'],
+        [4, 'Estimate the resale price of a used car in AED'],
+        [5, 'Group news articles by topic when no topics are given in advance'],
+        [6, 'Predict whether a customer will cancel their contract next month'],
+      ],
+    },
     options: ['$2$', '$3$', '$4$', '$5$'],
     correctIndex: 1,
     markScheme: {
@@ -258,7 +262,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-009',
     subtopic: 'ml-basics',
     difficulty: 'exam',
-    stem: 'A face-analysis model was trained on a photo dataset in which about 80% of the faces were lighter-skinned. When tested, its error rates for four groups of people were as shown in the chart. What is the **most likely main cause** of this pattern?',
+    stem: 'A face-analysis model was trained on photos in which about 80% of faces were lighter-skinned. The chart shows its test error rates. What is the **most likely main cause** of this pattern?',
     chart: {
       kind: 'bar',
       title: 'Error rate of the face-analysis model by group',
@@ -268,20 +272,20 @@ export const questions: StaticQuestion[] = [
       series: [{ name: 'Error rate (%)', values: [1, 7, 12, 35] }],
     },
     options: [
-      'The training data under-represents darker-skinned faces, so the model learned much less about them (sampling bias)',
-      'Darker-skinned faces are naturally impossible for computers to analyse accurately, so nothing can be done',
-      'The model was trained for too long, so it is overfitting equally on every group',
-      'The test set was too large, which made the error rates for some groups go up',
+      'Darker-skinned faces are under-represented in training (sampling bias)',
+      'Computers cannot analyse darker-skinned faces accurately',
+      'Overfitting equally on every group',
+      'A test set that was too large',
     ],
     correctIndex: 0,
     markScheme: {
       solution:
         'A model can only learn well from what it sees. Here about 80% of the training faces were lighter-skinned, so the model saw **far fewer examples** of darker-skinned faces (and probably even fewer of darker-skinned women).\n\n' +
-        'The chart matches this exactly: the error rate is lowest (1%) for the best-represented group and highest (35%) for the least-represented group.\n\n' +
+        'The chart fits this: each darker-skinned group has a much higher error rate than the lighter-skinned group of the same sex (12% against 1% for men, 35% against 7% for women).\n\n' +
         'This is **sampling (representation) bias**: the training data does not represent all the people the model will be used on. The usual fixes are to collect more balanced data and to **test the model separately on each group** before using it.',
       whyWrong: [
         null,
-        'There is nothing about darker skin that makes accurate analysis impossible; models trained on **balanced** data perform far better on every group. The gap comes from the data, not from the people.',
+        'There is nothing about darker skin that makes accurate analysis impossible; models trained on **balanced** data perform far better on the groups that were under-represented. The gap comes from the data, not from the people.',
         'Overfitting from too much training would not explain why the errors line up with **how well each group was represented** in the data. The pattern points to the training data, not the training time.',
         'A larger test set gives **more reliable** error estimates; it does not make the model itself worse for any group.',
       ],
@@ -292,7 +296,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-010',
     subtopic: 'ml-basics',
     difficulty: 'exam',
-    stem: 'A bank tests a loan-approval model on applicants from two groups. The results are in the table. A fairness check compares the **approval rates** of the two groups. By how many percentage points is Group A\'s approval rate **higher** than Group B\'s?',
+    stem: 'The table shows how a loan-approval model treated two groups. By how many percentage points is Group A\'s approval rate **higher** than Group B\'s?',
     table: {
       headers: ['Group', 'Applicants', 'Approved by the model'],
       rows: [
@@ -331,26 +335,25 @@ export const questions: StaticQuestion[] = [
     subtopic: 'ml-basics',
     difficulty: 'exam',
     fixedOrder: true,
-    stem: 'Which of the following are examples of **supervised** learning?',
+    stem: 'Statement 1: predicting house prices from past sales with known prices is supervised learning.\n\nStatement 2: recognising cats and dogs from photos tagged "cat" or "dog" is supervised learning.\n\nWhich is true?',
     options: [
-      'Training a model to predict house prices from past sales, where the selling price of every house is known',
-      'Training a model to recognise cats and dogs from photos that have each been tagged "cat" or "dog"',
-      'Both A and B',
-      'None of the above',
+      'Statement 1 only',
+      'Statement 2 only',
+      'Both statements',
+      'Neither statement',
     ],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Supervised learning = learning from examples that come **with the correct answer (label)**.\n\n' +
-        '- A: every past sale has its real price, so each example is labelled. It predicts a number, so it is supervised **regression**.\n' +
-        '- B: every photo is tagged "cat" or "dog", so each example is labelled. It predicts a category, so it is supervised **classification**.\n\n' +
-        'Both are supervised, so the answer is C (Both A and B).\n\n' +
-        'Remember: regression and classification are **both** kinds of supervised learning; clustering is the classic unsupervised task.',
+        'Supervised learning means learning from examples that come **with the correct answer (label)**.\n\n' +
+        '- Statement 1: every past sale has its real price, so each example is labelled. It predicts a number, so it is supervised **regression**.\n' +
+        '- Statement 2: every photo is tagged "cat" or "dog", so each example is labelled. It predicts a category, so it is supervised **classification**.\n\n' +
+        'Both statements are true. Regression and classification are **both** kinds of supervised learning; clustering is the classic unsupervised task.',
       whyWrong: [
-        'A is supervised, but so is B: the "cat" / "dog" tags are labels. Classification is supervised learning too.',
-        'B is supervised, but so is A: the known selling prices are labels. Regression is supervised learning too.',
+        'Statement 1 is true, but so is Statement 2: the "cat" and "dog" tags are labels, and classification is supervised learning too.',
+        'Statement 2 is true, but so is Statement 1: the known selling prices are labels, and regression is supervised learning too.',
         null,
-        'Both A and B train on labelled data (known prices, known tags), which is exactly what supervised learning means.',
+        'Both statements describe training on labelled data (known prices, known tags), which is exactly what supervised learning means.',
       ],
       keyIdea: 'Regression and classification are both supervised: the training data includes the correct answers.',
     },
@@ -359,7 +362,7 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-012',
     subtopic: 'ml-basics',
     difficulty: 'foundation',
-    stem: 'A model reads small **grayscale** (black-and-white) images that are 28 pixels wide and 28 pixels tall. Each pixel\'s brightness is fed into the model as one input feature. How many features does each image have?',
+    stem: 'A model reads **grayscale** images 28 pixels wide and 28 pixels tall, using each pixel\'s brightness as one input feature. How many features does each image have?',
     options: ['$56$', '$28$', '$2352$', '$784$'],
     correctIndex: 3,
     markScheme: {
@@ -393,12 +396,12 @@ export const questions: StaticQuestion[] = [
     id: 'ml-basics-013',
     subtopic: 'ml-basics',
     difficulty: 'exam',
-    stem: 'A hospital wants to use its patient records to train a model that predicts the risk of developing diabetes. Which approach is the **most appropriate** for protecting patients\' privacy?',
+    stem: 'A hospital trains a diabetes-risk model on patient records. Which approach **best** protects patients\' privacy?',
     options: [
-      'Use the data only with patient consent or proper ethical approval, remove names and ID numbers, keep only the fields the model needs, and store the data securely',
-      'Use every record with names attached, because the model is for a good medical purpose',
-      'Publish the full patient records online so that other researchers can check the results',
-      'Skip privacy steps as long as the final model reaches a high accuracy',
+      'Consent, remove identifiers, keep only needed fields, store securely',
+      'Use every record with names, because the purpose is good',
+      'Publish the records so that others can check the results',
+      'Skip privacy steps if the model is accurate enough',
     ],
     correctIndex: 0,
     markScheme: {
@@ -408,7 +411,7 @@ export const questions: StaticQuestion[] = [
         '- **Remove direct identifiers** such as names and ID numbers.\n' +
         '- **Data minimisation**: collect and keep only the fields that the model actually needs.\n' +
         '- **Security**: store the data safely and limit who can access it.\n\n' +
-        'Only the first approach does all of this. A good purpose or a high accuracy does not remove the duty to protect people\'s privacy.',
+        'Only the approach built on consent and removing identifiers does all of this. A good purpose or a high accuracy does not remove the duty to protect people\'s privacy.',
       whyWrong: [
         null,
         'A good purpose does not cancel the need for **consent** and protection. Keeping names attached is unnecessary for predicting risk and exposes patients if the data leaks.',
@@ -418,145 +421,11 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'Privacy in ML: get consent, remove identifiers, keep only what you need and store it securely, regardless of purpose or accuracy.',
     },
   },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'ml-basics-014',
-    subtopic: 'ml-basics',
-    difficulty: 'challenge',
-    stem:
-      'Three projects are described below.\n\n' +
-      '- **P**: Divide 10,000 online shoppers into groups with similar buying behaviour. No groups are given in advance.\n' +
-      '- **Q**: Predict how many minutes a food delivery will take, using past deliveries whose actual times were recorded.\n' +
-      '- **R**: Learn when to switch a junction\'s traffic lights by trying different timings in a simulator, and being rewarded whenever cars wait less.\n\n' +
-      'Which line matches every project to the correct type of machine learning?',
-    options: [
-      'P: classification (supervised); Q: regression (supervised); R: reinforcement learning',
-      'P: clustering (unsupervised); Q: classification (supervised); R: reinforcement learning',
-      'P: clustering (unsupervised); Q: regression (supervised); R: supervised learning',
-      'P: clustering (unsupervised); Q: regression (supervised); R: reinforcement learning',
-    ],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Work through each project with three questions: Is there an agent acting and getting rewards? Are there labels? Is the output a category or a number?\n\n' +
-        '1. **P**: no labels, and the groups are discovered from the data. That is **clustering**, which is **unsupervised**.\n' +
-        '2. **Q**: past deliveries have their real times recorded (labels), so it is supervised. The output, a number of minutes, is continuous, so it is **regression**.\n' +
-        '3. **R**: an agent (the light controller) takes actions (timings) in an environment (the simulator) and gets rewards (less waiting). That is **reinforcement learning**.\n\n' +
-        'So: P clustering, Q regression, R reinforcement learning.',
-      whyWrong: [
-        'P has **no labels** and no groups decided in advance, so it cannot be classification; discovering groups yourself is clustering.',
-        'Q predicts a **number of minutes**, a continuous quantity, so it is regression, not classification.',
-        'R is never shown labelled "correct" timings; it learns by trial and error from a **reward** signal, which is reinforcement learning, not supervised learning.',
-        null,
-      ],
-      keyIdea: 'No labels and discovered groups: clustering; labels and a number: regression; actions and rewards: reinforcement learning.',
-    },
-  },
-  {
-    id: 'ml-basics-015',
-    subtopic: 'ml-basics',
-    difficulty: 'challenge',
-    stem: 'A team is training a model to predict the opinions of a city\'s adult residents. Its training dataset has 2000 records, split by age as shown in the chart. In the city itself, only **40%** of adults are aged under 30. To make the dataset match the city, the team keeps **all 600** records of people aged 30 and over and randomly removes some of the under-30 records. How many under-30 records should they **keep**?',
-    chart: {
-      kind: 'pie',
-      title: 'Training dataset by age (2000 records)',
-      slices: [
-        { label: 'Aged under 30', value: 1400 },
-        { label: 'Aged 30 and over', value: 600 },
-      ],
-    },
-    options: ['$800$', '$400$', '$560$', '$240$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The dataset is 70% under-30 ($\\frac{1400}{2000}$), but the city is only 40% under-30, so the data is **biased** towards young people.\n\n' +
-        'Keep all 600 older records and keep $u$ under-30 records. The **new** total is $u + 600$, and the under-30s must be 40% of that new total:\n\n' +
-        '$$\\frac{u}{u + 600} = 0.4$$\n\n' +
-        'Multiply both sides by $u + 600$:\n\n' +
-        '$$u = 0.4u + 240$$\n\n' +
-        '$$0.6u = 240 \\quad\\Rightarrow\\quad u = 400$$\n\n' +
-        'Check: the new dataset has $400 + 600 = 1000$ records, and $\\frac{400}{1000} = 40\\%$. Correct.\n\n' +
-        'Shortcut: the 600 older records must make up the other 60%, so the new total is $\\frac{600}{0.6} = 1000$, and 40% of 1000 is 400.',
-      whyWrong: [
-        'This is 40% of the **original** 2000 records. After removing records the total is smaller, so 40% must be taken of the new total, $u + 600$. (Check: $\\frac{800}{1400} \\approx 57\\%$, not 40%.)',
-        null,
-        'This is 40% of the 1400 under-30 records. The 40% refers to the share of the **whole** new dataset, not of the under-30 group.',
-        'This is 40% of the 600 older records. That would make under-30s $\\frac{240}{840} \\approx 29\\%$ of the data; the 600 older records must be the **60%** share.',
-      ],
-      keyIdea: 'When rebalancing a biased dataset, the target percentage applies to the NEW total, so set up and solve an equation.',
-    },
-    check: {
-      optionValues: [800, 400, 560, 240],
-      compute: () => {
-        const older = 600;
-        const under30Available = 1400;
-        const target = F(40, 100);
-        for (let u = 0; u <= under30Available; u++) {
-          if (F(u, u + older).equals(target)) return u;
-        }
-        return -1;
-      },
-    },
-  },
-  {
-    id: 'ml-basics-016',
-    subtopic: 'ml-basics',
-    difficulty: 'challenge',
-    stem: 'A company releases a dataset for machine learning research. It has removed every person\'s name and phone number, but each record still contains the person\'s **full postcode, date of birth and gender**, together with their medical diagnosis. Which statement is correct?',
-    options: [
-      'The data is now fully anonymous, because no names or phone numbers remain',
-      'Many people could still be re-identified by matching postcode, date of birth and gender with other available data, so the data is not truly anonymous',
-      'Re-identification is impossible, because thousands of people share each postcode, each date of birth and each gender',
-      'The privacy risk would disappear if a more accurate model were trained on the data',
-    ],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Names and phone numbers are **direct identifiers**. Postcode, date of birth and gender are **quasi-identifiers**: each one alone is shared by many people, but **together** they often single out one person.\n\n' +
-        'For example, in one postcode area there may be thousands of people, but how many were born on 14 March 2005 **and** are female? Very often just one. Matching these three fields against another dataset that does include names (such as a public register or a social-media profile) can reveal who each record belongs to, and therefore their diagnosis.\n\n' +
-        'Studies of real populations have found that a large majority of people are unique on the combination of postcode, full date of birth and gender. So removing names alone does **not** make data anonymous. Safer releases coarsen or remove these fields (for example, only the year of birth and the first part of the postcode).',
-      whyWrong: [
-        'Removing direct identifiers is not enough: the **combination** of postcode, date of birth and gender can still point to a single person.',
-        null,
-        'Each field on its own is common, but the **combination** of all three is usually rare or unique, which is exactly what makes re-identification possible.',
-        'The accuracy of a model trained on the data has **no effect** on whether people in the released dataset can be identified.',
-      ],
-      keyIdea: 'Removing names is not anonymisation: combinations of quasi-identifiers (postcode, birth date, gender) can re-identify people.',
-    },
-  },
-  {
-    id: 'ml-basics-017',
-    subtopic: 'ml-basics',
-    difficulty: 'challenge',
-    stem: 'A company trains a hiring model on its last 10 years of hiring decisions, a period in which mostly men were hired. To make the model fair, the company **deletes the "gender" column** before training. The new model still recommends far fewer women than men with similar qualifications. What is the **most likely** explanation?',
-    options: [
-      'Other features act as proxies for gender (for example, a women\'s sports club on the CV or a career break), so the model can still learn the old biased pattern from the historical decisions',
-      'Deleting a column has no effect on what a model learns, so the model is still secretly reading the gender column',
-      'The model must be underfitting; training it for longer would remove the bias',
-      'The training data contained too many women, so the model learned to reject them',
-    ],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Two things combine here:\n\n' +
-        '1. **Biased labels**: the "correct answers" the model learns from are past human decisions, which favoured men. The model is rewarded for copying those decisions.\n' +
-        '2. **Proxy features**: even without a gender column, other features are **correlated** with gender (for example, membership of a women\'s club, a gap in employment for childcare, or certain schools). The model can use these to reproduce the same pattern.\n\n' +
-        'So simply deleting the sensitive column ("fairness through unawareness") often does not work. Real fixes include checking outcomes by group, removing or adjusting proxy features, and correcting the biased training labels.',
-      whyWrong: [
-        null,
-        'A deleted column really is gone; the model cannot read it. The problem is that **other columns carry similar information** (proxies).',
-        'Training longer makes the model copy the training labels **more** closely, and those labels are the biased past decisions, so the bias would not disappear.',
-        'The data came from a period when **mostly men** were hired, so the historical pattern favours men; too many women is the opposite of what the stem describes.',
-      ],
-      keyIdea: 'Removing a sensitive column does not remove bias: proxy features and biased historical labels can reproduce it.',
-    },
-  },
   {
     id: 'ml-basics-018',
     subtopic: 'ml-basics',
     difficulty: 'exam',
-    stem: 'A university admissions model is tested on two groups of applicants. A fairness rule called **equal opportunity** says that **qualified** applicants should be accepted at the same rate in every group. Using the table, by how many percentage points do the acceptance rates of **qualified** applicants differ between the two groups?',
+    stem: '**Equal opportunity** requires qualified applicants to be accepted at the same rate in every group. From the table, by how many percentage points do the two groups\' rates differ?',
     table: {
       headers: ['Group', 'Qualified applicants', 'Qualified and accepted', 'Unqualified applicants', 'Unqualified and accepted'],
       rows: [
@@ -590,6 +459,108 @@ export const questions: StaticQuestion[] = [
         const ry = F(y.qualifiedAccepted, y.qualified);
         return Math.abs(rx.sub(ry).mul(100).value());
       },
+    },
+  },
+
+  // ---------------------------------------------------------------- recall and approach
+  {
+    id: 'ml-basics-019',
+    subtopic: 'ml-basics',
+    difficulty: 'foundation',
+    stem: 'In supervised learning, what is a **label**?',
+    options: ['The correct output for a training example', 'An input column of the data', 'A weight inside the model', 'A group found by clustering'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Supervised learning trains on pairs of inputs and correct outputs.\n\n' +
+        'The correct output is the **label** (or target): for example "spam" for an email, or the selling price of a house. The inputs are the **features**.',
+      whyWrong: [
+        null,
+        'An input column is a **feature**. The label is the output that the model learns to predict.',
+        'Weights are numbers the model learns during training. Labels are part of the data and are given in advance.',
+        'Clustering finds groups in data that has **no** labels, so a discovered group is not a label.',
+      ],
+      keyIdea: 'A label is the correct answer attached to a training example.',
+    },
+  },
+  {
+    id: 'ml-basics-020',
+    subtopic: 'ml-basics',
+    difficulty: 'foundation',
+    stem: 'In machine learning, what is a **feature**?',
+    options: ['An input variable used to make a prediction', 'The answer the model must predict', 'One row of the dataset', 'The error of the model'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **feature** is one input variable: one column of the data table, such as age or monthly spend.\n\n' +
+        'Each row is an **example**, and the column being predicted is the **label**.',
+      whyWrong: [
+        null,
+        'The answer to be predicted is the **label** (or target).',
+        'One row is an **example**. Features are the columns.',
+        'The error is measured by the **loss**. It is computed from the predictions, not given as an input.',
+      ],
+      keyIdea: 'Features are the input columns; examples are the rows; the label is the column being predicted.',
+    },
+  },
+  {
+    id: 'ml-basics-021',
+    subtopic: 'ml-basics',
+    difficulty: 'foundation',
+    stem: 'Which type of machine learning uses data with **no** labels?',
+    options: ['Unsupervised learning', 'Supervised learning', 'Reinforcement learning', 'Classification'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Unsupervised learning** looks for structure, such as groups of similar items, in data that has no labels. Clustering is the classic example.',
+      whyWrong: [
+        null,
+        'Supervised learning is defined by having labels: the correct answers are supplied with the training data.',
+        'Reinforcement learning has no labelled dataset, but it does get feedback, from rewards and penalties. It is not the type defined by learning from unlabelled data.',
+        'Classification is a kind of supervised learning, so it needs labelled examples of each class.',
+      ],
+      keyIdea: 'No labels means unsupervised learning.',
+    },
+  },
+  {
+    id: 'ml-basics-022',
+    subtopic: 'ml-basics',
+    difficulty: 'foundation',
+    stem: 'A dataset of $n$ examples, each with $d$ features, is stored as a matrix with one row per example. What is the order of this matrix?',
+    options: ['$n \\times d$', '$d \\times n$', '$n \\times n$', '$(n + d) \\times 1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **order** of a matrix means its size, written rows $\\times$ columns.\n\n' +
+        'There is one row per example, so $n$ rows, and one column per feature, so $d$ columns. The order is $n \\times d$.',
+      whyWrong: [
+        null,
+        'This swaps rows and columns. The order lists rows first, and the rows here are the $n$ examples.',
+        'This would be a square matrix, which needs as many features as examples. The number of columns is $d$.',
+        'This adds the two counts and uses a single column. A table of $n$ rows and $d$ columns has $n \\times d$ entries.',
+      ],
+      keyIdea: 'A data matrix has one row per example and one column per feature, so its order is $n \\times d$.',
+    },
+  },
+  {
+    id: 'ml-basics-023',
+    subtopic: 'ml-basics',
+    difficulty: 'exam',
+    stem: 'A hospital wants to predict how many days a patient will stay, using past records that include the actual stays. Which approach fits best?',
+    options: ['Regression', 'Classification', 'Clustering', 'Reinforcement learning'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Step 1: are there labels?** Yes: the past records include the actual stays, so this is supervised learning.\n\n' +
+        '**Step 2: what kind of output?** A number of days is a quantity on a scale, not one of a few fixed categories.\n\n' +
+        'Supervised learning that predicts a quantity is **regression**.',
+      whyWrong: [
+        null,
+        'Classification picks one of a fixed set of categories. A length of stay is a quantity, where 6 days is more than 5 days.',
+        'Clustering is for data with **no** labels. Here the actual stays are known.',
+        'Reinforcement learning needs an agent that takes actions and receives rewards. Here there is a fixed set of past records.',
+      ],
+      keyIdea: 'Labels plus a numeric output means regression.',
     },
   },
 ];

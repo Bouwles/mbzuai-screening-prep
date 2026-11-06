@@ -140,6 +140,120 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'A geometric series converges (has a sum to infinity) exactly when $-1 < r < 1$; a negative ratio is fine as long as its size is less than 1.',
     },
   },
+  {
+    id: 'sequences-series-020',
+    subtopic: 'sequences-series',
+    difficulty: 'foundation',
+    stem: 'What is the $n$th term of an arithmetic sequence with first term $a$ and common difference $d$?',
+    options: ['$a + (n-1)d$', '$a + nd$', '$ar^{n-1}$', '$\\frac{n}{2}\\left(2a + (n-1)d\\right)$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Start at the first term $a$. To reach the $n$th term you add $d$ exactly $n - 1$ times.\n\n' +
+        'So $u_n = a + (n-1)d$. For example, the 2nd term is $a + d$.',
+      whyWrong: [
+        null,
+        'This adds $d$ one time too many: with $n = 1$ it gives $a + d$, not the first term $a$.',
+        'This is the $n$th term of a **geometric** sequence, with common ratio $r$.',
+        'This is the **sum** of the first $n$ terms, not the $n$th term.',
+      ],
+      keyIdea: 'The $n$th term of an arithmetic sequence is $a + (n-1)d$.',
+    },
+    check: {
+      // each option evaluated at a = 5, d = 3, n = 4 (and r = 3 for the geometric form)
+      optionValues: [5 + 3 * 3, 5 + 4 * 3, 5 * 3 ** 3, 2 * (10 + 3 * 3)],
+      compute: () => arithTerms(5, 3, 4)[3],
+    },
+  },
+  {
+    id: 'sequences-series-021',
+    subtopic: 'sequences-series',
+    difficulty: 'foundation',
+    stem: 'What is the common ratio of the geometric sequence $2, 6, 18, 54, \\dots$?',
+    options: ['$3$', '$4$', '$2$', '$\\frac{1}{3}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **common ratio** is what each term is multiplied by to give the next one. Find it by dividing a term by the one before it:\n\n' +
+        '$$r = \\frac{6}{2} = 3$$',
+      whyWrong: [
+        null,
+        '$4$ is the difference $6 - 2$. In a geometric sequence you divide, not subtract.',
+        '$2$ is the first term, not the ratio.',
+        'This divides a term by the one **after** it. The ratio is the next term divided by the previous one.',
+      ],
+      keyIdea: 'Common ratio $=$ a term divided by the term before it.',
+    },
+    check: {
+      optionValues: [3, 4, 2, 1 / 3],
+      compute: () => 18 / 6,
+    },
+  },
+  {
+    id: 'sequences-series-022',
+    subtopic: 'sequences-series',
+    difficulty: 'foundation',
+    stem: 'What is the common difference of the arithmetic sequence $5, 2, -1, -4, \\dots$?',
+    options: ['$-3$', '$3$', '$-4$', '$\\frac{2}{5}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **common difference** is what is added to each term to give the next one. Subtract a term from the one after it:\n\n' +
+        '$$d = 2 - 5 = -3$$\n\n' +
+        'The sequence is falling, so $d$ is negative.',
+      whyWrong: [
+        null,
+        'This subtracts the wrong way round, $5 - 2$. The sequence falls, so the difference is negative.',
+        '$-4$ is the 4th term, not the difference.',
+        'This divides $\\frac{2}{5}$, which is how you would look for a ratio in a geometric sequence.',
+      ],
+      keyIdea: 'Common difference $=$ a term minus the term before it; it is negative for a falling sequence.',
+    },
+    check: {
+      optionValues: [-3, 3, -4, 2 / 5],
+      compute: () => -1 - 2,
+    },
+  },
+  {
+    id: 'sequences-series-023',
+    subtopic: 'sequences-series',
+    difficulty: 'foundation',
+    stem: 'A geometric series with common ratio $r$ has a sum to infinity exactly when:',
+    options: ['$|r| < 1$', '$r < 1$', '$r > 1$', '$|r| \\le 1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A sum to infinity exists only if the terms shrink towards 0, which happens exactly when $|r| < 1$, that is, $-1 < r < 1$.\n\n' +
+        'Then $S_\\infty = \\frac{a}{1 - r}$.',
+      whyWrong: [
+        null,
+        'This also allows values such as $r = -3$, where the terms grow in size: $1, -3, 9, -27, \\dots$',
+        'Here the terms keep growing, so the total grows without limit.',
+        'This includes $r = 1$ and $r = -1$, where the terms never shrink. The inequality must be strict.',
+      ],
+      keyIdea: 'A geometric series has a sum to infinity exactly when $|r| < 1$.',
+    },
+  },
+  {
+    id: 'sequences-series-024',
+    subtopic: 'sequences-series',
+    difficulty: 'foundation',
+    stem: 'In an arithmetic progression, which quantity is constant?',
+    options: ['The difference of consecutive terms', 'The ratio of consecutive terms', 'The sum of consecutive terms', 'The product of consecutive terms'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'An **arithmetic progression** (AP) is another name for an arithmetic sequence. Each term is the one before it plus a fixed number $d$, so the difference of consecutive terms is constant.\n\n' +
+        'For example, in $4, 7, 10, 13, \\dots$ the difference is always 3.',
+      whyWrong: [
+        null,
+        'A constant ratio defines a **geometric** progression.',
+        'The sums change: in $4, 7, 10, \\dots$ they are 11, then 17.',
+        'The products change: in $4, 7, 10, \\dots$ they are 28, then 70.',
+      ],
+      keyIdea: 'Arithmetic: constant difference. Geometric: constant ratio.',
+    },
+  },
   // ------------------------------------------------------------------ exam
   {
     id: 'sequences-series-006',
@@ -316,32 +430,39 @@ export const questions: StaticQuestion[] = [
     id: 'sequences-series-012',
     subtopic: 'sequences-series',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'What does this pseudocode print?',
     code: {
-      lang: 'python',
-      source: 'total = 0\nterm = 2\nfor i in range(5):\n    total += term\n    term *= 3\nprint(total)',
+      lang: 'pseudocode',
+      source: 'total = 0\nterm = 2\nfor i = 1 to 5\n   total = total + term\n   term = term * 3\nend for\nprint(total)',
     },
     options: ['`726`', '`80`', '`242`', '`486`'],
     correctIndex: 2,
     markScheme: {
       solution:
         'The loop adds the current term to `total`, then multiplies the term by 3. So it adds the first 5 terms of the geometric series $2 + 6 + 18 + \\dots$\n\n' +
-        '`range(5)` gives `i = 0, 1, 2, 3, 4`, so the body runs 5 times:\n\n' +
-        '| `i` | `total` after adding | `term` after multiplying |\n|---|---|---|\n| 0 | 2 | 6 |\n| 1 | 8 | 18 |\n| 2 | 26 | 54 |\n| 3 | 80 | 162 |\n| 4 | 242 | 486 |\n\n' +
+        '`for i = 1 to 5` includes both end values, so the body runs 5 times:\n\n' +
+        '| `i` | `total` after adding | `term` after multiplying |\n|---|---|---|\n| 1 | 2 | 6 |\n| 2 | 8 | 18 |\n| 3 | 26 | 54 |\n| 4 | 80 | 162 |\n| 5 | 242 | 486 |\n\n' +
         'It prints `242`. Check with the formula: $\\frac{2(3^{5} - 1)}{3 - 1} = 3^{5} - 1 = 242$.',
       whyWrong: [
-        'This is $6 + 18 + 54 + 162 + 486$: it multiplies the term by 3 **before** adding it. In the code `total += term` comes first, so 2 is added.',
-        'This stops after 4 passes (`i = 0` to `3`). `range(5)` runs 5 times, for `i = 0, 1, 2, 3, 4`.',
+        'This is $6 + 18 + 54 + 162 + 486$: it multiplies the term by 3 **before** adding it. In the code the line `total = total + term` comes first, so 2 is added.',
+        'This stops after 4 passes. `for i = 1 to 5` includes `i = 5`, so the body runs 5 times.',
         null,
         'This is the final value of `term`, not `total`. The code prints `total`.',
       ],
-      keyIdea: 'A loop that adds a term and then multiplies it by $r$ is computing a geometric series; `range(n)` runs exactly $n$ times.',
+      keyIdea: 'A loop that adds a term and then multiplies it by $r$ is computing a geometric series; `for i = 1 to n` runs exactly $n$ times.',
     },
     check: {
       optionValues: [726, 80, 242, 486],
-      compute: () => sumOf(geoTerms(2, 3, 5)),
+      compute: () => {
+        let total = 0;
+        let term = 2;
+        for (let i = 1; i <= 5; i++) {
+          total += term;
+          term *= 3;
+        }
+        return total;
+      },
     },
-    python: { stdout: '242' },
   },
   {
     id: 'sequences-series-013',
@@ -397,105 +518,6 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'Find the ratio as an expression in $x$, then solve $-1 < r < 1$.',
     },
   },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'sequences-series-015',
-    subtopic: 'sequences-series',
-    difficulty: 'challenge',
-    stem: 'What is the smallest number of terms of the arithmetic series $3 + 7 + 11 + \\dots$ that must be added for the total to be greater than $500$?',
-    options: ['$15$', '$16$', '$11$', '$126$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Here $a = 3$ and $d = 4$, so\n\n' +
-        '$$S_n = \\frac{n}{2}\\left(2 \\times 3 + (n-1) \\times 4\\right) = \\frac{n}{2}(4n + 2) = n(2n + 1)$$\n\n' +
-        'We need $n(2n + 1) > 500$. Solving $2n^{2} + n - 500 = 0$ with the quadratic formula gives $n = \\frac{-1 + \\sqrt{4001}}{4} \\approx 15.6$.\n\n' +
-        '$n$ must be a whole number, so test the integers either side:\n\n' +
-        '- $S_{15} = 15 \\times 31 = 465$ (not yet over 500)\n' +
-        '- $S_{16} = 16 \\times 33 = 528$ (over 500)\n\n' +
-        'So the smallest number of terms is $16$.',
-      whyWrong: [
-        'This rounds $15.6$ down. With 15 terms the total is only 465. Because we need the total to **exceed** 500, round up to the next whole number of terms.',
-        null,
-        'This uses $n\\left(2a + (n-1)d\\right)$ without the $\\frac{1}{2}$, which doubles every sum and makes 11 terms look like enough. Really $S_{11} = 11 \\times 23 = 253$.',
-        'This finds when a single **term** $4n - 1$ first exceeds 500. The question is about the **sum** of the terms.',
-      ],
-      keyIdea: 'For "how many terms until the sum passes a target", set up $S_n > \\text{target}$, solve the quadratic, and round **up** to the next whole number.',
-    },
-    check: {
-      optionValues: [15, 16, 11, 126],
-      compute: () => {
-        let n = 0;
-        let s = 0;
-        while (s <= 500) {
-          s += 3 + n * 4;
-          n++;
-        }
-        return n;
-      },
-    },
-  },
-  {
-    id: 'sequences-series-016',
-    subtopic: 'sequences-series',
-    difficulty: 'challenge',
-    stem: 'Write the recurring decimal $0.4\\overline{5} = 0.45555\\dots$ as a fraction in its lowest terms.',
-    options: ['$\\frac{5}{11}$', '$\\frac{9}{20}$', '$\\frac{41}{90}$', '$\\frac{43}{45}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Only the 5 repeats. Split off the part that does not repeat:\n\n' +
-        '$$0.45555\\dots = 0.4 + (0.05 + 0.005 + 0.0005 + \\dots)$$\n\n' +
-        'The bracket is a geometric series with $a = 0.05$ and $r = 0.1$. Since $|r| < 1$:\n\n' +
-        '$$0.05 + 0.005 + \\dots = \\frac{0.05}{1 - 0.1} = \\frac{0.05}{0.9} = \\frac{5}{90} = \\frac{1}{18}$$\n\n' +
-        'So the number is $\\frac{4}{10} + \\frac{5}{90} = \\frac{36}{90} + \\frac{5}{90} = \\frac{41}{90}$.\n\n' +
-        'Check on a calculator: $41 \\div 90 = 0.45555\\dots$ and 41 is prime, so the fraction is already in lowest terms.',
-      whyWrong: [
-        'This is $0.454545\\dots$: it treats **both** digits 4 and 5 as repeating. Only the 5 repeats.',
-        'This is exactly $0.45$: it ignores the infinitely many 5s that follow.',
-        null,
-        'This is $0.4 + \\frac{5}{9} = 0.9555\\dots$: the repeating 5s start in the **second** decimal place, so the series starts at $0.05$, not $0.5$.',
-      ],
-      keyIdea: 'A recurring decimal is a geometric series with ratio $0.1$ (or $0.01$ for a 2-digit block), so its value is the non-repeating part plus $\\frac{a}{1-r}$.',
-    },
-    check: {
-      optionValues: [5 / 11, 9 / 20, 41 / 90, 43 / 45],
-      compute: () => new Frac(4, 10).add(new Frac(5, 100).div(new Frac(1).sub(new Frac(1, 10)))).value(),
-    },
-  },
-  {
-    id: 'sequences-series-017',
-    subtopic: 'sequences-series',
-    difficulty: 'challenge',
-    stem: 'The sum to infinity of a geometric series is 3 times its first term, and its second term is $8$. Find the first term.',
-    options: ['$12$', '$24$', '$\\frac{16}{3}$', '$36$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Let the first term be $a$ and the ratio $r$.\n\n' +
-        '**Step 1, use the sum to infinity.** $S_\\infty = 3a$, so\n\n' +
-        '$$\\frac{a}{1 - r} = 3a$$\n\n' +
-        'Divide both sides by $a$ (it is not 0, since the second term is 8): $\\frac{1}{1 - r} = 3$, so $1 - r = \\frac{1}{3}$ and $r = \\frac{2}{3}$.\n\n' +
-        '**Step 2, use the second term.** $u_2 = ar = 8$, so\n\n' +
-        '$$a = \\frac{8}{r} = 8 \\div \\frac{2}{3} = 8 \\times \\frac{3}{2} = 12$$\n\n' +
-        'Check: the series is $12 + 8 + \\frac{16}{3} + \\dots$ and $S_\\infty = \\frac{12}{1 - \\frac{2}{3}} = 36 = 3 \\times 12$.',
-      whyWrong: [
-        null,
-        'This uses $r = \\frac{1}{3}$, which is the value of $1 - r$, not $r$. Then $a = 8 \\div \\frac{1}{3} = 24$, but that series would have $S_\\infty = 36$, only 1.5 times its first term.',
-        'This multiplies 8 by $r = \\frac{2}{3}$. That gives the **third** term; the first term comes before the second, so divide by $r$.',
-        'This is the sum to infinity, $3a = 36$, not the first term $a$.',
-      ],
-      keyIdea: 'Translate each fact into an equation in $a$ and $r$ ($S_\\infty = \\frac{a}{1-r}$, $u_2 = ar$), solve for $r$ first, then $a$.',
-    },
-    check: {
-      optionValues: [12, 24, 16 / 3, 36],
-      compute: () => {
-        const multiple = 3; // S_inf = 3a  =>  1/(1 - r) = 3
-        const r = new Frac(1).sub(new Frac(1, multiple));
-        return new Frac(8).div(r).value();
-      },
-    },
-  },
   {
     id: 'sequences-series-018',
     subtopic: 'sequences-series',
@@ -526,44 +548,6 @@ export const questions: StaticQuestion[] = [
         let s = 0;
         for (let k = 11; k <= 30; k++) s += 3 * k - 2;
         return s;
-      },
-    },
-  },
-  {
-    id: 'sequences-series-019',
-    subtopic: 'sequences-series',
-    difficulty: 'challenge',
-    stem: 'A ball is dropped from a height of 10 m. After each bounce it rises to 60% of the height it has just fallen from. Assuming it keeps bouncing forever, what is the total vertical distance the ball travels?',
-    options: ['$25$ m', '$40$ m', '$50$ m', '$30$ m'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Track the journey:\n\n' +
-        '- First it falls 10 m (down only).\n' +
-        '- Then it rises 6 m and falls 6 m.\n' +
-        '- Then it rises 3.6 m and falls 3.6 m, and so on.\n\n' +
-        'The bounce heights $6 + 3.6 + 2.16 + \\dots$ form a geometric series with $a = 6$ and $r = 0.6$. Since $|r| < 1$:\n\n' +
-        '$$6 + 3.6 + 2.16 + \\dots = \\frac{6}{1 - 0.6} = \\frac{6}{0.4} = 15$$\n\n' +
-        'Each bounce height is travelled twice (up and down), so\n\n' +
-        '$$\\text{total} = 10 + 2 \\times 15 = 40 \\text{ m}$$',
-      whyWrong: [
-        'This is $\\frac{10}{1 - 0.6}$: it counts each height only once. After the first drop the ball travels every bounce height twice, up and then down.',
-        null,
-        'This doubles everything, including the first 10 m. The ball is dropped, so the first 10 m is travelled only once (downwards).',
-        'This is $2 \\times 15$: the up-and-down bounces are right, but the initial 10 m drop has been left out.',
-      ],
-      keyIdea: 'Split a bouncing-ball problem into the first drop plus twice the sum to infinity of the bounce heights.',
-    },
-    check: {
-      optionValues: [25, 40, 50, 30],
-      compute: () => {
-        let total = 10;
-        let h = 10;
-        for (let i = 0; i < 2000; i++) {
-          h *= 0.6;
-          total += 2 * h;
-        }
-        return total;
       },
     },
   },

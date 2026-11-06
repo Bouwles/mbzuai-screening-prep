@@ -232,27 +232,12 @@ interface WordCtx {
 const WORD: WordCtx[] = [
   {
     kind: 'lcm-word',
-    stem: (a, b) => `Two warning lights flash together at time 0. One flashes every ${a} seconds and the other every ${b} seconds. After how many seconds do they next flash together?`,
+    stem: (a, b) => `Two lights flash together at time 0, one every ${a} seconds and the other every ${b} seconds. After how many seconds do they next flash together?`,
     unit: 'seconds',
   },
   {
-    kind: 'lcm-word',
-    stem: (a, b) => `Two runners start together at the same point of a circular track. One completes a lap every ${a} seconds and the other every ${b} seconds. After how many seconds are they next together at the starting point?`,
-    unit: 'seconds',
-  },
-  {
-    kind: 'lcm-word',
-    stem: (a, b) => `A server backs up file A every ${a} minutes and file B every ${b} minutes. Both backups run at midnight. After how many minutes do both backups next run at the same time?`,
-    unit: 'minutes',
-  },
-  {
     kind: 'hcf-word',
-    stem: (a, b) => `A rectangular floor measures ${a} cm by ${b} cm. It is to be covered exactly with identical square tiles, with no cutting. What is the side length, in cm, of the **largest** possible square tile?`,
-    unit: 'cm',
-  },
-  {
-    kind: 'hcf-word',
-    stem: (a, b) => `A teacher has ${a} pencils and ${b} erasers. She wants to make identical packs using all of them, with no items left over. What is the **largest** number of packs she can make?`,
+    stem: (a, b) => `Identical packs use up ${a} pencils and ${b} erasers with nothing left over. What is the **largest** possible number of packs?`,
     unit: 'packs',
   },
 ];

@@ -317,4 +317,95 @@ export const generators: Generator[] = [
       };
     },
   },
+  // ------------------------------------------------------------------ 4. which product is defined, and what size is it?
+  {
+    id: 'gen-matrix-product-defined',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    title: 'Which matrix product is defined, and what size is it?',
+    generate(rng) {
+      const DIMS = [1, 2, 3, 4, 5, 6];
+      const rule = 'Inner dimensions must match; outer dimensions give the size.';
+      const kind = rng.pick(['not-defined', 'size', 'size-not-defined'] as const);
+
+      if (kind === 'not-defined') {
+        const optionText = (a: number, b: number, c: number, d: number) => `a ${ord(a, b)} matrix with a ${ord(c, d)}`;
+        // The bad pair fails in both orders, so "with" can't be read as allowing the other order.
+        let bad: [number, number, number, number];
+        if (rng.bool()) {
+          const [a, b] = rng.sample(DIMS, 2);
+          bad = [a, b, a, b];
+        } else {
+          for (;;) {
+            bad = [rng.pick(DIMS), rng.pick(DIMS), rng.pick(DIMS), rng.pick(DIMS)];
+            if (bad[1] !== bad[2] && bad[3] !== bad[0]) break;
+          }
+        }
+        const answer = optionText(...bad);
+        const seen = new Set<string>([answer]);
+        const good: { text: string; working: string; why: string }[] = [];
+        while (good.length < 3) {
+          const [p, q, r] = [rng.pick(DIMS), rng.pick(DIMS), rng.pick(DIMS)];
+          const text = optionText(p, q, q, r);
+          if (seen.has(text)) continue;
+          seen.add(text);
+          good.push({
+            text,
+            working: `- ${m(`(${p} \\times ${q})(${q} \\times ${r})`)}: inner dimensions ${q} and ${q} match, so it is defined and gives ${ord(p, r)}.`,
+            why: `This product is defined: the inner dimensions ${q} and ${q} match, and the outer dimensions give ${ord(p, r)}.`,
+          });
+        }
+        return {
+          stem: 'Which of the following matrix products is **not** defined?',
+          answer,
+          answerValue: answer,
+          distractors: good.map((g) => ({ text: g.text, value: g.text, why: g.why })),
+          solution:
+            `${rule}\n\n` +
+            good.map((g) => g.working).join('\n') +
+            `\n- ${m(`(${bad[0]} \\times ${bad[1]})(${bad[2]} \\times ${bad[3]})`)}: inner dimensions ${bad[1]} and ${bad[2]} do not match, so it is **not defined**.\n\n` +
+            `Answer: ${answer}`,
+          keyIdea: rule,
+        };
+      }
+
+      const notDefined = '$AB$ is not defined';
+      if (kind === 'size') {
+        const [p, q, r] = rng.sample(DIMS, 3);
+        const answer = ord(p, r);
+        return {
+          stem: `$A$ is a ${ord(p, q)} matrix and $B$ is a ${ord(q, r)} matrix. What is the order of $AB$?`,
+          answer,
+          answerValue: `${p}x${r}`,
+          distractors: [
+            { text: ord(r, p), value: `${r}x${p}`, why: `This writes the order backwards. The product has the rows of $A$ (${p}) and the columns of $B$ (${r}).` },
+            { text: ord(q, q), value: `${q}x${q}`, why: 'This uses the **inner** dimensions. They only have to match; the outer dimensions give the size.' },
+            { text: notDefined, value: 'not defined', why: `The product is defined: $A$ has ${q} columns and $B$ has ${q} rows, and those are the numbers that must match.` },
+          ],
+          solution:
+            `${rule}\n\n` +
+            `Write the orders side by side: ${m(`(${p} \\times ${q})(${q} \\times ${r})`)}. The inner dimensions ${q} and ${q} match, and the outer dimensions give the size.\n\n` +
+            `Answer: ${answer}`,
+          keyIdea: rule,
+        };
+      }
+
+      const [p, q, r, s] = rng.sample(DIMS, 4);
+      return {
+        stem: `$A$ is a ${ord(p, q)} matrix and $B$ is a ${ord(r, s)} matrix. What is the order of $AB$?`,
+        answer: notDefined,
+        answerValue: 'not defined',
+        distractors: [
+          { text: ord(p, s), value: `${p}x${s}`, why: `This reads off the outer dimensions without checking the inner ones. The inner dimensions ${q} and ${r} do not match, so there is no product.` },
+          { text: ord(q, r), value: `${q}x${r}`, why: `This uses the inner dimensions as the size. They are ${q} and ${r}, and because they differ the product does not exist.` },
+          { text: ord(s, p), value: `${s}x${p}`, why: `This writes the outer dimensions backwards, and it misses that the inner dimensions ${q} and ${r} do not match.` },
+        ],
+        solution:
+          `${rule}\n\n` +
+          `Write the orders side by side: ${m(`(${p} \\times ${q})(${r} \\times ${s})`)}. The inner dimensions ${q} and ${r} do not match, so the product does not exist.\n\n` +
+          `Answer: ${notDefined}`,
+        keyIdea: rule,
+      };
+    },
+  },
 ];

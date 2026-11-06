@@ -11,10 +11,11 @@ const DIFFS: { id: DiffChoice; label: string; hint: string }[] = [
   { id: 'stepup', label: 'Build up', hint: 'Starts with Foundation, moves to Exam level as you get them right' },
   { id: 'foundation', label: 'Foundation', hint: 'The basics, one or two steps' },
   { id: 'exam', label: 'Exam level', hint: "Like MBZUAI's official samples" },
-  { id: 'challenge', label: 'Challenge', hint: 'Optional: harder than the exam is likely to be' },
   { id: 'mixed', label: 'Mixed', hint: 'All levels' },
 ];
 const isDiff = (d: string | null): d is DiffChoice => DIFFS.some((x) => x.id === d);
+/** Choice from the URL. Old links may still ask for the removed Challenge level. */
+const initialDiff = (d: string | null): DiffChoice => (d === 'challenge' ? 'mixed' : isDiff(d) ? d : 'stepup');
 const COUNTS: (number | null)[] = [10, 20, 30, null];
 
 export function Practice() {
@@ -22,8 +23,7 @@ export function Practice() {
   const initial = (params.get('subs') ?? '').split(',').filter(hasSubtopic);
   const [subs, setSubs] = useState<string[]>(initial);
   const [wide] = useState(() => typeof window === 'undefined' || window.matchMedia('(min-width: 900px)').matches);
-  const d0 = params.get('diff');
-  const [diff, setDiff] = useState<DiffChoice>(isDiff(d0) ? d0 : 'stepup');
+  const [diff, setDiff] = useState<DiffChoice>(() => initialDiff(params.get('diff')));
   const [count, setCount] = useState<number | null>(10);
   const [run, setRun] = useState(0);
 

@@ -26,8 +26,8 @@ export const lesson: Lesson = {
       method: 'List the sensible routes (or use Dijkstra) and add the weights; a route with more roads can still be shorter.',
     },
     {
-      cue: 'Adjacency matrix and "number of **walks of length 2 or 3**"',
-      method: 'Walks of length 2 from $X$ to $Y$: count the middle vertices $Z$ with edges $X \\to Z$ and $Z \\to Y$ (the entry of $M^2$). The diagonal of $M^3$ counts triangles through a vertex, twice each.',
+      cue: 'Adjacency matrix and "number of **walks of length 2**"',
+      method: 'Walks of length 2 from $X$ to $Y$: count the middle vertices $Z$ with edges $X \\to Z$ and $Z \\to Y$ (the entry of $M^2$).',
     },
   ],
   know:

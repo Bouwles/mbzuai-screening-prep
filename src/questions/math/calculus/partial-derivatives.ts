@@ -7,43 +7,17 @@ type Poly = [number, number, number][];
 const ev = (p: Poly, x: number, y: number): number => p.reduce((s, [c, a, b]) => s + c * x ** a * y ** b, 0);
 const dx = (p: Poly): Poly => p.filter(([, a]) => a > 0).map(([c, a, b]) => [c * a, a - 1, b] as [number, number, number]);
 const dy = (p: Poly): Poly => p.filter(([, , b]) => b > 0).map(([c, a, b]) => [c * b, a, b - 1] as [number, number, number]);
-// Numeric (central difference) partial derivatives for non-polynomial functions.
+// Numeric (central difference) derivatives for squared-error losses.
 type F2 = (x: number, y: number) => number;
 const H = 1e-4;
 const nx = (f: F2, x: number, y: number): number => (f(x + H, y) - f(x - H, y)) / (2 * H);
 const ny = (f: F2, x: number, y: number): number => (f(x, y + H) - f(x, y - H)) / (2 * H);
-const nxy = (f: F2, x: number, y: number): number =>
-  (f(x + H, y + H) - f(x + H, y - H) - f(x - H, y + H) + f(x - H, y - H)) / (4 * H * H);
+const n1 = (f: (w: number) => number, w: number): number => (f(w + H) - f(w - H)) / (2 * H);
 /** A 2D vector as a comparable string, e.g. "8,-1". */
 const vec = (a: number, b: number): string => `${round(a, 6)},${round(b, 6)}`;
 
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------------ foundation
-  {
-    id: 'partial-derivatives-001',
-    subtopic: 'partial-derivatives',
-    difficulty: 'foundation',
-    stem: 'A function of two variables is defined by $f(x, y) = x^2y + 3y$. What is the value of $f(2, -1)$?',
-    options: ['$8$', '$1$', '$-7$', '$7$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'A function of two variables takes a **pair** of inputs and gives one output. In $f(2, -1)$ the first number is $x$ and the second is $y$, so $x = 2$ and $y = -1$.\n\n' +
-        'Substitute, keeping the negative number in brackets:\n\n' +
-        '$$f(2, -1) = 2^2 \\times (-1) + 3 \\times (-1) = 4 \\times (-1) - 3 = -4 - 3 = -7$$',
-      whyWrong: [
-        'This swaps the inputs, using $x = -1$ and $y = 2$: $(-1)^2 \\times 2 + 3 \\times 2 = 8$. The first number in $f(2, -1)$ is always $x$.',
-        'This reads $x^2y$ as $(xy)^2$: $(2 \\times (-1))^2 + 3 \\times (-1) = 4 - 3 = 1$. Only $x$ is squared, then multiplied by $y$.',
-        null,
-        'This drops the minus sign on $y$, effectively using $y = 1$: $4 + 3 = 7$.',
-      ],
-      keyIdea: 'To evaluate $f(a, b)$, substitute $x = a$ and $y = b$ (in that order), bracketing negative numbers.',
-    },
-    check: {
-      optionValues: [8, 1, -7, 7],
-      compute: () => ev([[1, 2, 1], [3, 0, 1]], 2, -1),
-    },
-  },
   {
     id: 'partial-derivatives-002',
     subtopic: 'partial-derivatives',
@@ -130,30 +104,137 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'partial-derivatives-005',
+    id: 'partial-derivatives-020',
     subtopic: 'partial-derivatives',
     difficulty: 'foundation',
-    stem: 'In gradient descent, a model\'s weights $\\mathbf{w}$ are updated step by step to make a loss function $L$ smaller. At each step, in which direction are the weights moved?',
-    options: [
-      'In the direction of the gradient, $\\nabla L$',
-      'Perpendicular to the gradient $\\nabla L$',
-      'In the direction of the negative gradient, $-\\nabla L$',
-      'Straight towards the point where every weight equals zero',
-    ],
-    correctIndex: 2,
+    stem: 'When you find $\\frac{\\partial f}{\\partial x}$ for a function $f(x, y)$, how do you treat $y$?',
+    options: ['As a constant', 'As zero', 'As equal to $x$', 'As another variable to differentiate'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'The gradient $\\nabla L$ points in the direction in which $L$ **increases** fastest (steepest ascent).\n\n' +
-        'We want $L$ to **decrease**, so we step the opposite way, in the direction of $-\\nabla L$ (steepest descent). That is exactly what the update rule does:\n\n' +
-        '$$\\mathbf{w} := \\mathbf{w} - \\eta \\nabla L$$\n\n' +
-        'where $\\eta$ (the learning rate) is a small positive number controlling the step size.',
+        'A partial derivative changes one variable at a time. For $\\frac{\\partial f}{\\partial x}$, only $x$ changes, so $y$ is held fixed and treated like an ordinary number: a constant.',
       whyWrong: [
-        'Moving along $\\nabla L$ is steepest **ascent**: it makes the loss increase as fast as possible. That is gradient ascent, the opposite of what we want.',
-        'Moving at right angles to the gradient follows a contour (level curve) of $L$, where the loss stays (to first order) the same, so it does not reduce the loss.',
         null,
-        'The minimum of a loss is generally not at $\\mathbf{w} = \\mathbf{0}$. Gradient descent uses the slope of the loss, not the distance to the origin.',
+        'A constant is not the same as zero. For example, $\\frac{\\partial}{\\partial x}(5xy) = 5y$, not $0$.',
+        'The two variables are independent, so $y$ does not change when $x$ changes.',
+        'Only $x$ is differentiated here. Differentiating $y$ as well would not be a partial derivative with respect to $x$.',
       ],
-      keyIdea: 'The gradient points uphill (steepest ascent), so gradient descent steps along $-\\nabla L$.',
+      keyIdea: 'In a partial derivative, every other variable is held constant.',
+    },
+  },
+  {
+    id: 'partial-derivatives-021',
+    subtopic: 'partial-derivatives',
+    difficulty: 'foundation',
+    stem: 'Let $f(x, y) = 7y^2$. What is $\\frac{\\partial f}{\\partial x}$?',
+    options: ['$0$', '$14y$', '$7y^2$', '$14$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'The function has no $x$ in it. With $y$ held constant, $7y^2$ is just a constant, so its derivative with respect to $x$ is $0$.',
+      whyWrong: [
+        null,
+        'This is $\\frac{\\partial f}{\\partial y}$. The question asks for the derivative with respect to $x$.',
+        'This leaves the term unchanged. A constant differentiates to $0$; it does not stay as it is.',
+        'This differentiates with respect to $y$ and also drops the $y$. A term with no $x$ gives $0$.',
+      ],
+      keyIdea: 'A term with no $x$ in it vanishes when you differentiate with respect to $x$.',
+    },
+    check: {
+      // values of the options at the test point (2, 3)
+      optionValues: [0, 42, 63, 14],
+      compute: () => ev(dx([[7, 0, 2]]), 2, 3),
+    },
+  },
+  {
+    id: 'partial-derivatives-022',
+    subtopic: 'partial-derivatives',
+    difficulty: 'foundation',
+    stem: 'Let $f(x, y) = 3x + 2y$. What is $\\frac{\\partial f}{\\partial y}$?',
+    options: ['$2$', '$3$', '$2y$', '$3x + 2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Hold $x$ constant. The term $3x$ is then a constant and gives $0$, and $2y$ gives $2$. So $\\frac{\\partial f}{\\partial y} = 2$.',
+      whyWrong: [
+        null,
+        'This is $\\frac{\\partial f}{\\partial x}$. The question asks for the derivative with respect to $y$.',
+        'This keeps the $y$. The derivative of $2y$ with respect to $y$ is $2$.',
+        'This keeps the term $3x$. With $x$ held constant, an added constant differentiates to $0$.',
+      ],
+      keyIdea: 'Added terms without the variable vanish; the variable\'s own term follows the usual rules.',
+    },
+    check: {
+      // values of the options at the test point (2, 3)
+      optionValues: [2, 3, 6, 8],
+      compute: () => ev(dy([[3, 1, 0], [2, 0, 1]]), 2, 3),
+    },
+  },
+  {
+    id: 'partial-derivatives-023',
+    subtopic: 'partial-derivatives',
+    difficulty: 'foundation',
+    stem: 'Let $f(x, y) = xy$. What is $\\frac{\\partial f}{\\partial x}$?',
+    options: ['$y$', '$x$', '$1$', '$xy$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Hold $y$ constant, so $xy$ behaves like a number times $x$. Just as $\\frac{d}{dx}(5x) = 5$, we get $\\frac{\\partial}{\\partial x}(xy) = y$.',
+      whyWrong: [
+        null,
+        'This is $\\frac{\\partial f}{\\partial y}$, where $x$ is held constant instead.',
+        'This differentiates the $x$ but loses the multiplier $y$. A multiplied constant stays in the answer.',
+        'This leaves the term unchanged. The $x$ must be differentiated.',
+      ],
+      keyIdea: 'A factor of the other variable stays as a multiplier.',
+    },
+    check: {
+      // values of the options at the test point (2, 3)
+      optionValues: [3, 2, 1, 6],
+      compute: () => ev(dx([[1, 1, 1]]), 2, 3),
+    },
+  },
+  {
+    id: 'partial-derivatives-024',
+    subtopic: 'partial-derivatives',
+    difficulty: 'foundation',
+    stem: 'What is the **gradient** $\\nabla f$ of a function $f(x, y)$?',
+    options: [
+      'The vector $\\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}\\right)$',
+      'The vector $\\left(\\frac{\\partial f}{\\partial y}, \\frac{\\partial f}{\\partial x}\\right)$',
+      'The sum $\\frac{\\partial f}{\\partial x} + \\frac{\\partial f}{\\partial y}$',
+      'The value of $f$ at the point $(x, y)$',
+    ],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'The gradient collects the partial derivatives into a vector, with the $x$-derivative first: $\\nabla f = \\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}\\right)$.',
+      whyWrong: [
+        null,
+        'The components are in the wrong order. The first component is always the $x$-derivative.',
+        'The gradient keeps its two components separate as a vector. It is not their sum.',
+        'That is the function itself. The gradient is made from its derivatives.',
+      ],
+      keyIdea: '$\\nabla f = \\left(f_x, f_y\\right)$, with the $x$-derivative first.',
+    },
+  },
+  {
+    id: 'partial-derivatives-025',
+    subtopic: 'partial-derivatives',
+    difficulty: 'foundation',
+    stem: 'Find the derivative of the squared error $(w - 3)^2$ with respect to $w$.',
+    options: ['$2(w - 3)$', '$w - 3$', '$2w$', '$2(w - 3)^2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Use the chain rule: bring down the power $2$, keep the bracket, reduce the power by $1$, and multiply by the derivative of the inside, which is $1$. This gives $2(w - 3)$.',
+      whyWrong: [
+        null,
+        'This forgets the factor $2$ that the power rule brings down.',
+        'This differentiates $w^2$ only and ignores the $-3$ in the bracket.',
+        'This brings the $2$ down but forgets to reduce the power from $2$ to $1$.',
+      ],
+      keyIdea: 'The derivative of a squared error is $2 \\times$ (error) $\\times$ (derivative of the inside).',
+    },
+    check: {
+      // the options at w = 5
+      optionValues: [4, 2, 10, 8],
+      compute: () => n1((w) => (w - 3) ** 2, 5),
     },
   },
   // ------------------------------------------------------------------ exam
@@ -184,36 +265,6 @@ export const questions: StaticQuestion[] = [
     check: {
       optionValues: [20, 16, 11, 8],
       compute: () => ev(dx([[1, 2, 3], [4, 1, 0], [-1, 0, 1]]), 1, 2),
-    },
-  },
-  {
-    id: 'partial-derivatives-007',
-    subtopic: 'partial-derivatives',
-    difficulty: 'exam',
-    stem: 'Let $f(x, y) = x^3y^2 + 5xy$. Find the mixed partial derivative $\\frac{\\partial^2 f}{\\partial y \\, \\partial x}$ (differentiate with respect to $x$, then differentiate the result with respect to $y$).',
-    options: ['$6x^2y$', '$6xy^2$', '$2x^3$', '$6x^2y + 5$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1: differentiate with respect to $x$** (hold $y$ constant):\n\n' +
-        '$$\\frac{\\partial f}{\\partial x} = 3x^2y^2 + 5y$$\n\n' +
-        '**Step 2: differentiate that with respect to $y$** (hold $x$ constant):\n\n' +
-        '- $3x^2y^2$ gives $3x^2 \\times 2y = 6x^2y$.\n' +
-        '- $5y$ gives $5$.\n\n' +
-        '$$\\frac{\\partial^2 f}{\\partial y \\, \\partial x} = 6x^2y + 5$$\n\n' +
-        '**Check** the other order: $\\frac{\\partial f}{\\partial y} = 2x^3y + 5x$, then with respect to $x$: $6x^2y + 5$. The same, as expected for smooth functions.',
-      whyWrong: [
-        'This loses the $+5$: after the first step $5xy$ becomes $5y$, and $5y$ differentiated with respect to $y$ is $5$, not $0$.',
-        'This is $\\frac{\\partial^2 f}{\\partial x^2}$: it differentiates with respect to $x$ twice instead of $x$ then $y$.',
-        'This is $\\frac{\\partial^2 f}{\\partial y^2}$: it differentiates with respect to $y$ twice.',
-        null,
-      ],
-      keyIdea: 'A mixed partial means differentiate with respect to one variable, then the other; the order does not change the answer for smooth functions.',
-    },
-    check: {
-      // values of the options at the test point (2, 3)
-      optionValues: [6 * 4 * 3, 6 * 2 * 9, 2 * 8, 6 * 4 * 3 + 5],
-      compute: () => ev(dy(dx([[1, 3, 2], [5, 1, 1]])), 2, 3),
     },
   },
   {
@@ -252,170 +303,76 @@ export const questions: StaticQuestion[] = [
     id: 'partial-derivatives-009',
     subtopic: 'partial-derivatives',
     difficulty: 'exam',
-    stem: 'A model has one weight $w$ and loss $L(w) = (w - 5)^2$. The current weight is $w = 1$ and the learning rate is $\\eta = 0.1$. What is $w$ after **one** gradient descent update $w := w - \\eta \\frac{dL}{dw}$?',
-    options: ['$0.2$', '$9$', '$1.8$', '$1.4$'],
-    correctIndex: 2,
+    stem: 'For the squared-error loss $L(w) = (w - 5)^2$, find $\\frac{dL}{dw}$ at $w = 1$.',
+    options: ['$-8$', '$8$', '$-4$', '$16$'],
+    correctIndex: 0,
     markScheme: {
       solution:
         '**Step 1: the derivative** (chain rule): $\\frac{dL}{dw} = 2(w - 5)$.\n\n' +
-        '**Step 2: evaluate at** $w = 1$: $2(1 - 5) = -8$.\n\n' +
-        '**Step 3: update.**\n\n' +
-        '$$w := 1 - 0.1 \\times (-8) = 1 + 0.8 = 1.8$$\n\n' +
-        'Sense check: the loss is smallest at $w = 5$, and the weight moved from 1 towards 5. The loss fell from $16$ to $(1.8 - 5)^2 = 10.24$.',
+        '**Step 2: substitute** $w = 1$: $2(1 - 5) = 2 \\times (-4) = -8$.\n\n' +
+        'The negative sign makes sense: the loss is smallest at $w = 5$, so at $w = 1$ increasing $w$ lowers the loss.',
       whyWrong: [
-        'This adds $\\eta \\times$ gradient instead of subtracting it: $1 + 0.1 \\times (-8) = 0.2$. That moves uphill, away from the minimum at $w = 5$.',
-        'This forgets the learning rate: $1 - (-8) = 9$. The gradient must be multiplied by $\\eta = 0.1$ first.',
         null,
-        'This forgets the factor 2 from the power rule, using $\\frac{dL}{dw} = w - 5 = -4$, so $1 - 0.1 \\times (-4) = 1.4$.',
+        'This has the sign wrong, as if the bracket were $5 - w$ with no chain-rule factor of $-1$. The derivative of $(w - 5)^2$ is $2(w - 5)$.',
+        'This forgets the factor $2$ from the power rule, using $w - 5 = -4$.',
+        'This is the value of the loss at $w = 1$, $(1 - 5)^2 = 16$, not its derivative.',
       ],
-      keyIdea: 'Gradient descent: new weight = old weight minus learning rate times the derivative at the old weight.',
+      keyIdea: 'Differentiate a squared error with the chain rule, then substitute the current weight.',
     },
     check: {
-      optionValues: [0.2, 9, 1.8, 1.4],
-      compute: () => {
-        const L = (w: number) => (w - 5) ** 2;
-        const w = 1;
-        const eta = 0.1;
-        const g = (L(w + H) - L(w - H)) / (2 * H);
-        return w - eta * g;
-      },
+      optionValues: [-8, 8, -4, 16],
+      compute: () => n1((w) => (w - 5) ** 2, 1),
     },
   },
   {
     id: 'partial-derivatives-010',
     subtopic: 'partial-derivatives',
     difficulty: 'exam',
-    stem: 'A loss function is $L(w_1, w_2) = w_1^2 + 2w_2^2$. The current weights are $(w_1, w_2) = (3, -2)$ and the learning rate is $\\eta = 0.1$. What are the weights after one gradient descent step $\\mathbf{w} := \\mathbf{w} - \\eta \\nabla L$?',
-    options: ['$\\left(2.4, -1.2\\right)$', '$\\left(3.6, -2.8\\right)$', '$\\left(-3, 6\\right)$', '$\\left(2.4, -1.6\\right)$'],
+    stem: 'A squared-error loss is $L(w_1, w_2) = (w_1 - 3)^2 + (w_2 + 1)^2$. What is the gradient $\\nabla L$ at $(w_1, w_2) = (1, 1)$?',
+    options: ['$\\left(-4, 4\\right)$', '$\\left(4, -4\\right)$', '$\\left(-2, 2\\right)$', '$\\left(4, 4\\right)$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        '**Step 1: partial derivatives.** $\\frac{\\partial L}{\\partial w_1} = 2w_1$ and $\\frac{\\partial L}{\\partial w_2} = 4w_2$.\n\n' +
-        '**Step 2: gradient at** $(3, -2)$: $\\nabla L = \\left(2 \\times 3, 4 \\times (-2)\\right) = \\left(6, -8\\right)$.\n\n' +
-        '**Step 3: update each weight.**\n\n' +
-        '- $w_1 := 3 - 0.1 \\times 6 = 3 - 0.6 = 2.4$\n' +
-        '- $w_2 := -2 - 0.1 \\times (-8) = -2 + 0.8 = -1.2$\n\n' +
-        'New weights: $\\left(2.4, -1.2\\right)$. Both moved towards the minimum at $(0, 0)$.',
+        '**Step 1: partial derivatives.** Each bracket contains only one of the weights, so the other bracket is a constant.\n\n' +
+        '- $\\frac{\\partial L}{\\partial w_1} = 2(w_1 - 3)$\n' +
+        '- $\\frac{\\partial L}{\\partial w_2} = 2(w_2 + 1)$\n\n' +
+        '**Step 2: substitute** $(1, 1)$:\n\n' +
+        '- $2(1 - 3) = -4$\n' +
+        '- $2(1 + 1) = 4$\n\n' +
+        'So $\\nabla L = \\left(-4, 4\\right)$.',
       whyWrong: [
         null,
-        'This adds $\\eta \\nabla L$ instead of subtracting it ($3 + 0.6$ and $-2 - 0.8$), which is a step of gradient **ascent**.',
-        'This forgets the learning rate and subtracts the whole gradient: $3 - 6 = -3$ and $-2 + 8 = 6$.',
-        'This differentiates $2w_2^2$ as $2w_2$ (forgetting to bring the power down), so the second gradient component is $-4$ and $w_2 = -2 + 0.4 = -1.6$.',
+        'Every sign is flipped, as if each bracket were written the other way round. Keep the brackets exactly as given.',
+        'This forgets the factor $2$ from the power rule, using only the values of the brackets.',
+        'This squares each bracket, which gives the two parts of the loss. The gradient needs their derivatives.',
       ],
-      keyIdea: 'Update every weight with its own partial derivative: $w_i := w_i - \\eta \\frac{\\partial L}{\\partial w_i}$.',
+      keyIdea: 'Differentiate a sum of squared errors one weight at a time, then keep the components in order.',
     },
     check: {
-      optionValues: ['2.4,-1.2', '3.6,-2.8', '-3,6', '2.4,-1.6'],
+      optionValues: ['-4,4', '4,-4', '-2,2', '4,4'],
       compute: () => {
-        const L: F2 = (a, b) => a ** 2 + 2 * b ** 2;
-        const [w1, w2, eta] = [3, -2, 0.1];
-        return vec(w1 - eta * nx(L, w1, w2), w2 - eta * ny(L, w1, w2));
+        const L: F2 = (a, b) => (a - 3) ** 2 + (b + 1) ** 2;
+        return vec(nx(L, 1, 1), ny(L, 1, 1));
       },
-    },
-  },
-  {
-    id: 'partial-derivatives-011',
-    subtopic: 'partial-derivatives',
-    difficulty: 'exam',
-    stem: 'Let $f(x, y) = x^2y$. In which direction does $f$ increase **most rapidly** at the point $(1, 3)$?',
-    options: [
-      'In the direction of the vector $\\left(-6, -1\\right)$',
-      'In the direction of the vector $\\left(1, 6\\right)$',
-      'In the direction of the vector $\\left(2, 1\\right)$',
-      'In the direction of the vector $\\left(6, 1\\right)$',
-    ],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The direction of steepest **ascent** is the direction of the gradient.\n\n' +
-        '**Step 1:** $\\frac{\\partial f}{\\partial x} = 2xy$ and $\\frac{\\partial f}{\\partial y} = x^2$.\n\n' +
-        '**Step 2:** at $(1, 3)$: $\\frac{\\partial f}{\\partial x} = 2 \\times 1 \\times 3 = 6$ and $\\frac{\\partial f}{\\partial y} = 1^2 = 1$.\n\n' +
-        'So $\\nabla f(1, 3) = \\left(6, 1\\right)$, and $f$ increases fastest in the direction of $\\left(6, 1\\right)$.',
-      whyWrong: [
-        'This is $-\\nabla f$, the direction of steepest **descent** (where $f$ decreases fastest).',
-        'The gradient components are swapped. The first component is $\\frac{\\partial f}{\\partial x} = 6$.',
-        'This drops the $y$ when differentiating $x^2y$ with respect to $x$ (using $2x$ instead of $2xy$), giving $\\frac{\\partial f}{\\partial x} = 2$.',
-        null,
-      ],
-      keyIdea: 'The gradient $\\nabla f$ points in the direction of steepest ascent; $-\\nabla f$ points in the direction of steepest descent.',
-    },
-    check: {
-      optionValues: ['-6,-1', '1,6', '2,1', '6,1'],
-      compute: () => {
-        const P: Poly = [[1, 2, 1]];
-        return vec(ev(dx(P), 1, 3), ev(dy(P), 1, 3));
-      },
-    },
-  },
-  {
-    id: 'partial-derivatives-012',
-    subtopic: 'partial-derivatives',
-    difficulty: 'exam',
-    stem: 'Let $f(x, y) = e^{xy}$. Which of the following is $\\frac{\\partial f}{\\partial x}$?',
-    options: ['$e^{xy}$', '$ye^{xy}$', '$xe^{xy}$', '$xye^{xy - 1}$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Use the chain rule: the derivative of $e^{u}$ is $e^{u} \\times \\frac{\\partial u}{\\partial x}$.\n\n' +
-        'Here $u = xy$. Holding $y$ constant, $\\frac{\\partial u}{\\partial x} = y$.\n\n' +
-        '$$\\frac{\\partial f}{\\partial x} = e^{xy} \\times y = ye^{xy}$$',
-      whyWrong: [
-        'This forgets the chain rule. The exponent is $xy$, not just $x$, so you must multiply by its derivative $\\frac{\\partial}{\\partial x}(xy) = y$.',
-        null,
-        'This is $\\frac{\\partial f}{\\partial y}$: differentiating the exponent $xy$ with respect to $y$ gives $x$.',
-        'This applies the power rule to an exponential. The power rule is for $x^n$ with a **constant** power; $e^{u}$ differentiates to $e^{u}$ times the derivative of $u$.',
-      ],
-      keyIdea: 'All the usual rules (including the chain rule) still apply to partial derivatives; just treat the other variable as a constant.',
-    },
-    check: {
-      // values of the options at the test point (0.5, 2), compared with a numeric derivative
-      optionValues: [Math.E, 2 * Math.E, 0.5 * Math.E, 1],
-      compute: () => nx((x, y) => Math.exp(x * y), 0.5, 2),
-    },
-  },
-  {
-    id: 'partial-derivatives-013',
-    subtopic: 'partial-derivatives',
-    difficulty: 'exam',
-    stem: 'Let $f(x, y) = x^2 \\sin y$, where $y$ is in radians. Find the value of $\\frac{\\partial f}{\\partial y}$ at the point $(3, 0)$.',
-    options: ['$9$', '$0$', '$6$', '$-9$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '**Step 1:** hold $x$ constant, so $x^2$ is a constant multiplier. The derivative of $\\sin y$ is $\\cos y$:\n\n' +
-        '$$\\frac{\\partial f}{\\partial y} = x^2 \\cos y$$\n\n' +
-        '**Step 2:** substitute $x = 3$, $y = 0$:\n\n' +
-        '$$3^2 \\times \\cos 0 = 9 \\times 1 = 9$$',
-      whyWrong: [
-        null,
-        'This is $\\frac{\\partial f}{\\partial x} = 2x \\sin y$, which is $6 \\times \\sin 0 = 0$ at this point. The question asks for the $y$-derivative.',
-        'This differentiates $x^2$ as well, giving $2x \\cos y = 6$. In a partial derivative with respect to $y$, $x^2$ is a constant multiplier and is not differentiated.',
-        'The derivative of $\\sin y$ is $+\\cos y$. The minus sign belongs to the derivative of $\\cos y$, which is $-\\sin y$.',
-      ],
-      keyIdea: 'When differentiating with respect to $y$, a factor that only involves $x$ is a constant multiplier and stays unchanged.',
-    },
-    check: {
-      optionValues: [9, 0, 6, -9],
-      compute: () => ny((x, y) => x ** 2 * Math.sin(y), 3, 0),
     },
   },
   {
     id: 'partial-derivatives-014',
     subtopic: 'partial-derivatives',
     difficulty: 'exam',
-    stem: 'A linear model predicts $\\hat{y} = wx + b$. For one training example the squared-error loss is $L = (wx + b - y)^2$. For the example $x = 2$, $y = 7$, with current parameters $w = 1$ and $b = 1$, what is $\\frac{\\partial L}{\\partial w}$?',
+    stem: 'For the squared-error loss $L = (wx + b - y)^2$ with $x = 2$, $y = 7$, $w = 1$ and $b = 1$, find $\\frac{\\partial L}{\\partial w}$.',
     options: ['$-8$', '$16$', '$-16$', '$-32$'],
     correctIndex: 2,
     markScheme: {
       solution:
         '**Step 1: chain rule.** Let $e = wx + b - y$ (the error), so $L = e^2$. Holding $x$, $b$ and $y$ constant, $\\frac{\\partial e}{\\partial w} = x$. Therefore\n\n' +
         '$$\\frac{\\partial L}{\\partial w} = 2e \\times \\frac{\\partial e}{\\partial w} = 2(wx + b - y)x$$\n\n' +
-        '**Step 2: the error.** $\\hat{y} = 1 \\times 2 + 1 = 3$, so $e = 3 - 7 = -4$.\n\n' +
+        '**Step 2: the error.** $wx + b = 1 \\times 2 + 1 = 3$, so $e = 3 - 7 = -4$.\n\n' +
         '**Step 3: substitute.** $\\frac{\\partial L}{\\partial w} = 2 \\times (-4) \\times 2 = -16$.\n\n' +
         'The negative sign makes sense: increasing $w$ would raise the prediction towards 7 and lower the loss.',
       whyWrong: [
         'This forgets the inner derivative $x = 2$ from the chain rule: $2 \\times (-4) = -8$. (That value is actually $\\frac{\\partial L}{\\partial b}$, since $\\frac{\\partial e}{\\partial b} = 1$.)',
-        'This is a sign error: it uses $y - \\hat{y} = 4$ as the error but forgets that differentiating $y - wx - b$ with respect to $w$ gives $-x$, which puts the minus sign back.',
+        'This is a sign error: it uses $y - wx - b = 4$ as the error but forgets that differentiating it with respect to $w$ gives $-x$, which puts the minus sign back.',
         null,
         'This multiplies by $x^2 = 4$ instead of $x$: the inner derivative of $wx + b - y$ with respect to $w$ is just $x$.',
       ],
@@ -425,118 +382,7 @@ export const questions: StaticQuestion[] = [
       optionValues: [-8, 16, -16, -32],
       compute: () => {
         const [x, y, b] = [2, 7, 1];
-        const L = (w: number) => (w * x + b - y) ** 2;
-        return (L(1 + H) - L(1 - H)) / (2 * H);
-      },
-    },
-  },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'partial-derivatives-015',
-    subtopic: 'partial-derivatives',
-    difficulty: 'challenge',
-    stem: 'Let $f(x, y) = x^2y + 2y$. What is the **greatest rate of increase** of $f$ at the point $(1, 2)$ (that is, the largest possible directional derivative there)?',
-    options: ['$7$', '$25$', '$\\sqrt{17}$', '$5$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The greatest rate of increase is in the direction of $\\nabla f$, and its value is the **length** of the gradient, $|\\nabla f|$.\n\n' +
-        '**Step 1:** $\\frac{\\partial f}{\\partial x} = 2xy$ and $\\frac{\\partial f}{\\partial y} = x^2 + 2$.\n\n' +
-        '**Step 2:** at $(1, 2)$: $\\frac{\\partial f}{\\partial x} = 2 \\times 1 \\times 2 = 4$ and $\\frac{\\partial f}{\\partial y} = 1 + 2 = 3$, so $\\nabla f = \\left(4, 3\\right)$.\n\n' +
-        '**Step 3:** $|\\nabla f| = \\sqrt{4^2 + 3^2} = \\sqrt{25} = 5$.',
-      whyWrong: [
-        'This adds the components, $4 + 3 = 7$. The length of a vector is $\\sqrt{a^2 + b^2}$, not $a + b$.',
-        'This forgets the square root: $4^2 + 3^2 = 25$ is $|\\nabla f|^2$, not $|\\nabla f|$.',
-        'This loses the $+2$ in $\\frac{\\partial f}{\\partial y}$ (differentiating $2y$ gives 2), so it uses $\\nabla f = \\left(4, 1\\right)$ and gets $\\sqrt{17}$.',
-        null,
-      ],
-      keyIdea: 'The maximum rate of increase of $f$ at a point is $|\\nabla f| = \\sqrt{f_x^2 + f_y^2}$, achieved in the direction of $\\nabla f$.',
-    },
-    check: {
-      optionValues: [7, 25, Math.sqrt(17), 5],
-      compute: () => {
-        const P: Poly = [[1, 2, 1], [2, 0, 1]];
-        return Math.hypot(ev(dx(P), 1, 2), ev(dy(P), 1, 2));
-      },
-    },
-  },
-  {
-    id: 'partial-derivatives-016',
-    subtopic: 'partial-derivatives',
-    difficulty: 'challenge',
-    stem: 'The loss $L(w_1, w_2) = (w_1 - 2)^2 + (w_2 + 1)^2$ is minimised by gradient descent, starting at $(w_1, w_2) = (0, 0)$ with learning rate $\\eta = 0.25$. What are the weights after **two** steps?',
-    options: ['$\\left(1, -0.5\\right)$', '$\\left(1.5, -0.75\\right)$', '$\\left(2, -1\\right)$', '$\\left(-2.5, 1.25\\right)$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Partial derivatives: $\\frac{\\partial L}{\\partial w_1} = 2(w_1 - 2)$ and $\\frac{\\partial L}{\\partial w_2} = 2(w_2 + 1)$.\n\n' +
-        '**Step 1** (from $(0, 0)$): $\\nabla L = \\left(2(0 - 2), 2(0 + 1)\\right) = \\left(-4, 2\\right)$.\n\n' +
-        '- $w_1 = 0 - 0.25 \\times (-4) = 1$\n' +
-        '- $w_2 = 0 - 0.25 \\times 2 = -0.5$\n\n' +
-        '**Step 2** (from $(1, -0.5)$, so the gradient must be **recomputed**): $\\nabla L = \\left(2(1 - 2), 2(-0.5 + 1)\\right) = \\left(-2, 1\\right)$.\n\n' +
-        '- $w_1 = 1 - 0.25 \\times (-2) = 1.5$\n' +
-        '- $w_2 = -0.5 - 0.25 \\times 1 = -0.75$\n\n' +
-        'After two steps: $\\left(1.5, -0.75\\right)$, moving closer to the minimum at $(2, -1)$.',
-      whyWrong: [
-        'This is the position after only **one** step; the question asks for two.',
-        null,
-        'This reuses the first gradient $\\left(-4, 2\\right)$ for the second step instead of recalculating it at the new point. It happens to land on the minimum, but that is not what two steps of gradient descent give.',
-        'This adds $\\eta \\nabla L$ at each step (gradient ascent): first $(-1, 0.5)$, then the gradient there is $(-6, 3)$, giving $(-2.5, 1.25)$, moving away from the minimum.',
-      ],
-      keyIdea: 'In gradient descent the gradient is recalculated at every new point, so equal learning rates give shrinking steps as you approach the minimum.',
-    },
-    check: {
-      optionValues: ['1,-0.5', '1.5,-0.75', '2,-1', '-2.5,1.25'],
-      compute: () => {
-        const L: F2 = (a, b) => (a - 2) ** 2 + (b + 1) ** 2;
-        let [w1, w2] = [0, 0];
-        const eta = 0.25;
-        for (let step = 0; step < 2; step++) {
-          const g1 = nx(L, w1, w2);
-          const g2 = ny(L, w1, w2);
-          [w1, w2] = [w1 - eta * g1, w2 - eta * g2];
-        }
-        return vec(w1, w2);
-      },
-    },
-  },
-  {
-    id: 'partial-derivatives-017',
-    subtopic: 'partial-derivatives',
-    difficulty: 'challenge',
-    stem: 'Let $f(x, y) = x^2 + xy + y^2 - 3x$. At which point is $\\nabla f = (0, 0)$, i.e. where is the stationary point at which gradient descent would stop?',
-    options: ['$\\left(2, -1\\right)$', '$\\left(1.5, 0\\right)$', '$\\left(1.2, 0.6\\right)$', '$\\left(-2, 1\\right)$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '**Step 1: set both partial derivatives to zero.**\n\n' +
-        '- $\\frac{\\partial f}{\\partial x} = 2x + y - 3 = 0$\n' +
-        '- $\\frac{\\partial f}{\\partial y} = x + 2y = 0$\n\n' +
-        '**Step 2: solve the simultaneous equations.** From the second, $x = -2y$. Substitute into the first:\n\n' +
-        '$$2(-2y) + y - 3 = 0 \\;\\Rightarrow\\; -3y = 3 \\;\\Rightarrow\\; y = -1$$\n\n' +
-        'Then $x = -2 \\times (-1) = 2$.\n\n' +
-        '**Check:** $\\frac{\\partial f}{\\partial x} = 4 - 1 - 3 = 0$ and $\\frac{\\partial f}{\\partial y} = 2 - 2 = 0$. The stationary point is $\\left(2, -1\\right)$.',
-      whyWrong: [
-        null,
-        'This ignores the $xy$ term in both partial derivatives, solving $2x - 3 = 0$ and $2y = 0$. The cross term contributes $y$ to $\\frac{\\partial f}{\\partial x}$ and $x$ to $\\frac{\\partial f}{\\partial y}$.',
-        'This rearranges $x + 2y = 0$ as $x = 2y$ (losing the minus sign), giving $5y = 3$, so $y = 0.6$ and $x = 1.2$.',
-        'This makes a sign slip on $-3x$, writing $\\frac{\\partial f}{\\partial x} = 2x + y + 3$, which leads to $y = 1$ and $x = -2$.',
-      ],
-      keyIdea: 'A stationary point of $f(x, y)$ is where both partial derivatives are zero: solve $f_x = 0$ and $f_y = 0$ simultaneously.',
-    },
-    check: {
-      optionValues: ['2,-1', '1.5,0', '1.2,0.6', '-2,1'],
-      compute: () => {
-        // f_x and f_y are linear: write each as A x + B y + C and solve by Cramer's rule
-        const P: Poly = [[1, 2, 0], [1, 1, 1], [1, 0, 2], [-3, 1, 0]];
-        const lin = (Q: Poly) => {
-          const c = ev(Q, 0, 0);
-          return [ev(Q, 1, 0) - c, ev(Q, 0, 1) - c, c];
-        };
-        const [a1, b1, c1] = lin(dx(P));
-        const [a2, b2, c2] = lin(dy(P));
-        const det = a1 * b2 - a2 * b1;
-        return vec((-c1 * b2 + c2 * b1) / det, (-a1 * c2 + a2 * c1) / det);
+        return n1((w) => (w * x + b - y) ** 2, 1);
       },
     },
   },
@@ -579,31 +425,113 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'partial-derivatives-019',
+    id: 'partial-derivatives-026',
     subtopic: 'partial-derivatives',
     difficulty: 'exam',
-    stem: 'Let $f(x, y) = e^{2x}y^3$. Find the value of the mixed partial derivative $\\frac{\\partial^2 f}{\\partial y \\, \\partial x}$ at the point $(0, 2)$.',
-    options: ['$16$', '$32$', '$12$', '$24$'],
-    correctIndex: 3,
+    stem: 'Let $f(x, y) = 2x^2y + 3y^2$. Find the value of $\\frac{\\partial f}{\\partial y}$ at the point $(1, 3)$.',
+    options: ['$20$', '$12$', '$18$', '$24$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        '**Step 1: differentiate with respect to $x$** ($y^3$ is a constant multiplier; the chain rule gives $\\frac{d}{dx}e^{2x} = 2e^{2x}$):\n\n' +
-        '$$\\frac{\\partial f}{\\partial x} = 2e^{2x}y^3$$\n\n' +
-        '**Step 2: differentiate with respect to $y$** ($2e^{2x}$ is now the constant multiplier):\n\n' +
-        '$$\\frac{\\partial^2 f}{\\partial y \\, \\partial x} = 2e^{2x} \\times 3y^2 = 6e^{2x}y^2$$\n\n' +
-        '**Step 3: substitute** $x = 0$, $y = 2$ (and $e^{0} = 1$):\n\n' +
-        '$$6 \\times 1 \\times 2^2 = 24$$',
+        '**Step 1: differentiate with respect to $y$** (treat $x$ as a constant).\n\n' +
+        '- $2x^2y$ gives $2x^2$.\n' +
+        '- $3y^2$ gives $6y$.\n\n' +
+        'So $\\frac{\\partial f}{\\partial y} = 2x^2 + 6y$.\n\n' +
+        '**Step 2: substitute** $x = 1$, $y = 3$: $2 + 18 = 20$.',
       whyWrong: [
-        'This stops after the first derivative: $\\frac{\\partial f}{\\partial x} = 2e^{2x}y^3 = 2 \\times 8 = 16$ at the point.',
-        'This differentiates with respect to $x$ twice: $\\frac{\\partial^2 f}{\\partial x^2} = 4e^{2x}y^3 = 32$ at the point.',
-        'This forgets the chain-rule factor 2 from $e^{2x}$, using $\\frac{\\partial f}{\\partial x} = e^{2x}y^3$, which gives $3e^{2x}y^2 = 12$.',
         null,
+        'This is $\\frac{\\partial f}{\\partial x} = 4xy$ at the point. The question asks for the $y$-derivative.',
+        'This drops the term $2x^2y$ as if it were an added constant. It contains $y$, so it contributes $2x^2$.',
+        'This substitutes the coordinates the wrong way round, using $x = 3$ and $y = 1$: $18 + 6 = 24$.',
       ],
-      keyIdea: 'For a mixed partial, differentiate one variable at a time, applying the chain rule fully at each stage, then substitute.',
+      keyIdea: 'Differentiate first with the other variable held constant, then substitute the point in the right order.',
     },
     check: {
-      optionValues: [16, 32, 12, 24],
-      compute: () => round(nxy((x, y) => Math.exp(2 * x) * y ** 3, 0, 2), 3),
+      optionValues: [20, 12, 18, 24],
+      compute: () => ev(dy([[2, 2, 1], [3, 0, 2]]), 1, 3),
+    },
+  },
+  {
+    id: 'partial-derivatives-027',
+    subtopic: 'partial-derivatives',
+    difficulty: 'exam',
+    stem: 'For the squared-error loss $L = (wx + b - y)^2$ with $x = 3$, $y = 4$, $w = 2$ and $b = 1$, find $\\frac{\\partial L}{\\partial b}$.',
+    options: ['$6$', '$18$', '$9$', '$3$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Step 1: chain rule.** The derivative of the inside with respect to $b$ is $1$, so $\\frac{\\partial L}{\\partial b} = 2(wx + b - y)$.\n\n' +
+        '**Step 2: the error.** $wx + b - y = 2 \\times 3 + 1 - 4 = 3$.\n\n' +
+        '**Step 3: substitute.** $\\frac{\\partial L}{\\partial b} = 2 \\times 3 = 6$.',
+      whyWrong: [
+        null,
+        'This is $\\frac{\\partial L}{\\partial w} = 2(\\text{error}) \\times x$. The derivative of the inside with respect to $b$ is $1$, not $x$.',
+        'This is the value of the loss, $3^2 = 9$, not its derivative.',
+        'This is the error itself. It forgets the factor $2$ from the power rule.',
+      ],
+      keyIdea: 'For a squared error, $\\frac{\\partial L}{\\partial b} = 2(\\text{error})$, because $b$ has coefficient $1$ inside the bracket.',
+    },
+    check: {
+      optionValues: [6, 18, 9, 3],
+      compute: () => {
+        const [x, y, w] = [3, 4, 2];
+        return n1((b) => (w * x + b - y) ** 2, 1);
+      },
+    },
+  },
+  {
+    id: 'partial-derivatives-028',
+    subtopic: 'partial-derivatives',
+    difficulty: 'exam',
+    stem: 'A squared-error loss over two examples is $L(w) = (w - 3)^2 + (2w - 5)^2$. Find $\\frac{dL}{dw}$ at $w = 1$.',
+    options: ['$-16$', '$-10$', '$-5$', '$13$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Step 1: differentiate each bracket** with the chain rule.\n\n' +
+        '- $(w - 3)^2$ gives $2(w - 3)$.\n' +
+        '- $(2w - 5)^2$ gives $2(2w - 5) \\times 2 = 4(2w - 5)$.\n\n' +
+        '**Step 2: substitute** $w = 1$: $2(-2) + 4(-3) = -4 - 12 = -16$.',
+      whyWrong: [
+        null,
+        'This forgets the inner derivative $2$ in the second bracket, working out $2(-2) + 2(-3)$.',
+        'This forgets the factor $2$ from the power rule in both brackets, and the inner derivative too, working out $-2 - 3$.',
+        'This is the value of the loss at $w = 1$, $4 + 9 = 13$, not its derivative.',
+      ],
+      keyIdea: 'Differentiate a sum of squared errors term by term, including the inner derivative of each bracket.',
+    },
+    check: {
+      optionValues: [-16, -10, -5, 13],
+      compute: () => n1((w) => (w - 3) ** 2 + (2 * w - 5) ** 2, 1),
+    },
+  },
+  {
+    id: 'partial-derivatives-029',
+    subtopic: 'partial-derivatives',
+    difficulty: 'exam',
+    stem: 'A squared-error loss is $L(w_1, w_2) = (w_1 + w_2 - 4)^2$. What is the gradient $\\nabla L$ at $(w_1, w_2) = (1, 2)$?',
+    options: ['$\\left(-2, -2\\right)$', '$\\left(2, 2\\right)$', '$\\left(-1, -1\\right)$', '$\\left(-2, -4\\right)$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Step 1: the error.** $w_1 + w_2 - 4 = 1 + 2 - 4 = -1$.\n\n' +
+        '**Step 2: partial derivatives.** Each weight has coefficient $1$ inside the bracket, so both partial derivatives equal $2 \\times$ the error:\n\n' +
+        '$$\\frac{\\partial L}{\\partial w_1} = \\frac{\\partial L}{\\partial w_2} = 2(w_1 + w_2 - 4) = -2$$\n\n' +
+        'So $\\nabla L = \\left(-2, -2\\right)$.',
+      whyWrong: [
+        null,
+        'This loses the sign of the error, which is $-1$ here.',
+        'This forgets the factor $2$ from the power rule.',
+        'This multiplies by the value of each weight instead of its coefficient. The inner derivative is $1$ for each weight.',
+      ],
+      keyIdea: 'The inner derivative is the coefficient of that weight inside the bracket, not the weight\'s value.',
+    },
+    check: {
+      optionValues: ['-2,-2', '2,2', '-1,-1', '-2,-4'],
+      compute: () => {
+        const L: F2 = (a, b) => (a + b - 4) ** 2;
+        return vec(nx(L, 1, 2), ny(L, 1, 2));
+      },
     },
   },
 ];

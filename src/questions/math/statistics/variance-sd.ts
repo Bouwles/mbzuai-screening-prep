@@ -5,7 +5,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'variance-sd-001',
     subtopic: 'variance-sd',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     stem: 'Find the **population** standard deviation of the data set $2, 4, 4, 4, 5, 5, 7, 9$.\n\nGive non-integer answers to 2 decimal places.',
     options: ['$1.50$', '$2$', '$4$', '$2.14$'],
     correctIndex: 1,
@@ -42,7 +42,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'variance-sd-002',
     subtopic: 'variance-sd',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     stem: 'Find the **population** variance of the data set $1, 3, 5, 7, 9$.',
     options: ['$40$', '$10$', '$8$', '$2\\sqrt{2}$'],
     correctIndex: 2,
@@ -185,7 +185,7 @@ export const questions: StaticQuestion[] = [
     id: 'variance-sd-007',
     subtopic: 'variance-sd',
     difficulty: 'exam',
-    stem: 'The daily maximum temperatures in a city over one month have mean $20$°C and standard deviation $5$°C. They are converted to Fahrenheit using $F = 1.8C + 32$. What is the standard deviation of the temperatures in °F?',
+    stem: 'Temperatures have mean $20$°C and standard deviation $5$°C. They are converted to Fahrenheit using $F = 1.8C + 32$. What is the standard deviation in °F?',
     options: ['$41$ °F', '$16.2$ °F', '$5$ °F', '$9$ °F'],
     correctIndex: 3,
     markScheme: {
@@ -245,7 +245,7 @@ export const questions: StaticQuestion[] = [
     id: 'variance-sd-009',
     subtopic: 'variance-sd',
     difficulty: 'exam',
-    stem: 'A random **sample** of $5$ students is asked how many books they read last year: $2, 5, 8, 9, 11$. To estimate the variance for **all** students, the sample variance $s^2$ is used, which divides by $n - 1$. What is $s^2$?\n\nGive non-integer answers to 2 decimal places.',
+    stem: 'A sample of $5$ values is $2, 5, 8, 9, 11$. Find the sample variance $s^2$, which divides by $n - 1$.\n\nGive non-integer answers to 2 decimal places.',
     options: ['$10$', '$50$', '$12.50$', '$3.54$'],
     correctIndex: 2,
     markScheme: {
@@ -323,71 +323,33 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'variance-sd-011',
-    subtopic: 'variance-sd',
-    difficulty: 'challenge',
-    stem: 'A data set of $9$ values has mean $10$ and population variance $4$. A tenth value, equal to $10$, is added. What is the population variance of the $10$ values?\n\nGive non-integer answers to 2 decimal places.',
-    options: ['$4$', '$13.60$', '$4.44$', '$3.60$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1: the mean does not change.** The old total is $9 \\times 10 = 90$; the new total is $90 + 10 = 100$, so the new mean is $\\frac{100}{10} = 10$.\n\n' +
-        '**Step 2: recover the sum of squared deviations.** Variance $= \\frac{\\sum (x - \\bar{x})^2}{n}$, so for the original data $\\sum (x - \\bar{x})^2 = 9 \\times 4 = 36$.\n\n' +
-        '**Step 3: add the new value.** Its deviation is $10 - 10 = 0$, so it adds $0^2 = 0$. The sum of squared deviations is still $36$.\n\n' +
-        '**Step 4: divide by the new $n$.** $\\sigma^2 = \\frac{36}{10} = 3.6$.\n\n' +
-        'The variance goes **down**: a value sitting exactly at the mean adds no spread, but it increases $n$.',
-      whyWrong: [
-        'This assumes adding a value at the mean changes nothing. The sum of squared deviations stays $36$, but it is now shared between $10$ values, so the variance falls.',
-        'This adds $10^2 = 100$ (the square of the **value**) instead of the square of its **deviation** from the mean, $0^2 = 0$: $\\frac{36 + 100}{10} = 13.6$.',
-        'This scales the variance the wrong way: $4 \\times \\frac{10}{9} \\approx 4.44$. The same total $36$ is divided by a **bigger** $n$, so the variance must decrease, to $4 \\times \\frac{9}{10}$.',
-        null,
-      ],
-      keyIdea: 'Work with the sum of squared deviations ($n \\times$ variance): add the new value\'s squared deviation, then divide by the new $n$.',
-    },
-    check: {
-      optionValues: [4, 13.6, 40 / 9, 3.6],
-      compute: () => {
-        const nine = [7, 7, 10, 10, 10, 10, 10, 13, 13]; // mean 10, variance 4
-        if (mean(nine) !== 10 || variance(nine) !== 4) throw new Error('bad example data');
-        return variance([...nine, 10]);
-      },
-    },
-  },
-  {
     id: 'variance-sd-012',
     subtopic: 'variance-sd',
     difficulty: 'exam',
-    stem: 'What does this program print? (Both numbers are printed on one line, separated by a space.)',
-    code: {
-      lang: 'python',
-      source:
-        'data = [3, 5, 7, 9]\n' +
-        'm = sum(data) / len(data)\n' +
-        'ss = sum((x - m) ** 2 for x in data)\n' +
-        'print(ss / len(data), ss / (len(data) - 1))',
-    },
-    options: ['`6.666666666666667 5.0`', '`5.0 6.666666666666667`', '`2.23606797749979 2.581988897471611`', '`5 6.666666666666667`'],
-    correctIndex: 1,
+    stem: 'For the data $3, 5, 7, 9$, find the population variance and the sample variance, in that order, to 2 decimal places.',
+    options: ['$5.00$ and $6.67$', '$6.67$ and $5.00$', '$2.24$ and $2.58$', '$20.00$ and $20.00$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Trace the program line by line.\n\n' +
-        '| Line | What happens | Value |\n' +
-        '| --- | --- | --- |\n' +
-        '| 1 | `data` is the list | `[3, 5, 7, 9]` |\n' +
-        '| 2 | `m = 24 / 4` | `6.0` (a float, because `/` always gives a float) |\n' +
-        '| 3 | squared deviations: $(3 - 6)^2, (5 - 6)^2, (7 - 6)^2, (9 - 6)^2$ | `9.0 + 1.0 + 1.0 + 9.0`, so `ss = 20.0` |\n' +
-        '| 4 | `ss / len(data)` is `20.0 / 4` | `5.0` |\n' +
-        '| 4 | `ss / (len(data) - 1)` is `20.0 / 3` | `6.666666666666667` |\n\n' +
-        'The first number is the **population** variance (divide by $n = 4$), the second is the **sample** variance (divide by $n - 1 = 3$). `print` separates its arguments with a space, so the output is `5.0 6.666666666666667`.',
+        '1. Mean: $\\bar{x} = \\frac{3 + 5 + 7 + 9}{4} = 6$.\n' +
+        '2. Squared deviations: $9, 1, 1, 9$, with sum $20$.\n' +
+        '3. Population variance: divide by $n = 4$, giving $\\frac{20}{4} = 5$.\n' +
+        '4. Sample variance: divide by $n - 1 = 3$, giving $\\frac{20}{3} \\approx 6.67$.',
       whyWrong: [
-        'This prints the two results in the wrong order. The first expression divides by `len(data)` (that is $4$), the population variance; the second divides by `len(data) - 1` (that is $3$), the sample variance.',
         null,
-        'These are the square roots of the two results, i.e. the standard deviations. The code never takes a square root, so it prints variances.',
-        'In Python 3, `/` always produces a float, and `m` is already `6.0`, so `ss` is `20.0` and the first result prints as `5.0`, not `5`.',
+        'This gives the two results in the wrong order. The population variance divides by $n$, so it is the smaller one.',
+        'These are the square roots of the two results, which are the standard deviations. The question asks for variances.',
+        'This is the sum of squared deviations, which is the same for both. You still have to divide it by $n$ and by $n - 1$.',
       ],
-      keyIdea: 'Dividing the sum of squared deviations by $n$ gives the population variance; dividing by $n - 1$ gives the (larger) sample variance.',
+      keyIdea: 'Dividing the sum of squared deviations by $n$ gives the population variance; dividing by $n - 1$ gives the larger sample variance.',
     },
-    python: { stdout: '5.0 6.666666666666667' },
+    check: {
+      optionValues: ['5.00,6.67', '6.67,5.00', '2.24,2.58', '20.00,20.00'],
+      compute: () => {
+        const d = [3, 5, 7, 9];
+        return `${variance(d).toFixed(2)},${sampleVariance(d).toFixed(2)}`;
+      },
+    },
   },
   {
     id: 'variance-sd-013',
@@ -436,10 +398,10 @@ export const questions: StaticQuestion[] = [
       ],
     },
     options: [
-      'Stall B has the higher mean, because its best day is the highest.',
-      'Both stalls have the same mean and the same standard deviation, because their totals are equal.',
-      'Both stalls have the same mean, and Stall B\'s standard deviation is $5$ times Stall A\'s.',
-      'Both stalls have the same mean, and Stall B\'s standard deviation is $25$ times Stall A\'s.',
+      'Stall B has the higher mean',
+      'Same mean and same standard deviation',
+      'Same mean, and Stall B\'s standard deviation is $5$ times Stall A\'s',
+      'Same mean, and Stall B\'s standard deviation is $25$ times Stall A\'s',
     ],
     correctIndex: 2,
     markScheme: {
@@ -470,7 +432,7 @@ export const questions: StaticQuestion[] = [
     id: 'variance-sd-015',
     subtopic: 'variance-sd',
     difficulty: 'exam',
-    stem: 'A data set has mean $10$ and standard deviation $2$. Every value $x$ is transformed to $y = ax + b$, where $a > 0$. The new data set has mean $23$ and standard deviation $5$. What is the value of $b$?',
+    stem: 'A data set has mean $10$ and standard deviation $2$. Each value $x$ becomes $y = ax + b$, with $a > 0$. The new mean is $23$ and the new standard deviation is $5$. Find $b$.',
     options: ['$13$', '$-7$', '$20.5$', '$-2$'],
     correctIndex: 3,
     markScheme: {
@@ -500,110 +462,99 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'variance-sd-016',
+    id: 'variance-sd-019',
     subtopic: 'variance-sd',
-    difficulty: 'challenge',
-    stem: 'Group P has $5$ values with mean $8$ and population variance $6$. Group Q has $5$ values with mean $12$ and population variance $10$. The two groups are combined into one data set of $10$ values. What is the population variance of the combined data?\n\nGive non-integer answers to 2 decimal places.',
-    options: ['$8$', '$12$', '$16$', '$13.33$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '**Step 1: combined mean.** $\\bar{x} = \\frac{5 \\times 8 + 5 \\times 12}{10} = \\frac{100}{10} = 10$.\n\n' +
-        '**Step 2: recover** $\\sum x^2$ **for each group**, using $\\sum x^2 = n(\\sigma^2 + \\bar{x}^2)$:\n\n' +
-        '- P: $5(6 + 8^2) = 5 \\times 70 = 350$\n' +
-        '- Q: $5(10 + 12^2) = 5 \\times 154 = 770$\n\n' +
-        'Combined: $\\sum x^2 = 350 + 770 = 1120$.\n\n' +
-        '**Step 3: combined variance.** $\\sigma^2 = \\frac{1120}{10} - 10^2 = 112 - 100 = 12$.\n\n' +
-        'Why is this bigger than the average variance $8$? The groups are centred in different places ($8$ and $12$, each $2$ away from the overall mean $10$), which adds $2^2 = 4$ of extra spread: $8 + 4 = 12$.',
-      whyWrong: [
-        'This averages the two variances, $\\frac{6 + 10}{2} = 8$. That only measures the spread **within** each group and ignores that the groups have different means, which adds extra spread.',
-        null,
-        'This adds the two variances, $6 + 10 = 16$. Variances of separate groups are not simply added when the data are merged; go back to $\\sum x^2$ for each group.',
-        'This divides by $n - 1 = 9$: $\\frac{1120 - 10 \\times 10^2}{9} = \\frac{120}{9} \\approx 13.33$, the sample variance. The question asks for the population variance.',
-      ],
-      keyIdea: 'To combine groups, rebuild each group\'s $\\sum x$ and $\\sum x^2$, add them, then use $\\sigma^2 = \\frac{\\sum x^2}{n} - \\bar{x}^2$ on the whole data set.',
-    },
-    check: {
-      optionValues: [8, 12, 16, 120 / 9],
-      compute: () => {
-        const p = [4, 7, 8, 10, 11]; // mean 8, variance 6
-        const q = [8, 9, 12, 15, 16]; // mean 12, variance 10
-        if (mean(p) !== 8 || variance(p) !== 6 || mean(q) !== 12 || variance(q) !== 10) throw new Error('bad example data');
-        return variance([...p, ...q]);
-      },
-    },
-  },
-  {
-    id: 'variance-sd-017',
-    subtopic: 'variance-sd',
-    difficulty: 'challenge',
-    stem: 'Three numbers $a$, $6$ and $b$, with $a < b$, have mean $6$ and population variance $6$. What is the value of $b$?\n\nGive non-integer answers to 2 decimal places.',
-    options: ['$9$', '$7.73$', '$8.45$', '$10.24$'],
+    difficulty: 'foundation',
+    stem: 'What is the standard deviation of the data set $7, 7, 7, 7$?',
+    options: ['$0$', '$7$', '$1$', '$49$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        '**Step 1: use the mean.** $\\frac{a + 6 + b}{3} = 6$, so $a + 6 + b = 18$ and $a + b = 12$. So $a$ and $b$ sit the same distance $d$ either side of $6$: $a = 6 - d$ and $b = 6 + d$, with $d > 0$.\n\n' +
-        '**Step 2: use the variance.** The deviations from the mean are $-d$, $0$ and $d$. The middle one contributes nothing, so\n\n' +
-        '$$\\sigma^2 = \\frac{d^2 + d^2}{3} = \\frac{2d^2}{3}$$\n\n' +
-        '**Step 3: solve.** $\\frac{2d^2}{3} = 6$, so $2d^2 = 18$, $d^2 = 9$ and $d = 3$.\n\n' +
-        'So $a = 3$ and $b = 9$. Check: $3, 6, 9$ has mean $6$ and variance $\\frac{9 + 9}{3} = 6$ (the $6$ itself has deviation $0$).',
+        'The mean is $7$, so every deviation from the mean is $0$. The squared deviations are all $0$, so the variance and the standard deviation are both $0$.',
       whyWrong: [
         null,
-        'This sets the **sum** of squared deviations equal to $6$ ($2d^2 = 6$, so $d = \\sqrt{3} \\approx 1.73$), forgetting that the variance is that sum divided by $n = 3$.',
-        'This divides by $n - 1 = 2$ (sample variance): $\\frac{2d^2}{2} = 6$ gives $d = \\sqrt{6} \\approx 2.45$. The question says population variance, so divide by $3$.',
-        'This forgets that **both** $a$ and $b$ deviate from the mean: $\\frac{d^2}{3} = 6$ gives $d = \\sqrt{18} \\approx 4.24$. The deviations $-d$ and $d$ each contribute $d^2$.',
+        'This is the mean. The standard deviation measures the distance from the mean, and here that distance is zero.',
+        'A value of $1$ would need the data to differ from the mean. Here no value differs at all.',
+        'This squares the mean. Identical values have no spread, whatever their size.',
       ],
-      keyIdea: 'Turn the mean and variance into equations: the mean fixes $a + b$, and the variance fixes the sum of squared deviations ($n \\times \\sigma^2$).',
+      keyIdea: 'If all the values are equal, there is no spread, so the standard deviation is $0$.',
     },
     check: {
-      optionValues: [9, 6 + Math.sqrt(3), 6 + Math.sqrt(6), 6 + Math.sqrt(18)],
+      optionValues: [0, 7, 1, 49],
+      compute: () => sd([7, 7, 7, 7]),
+    },
+  },
+  {
+    id: 'variance-sd-020',
+    subtopic: 'variance-sd',
+    difficulty: 'foundation',
+    stem: 'When finding the **sample** variance $s^2$ of $n$ values, the sum of squared deviations is divided by:',
+    options: ['$n - 1$', '$n$', '$n + 1$', '$n^2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **sample** variance divides by $n - 1$. The **population** variance divides by $n$.\n\n' +
+        'Using $n - 1$ corrects for sample values sitting closer to their own mean than to the true mean.',
+      whyWrong: [
+        null,
+        'Dividing by $n$ gives the **population** variance.',
+        'Neither variance divides by $n + 1$. The correction makes the divisor smaller, not larger.',
+        'Neither variance divides by $n^2$. You may be thinking of the square of the mean in the computational formula.',
+      ],
+      keyIdea: 'Sample variance divides by $n - 1$; population variance divides by $n$.',
+    },
+    check: {
+      // n = 4
+      optionValues: [3, 4, 5, 16],
       compute: () => {
-        // Search b > 6 (with a = 12 - b from the mean) for population variance 6.
-        let best = 6;
-        let bestErr = Infinity;
-        for (let k = 6001; k <= 20000; k++) {
-          const b = k / 1000;
-          const err = Math.abs(variance([12 - b, 6, b]) - 6);
-          if (err < bestErr) {
-            bestErr = err;
-            best = b;
-          }
-        }
-        return best;
+        const d = [3, 5, 7, 9];
+        const mu = mean(d);
+        return sumOf(d.map((x) => (x - mu) ** 2)) / sampleVariance(d);
       },
     },
   },
   {
-    id: 'variance-sd-018',
+    id: 'variance-sd-021',
     subtopic: 'variance-sd',
-    difficulty: 'challenge',
-    stem: 'For a data set of $20$ values, $\\sum (x - 10) = 20$ and $\\sum (x - 10)^2 = 240$. What is the **population** standard deviation of $x$?\n\nGive your answer to 2 decimal places.',
-    options: ['$3.46$', '$11$', '$3.32$', '$3.40$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Every value in a data set is multiplied by $3$. What happens to the standard deviation?',
+    options: ['It is multiplied by $3$', 'It is multiplied by $9$', 'It does not change', 'It increases by $3$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Work with the coded values $y = x - 10$. Subtracting $10$ from every value does not change the spread, so $\\sigma_x = \\sigma_y$.\n\n' +
-        '1. Mean of $y$: $\\bar{y} = \\frac{\\sum y}{n} = \\frac{20}{20} = 1$.\n' +
-        '2. Variance of $y$ (computational formula): $\\sigma_y^2 = \\frac{\\sum y^2}{n} - \\bar{y}^2 = \\frac{240}{20} - 1^2 = 12 - 1 = 11$.\n' +
-        '3. Standard deviation: $\\sigma_x = \\sigma_y = \\sqrt{11} \\approx 3.32$ (2 d.p.).\n\n' +
-        '(The mean of $x$ is $\\bar{y} + 10 = 11$, but it is not needed for the SD.)',
+        'Multiplying every value by $3$ makes every distance from the mean $3$ times as big. So the standard deviation is multiplied by $3$ too.',
       whyWrong: [
-        'This is $\\sqrt{\\frac{240}{20}} = \\sqrt{12} \\approx 3.46$, forgetting to subtract $\\bar{y}^2$. The sum $\\sum (x - 10)^2$ measures spread around $10$, not around the actual mean $11$.',
-        'This is the **variance**, $11$. The standard deviation is its square root.',
         null,
-        'This divides by $n - 1 = 19$: $\\sqrt{\\frac{240 - 20 \\times 1^2}{19}} = \\sqrt{\\frac{220}{19}} \\approx 3.40$, the sample SD. The question asks for the population SD.',
+        'The **variance** is multiplied by $3^2 = 9$. The standard deviation is its square root, so it is multiplied by $3$.',
+        'This is what happens when the same number is **added** to every value. Multiplying does stretch the data.',
+        'The change is a multiplication, not an increase by a fixed amount. A larger spread grows by more.',
       ],
-      keyIdea: 'Coding $y = x - c$ leaves the SD unchanged, so find the SD of the coded data with $\\sigma^2 = \\frac{\\sum y^2}{n} - \\bar{y}^2$.',
+      keyIdea: 'Multiplying the data by $a$ multiplies the standard deviation by $|a|$ and the variance by $a^2$.',
     },
     check: {
-      optionValues: [Math.sqrt(12), 11, Math.sqrt(11), Math.sqrt(220 / 19)],
+      optionValues: [3, 9, 1, null],
       compute: () => {
-        const n = 20;
-        const sumY = 20;
-        const sumY2 = 240;
-        const yBar = sumY / n;
-        return Math.sqrt(sumY2 / n - yBar * yBar);
+        const d = [2, 4, 4, 9];
+        return sd(d.map((x) => 3 * x)) / sd(d);
       },
     },
   },
-];
+  {
+    id: 'variance-sd-022',
+    subtopic: 'variance-sd',
+    difficulty: 'foundation',
+    stem: 'What does the standard deviation of a data set measure?',
+    options: ['How spread out the values are around the mean', 'The central value of the data', 'The most common value', 'The largest value minus the smallest'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The standard deviation is roughly the typical distance of a value from the mean. A small value means the data sit close to the mean; a large value means they are widely spread.',
+      whyWrong: [
+        null,
+        'This is an average such as the mean or the median, not a measure of spread.',
+        'This is the **mode**.',
+        'This is the **range**, which uses only the two extreme values.',
+      ],
+      keyIdea: 'The standard deviation measures spread around the mean.',
+    },
+  },];

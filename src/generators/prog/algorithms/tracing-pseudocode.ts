@@ -1,4 +1,4 @@
-import type { Generator } from '../../../types';
+import type { GeneratedCore, Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
 import { m } from '../../../lib/tex';
 
@@ -34,10 +34,10 @@ function listVals(vals: number[]): string {
 type LoopForm = 'for' | 'whileLt' | 'whileLe' | 'down';
 
 function loopCode(form: LoopForm, a: number, b: number, s: number): string {
-  if (form === 'for') return [s === 1 ? `for i = ${a} to ${b}` : `for i = ${a} to ${b} step ${s}`, '    print(i)', 'end for'].join('\n');
-  if (form === 'down') return [`i = ${b}`, `while i > ${a}`, '    print(i)', `    i = i - ${s}`, 'end while'].join('\n');
+  if (form === 'for') return [`for i = ${a} to ${b}`, '   print(i)', 'end for'].join('\n');
+  if (form === 'down') return [`i = ${b}`, `while (i > ${a})`, '   print(i)', `   i = i - ${s}`, 'end while'].join('\n');
   const op = form === 'whileLt' ? '<' : '<=';
-  return [`i = ${a}`, `while i ${op} ${b}`, '    print(i)', `    i = i + ${s}`, 'end while'].join('\n');
+  return [`i = ${a}`, `while (i ${op} ${b})`, '   print(i)', `   i = i + ${s}`, 'end while'].join('\n');
 }
 
 /** Values of i for which the body runs, by direct simulation of the loop. */
@@ -57,7 +57,7 @@ function loopValues(form: LoopForm, a: number, b: number, s: number): { vals: nu
 function genLoopCount(rng: Rng) {
   const form = rng.pick<LoopForm>(['for', 'whileLt', 'whileLe', 'down']);
   const ask: 'count' | 'final' = form === 'for' ? 'count' : rng.bool(0.6) ? 'count' : 'final';
-  const s = rng.pick([1, 1, 2, 3, 4, 5]);
+  const s = form === 'for' ? 1 : rng.pick([1, 1, 2, 3, 4, 5]);
   const k = rng.int(3, 10);
   const r = s === 1 ? 0 : rng.int(0, s - 1);
   const a = rng.int(2, 9);
@@ -69,16 +69,7 @@ function genLoopCount(rng: Rng) {
   const up = form !== 'down';
   const opWord = form === 'whileLt' ? `i < ${b}` : form === 'whileLe' ? `i <= ${b}` : `i > ${a}`;
 
-  let stem: string;
-  if (form === 'for') {
-    stem =
-      `In this pseudocode, \`for i = a to b\` starts at \`a\`${s === 1 ? ' and goes up by 1' : ` and goes up by the \`step\` value`} each time; the end value \`b\` is used if \`i\` reaches it exactly, and the loop stops once \`i\` would go past \`b\`. ` +
-      'How many times is `print(i)` executed?';
-  } else if (ask === 'count') {
-    stem = 'How many times is `print(i)` executed when this pseudocode runs?';
-  } else {
-    stem = 'What is the value of `i` after this loop has finished?';
-  }
+  const stem = ask === 'count' ? 'How many times is `print(i)` executed?' : 'What is the value of `i` after this loop has finished?';
 
   const listing = `The body runs for ${listVals(vals)}, which is ${count} value${count === 1 ? '' : 's'}.`;
   const lastVal = vals[vals.length - 1];
@@ -178,7 +169,7 @@ function genLoopCount(rng: Rng) {
     ];
   }
   const ds = pickDistinct(answerV, pool, fallbacks);
-  const answer = m(String(answerV));
+  const answer = String(answerV);
   const solution =
     'Trace the values that `i` takes.\n\n' +
     `${listing}\n\n` +
@@ -190,7 +181,7 @@ function genLoopCount(rng: Rng) {
     code: { lang: 'pseudocode' as const, source: code },
     answer,
     answerValue: answerV,
-    distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
+    distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
     solution,
     keyIdea:
       ask === 'count'
@@ -212,14 +203,9 @@ function genAccumulator(rng: Rng) {
   const sumOf = (xs: number[]) => xs.reduce((x, y) => x + y, 0);
   const S = sumOf(chosen);
   const all = (n * (n + 1)) / 2;
-  const cond = `i mod ${k} ${eq ? '==' : '!='} 0`;
-  const code = [`${v} = 0`, `for i = 1 to ${n}`, `    if ${cond} then`, `        ${v} = ${v} + i`, '    end if', 'end for', `print(${v})`].join('\n');
-  const stem =
-    'What is printed by this pseudocode? (`for i = 1 to n` includes both 1 and n; `mod` gives the remainder after division, so `i mod ' +
-    k +
-    ' == 0` means `i` is a multiple of ' +
-    k +
-    '.)';
+  const cond = `mod(i,${k}) ${eq ? '==' : '!='} 0`;
+  const code = [`${v} = 0`, `for i = 1 to ${n}`, `   if ${cond} // mod is the modulus operator`, `      ${v} = ${v} + i`, '   end if', 'end for', `print(${v})`].join('\n');
+  const stem = 'What is printed?';
   const condWords = eq ? `a multiple of ${k}` : `not a multiple of ${k}`;
   const pool: Cand[] = [
     {
@@ -247,7 +233,7 @@ function genAccumulator(rng: Rng) {
     { v: S - chosen[0], why: `This misses the first number that passes the test, ${m(String(chosen[0]))}.` },
   ];
   const ds = pickDistinct(S, pool, fallbacks);
-  const answer = m(String(S));
+  const answer = String(S);
   let working: string;
   const vTex = `\\text{${v}}`;
   if (eq) {
@@ -277,9 +263,155 @@ function genAccumulator(rng: Rng) {
     code: { lang: 'pseudocode' as const, source: code },
     answer,
     answerValue: S,
-    distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
+    distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
     solution,
     keyIdea: 'An `if` inside a loop filters which passes update the accumulator; list the values that pass the test, then add them.',
+  };
+}
+
+// ---------------------------------------------------------------- while (true) with a mod accumulator
+const INFINITE = 'Infinite loop';
+const posMod = (a: number, b: number) => ((a % b) + b) % b;
+
+type Brk = '<' | '<=';
+type Row = { n: number; r: number; t: number };
+
+/** Run the loop as the code does: add first, then move n, then test for the break. Passes are capped by the caller's choice of start. */
+function simulate(start: number, step: number, md: number, extra: number, brk: Brk): { rows: Row[]; t: number; last: number } {
+  const rows: Row[] = [];
+  let n = start;
+  let t = 0;
+  for (;;) {
+    const r = posMod(n, md);
+    t += r + extra;
+    rows.push({ n, r, t });
+    n -= step;
+    if (brk === '<' ? n < 0 : n <= 0) return { rows, t, last: n };
+  }
+}
+
+function modLine(md: number, extra: number): string {
+  return `   t = t + mod(n,${md})${extra ? ` + ${extra}` : ''} // mod is the modulus operator`;
+}
+
+function genWhileTrueMod(rng: Rng): GeneratedCore {
+  let step: number;
+  let md: number;
+  let start: number;
+  do {
+    step = rng.int(4, 9);
+    md = rng.int(2, 5);
+    // At most about 7 passes, so a trace fits in the time available.
+    const maxStart = Math.min(60, step * 7);
+    start = rng.int(15, maxStart);
+    // Landing exactly on 0 is the case where <0 and <=0 behave differently.
+    if (rng.bool(0.35)) start = step * rng.int(Math.ceil(15 / step), Math.floor(maxStart / step));
+    // Every remainder being 0 would leave nothing to trace.
+  } while (simulate(start, step, md, 0, '<').t === 0);
+  const brk: Brk = rng.bool() ? '<' : '<=';
+  const extra = rng.bool(0.3) ? 1 : 0;
+  const addTex = extra ? `\\text{mod}(n, ${md}) + ${extra}` : `\\text{mod}(n, ${md})`;
+  const table = (rows: Row[]) => `| \`n\` | \`mod(n,${md})\` | \`t\` |\n|---|---|---|\n${rows.map((x) => `| ${x.n} | ${x.r} | ${x.t} |`).join('\n')}`;
+  const keyIdea = 'In a `while (true)` loop, keep one row per pass and test the `break` straight after `n` changes.';
+  const trueLoop = simulate(start, step, md, extra, brk);
+
+  if (rng.bool(0.15)) {
+    // A version that never breaks: n moves away from the test, or jumps over an exact value.
+    const skip = start % step !== 0 && rng.bool();
+    const update = skip ? `   n = n - ${step}` : `   n = n + ${step}`;
+    const test = skip ? 'n==0' : `n${brk}0`;
+    const code = [`n = ${start}`, 't = 0', 'while (true)', modLine(md, extra), update, `   if ${test}`, '      break', '   end if', 'end while', 'print(t)'].join('\n');
+    const shown: Row[] = [];
+    let n = start;
+    let t = 0;
+    for (let i = 0; i < 4; i++) {
+      const r = posMod(n, md);
+      t += r + extra;
+      shown.push({ n, r, t });
+      n += skip ? -step : step;
+    }
+    const finish = simulate(start, step, md, extra, skip ? '<=' : brk);
+    const lastRow = finish.rows[finish.rows.length - 1];
+    const first = posMod(start, md) + extra;
+    const pool: Cand[] = [
+      {
+        v: finish.t,
+        why: skip
+          ? `This stops as soon as \`n\` passes 0, as if the test were \`n<=0\`. The test is \`n==0\`, and \`n\` jumps straight past 0.`
+          : `This reads \`n + ${step}\` as \`n - ${step}\`, so that \`n\` falls below 0. The code adds ${step}, so \`n\` keeps growing.`,
+      },
+      { v: first, why: 'This stops after the first pass, as if the `break` test were true straight away. It is false on every pass.' },
+      {
+        v: finish.t - lastRow.r - extra,
+        why: 'This assumes the loop ends one pass before `n` crosses 0. The `break` test is never true, so the loop does not end at all.',
+      },
+      { v: 0, why: 'This is the starting value of `t`. The `print` line is never reached, so nothing is printed.' },
+    ];
+    const noTotal = 'This assumes the loop ends with a final total. The `break` test is never true, so there is no final total.';
+    const ds = pickDistinct(-1, pool, [
+      { v: finish.t + 1, why: noTotal },
+      { v: finish.t + 2, why: noTotal },
+      { v: finish.t + 3, why: noTotal },
+    ]);
+    const why = skip
+      ? `\`n\` takes the values ${start}, ${start - step}, ${start - 2 * step}, and so on. ${start} is not a multiple of ${step}, so \`n\` is never exactly 0 and \`n==0\` is never true.`
+      : `\`n\` starts positive and goes up by ${step} on every pass, so \`${test}\` is never true.`;
+    return {
+      stem: 'What is printed?',
+      code: { lang: 'pseudocode', source: code },
+      answer: INFINITE,
+      answerValue: INFINITE,
+      distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
+      solution: `The first few passes, with \`n\` as it is at the start of each pass:\n\n${table(shown)}\n\n${why} The \`break\` never runs, so the loop never ends and \`print(t)\` is never reached.\n\nAnswer: ${INFINITE}`,
+      keyIdea: 'Check which values the loop variable really takes: if it can never satisfy the `break` test, the loop never ends.',
+    };
+  }
+
+  const code = [`n = ${start}`, 't = 0', 'while (true)', modLine(md, extra), `   n = n - ${step}`, `   if n${brk}0`, '      break', '   end if', 'end while', 'print(t)'].join('\n');
+  const answer = trueLoop.t;
+  const otherBrk: Brk = brk === '<' ? '<=' : '<';
+  const wrongBreak = simulate(start, step, md, extra, otherBrk).t;
+  const lastRow = trueLoop.rows[trueLoop.rows.length - 1];
+  const numeric: Cand[] = [
+    {
+      v: wrongBreak,
+      why:
+        brk === '<'
+          ? 'This breaks as soon as `n` reaches 0, as if the test were `n<=0`. With `n<0` the value 0 is not enough, so one more pass runs.'
+          : 'This keeps going when `n` reaches 0, as if the test were `n<0`. With `n<=0` the loop breaks at 0.',
+    },
+    {
+      v: answer + posMod(trueLoop.last, md) + extra,
+      why: `This runs one extra pass with ${m(`n = ${trueLoop.last}`)}. The \`break\` is tested straight after \`n\` changes, so that pass never happens.`,
+    },
+    {
+      v: answer - lastRow.r - extra,
+      why: `This leaves out the last pass, with ${m(`n = ${lastRow.n}`)}. The \`break\` test only becomes true after that pass has added to \`t\`.`,
+    },
+    {
+      v: posMod(start, md) + extra,
+      why: 'This stops after the first pass, reading the `break` test backwards. It only becomes true once `n` has fallen far enough.',
+    },
+  ];
+  const ds = pickDistinct(answer, numeric, [
+    { v: answer + 1, why: 'This adds 1 too many: an off-by-one slip in the running total. Keep one row per pass and add each remainder once.' },
+    { v: answer + 2, why: 'This adds 2 too many, usually from counting a pass twice. Keep one row per pass and add each remainder once.' },
+    { v: answer + 3, why: 'This adds 3 too many, usually from a remainder worked out wrongly. Recheck each value of `mod(n,m)`.' },
+  ]).slice(0, 2);
+  return {
+    stem: 'What is printed?',
+    code: { lang: 'pseudocode', source: code },
+    answer: String(answer),
+    answerValue: answer,
+    distractors: [
+      ...ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
+      { text: INFINITE, value: INFINITE, why: `\`n\` falls by ${step} on every pass, so \`n${brk}0\` eventually becomes true and the \`break\` runs.` },
+    ],
+    solution:
+      `Each pass adds ${m(addTex)} to \`t\`, then lowers \`n\` by ${step}, then tests for the \`break\`. With \`n\` as it is at the start of each pass:\n\n` +
+      `${table(trueLoop.rows)}\n\n` +
+      `After the last row \`n\` becomes ${m(String(trueLoop.last))}, so \`n${brk}0\` is true and the loop breaks. It prints the value of \`t\`.\n\nAnswer: ${answer}`,
+    keyIdea,
   };
 }
 
@@ -297,5 +429,12 @@ export const generators: Generator[] = [
     difficulty: 'exam',
     title: 'Trace an accumulator with an if inside a loop',
     generate: genAccumulator,
+  },
+  {
+    id: 'gen-pseudo-while-true-mod',
+    subtopic: 'tracing-pseudocode',
+    difficulty: 'exam',
+    title: 'Trace a while (true) loop with a mod accumulator',
+    generate: genWhileTrueMod,
   },
 ];

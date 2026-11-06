@@ -3,7 +3,6 @@ import { det3, isPrime } from '../../../lib/mathx';
 
 // ---------------------------------------------------------------- helpers for the answer checks
 const isSquare = (n: number): boolean => Number.isInteger(Math.sqrt(n));
-const isTriangular = (n: number): boolean => isSquare(8 * n + 1);
 const isPalindrome = (w: string): boolean => w === [...w].reverse().join('');
 /** Linear rule y = a*x + b through the first two examples (checked against every example). */
 function linearRule(xs: number[], ys: number[]): { a: number; b: number } {
@@ -30,45 +29,6 @@ function oddByKey<T>(items: T[], key: (t: T) => string | number): T {
 
 export const questions: StaticQuestion[] = [
   // ================================================================ foundation
-  {
-    id: 'odd-one-out-001',
-    subtopic: 'odd-one-out',
-    difficulty: 'foundation',
-    stem: 'A function machine takes an input and gives an output. The table shows four examples. Using the same rule, what is the output when the input is $10$?',
-    table: {
-      headers: ['Input', 'Output'],
-      rows: [
-        [1, 5],
-        [2, 7],
-        [3, 9],
-        [4, 11],
-      ],
-    },
-    options: ['$13$', '$20$', '$23$', '$50$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Step 1: see how the output changes.** Each time the input goes up by $1$, the output goes up by $2$ ($5, 7, 9, 11$). So the rule starts with "multiply by $2$".\n\n' +
-        '**Step 2: find the fixed number.** For input $1$: $2 \\times 1 = 2$, but the output is $5$, so we must add $3$.\n\n' +
-        '$$\\text{output} = 2 \\times \\text{input} + 3$$\n\n' +
-        '**Step 3: check on another row.** Input $4$: $2 \\times 4 + 3 = 11$, which matches the table.\n\n' +
-        '**Step 4: apply the rule.** Input $10$: $2 \\times 10 + 3 = 23$.',
-      whyWrong: [
-        'This is the output for input $5$, the next row of the table ($11 + 2 = 13$). The question asks for input $10$, which is six steps beyond input $4$.',
-        'This is $2 \\times 10$: it spots "multiply by $2$" but forgets to add the $3$.',
-        null,
-        'This uses only the first example, $1 \\to 5$, and guesses "multiply by $5$". The second example already breaks that rule: $2 \\times 5 = 10$, but the table says $7$.',
-      ],
-      keyIdea: 'For a function machine, find how much the output changes per 1 step of input (the multiplier), then the fixed number to add, and check the rule on every row.',
-    },
-    check: {
-      optionValues: [13, 20, 23, 50],
-      compute: () => {
-        const { a, b } = linearRule([1, 2, 3, 4], [5, 7, 9, 11]);
-        return a * 10 + b;
-      },
-    },
-  },
   {
     id: 'odd-one-out-002',
     subtopic: 'odd-one-out',
@@ -228,6 +188,45 @@ export const questions: StaticQuestion[] = [
   },
 
   // ================================================================ exam
+  {
+    id: 'odd-one-out-001',
+    subtopic: 'odd-one-out',
+    difficulty: 'exam',
+    stem: 'A function machine takes an input and gives an output. The table shows four examples. Using the same rule, what is the output when the input is $10$?',
+    table: {
+      headers: ['Input', 'Output'],
+      rows: [
+        [1, 5],
+        [2, 7],
+        [3, 9],
+        [4, 11],
+      ],
+    },
+    options: ['$13$', '$20$', '$23$', '$50$'],
+    correctIndex: 2,
+    markScheme: {
+      solution:
+        '**Step 1: see how the output changes.** Each time the input goes up by $1$, the output goes up by $2$ ($5, 7, 9, 11$). So the rule starts with "multiply by $2$".\n\n' +
+        '**Step 2: find the fixed number.** For input $1$: $2 \\times 1 = 2$, but the output is $5$, so we must add $3$.\n\n' +
+        '$$\\text{output} = 2 \\times \\text{input} + 3$$\n\n' +
+        '**Step 3: check on another row.** Input $4$: $2 \\times 4 + 3 = 11$, which matches the table.\n\n' +
+        '**Step 4: apply the rule.** Input $10$: $2 \\times 10 + 3 = 23$.',
+      whyWrong: [
+        'This is the output for input $5$, the next row of the table ($11 + 2 = 13$). The question asks for input $10$, which is six steps beyond input $4$.',
+        'This is $2 \\times 10$: it spots "multiply by $2$" but forgets to add the $3$.',
+        null,
+        'This uses only the first example, $1 \\to 5$, and guesses "multiply by $5$". The second example already breaks that rule: $2 \\times 5 = 10$, but the table says $7$.',
+      ],
+      keyIdea: 'For a function machine, find how much the output changes per 1 step of input (the multiplier), then the fixed number to add, and check the rule on every row.',
+    },
+    check: {
+      optionValues: [13, 20, 23, 50],
+      compute: () => {
+        const { a, b } = linearRule([1, 2, 3, 4], [5, 7, 9, 11]);
+        return a * 10 + b;
+      },
+    },
+  },
   {
     id: 'odd-one-out-007',
     subtopic: 'odd-one-out',
@@ -463,7 +462,7 @@ export const questions: StaticQuestion[] = [
     id: 'odd-one-out-013',
     subtopic: 'odd-one-out',
     difficulty: 'exam',
-    stem: 'A Python function `f(n)` has a one-line body `return ...`. When it was tested it gave the results in the table. Which line could be the body of `f`?',
+    stem: 'A function `f(n)` gave the results in the table. Which line could be its body? (`mod` gives the remainder and `div` is integer division.)',
     table: {
       headers: ['`n`', '`f(n)`'],
       rows: [
@@ -473,29 +472,29 @@ export const questions: StaticQuestion[] = [
         [20, 0],
       ],
     },
-    options: ['`return n // 5`', '`return n % 3`', '`return n % 4`', '`return n // 4`'],
+    options: ['`return div(n,5)`', '`return mod(n,3)`', '`return mod(n,4)`', '`return div(n,4)`'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Recall: `//` is whole-number (floor) division and `%` gives the **remainder**. Test each candidate on every row:\n\n' +
-        '| `n` | wanted | `n // 5` | `n % 3` | `n % 4` | `n // 4` |\n' +
+        '`div(a,b)` is whole-number division and `mod(a,b)` gives the **remainder**. Test each candidate on every row:\n\n' +
+        '| `n` | wanted | `div(n,5)` | `mod(n,3)` | `mod(n,4)` | `div(n,4)` |\n' +
         '| --- | --- | --- | --- | --- | --- |\n' +
         '| 5 | 1 | 1 | 2 | 1 | 1 |\n' +
         '| 9 | 1 | 1 | 0 | 1 | 2 |\n' +
         '| 14 | 2 | 2 | 2 | 2 | 3 |\n' +
         '| 20 | 0 | 4 | 2 | 0 | 5 |\n\n' +
-        'Only `n % 4` matches every row: $5 = 4 + 1$, $9 = 8 + 1$, $14 = 12 + 2$, and $20 = 5 \\times 4$ exactly, so its remainder is $0$.\n\n' +
-        'So the body is `return n % 4`.',
+        'Only `mod(n,4)` matches every row: $5 = 4 + 1$, $9 = 8 + 1$, $14 = 12 + 2$, and $20 = 5 \\times 4$ exactly, so its remainder is $0$.\n\n' +
+        'So the body is `return mod(n,4)`.',
       whyWrong: [
-        '`n // 5` matches the first three rows (1, 1, 2) but gives `20 // 5 = 4` for the last row, not 0. Always test the rule on every example.',
-        '`n % 3` fails straight away: `5 % 3` is 2, not 1.',
+        '`div(n,5)` matches the first three rows (1, 1, 2) but gives `div(20,5) = 4` for the last row, not 0. Always test the rule on every example.',
+        '`mod(n,3)` fails straight away: `mod(5,3)` is 2, not 1.',
         null,
-        '`n // 4` confuses the quotient with the remainder: `9 // 4` is 2, but the table says 1.',
+        '`div(n,4)` confuses the quotient with the remainder: `div(9,4)` is 2, but the table says 1.',
       ],
       keyIdea: 'Test a candidate rule on every input-output example; a rule that fits only some rows is wrong.',
     },
     check: {
-      optionValues: ['n // 5', 'n % 3', 'n % 4', 'n // 4'],
+      optionValues: ['div(n,5)', 'mod(n,3)', 'mod(n,4)', 'div(n,4)'],
       compute: () => {
         const rows = [
           [5, 1],
@@ -504,10 +503,10 @@ export const questions: StaticQuestion[] = [
           [20, 0],
         ];
         const cands: [string, (n: number) => number][] = [
-          ['n // 5', (n) => Math.floor(n / 5)],
-          ['n % 3', (n) => n % 3],
-          ['n % 4', (n) => n % 4],
-          ['n // 4', (n) => Math.floor(n / 4)],
+          ['div(n,5)', (n) => Math.floor(n / 5)],
+          ['mod(n,3)', (n) => n % 3],
+          ['mod(n,4)', (n) => n % 4],
+          ['div(n,4)', (n) => Math.floor(n / 4)],
         ];
         const fits = cands.filter(([, f]) => rows.every(([n, out]) => f(n) === out));
         if (fits.length !== 1) throw new Error('not unique');
@@ -584,12 +583,11 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ================================================================ challenge
   {
     id: 'odd-one-out-016',
     subtopic: 'odd-one-out',
     difficulty: 'exam',
-    stem: 'A function machine multiplies its input by a fixed number and then adds another fixed number. An input of $3$ gives an output of $17$, and an input of $7$ gives an output of $33$. Which input gives an output of $85$?',
+    stem: 'A function machine multiplies its input by a fixed number, then adds another fixed number. Input $3$ gives output $17$ and input $7$ gives output $33$. Which input gives output $85$?',
     options: ['$20$', '$15$', '$18$', '$16.25$'],
     correctIndex: 0,
     markScheme: {
@@ -617,125 +615,9 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'odd-one-out-017',
-    subtopic: 'odd-one-out',
-    difficulty: 'challenge',
-    stem: 'Three of these numbers belong to the same well-known sequence of numbers. Which number is the odd one out?',
-    options: ['$78$', '$28$', '$35$', '$55$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'First rule out the obvious properties:\n\n' +
-        '- Even/odd: $78, 28$ even; $35, 55$ odd. 2 against 2.\n' +
-        '- Multiples of 5: $35, 55$. 2 against 2.\n' +
-        '- Multiples of 7: $28, 35$. 2 against 2.\n\n' +
-        'Now try the **triangular numbers** $T_n = \\frac{n(n+1)}{2}$: $1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78, \\ldots$\n\n' +
-        '- $28 = \\frac{7 \\times 8}{2}$\n' +
-        '- $55 = \\frac{10 \\times 11}{2}$\n' +
-        '- $78 = \\frac{12 \\times 13}{2}$\n' +
-        '- $35$ falls between $28$ and $36$, so it is **not** triangular.\n\n' +
-        '(Quick test: $N$ is triangular exactly when $8N + 1$ is a perfect square. $8 \\times 35 + 1 = 281$ is not a square, but $8 \\times 28 + 1 = 225 = 15^2$.)\n\n' +
-        'The odd one out is $35$.',
-      whyWrong: [
-        '$78 = \\frac{12 \\times 13}{2}$ is the 12th triangular number. It is the largest number and the only multiple of 3, but those are one-off facts, not a sequence shared by the other three.',
-        '$28 = \\frac{7 \\times 8}{2}$ is the 7th triangular number. Being even does not single it out, because $78$ is even too.',
-        null,
-        '$55 = \\frac{10 \\times 11}{2}$ is the 10th triangular number. It is also a Fibonacci number, but none of $28$, $35$ or $78$ is, so Fibonacci cannot be the shared sequence.',
-      ],
-      keyIdea: 'Know the famous sequences (squares, cubes, primes, triangular, Fibonacci) and test each number against them after ruling out properties that split 2 against 2.',
-    },
-    check: {
-      optionValues: [78, 28, 35, 55],
-      compute: () => oddByKey([78, 28, 35, 55], (n) => String(isTriangular(n))),
-    },
-  },
-  {
-    id: 'odd-one-out-018',
-    subtopic: 'odd-one-out',
-    difficulty: 'challenge',
-    stem: 'Three of these Python 3 expressions evaluate to the same value. Which expression gives a different value?',
-    options: ['`7 // 2`', '`int(3.9)`', '`len("abc")`', '`round(2.5)`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Evaluate each expression carefully:\n\n' +
-        '- `7 // 2`: floor division keeps the whole-number part of $3.5$, giving `3`.\n' +
-        '- `int(3.9)`: `int()` **chops off** the decimal part (it does not round), giving `3`.\n' +
-        '- `len("abc")`: the string has 3 characters, giving `3`.\n' +
-        '- `round(2.5)`: in Python 3, a value exactly halfway between two integers is rounded to the **even** one ("banker\'s rounding"). $2.5$ is halfway between 2 and 3, and 2 is even, so the result is `2`.\n\n' +
-        'Three expressions give `3`; `round(2.5)` gives `2`, so it is the odd one out.',
-      whyWrong: [
-        '`//` is floor division, so `7 // 2` is `3` (not `3.5`), the same value as `int(3.9)` and `len("abc")`.',
-        '`int()` truncates rather than rounds, so `int(3.9)` is `3`, not `4`. If you thought it rounded up you would pick this, but it matches the others.',
-        '`len("abc")` counts the characters: there are 3, the same value as `7 // 2` and `int(3.9)`.',
-        null,
-      ],
-      keyIdea: 'In Python 3, `int()` truncates, `//` floors, and `round()` sends exact halves to the nearest even integer, so `round(2.5)` is `2`.',
-    },
-    check: {
-      optionValues: [3, 3, 3, 2],
-      compute: () => {
-        // emulate Python 3 semantics
-        const roundHalfEven = (x: number) => {
-          const f = Math.floor(x);
-          const d = x - f;
-          if (d > 0.5) return f + 1;
-          if (d < 0.5) return f;
-          return f % 2 === 0 ? f : f + 1;
-        };
-        const vals = [Math.floor(7 / 2), Math.trunc(3.9), 'abc'.length, roundHalfEven(2.5)];
-        return oddByKey(vals, (v) => v);
-      },
-    },
-  },
-  {
-    id: 'odd-one-out-019',
-    subtopic: 'odd-one-out',
-    difficulty: 'challenge',
-    stem: '$23$ is to $13$, $45$ is to $41$, and $37$ is to $58$. Using the same rule, $62$ is to what?',
-    options: ['$64$', '$40$', '$12$', '$38$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The outputs do not follow the size of the inputs ($23 \\to 13$ but $37 \\to 58$), so look at the **digits** separately.\n\n' +
-        'Try squaring each digit and adding:\n\n' +
-        '- $23$: $2^2 + 3^2 = 4 + 9 = 13$. Fits.\n' +
-        '- $45$: $4^2 + 5^2 = 16 + 25 = 41$. Fits.\n' +
-        '- $37$: $3^2 + 7^2 = 9 + 49 = 58$. Fits.\n\n' +
-        'So $62 \\to 6^2 + 2^2 = 36 + 4 = 40$.',
-      whyWrong: [
-        'This adds the digits first and then squares: $(6 + 2)^2 = 64$. Check: $(2 + 3)^2 = 25$, not $13$.',
-        null,
-        'This multiplies the digits: $6 \\times 2 = 12$. Check: $2 \\times 3 = 6$, not $13$.',
-        'This squares only the first digit: $6^2 + 2 = 38$. Check: $2^2 + 3 = 7$, not $13$.',
-      ],
-      keyIdea: 'When outputs do not grow with the inputs, try operations on the individual digits, and confirm the rule on every example.',
-    },
-    check: {
-      optionValues: [64, 40, 12, 38],
-      compute: () => {
-        const digits = (n: number) => [Math.floor(n / 10), n % 10];
-        const rule = onlyFit(
-          [
-            (n: number) => digits(n).reduce((s, d) => s + d * d, 0),
-            (n: number) => digits(n).reduce((s, d) => s + d, 0) ** 2,
-            (n: number) => digits(n).reduce((s, d) => s * d, 1),
-            (n: number) => digits(n)[0] ** 2 + digits(n)[1],
-          ],
-          [
-            [23, 13],
-            [45, 41],
-            [37, 58],
-          ],
-        );
-        return rule(62);
-      },
-    },
-  },
-  {
     id: 'odd-one-out-020',
     subtopic: 'odd-one-out',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A rule turns a pair of numbers into one number: $(3, 4) \\to 5$, $(6, 8) \\to 10$ and $(5, 12) \\to 13$. What does the rule give for $(8, 15)$?',
     options: ['$17$', '$289$', '$23$', '$16$'],
     correctIndex: 0,
@@ -767,6 +649,93 @@ export const questions: StaticQuestion[] = [
         );
         return rule(8, 15);
       },
+    },
+  },
+  {
+    id: 'odd-one-out-021',
+    subtopic: 'odd-one-out',
+    difficulty: 'foundation',
+    stem: 'Which number is the odd one out?',
+    options: ['$2$', '$3$', '$5$', '$9$'],
+    correctIndex: 3,
+    markScheme: {
+      solution: '$2$, $3$ and $5$ are all **prime**: their only factors are 1 and themselves. $9 = 3 \\times 3$ is not prime, so $9$ is the odd one out.',
+      whyWrong: [
+        '$2$ is the only even number, but being even is a one-off fact here. It is prime, like $3$ and $5$.',
+        '$3$ is prime, like $2$ and $5$. It is a factor of $9$, but that does not separate it from the rest.',
+        '$5$ is prime, like $2$ and $3$.',
+        null,
+      ],
+      keyIdea: 'Look for a property that three items share and the fourth does not.',
+    },
+    check: {
+      optionValues: [2, 3, 5, 9],
+      compute: () => oddByKey([2, 3, 5, 9], (n) => String(isPrime(n))),
+    },
+  },
+  {
+    id: 'odd-one-out-022',
+    subtopic: 'odd-one-out',
+    difficulty: 'foundation',
+    stem: 'A **palindrome** is a word that:',
+    options: ['reads the same forwards and backwards', 'uses each letter only once', 'has the same letters as another word', 'starts and ends with a vowel'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A palindrome reads the same in both directions, as RADAR and REFER do.',
+      whyWrong: [
+        null,
+        'A palindrome usually repeats letters: RADAR uses R twice and A twice.',
+        'This describes an **anagram**, such as LISTEN and SILENT.',
+        'RADAR is a palindrome that starts and ends with a consonant.',
+      ],
+      keyIdea: 'Palindrome: the same backwards. Anagram: the same letters rearranged.',
+    },
+    check: {
+      optionValues: ['RADAR', null, null, null],
+      compute: () => ['RADAR', 'MOTOR'].filter(isPalindrome).join('+'),
+    },
+  },
+  {
+    id: 'odd-one-out-023',
+    subtopic: 'odd-one-out',
+    difficulty: 'foundation',
+    stem: 'Two words are **anagrams** of each other when they:',
+    options: ['use the same letters in a different order', 'read the same backwards', 'start with the same letter', 'have the same number of letters'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Anagrams use exactly the same letters, rearranged. LISTEN and SILENT both sort to E, I, L, N, S, T.',
+      whyWrong: [
+        null,
+        'This describes a **palindrome**, which is a property of one word.',
+        'LISTEN and SILENT are anagrams that start with different letters.',
+        'Equal length is necessary but not enough: CAT and DOG have the same length but different letters.',
+      ],
+      keyIdea: 'Sort the letters of both words: anagrams give the same sorted list.',
+    },
+    check: {
+      optionValues: ['same letters', null, null, null],
+      compute: () => {
+        const sorted = (w: string) => [...w].sort().join('');
+        return sorted('LISTEN') === sorted('SILENT') ? 'same letters' : 'different';
+      },
+    },
+  },
+  {
+    id: 'odd-one-out-024',
+    subtopic: 'odd-one-out',
+    difficulty: 'foundation',
+    stem: 'In an odd-one-out question with four items, the right property splits them:',
+    options: ['3 against 1', '2 against 2', '4 against 0', 'by size alone'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Three items share the property and exactly one does not, so the split is **3 against 1**.',
+      whyWrong: [
+        null,
+        'A 2 against 2 split leaves no single item as the odd one out, so that property is not the rule.',
+        'If all four items share a property, it cannot separate any of them.',
+        'Being the largest or smallest is a one-off fact, not a property that three items share.',
+      ],
+      keyIdea: 'An odd-one-out property must split the items 3 against 1.',
     },
   },
 ];

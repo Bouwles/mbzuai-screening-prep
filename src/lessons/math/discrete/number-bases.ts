@@ -26,8 +26,8 @@ export const lesson: Lesson = {
       method: '$n$ bits give $2^{n}$ patterns: unsigned $0$ to $2^{n} - 1$, two\'s complement $-2^{n-1}$ to $2^{n-1} - 1$. For $N$ codes find the smallest $n$ with $2^{n} \\ge N$.',
     },
     {
-      cue: 'Binary addition, or Python `<<`, `>>`, `bin`, `hex`',
-      method: 'Add column by column with $1 + 1 = 10_2$ (write 0, carry 1). `x << k` is $x \\times 2^{k}$ and `x >> k` is $x \\div 2^{k}$ rounded down.',
+      cue: 'Binary addition, or a bit shift',
+      method: 'Add column by column with $1 + 1 = 10_2$ (write 0, carry 1). A left shift by $k$ places multiplies by $2^{k}$; a right shift by $k$ places divides by $2^{k}$ and rounds down.',
     },
   ],
   know:
@@ -62,9 +62,9 @@ export const lesson: Lesson = {
     'Computers store negative integers using **two\'s complement**. In $n$ bits, the leftmost bit is worth $-2^{n-1}$ instead of $+2^{n-1}$; all other bits are normal. In 8 bits, $11111111_2 = -128 + 127 = -1$.\n\n' +
     '- **To write $-k$:** write $k$ in $n$ bits, flip every bit, then add 1. Example: $5 = 00000101_2$, flipped $11111010_2$, add 1: $-5 = 11111011_2$.\n' +
     '- **To read a pattern starting with 1:** flip and add 1 to get the size, then put a minus sign in front. Or subtract $2^n$ from its unsigned value: $11111011_2 = 251$ unsigned, and $251 - 256 = -5$.\n' +
-    '- **Range:** $-2^{n-1}$ to $2^{n-1} - 1$; for 8 bits, $-128$ to $127$. Adding two positives that go past the top **overflows** into a negative pattern.\n\n' +
+    '- **Range:** $-2^{n-1}$ to $2^{n-1} - 1$; for 8 bits, $-128$ to $127$.\n\n' +
     '### Bit shifts\n\n' +
-    'Shifting the bits one place left adds a 0 on the right, which **doubles** the number (just like adding a 0 in decimal multiplies by 10). Shifting right drops the rightmost bit, which **halves** the number and rounds down. In Python, `x << k` is $x \\times 2^k$ and `x >> k` is $x \\div 2^k$ rounded down, the same as `x // 2**k`.',
+    'Shifting the bits one place left adds a 0 on the right, which **doubles** the number (just like adding a 0 in decimal multiplies by 10). Shifting right drops the rightmost bit, which **halves** the number and rounds down. So a left shift by $k$ places multiplies by $2^k$, and a right shift by $k$ places divides by $2^k$ and rounds down.',
   formulas: [
     { label: 'Value of a base-$b$ number', tex: '(d_k \\dots d_1 d_0)_b = d_k b^k + \\dots + d_1 b + d_0', note: 'Every digit must be between $0$ and $b - 1$.' },
     { label: 'Hex letters', tex: '\\mathrm{A} = 10,\\ \\mathrm{B} = 11,\\ \\mathrm{C} = 12,\\ \\mathrm{D} = 13,\\ \\mathrm{E} = 14,\\ \\mathrm{F} = 15' },
@@ -74,7 +74,7 @@ export const lesson: Lesson = {
     { label: 'Bits needed for $N$ different codes', tex: '\\text{smallest } n \\text{ with } 2^n \\ge N' },
     { label: "Two's complement range ($n$ bits)", tex: '-2^{n-1} \\text{ to } 2^{n-1} - 1' },
     { label: "Two's complement of $-k$", tex: '\\text{flip all bits of } k, \\text{ then add } 1 \\quad (\\text{equivalently } 2^n - k \\text{ unsigned})' },
-    { label: 'Bit shifts', tex: 'x \\ll k = x \\times 2^k, \\qquad x \\gg k = \\left\\lfloor \\frac{x}{2^k} \\right\\rfloor', note: 'Here $\\ll$ and $\\gg$ mean the shift operators, written `<<` and `>>` in Python. The brackets $\\lfloor \\; \\rfloor$ mean round down.' },
+    { label: 'Bit shifts', tex: 'x \\ll k = x \\times 2^k, \\qquad x \\gg k = \\left\\lfloor \\frac{x}{2^k} \\right\\rfloor', note: 'Here $\\ll$ and $\\gg$ mean a left shift and a right shift by $k$ places. The brackets $\\lfloor \\; \\rfloor$ mean round down.' },
   ],
   examples: [
     {
@@ -127,7 +127,7 @@ export const lesson: Lesson = {
     'Confusing "how many values" with "largest value": $n$ bits give $2^n$ values but the largest unsigned value is $2^n - 1$ (one byte: 256 values, largest 255).',
     'Forgetting the "add 1" in two\'s complement, or using sign-and-magnitude (just setting the first bit to 1). In 8 bits, $-13$ is $11110011_2$, not $10001101_2$ and not $11110010_2$.',
     'Grouping bits from the left when converting to hex or octal. Always group from the **right** and pad the leftmost group with zeros.',
-    'Thinking a shift by $k$ multiplies by $k$. A left shift by 3 multiplies by $2^3 = 8$; a right shift rounds **down**, so in Python `-21 >> 2` is $-6$, not $-5$.',
+    'Thinking a shift by $k$ multiplies by $k$. A left shift by 3 multiplies by $2^3 = 8$; a right shift rounds **down**, so $21$ shifted right by 2 places is $5$, not $5.25$.',
   ],
   examTip:
     'These questions are quick marks if you **check by converting back**. For a conversion, turn each option back into decimal (or into the base you started from) and see which one matches; this takes seconds with place values. Fast eliminations: an odd decimal number must end in 1 in binary, an even one in 0; a binary answer containing a 2, or an octal answer containing an 8 or 9, is impossible; in base $b$ every digit must be less than $b$. For two\'s complement, a negative number must start with 1, and the "flip but forget to add 1" option is always exactly one away from the answer, so do the last step carefully. For "how many bits" questions, list powers of 2 ($2, 4, 8, 16, 32, 64, 128, 256, 512, 1024$) and pick the first one that is **at least** the number needed.',

@@ -12,8 +12,7 @@ export const lesson: Lesson = {
     { cue: '**Parallel** vectors', method: 'One is a scalar multiple of the other: every component has the same ratio (a negative ratio still counts as parallel).' },
     { cue: '**Angle** between two vectors', method: '$\\cos\\theta = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{|\\mathbf{a}|\\,|\\mathbf{b}|}$, then $\\cos^{-1}$. A negative dot product means an obtuse angle.' },
     { cue: '**Midpoint**, a point dividing $AB$ in a ratio, or the fourth vertex of a parallelogram', method: '$\\overrightarrow{AB} = \\mathbf{b} - \\mathbf{a}$ (end minus start). Midpoint $\\frac{1}{2}(\\mathbf{a} + \\mathbf{b})$; ratio $m : n$ gives $\\mathbf{a} + \\frac{m}{m + n}\\overrightarrow{AB}$; parallelogram $ABCD$ has $\\mathbf{d} = \\mathbf{a} + \\mathbf{c} - \\mathbf{b}$.' },
-    { cue: 'Find the scalars in a **linear combination**, or test **linear independence**', method: 'Write one equation per component and solve them together (or test the options). $n$ vectors in $n$ dimensions are dependent exactly when their determinant is $0$; more than $n$ are always dependent.' },
-    { cue: 'Length of a combination such as $|2\\mathbf{a} - \\mathbf{b}|$, given lengths and an angle', method: 'Square it: $|\\mathbf{v}|^{2} = \\mathbf{v} \\cdot \\mathbf{v}$. Expand, use $\\mathbf{a} \\cdot \\mathbf{b} = |\\mathbf{a}|\\,|\\mathbf{b}|\\cos\\theta$, then take the square root.' },
+    { cue: 'Find the scalars in a **linear combination**', method: 'Write one equation per component and solve them together (or test the options).' },
   ],
   know:
     '### What is a vector?\n\n' +
@@ -47,13 +46,7 @@ export const lesson: Lesson = {
     '| negative | between $90^\\circ$ and $180^\\circ$ | obtuse, roughly opposite directions |\n\n' +
     'So two non-zero vectors are **orthogonal** (perpendicular) exactly when their dot product is $0$. In 2D, a quick perpendicular to $\\begin{pmatrix} x \\\\ y \\end{pmatrix}$ is $\\begin{pmatrix} -y \\\\ x \\end{pmatrix}$: swap the components and change one sign.\n\n' +
     '### Linear combinations\n\n' +
-    'A **linear combination** of vectors is any sum of scalar multiples, like $2\\mathbf{u} - 3\\mathbf{v}$. To find the scalars that make a target vector, write one equation per component and solve the simultaneous equations. In a multiple-choice question it is often faster to plug each option in.\n\n' +
-    '### Linear independence\n\n' +
-    'Vectors are **linearly independent** if none of them can be built as a combination of the others. Equivalently, the only way to make $c_1\\mathbf{v}_1 + c_2\\mathbf{v}_2 + \\dots = \\mathbf{0}$ is with every $c$ equal to $0$. Otherwise they are **dependent**. Quick tests:\n\n' +
-    '- Two vectors are dependent exactly when they are parallel.\n' +
-    '- Any set containing the zero vector is dependent.\n' +
-    '- $n$ vectors in $n$ dimensions (e.g. 3 vectors in 3D) are dependent exactly when the determinant of the matrix they form is $0$.\n' +
-    '- More than $n$ vectors in $n$ dimensions are **always** dependent (4 vectors in 3D can never be independent).',
+    'A **linear combination** of vectors is any sum of scalar multiples, like $2\\mathbf{u} - 3\\mathbf{v}$. To find the scalars that make a target vector, write one equation per component and solve the simultaneous equations. In a multiple-choice question it is often faster to plug each option in.',
   formulas: [
     { label: 'Addition (component by component)', tex: '\\begin{pmatrix} a_1 \\\\ a_2 \\\\ a_3 \\end{pmatrix} + \\begin{pmatrix} b_1 \\\\ b_2 \\\\ b_3 \\end{pmatrix} = \\begin{pmatrix} a_1 + b_1 \\\\ a_2 + b_2 \\\\ a_3 + b_3 \\end{pmatrix}' },
     { label: 'Scalar multiple', tex: 'k\\begin{pmatrix} a_1 \\\\ a_2 \\\\ a_3 \\end{pmatrix} = \\begin{pmatrix} ka_1 \\\\ ka_2 \\\\ ka_3 \\end{pmatrix}', note: 'A negative $k$ reverses the direction.' },
@@ -69,7 +62,6 @@ export const lesson: Lesson = {
     { label: 'Perpendicular (orthogonal) vectors', tex: '\\mathbf{a} \\cdot \\mathbf{b} = 0' },
     { label: 'Dot product with itself', tex: '\\mathbf{a} \\cdot \\mathbf{a} = |\\mathbf{a}|^2' },
     { label: 'Length of a sum', tex: '|\\mathbf{a} + \\mathbf{b}|^2 = |\\mathbf{a}|^2 + 2\\,\\mathbf{a} \\cdot \\mathbf{b} + |\\mathbf{b}|^2' },
-    { label: 'Linear independence of 3 vectors in 3D', tex: '\\det\\begin{pmatrix} \\mathbf{u} & \\mathbf{v} & \\mathbf{w} \\end{pmatrix} \\neq 0', note: 'Determinant zero means the vectors are linearly dependent.' },
   ],
   examples: [
     {
@@ -104,18 +96,6 @@ export const lesson: Lesson = {
       ],
       answer: '$\\theta \\approx 101.1^\\circ$',
     },
-    {
-      title: 'When are three vectors linearly dependent?',
-      problem: 'For which value of $k$ are $\\begin{pmatrix} 1 \\\\ 0 \\\\ 2 \\end{pmatrix}$, $\\begin{pmatrix} 0 \\\\ 1 \\\\ k \\end{pmatrix}$ and $\\begin{pmatrix} 1 \\\\ 2 \\\\ 6 \\end{pmatrix}$ linearly dependent?',
-      steps: [
-        'Three vectors in 3D are dependent exactly when the determinant of the matrix they form is $0$. Use them as rows: $\\det\\begin{pmatrix} 1 & 0 & 2 \\\\ 0 & 1 & k \\\\ 1 & 2 & 6 \\end{pmatrix}$.',
-        'Expand along the first row (signs plus, minus, plus). The middle entry is $0$, so its term vanishes, leaving $1 \\times (1 \\times 6 - k \\times 2) + 2 \\times (0 \\times 2 - 1 \\times 1)$.',
-        'Simplify: $(6 - 2k) + 2(-1) = 4 - 2k$.',
-        'Set it to zero: $4 - 2k = 0$, so $k = 2$.',
-        'Check: $\\begin{pmatrix} 1 \\\\ 0 \\\\ 2 \\end{pmatrix} + 2\\begin{pmatrix} 0 \\\\ 1 \\\\ 2 \\end{pmatrix} = \\begin{pmatrix} 1 \\\\ 2 \\\\ 6 \\end{pmatrix}$, so the third vector is a combination of the other two.',
-      ],
-      answer: '$k = 2$',
-    },
   ],
   traps: [
     'Getting $\\overrightarrow{AB}$ backwards. It is "end minus start", $\\mathbf{b} - \\mathbf{a}$; using $\\mathbf{a} - \\mathbf{b}$ gives the vector pointing the opposite way.',
@@ -131,6 +111,5 @@ export const lesson: Lesson = {
     '- **Use the sign of the dot product.** Negative means obtuse, so any acute option is wrong; zero means exactly $90^\\circ$. An angle between vectors is never negative or above $180^\\circ$.\n' +
     '- **Unit vector check:** square the components and add; the total must be exactly 1. This kills options divided by the wrong number, and the signs must match the original vector.\n' +
     '- **Midpoint sense check:** each coordinate must lie between the two end coordinates.\n' +
-    '- **Independence shortcuts:** parallel vectors, a zero vector, or more vectors than dimensions mean dependent, with no calculation needed. Otherwise use the determinant (most calculators do $3 \\times 3$ determinants in the matrix menu).\n' +
     '- Set your calculator to **degrees** when the options are in degrees, and keep full accuracy until the final rounding.',
 };

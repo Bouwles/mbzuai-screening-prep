@@ -32,7 +32,7 @@ export const EXAM = {
   targetPercent: 75,
 
   /**
-   * ESTIMATED pace in seconds per question, used by practice timers and mock lengths.
+   * ESTIMATED pace in seconds per question, used only to estimate mock question counts.
    * The real count is unpublished; 67.5 s (the old graduate pace) is a deliberately brisk guess,
    * so training at it leaves a margin if the real exam has fewer questions.
    */
@@ -58,14 +58,10 @@ export const EXAM = {
     ctl: 0.15, // Computational Thinking & Logic
   },
 
-  /**
-   * Difficulty mix in mock exams (must add up to 1). ESTIMATE: the guide only says "varying difficulty".
-   * Challenge questions are optional enrichment above the level of the official samples, so mocks leave them out.
-   */
+  /** Difficulty mix in mock exams (must add up to 1). An estimate, weighted towards one-step questions. */
   difficultyMix: {
-    foundation: 0.3,
-    exam: 0.7,
-    challenge: 0,
+    foundation: 0.4,
+    exam: 0.6,
   },
 
   /** Share of mock-exam questions taken from generators (fresh variants) rather than the static bank. */

@@ -254,11 +254,6 @@ export const VIDEOS: Record<string, Video[]> = {
     v('MnQ7Lizkpqk', 'Inductive reasoning 1', KA, '2:07'),
     v('ZSsBh4Ybbj8', 'Inductive reasoning 2', KA, '2:21'),
   ],
-  'rates-clocks': [
-    v('fpjXtpg_isc', 'Rate problems', KA, '4:30'),
-    v('zUE59CNlFsI', 'Time and work problems: shortcuts and tricks', OCT, '33:55'),
-    v('LEHYr0XfSyI', 'Clock problems: finding the angle between the hands', OCT, '12:19'),
-  ],
   // ---------------------------------------------------------------- Programming fundamentals
   'variables-operators': [
     v('khKv-8q7YmY', 'Integers and floats: working with numeric data', CS, '11:55'),

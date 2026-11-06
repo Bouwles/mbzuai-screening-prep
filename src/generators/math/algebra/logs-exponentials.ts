@@ -201,10 +201,10 @@ export const generators: Generator[] = [
     title: 'Exponential growth or decay: find the time',
     generate(rng) {
       const contexts = [
-        { kind: 'decay', sym: 'C', starts: [100, 200, 400, 500, 800], ks: [0.1, 0.15, 0.2, 0.25, 0.3, 0.4], unit: 'hours', what: (q: string) => `The amount of a medicine in a patient's blood is modelled by ${q} mg, where $t$ is the time in hours after the dose.`, target: (v: number) => `${v} mg`, verb: 'fall to' },
-        { kind: 'decay', sym: 'M', starts: [100, 200, 500, 800, 1000], ks: [0.02, 0.03, 0.04, 0.05, 0.08], unit: 'years', what: (q: string) => `The mass of a radioactive sample is modelled by ${q} grams, where $t$ is the time in years.`, target: (v: number) => `${v} grams`, verb: 'fall to' },
-        { kind: 'growth', sym: 'N', starts: [200, 500, 1000, 1200], ks: [0.1, 0.2, 0.25, 0.3, 0.4, 0.5], unit: 'hours', what: (q: string) => `The number of bacteria in a culture is modelled by ${q}, where $t$ is the time in hours.`, target: (v: number) => `${v} bacteria`, verb: 'reach' },
-        { kind: 'growth', sym: 'V', starts: [1000, 2000, 5000], ks: [0.02, 0.03, 0.04, 0.05, 0.06, 0.08], unit: 'years', what: (q: string) => `The value of an investment is modelled by ${q} dirhams, where $t$ is the time in years.`, target: (v: number) => `AED ${v}`, verb: 'reach' },
+        { kind: 'decay', sym: 'C', starts: [100, 200, 400, 500, 800], ks: [0.1, 0.15, 0.2, 0.25, 0.3, 0.4], unit: 'hours', what: (q: string) => `A dose of medicine is modelled by ${q} mg, where $t$ is in hours.`, target: (v: number) => `${v} mg`, verb: 'fall to' },
+        { kind: 'decay', sym: 'M', starts: [100, 200, 500, 800, 1000], ks: [0.02, 0.03, 0.04, 0.05, 0.08], unit: 'years', what: (q: string) => `A radioactive sample is modelled by ${q} grams, where $t$ is in years.`, target: (v: number) => `${v} grams`, verb: 'fall to' },
+        { kind: 'growth', sym: 'N', starts: [200, 500, 1000, 1200], ks: [0.1, 0.2, 0.25, 0.3, 0.4, 0.5], unit: 'hours', what: (q: string) => `A culture of bacteria is modelled by ${q}, where $t$ is in hours.`, target: (v: number) => `${v} bacteria`, verb: 'reach' },
+        { kind: 'growth', sym: 'V', starts: [1000, 2000, 5000], ks: [0.02, 0.03, 0.04, 0.05, 0.06, 0.08], unit: 'years', what: (q: string) => `An investment is modelled by ${q} dirhams, where $t$ is in years.`, target: (v: number) => `AED ${v}`, verb: 'reach' },
       ] as const;
       for (;;) {
         const ctx = rng.pick(contexts);
@@ -264,7 +264,7 @@ export const generators: Generator[] = [
           `To 1 decimal place, ${m(`t = ${ansS}`)} ${ctx.unit}.`,
         ];
         return {
-          stem: `${ctx.what(m(model))} How long does it take for it to ${ctx.verb} ${ctx.target(target)}? Give your answer in ${ctx.unit}, to 1 decimal place.`,
+          stem: `${ctx.what(m(model))} Find the time for it to ${ctx.verb} ${ctx.target(target)}, in ${ctx.unit} to 1 decimal place.`,
           answer,
           answerValue,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),

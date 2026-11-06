@@ -378,7 +378,7 @@ export const questions: StaticQuestion[] = [
     id: 'propositional-logic-012',
     subtopic: 'propositional-logic',
     difficulty: 'exam',
-    stem: 'In Python, which condition always gives the same result as `not (x > 3 and y < 5)` for all integers `x` and `y`?',
+    stem: 'Which condition always gives the same result as `not (x > 3 and y < 5)` for all integers `x` and `y`?',
     options: ['`x <= 3 and y >= 5`', '`x < 3 or y > 5`', '`x <= 3 or y >= 5`', '`x <= 3 or y < 5`'],
     correctIndex: 2,
     markScheme: {
@@ -387,12 +387,12 @@ export const questions: StaticQuestion[] = [
         '1. The `and` becomes `or`.\n' +
         '2. Negate each comparison. The opposite of `x > 3` is `x <= 3` (the value 3 itself makes `x > 3` false, so it belongs to the negation). The opposite of `y < 5` is `y >= 5`.\n\n' +
         'Result: `x <= 3 or y >= 5`.\n\n' +
-        'Spot check with `x = 3`, `y = 5`: original `not (False and False)` is `True`; `3 <= 3 or 5 >= 5` is `True`. With `x = 4`, `y = 0`: original `not (True and True)` is `False`; `4 <= 3 or 0 >= 5` is `False`. They agree.',
+        'Spot check with `x = 3`, `y = 5`: both comparisons in the bracket are false, so the original is true, and `3 <= 3 or 5 >= 5` is true. With `x = 4`, `y = 0`: both comparisons are true, so the original is false, and `4 <= 3 or 0 >= 5` is false. They agree.',
       whyWrong: [
-        'This negates both comparisons but keeps `and`. De Morgan\'s law turns `and` into `or`; for example `x = 0`, `y = 0` makes the original `True` but this `False`.',
-        'This flips `and` to `or` but negates the comparisons wrongly: the opposite of `>` is `<=`, not `<`. With `x = 3`, `y = 5` the original is `True` but this is `False`.',
+        'This negates both comparisons but keeps `and`. De Morgan\'s law turns `and` into `or`; for example `x = 0`, `y = 0` makes the original true but this false.',
+        'This flips `and` to `or` but negates the comparisons wrongly: the opposite of `>` is `<=`, not `<`. With `x = 3`, `y = 5` the original is true but this is false.',
         null,
-        'This negates only the first comparison. With `x = 4`, `y = 0` the original is `False` but this is `True`.',
+        'This negates only the first comparison. With `x = 4`, `y = 0` the original is false but this is true.',
       ],
       keyIdea: 'De Morgan in code: `not (A and B)` equals `not A or not B`, and the negation of `>` is `<=`.',
     },
@@ -476,153 +476,37 @@ export const questions: StaticQuestion[] = [
     id: 'propositional-logic-014',
     subtopic: 'propositional-logic',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source: [
-        'count = 0',
-        'for p in [True, False]:',
-        '    for q in [True, False]:',
-        '        for r in [True, False]:',
-        '            if (not p or q) and (q or r):',
-        '                count += 1',
-        'print(count)',
-      ].join('\n'),
-    },
-    options: ['`5`', '`6`', '`7`', '`1`'],
+    stem: 'In how many of the 8 rows of its truth table is $(p \\to q) \\land (q \\lor r)$ **true**?',
+    options: ['$5$', '$6$', '$7$', '$1$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'The three loops visit all $2^3 = 8$ combinations. `not p or q` is the implication $p \\to q$ (because `not` binds tighter than `or`, it means `(not p) or q`). The code counts the rows where $(p \\to q) \\land (q \\lor r)$ is true.\n\n' +
-        '| `p` | `q` | `r` | `not p or q` | `q or r` | both? | `count` |\n' +
-        '| --- | --- | --- | --- | --- | --- | --- |\n' +
-        '| T | T | T | T | T | yes | 1 |\n' +
-        '| T | T | F | T | T | yes | 2 |\n' +
-        '| T | F | T | F | T | no | 2 |\n' +
-        '| T | F | F | F | F | no | 2 |\n' +
-        '| F | T | T | T | T | yes | 3 |\n' +
-        '| F | T | F | T | T | yes | 4 |\n' +
-        '| F | F | T | T | T | yes | 5 |\n' +
-        '| F | F | F | T | F | no | 5 |\n\n' +
-        'The program prints `5`.',
+        'An AND is true only when both sides are true.\n\n' +
+        '| $p$ | $q$ | $r$ | $p \\to q$ | $q \\lor r$ | both? |\n' +
+        '| --- | --- | --- | --- | --- | --- |\n' +
+        '| T | T | T | T | T | yes |\n' +
+        '| T | T | F | T | T | yes |\n' +
+        '| T | F | T | F | T | no |\n' +
+        '| T | F | F | F | F | no |\n' +
+        '| F | T | T | T | T | yes |\n' +
+        '| F | T | F | T | T | yes |\n' +
+        '| F | F | T | T | T | yes |\n' +
+        '| F | F | F | T | F | no |\n\n' +
+        'That is $5$ rows.\n\n' +
+        'Quicker: $p \\to q$ is false in 2 rows ($p$ T, $q$ F), $q \\lor r$ is false in 2 rows ($q$ F, $r$ F), and they share 1 row. So $3$ rows are false and $8 - 3 = 5$ are true.',
       whyWrong: [
         null,
-        'This counts the rows where `not p or q` is `True` (6 rows) and ignores the second condition `(q or r)`.',
-        'This treats `and` as `or`: the only row where both brackets are `False` is `p = True, q = False, r = False`, so `or` would give 7.',
-        'This reads `not p or q` as `not (p or q)`. In Python `not` applies only to `p`, so the condition is `(not p) or q`.',
+        'This counts the rows where $p \\to q$ is true (6 rows) and ignores the second bracket.',
+        'This treats $\\land$ as $\\lor$: the only row where both brackets are false is $p$ T, $q$ F, $r$ F, so "or" would give 7.',
+        'This replaces $p \\to q$ by $\\neg(p \\lor q)$, which is true only when $p$ and $q$ are both false. The implication is $\\neg p \\lor q$.',
       ],
-      keyIdea: '`not p or q` is the implication $p \\to q$; count rows by building the 8-row truth table.',
+      keyIdea: 'An AND is false as soon as one side is false: count the false rows of each side, remove the overlap, and subtract from 8.',
     },
     check: {
       optionValues: [5, 6, 7, 1],
       compute: () => {
         let c = 0;
         for (const p of TF) for (const q of TF) for (const r of TF) if (imp(p, q) && (q || r)) c++;
-        return c;
-      },
-    },
-    python: { stdout: '5\n' },
-  },
-
-  // ================================================================ challenge
-  {
-    id: 'propositional-logic-015',
-    subtopic: 'propositional-logic',
-    difficulty: 'challenge',
-    stem: 'Find the truth values of $p$, $q$ and $r$ that make **all four** of these statements true at the same time:\n\n$$p \\lor r, \\qquad p \\to q, \\qquad q \\to \\neg r, \\qquad \\neg q \\to p$$',
-    options: [
-      '$(p, q, r) = (\\text{F}, \\text{F}, \\text{T})$',
-      '$(p, q, r) = (\\text{T}, \\text{F}, \\text{T})$',
-      '$(p, q, r) = (\\text{T}, \\text{T}, \\text{F})$',
-      '$(p, q, r) = (\\text{T}, \\text{T}, \\text{T})$',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Step 1: find $q$.** Suppose $q$ were false. Then $\\neg q$ is true, so $\\neg q \\to p$ forces $p$ to be true. But then $p \\to q$ forces $q$ to be true, a contradiction. So $q$ is **true**.\n\n' +
-        '**Step 2: find $r$.** $q$ is true, so $q \\to \\neg r$ forces $\\neg r$ to be true: $r$ is **false**.\n\n' +
-        '**Step 3: find $p$.** $p \\lor r$ must be true and $r$ is false, so $p$ is **true**.\n\n' +
-        '**Step 4: check all four** with $(p, q, r) = (\\text{T}, \\text{T}, \\text{F})$:\n\n' +
-        '- $p \\lor r$: T or F = T\n' +
-        '- $p \\to q$: T $\\to$ T = T\n' +
-        '- $q \\to \\neg r$: T $\\to$ T = T\n' +
-        '- $\\neg q \\to p$: F $\\to$ T = T\n\n' +
-        'All four are true, and the steps show no other assignment works.',
-      whyWrong: [
-        'This satisfies the first three statements but not $\\neg q \\to p$: with $q$ false and $p$ false it is T $\\to$ F, which is false.',
-        'This fails $p \\to q$: with $p$ true and $q$ false it is T $\\to$ F, which is false.',
-        null,
-        'This fails $q \\to \\neg r$: with $q$ true and $r$ true it is T $\\to$ F, which is false.',
-      ],
-      keyIdea: 'Use the implications to force values one at a time (try a value, follow the arrows, look for a contradiction), then plug the answer back into every statement.',
-    },
-    check: {
-      optionValues: ['FFT', 'TFT', 'TTF', 'TTT'],
-      compute: () => {
-        const sols: string[] = [];
-        for (const p of TF)
-          for (const q of TF)
-            for (const r of TF)
-              if ((p || r) && imp(p, q) && imp(q, !r) && imp(!q, p)) sols.push([p, q, r].map((v) => (v ? 'T' : 'F')).join(''));
-        return sols.join(',');
-      },
-    },
-  },
-  {
-    id: 'propositional-logic-016',
-    subtopic: 'propositional-logic',
-    difficulty: 'challenge',
-    stem: 'Which of the following is logically equivalent to $\\neg(p \\to q) \\lor (p \\land q)$?',
-    options: ['$p \\land q$', '$p \\lor \\neg q$', '$p \\leftrightarrow q$', '$p$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1.** Rewrite the implication: $p \\to q \\equiv \\neg p \\lor q$.\n\n' +
-        '**Step 2.** Negate with De Morgan: $\\neg(\\neg p \\lor q) \\equiv \\neg\\neg p \\land \\neg q \\equiv p \\land \\neg q$.\n\n' +
-        '**Step 3.** The whole statement is now $(p \\land \\neg q) \\lor (p \\land q)$.\n\n' +
-        '**Step 4.** Factor out $p$ (distributive law): $p \\land (\\neg q \\lor q)$.\n\n' +
-        '**Step 5.** $\\neg q \\lor q$ is always true, and $p \\land \\text{T} \\equiv p$.\n\n' +
-        'So the statement is equivalent to $p$. Check with a truth table (rows TT, TF, FT, FF): $\\neg(p \\to q)$ is F, T, F, F and $p \\land q$ is T, F, F, F, so their OR is T, T, F, F, which is exactly the column of $p$.',
-      whyWrong: [
-        'This keeps only the second bracket, as if $\\neg(p \\to q)$ were always false. It is true in the row $p$ T, $q$ F.',
-        'This comes from negating the implication as $\\neg p \\to \\neg q$ (the inverse, equivalent to $p \\lor \\neg q$). The negation of $p \\to q$ is $p \\land \\neg q$, not another implication.',
-        'This comes from negating $p \\to q$ as $\\neg p \\land \\neg q$ (negating both parts). The correct negation is $p \\land \\neg q$: only the conclusion is negated.',
-        null,
-      ],
-      keyIdea: '$\\neg(p \\to q) \\equiv p \\land \\neg q$; then use the distributive law and $q \\lor \\neg q \\equiv \\text{T}$ to simplify.',
-    },
-    check: {
-      optionValues: ['TFFF', 'TTFT', 'TFFT', 'TTFF'],
-      compute: () => tt2((p, q) => !imp(p, q) || (p && q)),
-    },
-  },
-  {
-    id: 'propositional-logic-017',
-    subtopic: 'propositional-logic',
-    difficulty: 'challenge',
-    stem: 'A truth table is drawn for $(p \\to q) \\land (r \\to s)$ using all 16 combinations of $p$, $q$, $r$, $s$. In how many rows is the statement **true**?',
-    options: ['$9$', '$6$', '$12$', '$15$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '**Step 1.** $p \\to q$ involves only $p$ and $q$. It is false only for $(p, q) = (\\text{T}, \\text{F})$, so it is true for **3** of the 4 pairs $(p, q)$.\n\n' +
-        '**Step 2.** In the same way $r \\to s$ is true for **3** of the 4 pairs $(r, s)$.\n\n' +
-        '**Step 3.** The AND needs both to be true. The pairs $(p, q)$ and $(r, s)$ are chosen independently, so by the product rule the number of good rows is\n\n' +
-        '$$3 \\times 3 = 9$$\n\n' +
-        'Check: the total is $4 \\times 4 = 16$ rows, and $16 - 9 = 7$ rows have at least one implication false.',
-      whyWrong: [
-        null,
-        'This adds the counts ($3 + 3$). Each of the 3 good $(p, q)$ pairs can combine with each of the 3 good $(r, s)$ pairs, so you multiply.',
-        'This is $3 \\times 4$: it lets $(r, s)$ take all 4 values, ignoring the condition that $r \\to s$ must also be true.',
-        'This treats the AND as an OR: then the statement would fail only when both implications fail ($1 \\times 1 = 1$ row), giving $16 - 1 = 15$.',
-      ],
-      keyIdea: 'For AND of statements on separate variables, multiply the numbers of true rows (product rule).',
-    },
-    check: {
-      optionValues: [9, 6, 12, 15],
-      compute: () => {
-        let c = 0;
-        for (const p of TF) for (const q of TF) for (const r of TF) for (const s of TF) if (imp(p, q) && imp(r, s)) c++;
         return c;
       },
     },
@@ -661,49 +545,93 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'propositional-logic-019',
+    id: 'propositional-logic-020',
     subtopic: 'propositional-logic',
-    difficulty: 'challenge',
-    stem: 'Which of the following is a **contradiction** (false for every combination of truth values)?',
-    options: [
-      '$(p \\to q) \\lor (p \\land \\neg q)$',
-      '$(p \\lor q) \\land \\neg p$',
-      '$(p \\to q) \\land (p \\land \\neg q)$',
-      '$p \\land (q \\to \\neg p)$',
-    ],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'A statement that is **false** in every row of its truth table is called a:',
+    options: ['contradiction', 'tautology', 'contingency', 'converse'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Key fact: $p \\land \\neg q$ is exactly the negation of $p \\to q$ (an implication fails only when $p$ is true and $q$ is false).\n\n' +
-        'So $(p \\to q) \\land (p \\land \\neg q)$ has the form $X \\land \\neg X$: a statement AND its own negation can never both be true. It is a contradiction.\n\n' +
-        'Truth table (rows $(p, q)$ = TT, TF, FT, FF):\n\n' +
-        '| $p$ | $q$ | $(p \\to q) \\lor (p \\land \\neg q)$ | $(p \\lor q) \\land \\neg p$ | $(p \\to q) \\land (p \\land \\neg q)$ | $p \\land (q \\to \\neg p)$ |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| T | T | T | F | F | F |\n' +
-        '| T | F | T | F | F | T |\n' +
-        '| F | T | T | T | F | F |\n' +
-        '| F | F | T | F | F | F |\n\n' +
-        'Only $(p \\to q) \\land (p \\land \\neg q)$ is false in every row.',
+        'A **contradiction** is false in every row, for example $p \\land \\neg p$.\n\n' +
+        'A tautology is true in every row, and a contingency is true in some rows and false in others.',
       whyWrong: [
-        'This has the form $X \\lor \\neg X$, so it is true in every row: a **tautology**, the opposite of a contradiction.',
-        'This is true when $p$ is false and $q$ is true, so it is a contingency, not a contradiction.',
         null,
-        'This is true when $p$ is true and $q$ is false ($q \\to \\neg p$ is then F $\\to$ F, which is true), so it is a contingency.',
+        'A tautology is the opposite: it is true in every row.',
+        'A contingency is true in some rows and false in others.',
+        'A converse is the swapped form $q \\to p$ of an implication, not a type of truth table.',
       ],
-      keyIdea: 'A statement ANDed with its own negation is a contradiction; ORed with its negation it is a tautology.',
+      keyIdea: 'Always true is a tautology, always false is a contradiction, and anything else is a contingency.',
+    },
+  },
+  {
+    id: 'propositional-logic-021',
+    subtopic: 'propositional-logic',
+    difficulty: 'foundation',
+    stem: 'The **disjunction** of $p$ and $q$ is written:',
+    options: ['$p \\lor q$', '$p \\land q$', '$p \\to q$', '$p \\leftrightarrow q$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Disjunction** is the formal name for "or", written $p \\lor q$. It is true when at least one of $p$ and $q$ is true.\n\n' +
+        'The formal name for "and" is conjunction, written $p \\land q$.',
+      whyWrong: [
+        null,
+        'This is the **conjunction** ("and"), which is true only when both parts are true.',
+        'This is the **implication** ("if $p$ then $q$").',
+        'This is the **biconditional** ("$p$ if and only if $q$").',
+      ],
+      keyIdea: 'Disjunction means or ($\\lor$); conjunction means and ($\\land$).',
+    },
+  },
+  {
+    id: 'propositional-logic-022',
+    subtopic: 'propositional-logic',
+    difficulty: 'foundation',
+    stem: 'The statement $p \\leftrightarrow q$ is true exactly when:',
+    options: ['$p$ and $q$ have the same truth value', '$p$ and $q$ have different truth values', '$p$ is true', 'at least one of $p$, $q$ is true'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **biconditional** $p \\leftrightarrow q$ reads "$p$ if and only if $q$". It is true when both are true **or** both are false, so when their truth values match.',
+      whyWrong: [
+        null,
+        'This describes the negation of the biconditional (exclusive or), which is true when the values differ.',
+        'The value of $q$ matters as well: with $p$ true and $q$ false the biconditional is false.',
+        'This describes $p \\lor q$. A biconditional is also true when both are false, and false when just one is true.',
+      ],
+      keyIdea: 'A biconditional is true exactly when both sides have the same truth value.',
     },
     check: {
-      optionValues: ['a', 'b', 'c', 'd'],
-      compute: () =>
-        uniqueWhere(
-          [
-            ['a', (p, q) => imp(p, q) || (p && !q)],
-            ['b', (p, q) => (p || q) && !p],
-            ['c', (p, q) => imp(p, q) && p && !q],
-            ['d', (p, q) => p && imp(q, !p)],
-          ],
-          'FFFF',
-        ),
+      // truth-table columns, rows TT, TF, FT, FF
+      optionValues: [tt2((p, q) => p === q), tt2((p, q) => p !== q), tt2((p) => p), tt2((p, q) => p || q)],
+      compute: () => tt2((p, q) => iff(p, q)),
+    },
+  },
+  {
+    id: 'propositional-logic-023',
+    subtopic: 'propositional-logic',
+    difficulty: 'exam',
+    stem: 'Which statement is **logically equivalent** to $\\neg(p \\lor \\neg q)$?',
+    options: ['$\\neg p \\land q$', '$\\neg p \\lor q$', '$\\neg p \\land \\neg q$', '$p \\land \\neg q$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Apply De Morgan\'s law: $\\neg(A \\lor B) \\equiv \\neg A \\land \\neg B$, with $A = p$ and $B = \\neg q$.\n\n' +
+        '1. This gives $\\neg p \\land \\neg(\\neg q)$.\n' +
+        '2. A double negation cancels: $\\neg(\\neg q) \\equiv q$.\n\n' +
+        'So the statement is equivalent to $\\neg p \\land q$.',
+      whyWrong: [
+        null,
+        'This negates each part but keeps $\\lor$. De Morgan\'s law also swaps $\\lor$ for $\\land$.',
+        'This forgets that $q$ already carried a $\\neg$: negating $\\neg q$ gives $q$, not $\\neg q$.',
+        'This swaps the connective but leaves the two parts unchanged. Each part must be negated as well.',
+      ],
+      keyIdea: 'De Morgan: negate each part and swap $\\lor$ with $\\land$, then cancel any double negation.',
+    },
+    check: {
+      optionValues: [tt2((p, q) => !p && q), tt2((p, q) => !p || q), tt2((p, q) => !p && !q), tt2((p, q) => p && !q)],
+      compute: () => tt2((p, q) => !(p || !q)),
     },
   },
 ];

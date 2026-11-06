@@ -84,6 +84,7 @@ function draw(t: T): string {
   return lines.join('\n');
 }
 const fence = (s: string) => '```\n' + s + '\n```';
+const strip = (o: string) => o.replace(/`/g, '');
 
 // ---------------------------------------------------------------- the trees used below
 const T001 = N('A', N('B', N('D'), N('E', N('G'), N('H'))), N('C', undefined, N('F', undefined, N('I'))));
@@ -95,14 +96,16 @@ const T011 = N(40, N(25, N(10), N(30, N(28), N(35))), N(60, N(50), N(75, undefin
 const T015 = N('A', N('B', N('D', N('F')), N('E')), N('C'));
 
 const Q009_KEYS = [50, 30, 70, 20, 40, 60, 80, 35];
-const Q017_KEYS = [30, 10, 50, 20, 40, 25, 22, 60];
-const Q016_PRE = ['K', 'D', 'B', 'G', 'E', 'H', 'P', 'S', 'Q'];
-const Q016_IN = ['B', 'D', 'E', 'G', 'H', 'K', 'P', 'Q', 'S'];
+const Q017_KEYS = [30, 10, 50, 20, 40, 25, 22];
 const Q013_HEAP = [95, 80, 90, 45, 70, 85, 60, 20, 30, 65];
-const Q019_HEAP = [90, 70, 80, 40, 60, 50, 30, 20];
+const T028 = N('K', N('C', N('P'), N('A')), N('M', undefined, N('T')));
+const T031 = bst([5, 3, 8, 1, 4]);
 
-const NODE_CLASS =
-  'class Node:\n    def __init__(self, val, left=None, right=None):\n        self.val = val\n        self.left = left\n        self.right = right\n';
+/** Whether an array, read as a tree level by level with the root at position 1, is a max-heap. */
+const isMaxHeap = (a: number[]) => a.every((v, k) => k === 0 || a[Math.floor((k + 1) / 2) - 1] >= v);
+
+const HEAP_OPTIONS = ['`[9, 5, 8, 2, 4]`', '`[9, 5, 8, 6, 4]`', '`[5, 9, 8, 2, 4]`', '`[2, 4, 5, 8, 9]`'];
+const parseList = (o: string) => o.replace(/[`[\]]/g, '').split(', ').map(Number);
 
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------ foundation
@@ -110,8 +113,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-001',
     subtopic: 'trees',
     difficulty: 'foundation',
-    stem: 'How many **leaves** does the binary tree below have?',
-    code: { lang: 'pseudocode', source: draw(T001) },
+    stem: `How many **leaves** does the binary tree below have?\n\n${fence(draw(T001))}`,
     options: ['5', '4', '3', '6'],
     correctIndex: 1,
     markScheme: {
@@ -136,7 +138,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-002',
     subtopic: 'trees',
     difficulty: 'foundation',
-    stem: 'In a binary tree the root is at **level 0**, its children are at level 1, their children at level 2, and so on. What is the **maximum** number of nodes that can be at **level 4**?',
+    stem: 'With the root at **level 0**, what is the **maximum** number of nodes at **level 4** of a binary tree?',
     options: ['16', '8', '31', '32'],
     correctIndex: 0,
     markScheme: {
@@ -189,8 +191,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-004',
     subtopic: 'trees',
     difficulty: 'foundation',
-    stem: 'The **height** of a tree is the number of **edges** on the longest path from the root down to a leaf (so a tree with only a root has height 0). What is the height of the binary tree below?',
-    code: { lang: 'pseudocode', source: draw(T004) },
+    stem: `Height is the number of **edges** on the longest path from the root to a leaf. What is the height of the binary tree below?\n\n${fence(draw(T004))}`,
     options: ['5', '2', '7', '4'],
     correctIndex: 3,
     markScheme: {
@@ -200,7 +201,7 @@ export const questions: StaticQuestion[] = [
         'The longest path has 4 edges, so the height is 4. (Equivalently: W is at depth 4, the deepest node.)\n\n' +
         'Answer: 4',
       whyWrong: [
-        'This counts the **nodes** on the longest path (P, Q, S, V, W) instead of the edges between them. With the definition given, a single node has height 0, so you count links.',
+        'This counts the **nodes** on the longest path (P, Q, S, V, W) instead of the edges between them. Height counts links, so a single node has height 0.',
         'This is the **shortest** root-to-leaf path (P to R to T). Height uses the **longest** path.',
         'This is the total number of edges in the whole tree (8 nodes, so $8 - 1 = 7$ edges), not the length of the longest path.',
         null,
@@ -214,18 +215,13 @@ export const questions: StaticQuestion[] = [
     subtopic: 'trees',
     difficulty: 'foundation',
     stem: 'In a **max-heap**, where is the largest value always found?',
-    options: [
-      'At the root',
-      'At the rightmost node, found by following right children from the root',
-      'At the last position of the array that stores the heap',
-      'At a leaf on the bottom level',
-    ],
+    options: ['At the root', 'At the rightmost node', 'At the last array position', 'At a bottom-level leaf'],
     correctIndex: 0,
     markScheme: {
       solution:
         'A max-heap is a complete binary tree with the **heap property**: every parent is greater than or equal to each of its children.\n\n' +
         'Follow any path from a leaf up to the top: the values never decrease as you go up. Every path ends at the root, so the root is at least as large as every other node.\n\n' +
-        'That is why a heap is used as a priority queue: the maximum is always available at the root (index 0 of the array).\n\n' +
+        'That is why a heap is used as a priority queue: the maximum is always available at the root (the first position of the array).\n\n' +
         'Answer: At the root',
       whyWrong: [
         null,
@@ -236,14 +232,143 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'Heap property: in a max-heap every parent is at least as large as its children, so the maximum sits at the root.',
     },
   },
+  {
+    id: 'trees-022',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'What is a node with no children called?',
+    options: ['A root', 'A parent', 'A leaf', 'An internal node'],
+    correctIndex: 2,
+    markScheme: {
+      solution: 'A **leaf** is a node with no children. The **root** is the single node at the top, with no parent. An **internal node** is any node with at least one child.',
+      whyWrong: [
+        'The root is the node with no **parent**, at the top of the tree. It usually has children.',
+        'A parent has at least one child by definition.',
+        null,
+        'An internal node has at least one child, so it is the opposite of a leaf.',
+      ],
+      keyIdea: 'A leaf is a node with zero children.',
+    },
+  },
+  {
+    id: 'trees-023',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'What is the maximum number of children a node can have in a binary tree?',
+    options: ['1', '2', '3', 'No limit'],
+    correctIndex: 1,
+    markScheme: {
+      solution: '"Binary" means two: each node of a binary tree has at most **2** children, called the left child and the right child.',
+      whyWrong: [
+        'A node with one child is allowed, but it can have a second one as well.',
+        null,
+        'Three children would make a ternary tree, not a binary tree.',
+        'General trees have no limit, but a binary tree allows at most 2 children per node.',
+      ],
+      keyIdea: 'In a binary tree every node has at most 2 children.',
+    },
+  },
+  {
+    id: 'trees-024',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'In a post-order traversal, the root of the tree is visited:',
+    options: ['First', 'Second', 'Straight after its left subtree', 'Last'],
+    correctIndex: 3,
+    markScheme: {
+      solution: 'Post-order means left subtree, right subtree, then the node. Both subtrees of the root must finish first, so the root is visited **last**.',
+      whyWrong: [
+        'That describes pre-order (node, left, right).',
+        'In post-order every other node is visited before the root, so the root is only second in a tree with exactly two nodes.',
+        'That describes in-order (left, node, right).',
+        null,
+      ],
+      keyIdea: 'Post-order = left, right, node, so the root comes last.',
+    },
+  },
+  {
+    id: 'trees-025',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'In a binary search tree, where are the keys smaller than a node\'s key stored?',
+    options: ['In its left subtree', 'In its right subtree', 'In either subtree', 'Only above it'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'The BST rule: for every node, all keys in its **left** subtree are smaller and all keys in its **right** subtree are larger.',
+      whyWrong: [
+        null,
+        'The right subtree holds the **larger** keys.',
+        'If smaller keys could be on either side, a search could not decide which way to go.',
+        'Keys above a node can be larger or smaller than it. Every key below it on the left is smaller.',
+      ],
+      keyIdea: 'BST: smaller keys to the left, larger keys to the right.',
+    },
+  },
+  {
+    id: 'trees-026',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'A tree with $n$ nodes has how many edges?',
+    options: ['$n$', '$n + 1$', '$n - 1$', '$2n$'],
+    correctIndex: 2,
+    markScheme: {
+      solution: 'Every node except the root has exactly one edge coming down into it from its parent. So there is one edge for each of the other $n - 1$ nodes.',
+      whyWrong: [
+        'This gives the root an edge as well, but the root has no parent.',
+        'This is two more than the true count. Every edge belongs to exactly one non-root node.',
+        null,
+        'This counts two possible child links per node, but most nodes do not use both, and leaves use none.',
+      ],
+      keyIdea: 'A tree with $n$ nodes always has exactly $n - 1$ edges.',
+    },
+    check: {
+      optionValues: [8, 9, 7, 16],
+      compute: () => allNodes(T004).filter((x) => x.l).length + allNodes(T004).filter((x) => x.r).length,
+    },
+  },
+  {
+    id: 'trees-030',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'How do you find the smallest key in a binary search tree?',
+    options: ['Keep going left from the root', 'Keep going right from the root', 'Read the root', 'Read the last leaf'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Smaller keys are always to the left, so keep following left children from the root until there is no left child. That node holds the smallest key.',
+      whyWrong: [
+        null,
+        'Going right leads to larger keys, so this finds the **largest** key.',
+        'The root has no special size in a BST. Every key in its left subtree is smaller.',
+        'The last leaf is the rightmost one, and keys grow from left to right, so in general it is not the smallest key. The smallest key need not even be a leaf.',
+      ],
+      keyIdea: 'In a BST the smallest key is the leftmost node and the largest key is the rightmost node.',
+    },
+  },
+  {
+    id: 'trees-033',
+    subtopic: 'trees',
+    difficulty: 'foundation',
+    stem: 'A binary tree with every level completely filled is called:',
+    options: ['A skewed binary tree', 'A perfect binary tree', 'A binary search tree', 'A max-heap'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'A **perfect** binary tree has every level completely filled, so a perfect tree of height $h$ has $2^{h+1} - 1$ nodes.',
+      whyWrong: [
+        'A skewed tree is the opposite: its nodes form a long chain with one child each.',
+        null,
+        'A binary search tree is defined by the order of its keys, not by its shape.',
+        'A max-heap is defined by parents being at least as large as their children, and its last level need not be full.',
+      ],
+      keyIdea: 'Perfect binary tree: every level is full.',
+    },
+  },
 
   // ------------------------------------------------------------ exam
   {
     id: 'trees-006',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'What is the **pre-order** traversal of the binary tree below?',
-    code: { lang: 'pseudocode', source: draw(T006) },
+    stem: `What is the **pre-order** traversal of the binary tree below?\n\n${fence(draw(T006))}`,
     options: [seq(ino(T006)), seq(post(T006)), seq(pre(T006)), seq(levelOrder(T006))],
     correctIndex: 2,
     markScheme: {
@@ -272,8 +397,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-007',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'What is the **post-order** traversal of the binary tree below?',
-    code: { lang: 'pseudocode', source: draw(T007) },
+    stem: `What is the **post-order** traversal of the binary tree below?\n\n${fence(draw(T007))}`,
     options: ['1, 2, 4, 5, 7, 3, 6, 8', '4, 7, 5, 2, 8, 6, 3, 1', '4, 2, 5, 7, 1, 3, 8, 6', '8, 6, 3, 7, 5, 4, 2, 1'],
     correctIndex: 1,
     markScheme: {
@@ -302,8 +426,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-008',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'What is the **level-order** (breadth-first) traversal of the binary tree below?',
-    code: { lang: 'pseudocode', source: draw(T008) },
+    stem: `What is the **level-order** (breadth-first) traversal of the binary tree below?\n\n${fence(draw(T008))}`,
     options: ['10, 6, 3, 8, 7, 9, 15, 20, 17', '3, 6, 7, 8, 9, 10, 15, 17, 20', '10, 15, 6, 20, 8, 3, 17, 9, 7', '10, 6, 15, 3, 8, 20, 7, 9, 17'],
     correctIndex: 3,
     markScheme: {
@@ -360,7 +483,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-010',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'The height of a binary tree is the number of edges on the longest path from the root to a leaf (a single node has height 0). What is the **maximum** number of nodes in a binary tree of height 4?',
+    stem: 'Taking height as the number of edges on the longest root-to-leaf path, what is the **maximum** number of nodes in a binary tree of height 4?',
     options: ['16', '15', '31', '32'],
     correctIndex: 2,
     markScheme: {
@@ -391,8 +514,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-011',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'You search the binary search tree below for the key **35**. Counting one comparison for every node whose key is compared with 35 (including the node where 35 is found), how many comparisons are made?',
-    code: { lang: 'pseudocode', source: draw(T011) },
+    stem: `The binary search tree below is searched for **35**. How many nodes are compared with 35, including the node where it is found?\n\n${fence(draw(T011))}`,
     options: ['3', '4', '5', '10'],
     correctIndex: 1,
     markScheme: {
@@ -425,80 +547,40 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'trees-012',
-    subtopic: 'trees',
-    difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source:
-        NODE_CLASS +
-        '\ndef f(node):\n    if node is None:\n        return 0\n    if node.left is None and node.right is None:\n        return node.val\n    return f(node.left) + f(node.right)\n\n' +
-        'root = Node(1, Node(2, Node(4), Node(5)), Node(3, None, Node(6)))\nprint(f(root))',
-    },
-    options: ['`21`', '`12`', '`3`', '`15`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'First draw the tree: 1 is the root; its left child 2 has children 4 and 5; its right child 3 has only a right child 6.\n\n' +
-        fence(draw(N(1, N(2, N(4), N(5)), N(3, undefined, N(6))))) +
-        '\n\n`f` returns 0 for an empty spot, returns the node\'s own value for a **leaf** (no left and no right child), and otherwise adds up `f` of the two children. So `f` adds up the values of the leaves only.\n\n' +
-        '- `f(4) = 4`, `f(5) = 5` (leaves), so `f(2) = 4 + 5 = 9`. The value 2 itself is **not** added.\n' +
-        '- `f(6) = 6` (leaf). Node 3 is not a leaf (it has a right child), so `f(3) = f(None) + f(6) = 0 + 6 = 6`.\n' +
-        '- `f(1) = f(2) + f(3) = 9 + 6 = 15`.\n\n' +
-        'Answer: `15`',
-      whyWrong: [
-        'This adds up **every** node ($1 + 2 + 3 + 4 + 5 + 6 = 21$). The function never adds the value of a node that has children; it only returns `node.val` at a leaf.',
-        'This treats node 3 as a leaf because one of its children is missing, as if the test were `or`. With `and`, node 3 (which has a right child) is not a leaf, so the function continues down to 6.',
-        'This counts the leaves (there are 3) instead of adding their values. At a leaf the function returns `node.val`, not 1.',
-        null,
-      ],
-      keyIdea: 'A recursive tree function combines the results of the two subtrees; here the base cases make it sum only the leaf values.',
-    },
-    check: {
-      optionValues: [21, 12, 3, 15],
-      compute: () => {
-        const t = N(1, N(2, N(4), N(5)), N(3, undefined, N(6)));
-        const f = (n?: T): number => (!n ? 0 : !n.l && !n.r ? (n.v as number) : f(n.l) + f(n.r));
-        return f(t);
-      },
-    },
-    python: { stdout: '15\n' },
-  },
-  {
     id: 'trees-013',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem:
-      'A max-heap is stored in a Python list in the standard way: index 0 is the root, and the tree is filled level by level, left to right.\n\n' +
-      '`heap = [95, 80, 90, 45, 70, 85, 60, 20, 30, 65]`\n\nWhich value is the **right child** of 80?',
+    stem: 'A max-heap is stored level by level in the array `[95, 80, 90, 45, 70, 85, 60, 20, 30, 65]`, indexed from 1. Which value is the **right child** of 80?',
     options: ['70', '45', '90', '85'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'With 0-based indexing, the node at index $i$ has its left child at index $2i + 1$ and its right child at index $2i + 2$.\n\n' +
-        '80 is at index $i = 1$, so:\n\n- left child: index $2 \\times 1 + 1 = 3$, which holds 45\n- right child: index $2 \\times 1 + 2 = 4$, which holds 70\n\n' +
+        'With an array indexed from 1, the node at index $i$ has its left child at index $2i$ and its right child at index $2i + 1$.\n\n' +
+        '80 is at index $i = 2$, so:\n\n- left child: index $2 \\times 2 = 4$, which holds 45\n- right child: index $2 \\times 2 + 1 = 5$, which holds 70\n\n' +
         'You can confirm by drawing the tree row by row:\n\n' +
         fence(draw(N(95, N(80, N(45, N(20), N(30)), N(70, N(65))), N(90, N(85), N(60))))) +
         '\n\nAnswer: 70',
       whyWrong: [
         null,
-        'This is the **left** child of 80 (index $2i + 1 = 3$). The right child is the next one along, at index $2i + 2 = 4$.',
-        'This uses the 1-based formula $2i$ on a 0-based list: index 2 holds 90, which is actually the **sibling** of 80 (the other child of the root).',
-        'This mixes the two conventions: it takes 80 as position 2 (counting from 1), uses $2i + 1 = 5$, and then reads index 5 of the 0-based list.',
+        'This is the **left** child of 80 (index $2i = 4$). The right child is the next one along, at index $2i + 1 = 5$.',
+        'This is simply the next array item, which is the **sibling** of 80 (the other child of the root). Children are at $2i$ and $2i + 1$, not $i + 1$.',
+        'This is the left child of 90, found by using index 3 instead of index 2 for the position of 80.',
       ],
-      keyIdea: 'In a 0-based heap array, the children of index $i$ are at $2i + 1$ and $2i + 2$, and its parent is at $\\left\\lfloor \\frac{i - 1}{2} \\right\\rfloor$.',
+      keyIdea: 'In a heap array indexed from 1, the children of index $i$ are at $2i$ and $2i + 1$, and its parent is at $\\left\\lfloor \\frac{i}{2} \\right\\rfloor$.',
     },
     check: {
       optionValues: [70, 45, 90, 85],
-      compute: () => Q013_HEAP[2 * Q013_HEAP.indexOf(80) + 2],
+      compute: () => {
+        const i = Q013_HEAP.indexOf(80) + 1;
+        return Q013_HEAP[2 * i + 1 - 1];
+      },
     },
   },
   {
     id: 'trees-014',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'A binary tree has **20 nodes**. Taking the height as the number of edges on the longest root-to-leaf path, what is the **smallest possible height** of the tree?',
+    stem: 'Taking height as the number of edges on the longest root-to-leaf path, what is the **smallest possible height** of a binary tree with 20 nodes?',
     options: ['5', '19', '4', '3'],
     correctIndex: 2,
     markScheme: {
@@ -529,18 +611,17 @@ export const questions: StaticQuestion[] = [
     id: 'trees-015',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem:
-      'The function `mystery` is applied to the root (A) of this binary tree. What value does it return?\n\n' + fence(draw(T015)),
+    stem: `Here \`left(t)\` and \`right(t)\` are the children of node \`t\`, and \`t\` is empty where there is no node. What does \`mystery\` return for the root A of this tree?\n\n${fence(draw(T015))}`,
     code: {
       lang: 'pseudocode',
       source:
-        'FUNCTION mystery(node)\n    IF node = NULL THEN\n        RETURN 0\n    END IF\n    RETURN 1 + MAX(mystery(node.left), mystery(node.right))\nEND FUNCTION',
+        'function mystery(t)\n   if isEmpty(t)\n      return 0\n   end if\n   return 1 + max(mystery(left(t)), mystery(right(t)))\nend function',
     },
     options: ['3', '4', '6', '2'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Work from the bottom up. An empty child (NULL) gives 0, so every **leaf** gives $1 + \\max(0, 0) = 1$.\n\n' +
+        'Work from the bottom up. An empty child gives 0, so every **leaf** gives $1 + \\max(0, 0) = 1$.\n\n' +
         '- F, E and C are leaves: each returns 1.\n' +
         '- D has left child F and no right child: $1 + \\max(1, 0) = 2$.\n' +
         '- B: $1 + \\max(\\text{mystery}(D), \\text{mystery}(E)) = 1 + \\max(2, 1) = 3$.\n' +
@@ -548,10 +629,10 @@ export const questions: StaticQuestion[] = [
         'The function counts the number of **levels** (nodes on the longest root-to-leaf path A, B, D, F). That is the height in edges plus 1.\n\n' +
         'Answer: 4',
       whyWrong: [
-        'This is the height measured in **edges**. Because NULL returns 0, a leaf returns 1, so this function counts nodes on the longest path, which is one more than the number of edges.',
+        'This is the height measured in **edges**. Because an empty node returns 0, a leaf returns 1, so this function counts nodes on the longest path, which is one more than the number of edges.',
         null,
-        'This is the total number of nodes. That would need `1 + mystery(left) + mystery(right)`; using `MAX` follows only the deeper subtree.',
-        'This follows the **shorter** branch (A to C), as if the function used `MIN`. `MAX` always takes the deeper subtree.',
+        'This is the total number of nodes. That would need `1 + mystery(left(t)) + mystery(right(t))`; using `max` follows only the deeper subtree.',
+        'This follows the **shorter** branch (A to C), as if the function used `min`. `max` always takes the deeper subtree.',
       ],
       keyIdea: 'A recursive function "1 + max(left, right)" with 0 for an empty tree returns the number of levels of the tree.',
     },
@@ -567,7 +648,7 @@ export const questions: StaticQuestion[] = [
     id: 'trees-016',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem: 'In the **worst case**, how many key comparisons are needed to search for a key in a binary search tree with $n$ nodes? (The tree is not guaranteed to be balanced.)',
+    stem: 'In the **worst case**, how many key comparisons does a search make in a binary search tree of $n$ nodes that may be unbalanced?',
     options: ['$n$', '$\\log_2 n$', '$\\frac{n}{2}$', '$n \\log_2 n$'],
     correctIndex: 0,
     markScheme: {
@@ -587,196 +668,183 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'BST search costs about the height of the tree: $\\log_2 n$ if balanced, but $n$ in the worst case when the tree degenerates into a chain.',
     },
   },
-
-  // ------------------------------------------------------------ challenge
-  {
-    id: 'trees-017',
-    subtopic: 'trees',
-    difficulty: 'challenge',
-    stem:
-      'A binary tree (with all labels different) has these traversals:\n\n' +
-      `- Pre-order: ${seq(Q016_PRE)}\n- In-order: ${seq(Q016_IN)}\n\nWhat is its **post-order** traversal?`,
-    options: ['Q, S, P, H, E, G, B, D, K', 'K, D, P, B, G, S, E, H, Q', 'Q, S, P, B, E, H, G, D, K', 'B, E, H, G, D, Q, S, P, K'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Rebuild the tree. The **first** item of pre-order is the root; in the in-order list, everything to its left is the left subtree and everything to its right is the right subtree.\n\n' +
-        '1. Pre-order starts with K, so K is the root. In-order: B, D, E, G, H | K | P, Q, S. Left subtree has {B, D, E, G, H}, right subtree has {P, Q, S}.\n' +
-        '2. Left subtree: the next item in pre-order is D, so D is its root. In-order B | D | E, G, H: B is the left child of D; {E, G, H} is on the right.\n' +
-        '3. Of {E, G, H}, G comes first in pre-order, so G is the root of that part. In-order E | G | H: E is the left child, H the right child.\n' +
-        '4. Right subtree {P, Q, S}: P comes first in pre-order, so P is its root. In-order P | Q, S: P has no left child; {Q, S} is on the right.\n' +
-        '5. Of {Q, S}, S comes first in pre-order, so S is the root. In-order Q | S: Q is the left child of S.\n\n' +
-        fence(draw(N('K', N('D', N('B'), N('G', N('E'), N('H'))), N('P', undefined, N('S', N('Q')))))) +
-        '\n\nNow post-order (left, right, node): subtree D gives B, E, H, G, D; subtree P gives Q, S, P; then the root K.\n\n' +
-        'Answer: B, E, H, G, D, Q, S, P, K',
-      whyWrong: [
-        'This is the pre-order list written backwards. Reversing pre-order gives "right, left, node", which visits the right subtree **before** the left one; post-order goes left first.',
-        'This is the **level-order** traversal of the rebuilt tree (row by row), not post-order.',
-        'This traverses the root\'s **right** subtree (Q, S, P) before its left subtree. Post-order always finishes the left subtree first.',
-        null,
-      ],
-      keyIdea: 'Pre-order gives the root (first item); in-order splits the remaining nodes into left and right subtrees; repeat on each part.',
-    },
-    check: {
-      optionValues: ['Q, S, P, H, E, G, B, D, K', 'K, D, P, B, G, S, E, H, Q', 'Q, S, P, B, E, H, G, D, K', 'B, E, H, G, D, Q, S, P, K'],
-      compute: () => {
-        const build = (p: Key[], i: Key[]): T | undefined => {
-          if (!p.length) return undefined;
-          const k = i.indexOf(p[0]);
-          return N(p[0], build(p.slice(1, k + 1), i.slice(0, k)), build(p.slice(k + 1), i.slice(k + 1)));
-        };
-        return seq(post(build(Q016_PRE, Q016_IN)));
-      },
-    },
-  },
   {
     id: 'trees-018',
     subtopic: 'trees',
     difficulty: 'exam',
-    stem:
-      'The keys 30, 10, 50, 20, 40, 25, 22, 60 are inserted, **in that order**, into an empty binary search tree. Taking height as the number of edges on the longest root-to-leaf path, what is the height of the resulting tree?',
-    options: ['4', '3', '5', '7'],
+    stem: 'The keys 30, 10, 50, 20, 40, 25, 22 are inserted, **in that order**, into an empty binary search tree. What is its height, counted in edges on the longest root-to-leaf path?',
+    options: ['4', '2', '5', '6'],
     correctIndex: 0,
     markScheme: {
       solution:
         'Insert each key by going left if smaller, right if larger:\n\n' +
         '1. 30 is the root.\n2. 10 < 30: left child of 30.\n3. 50 > 30: right child of 30.\n4. 20: < 30, > 10: right child of 10.\n' +
-        '5. 40: > 30, < 50: left child of 50.\n6. 25: < 30, > 10, > 20: right child of 20.\n7. 22: < 30, > 10, > 20, < 25: left child of 25.\n8. 60: > 30, > 50: right child of 50.\n\n' +
+        '5. 40: > 30, < 50: left child of 50.\n6. 25: < 30, > 10, > 20: right child of 20.\n7. 22: < 30, > 10, > 20, < 25: left child of 25.\n\n' +
         fence(draw(bst(Q017_KEYS))) +
-        '\n\nThe longest root-to-leaf path is 30, 10, 20, 25, 22, which has **4 edges**. The other leaves (40 and 60) are only at depth 2.\n\n' +
+        '\n\nThe longest root-to-leaf path is 30, 10, 20, 25, 22, which has **4 edges**. The other leaf (40) is only at depth 2.\n\n' +
         'Answer: 4',
       whyWrong: [
         null,
-        'This assumes the tree is perfectly balanced ($\\lfloor \\log_2 8 \\rfloor = 3$). The insertion order makes the left side much deeper, so you must actually build the tree.',
+        'This assumes the tree is perfectly balanced ($\\lfloor \\log_2 7 \\rfloor = 2$). The insertion order makes the left side much deeper, so you must actually build the tree.',
         'This counts the **nodes** on the longest path (30, 10, 20, 25, 22) instead of the edges between them.',
-        'This assumes the tree becomes a single chain ($8 - 1 = 7$), which only happens when the keys arrive in sorted order.',
+        'This assumes the tree becomes a single chain ($7 - 1 = 6$), which only happens when the keys arrive in sorted order.',
       ],
       keyIdea: 'The shape (and height) of a BST depends on the insertion order, so build it step by step before measuring.',
     },
-    check: { optionValues: [4, 3, 5, 7], compute: () => height(bst(Q017_KEYS)) },
+    check: { optionValues: [4, 2, 5, 6], compute: () => height(bst(Q017_KEYS)) },
   },
   {
-    id: 'trees-019',
+    id: 'trees-027',
     subtopic: 'trees',
-    difficulty: 'challenge',
-    stem: 'A **full** binary tree is one in which every node has either 0 or 2 children. A full binary tree has **41 nodes** in total. How many of them are leaves?',
-    options: ['20', '40', '21', '42'],
-    correctIndex: 2,
+    difficulty: 'exam',
+    stem: 'A full binary tree, where every node has 0 or 2 children, has 7 internal nodes. How many leaves does it have?',
+    options: ['8', '7', '14', '15'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Let $I$ be the number of internal nodes (2 children each) and $L$ the number of leaves.\n\n' +
-        '1. Every node except the root has exactly one edge coming down into it, so there are $41 - 1 = 40$ edges.\n' +
-        '2. Every edge comes out of an internal node, and each internal node has exactly 2 children, so the number of edges is also $2I$. So $2I = 40$, giving $I = 20$.\n' +
-        '3. Leaves are the rest: $L = 41 - 20 = 21$.\n\n' +
-        'This is the general rule for full binary trees: $L = I + 1$, so $n = 2L - 1$ and $L = \\frac{n + 1}{2} = \\frac{42}{2} = 21$.\n\n' +
-        'Check with a tiny full tree: a root with two leaf children has $n = 3$ and $L = \\frac{3 + 1}{2} = 2$. Correct.\n\n' +
-        'Answer: 21',
+        'An **internal node** is a node with at least one child.\n\n' +
+        'Start with a single node, which is 1 leaf. Giving a leaf two children turns it into an internal node and adds 2 new leaves, so each internal node adds exactly 1 leaf overall.\n\n' +
+        'So leaves $=$ internal nodes $+ 1 = 7 + 1 = 8$.\n\n' +
+        'Check with 1 internal node: a root with two children has 2 leaves.',
       whyWrong: [
-        'This is the number of **internal** nodes. In a full binary tree there is always one more leaf than internal nodes.',
-        'This is the number of **edges** ($n - 1$), not the number of leaves.',
         null,
-        'This forgets to divide by 2 in $L = \\frac{n + 1}{2}$: it stops at $n + 1 = 42$.',
+        'This assumes equal numbers of leaves and internal nodes. A full binary tree always has one more leaf.',
+        'This is $2 \\times 7$, the number of child links. Most of those links lead to other internal nodes, not to leaves.',
+        'This is the total number of nodes, $7 + 8 = 15$, not the number of leaves.',
       ],
-      keyIdea: 'In a full binary tree, leaves = internal nodes + 1, so a tree with $n$ nodes has $\\frac{n + 1}{2}$ leaves.',
+      keyIdea: 'A full binary tree has one more leaf than it has internal nodes.',
     },
     check: {
-      optionValues: [20, 40, 21, 42],
+      optionValues: [8, 7, 14, 15],
       compute: () => {
-        // grow a full binary tree: start with one leaf; turning a leaf into an internal node adds 2 new leaves
-        let nodes = 1;
         let leaves = 1;
-        while (nodes < 41) {
-          leaves = leaves - 1 + 2;
-          nodes += 2;
-        }
+        for (let internal = 1; internal <= 7; internal++) leaves = leaves - 1 + 2;
         return leaves;
       },
     },
   },
   {
-    id: 'trees-020',
+    id: 'trees-028',
     subtopic: 'trees',
-    difficulty: 'challenge',
-    stem:
-      'A max-heap is stored in a list (index 0 is the root, filled level by level, left to right):\n\n' +
-      '`[90, 70, 80, 40, 60, 50, 30, 20]`\n\nThe value **85** is inserted using the standard heap insertion (add it at the end, then sift it up). What is the list afterwards?',
-    options: [
-      '`[90, 70, 80, 40, 60, 50, 30, 20, 85]`',
-      '`[90, 85, 80, 70, 60, 50, 30, 20, 40]`',
-      '`[90, 70, 80, 85, 60, 50, 30, 20, 40]`',
-      '`[85, 90, 80, 70, 60, 50, 30, 20, 40]`',
-    ],
-    correctIndex: 1,
+    difficulty: 'exam',
+    stem: `What is the **in-order** traversal of the binary tree below?\n\n${fence(draw(T028))}`,
+    options: [seq(pre(T028)), seq(post(T028)), seq(ino(T028)), seq(levelOrder(T028))],
+    correctIndex: 2,
     markScheme: {
       solution:
-        'Heap insertion: put the new value in the next free position (the end of the list), then **sift up**: while it is larger than its parent, swap it with the parent. With 0-based indexing the parent of index $i$ is at $\\left\\lfloor \\frac{i - 1}{2} \\right\\rfloor$.\n\n' +
-        '1. Append 85 at index 8: `[90, 70, 80, 40, 60, 50, 30, 20, 85]`.\n' +
-        '2. Parent of index 8 is index $\\left\\lfloor \\frac{7}{2} \\right\\rfloor = 3$, which holds 40. Since $85 > 40$, swap: `[90, 70, 80, 85, 60, 50, 30, 20, 40]`.\n' +
-        '3. Parent of index 3 is index 1, which holds 70. Since $85 > 70$, swap: `[90, 85, 80, 70, 60, 50, 30, 20, 40]`.\n' +
-        '4. Parent of index 1 is index 0, which holds 90. Since $85 < 90$, stop.\n\n' +
-        'Answer: `[90, 85, 80, 70, 60, 50, 30, 20, 40]`',
+        'In-order means: traverse the **left subtree**, then **visit the node**, then traverse the **right subtree**.\n\n' +
+        '- Subtree at C: left P, then C, then right A, giving P, C, A.\n' +
+        '- Subtree at M: no left child, then M, then right T, giving M, T.\n' +
+        '- Whole tree: P, C, A, then the root K, then M, T.\n\n' +
+        `Answer: ${seq(ino(T028))}`,
       whyWrong: [
-        'This appends 85 but never sifts it up. It is larger than its parent 40, so the heap property is broken.',
+        'This is the **pre-order** traversal (node, left, right), which starts with the root K.',
+        'This is the **post-order** traversal (left, right, node), which ends with the root K.',
         null,
-        'This does only **one** swap. After moving above 40, 85 is still larger than its new parent 70, so it must keep moving up.',
-        'This keeps swapping past the root. Sifting up stops as soon as the parent is larger: $85 < 90$, so 90 stays at the root.',
+        'This is the **level-order** traversal, row by row. In-order finishes the whole left subtree before visiting the root.',
       ],
-      keyIdea: 'Heap insert = add at the end, then repeatedly swap with the parent while the new value is larger (for a max-heap).',
+      keyIdea: 'In-order = left subtree, node, right subtree; the root sits between its two subtrees.',
     },
     check: {
-      optionValues: [
-        '[90, 70, 80, 40, 60, 50, 30, 20, 85]',
-        '[90, 85, 80, 70, 60, 50, 30, 20, 40]',
-        '[90, 70, 80, 85, 60, 50, 30, 20, 40]',
-        '[85, 90, 80, 70, 60, 50, 30, 20, 40]',
+      optionValues: [seq(pre(T028)), seq(post(T028)), seq(ino(T028)), seq(levelOrder(T028))],
+      compute: () => seq(ino(T028)),
+    },
+  },
+  {
+    id: 'trees-029',
+    subtopic: 'trees',
+    difficulty: 'exam',
+    stem: 'The max-heap `A` is stored level by level. Arrays are indexed from 1. What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source:
+        'A = [9, 7, 8, 3, 5, 6]\ni = 6\nc = 0\nwhile (i > 1)\n   i = div(i,2) // div is integer division\n   c = c + A[i]\nend while\nprint(c)',
+    },
+    options: ['17', '23', '8', 'Infinite loop'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '`div(i,2)` moves from a node to its parent, so the loop walks up the heap, adding each parent.\n\n' +
+        '| `i` after `div` | `A[i]` | `c` |\n|---|---|---|\n' +
+        '| 3 | 8 | 8 |\n' +
+        '| 1 | 9 | 17 |\n\n' +
+        'Now `i` is 1, so $1 > 1$ is false and the loop stops. It prints 17.',
+      whyWrong: [
+        null,
+        'This also adds the starting item `A[6]`, which is 6. The loop moves `i` before adding, so `A[6]` is never added.',
+        'This stops after the first parent. After that pass `i` is 3, and $3 > 1$ is true, so the loop runs again.',
+        '`i` is halved on every pass, so it reaches 1 and the test fails.',
       ],
+      keyIdea: 'In a heap array indexed from 1, `div(i,2)` gives the position of the parent of node `i`.',
+    },
+    check: {
+      optionValues: [17, 23, 8, 'Infinite loop'],
       compute: () => {
-        const h = [...Q019_HEAP, 85];
-        let i = h.length - 1;
-        while (i > 0) {
-          const p = Math.floor((i - 1) / 2);
-          if (h[i] <= h[p]) break;
-          [h[i], h[p]] = [h[p], h[i]];
-          i = p;
+        const a = [9, 7, 8, 3, 5, 6];
+        let i = 6;
+        let c = 0;
+        let guard = 0;
+        while (i > 1) {
+          if (++guard > 1000) return 'Infinite loop';
+          i = Math.floor(i / 2);
+          c += a[i - 1];
         }
-        return `[${h.join(', ')}]`;
+        return c;
       },
     },
   },
   {
-    id: 'trees-021',
+    id: 'trees-031',
     subtopic: 'trees',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source:
-        NODE_CLASS +
-        '\ndef walk(node, out):\n    if node is None:\n        return\n    walk(node.right, out)\n    out.append(node.val)\n    walk(node.left, out)\n\n' +
-        'root = Node(5, Node(3, Node(1), Node(4)), Node(8, None, Node(9)))\nresult = []\nwalk(root, result)\nprint(result)',
-    },
-    options: ['`[1, 3, 4, 5, 8, 9]`', '`[5, 8, 9, 3, 4, 1]`', '`[9, 8, 4, 1, 3, 5]`', '`[9, 8, 5, 4, 3, 1]`'],
-    correctIndex: 3,
+    difficulty: 'exam',
+    stem: 'The keys 5, 3, 8, 1, 4 are inserted, **in that order**, into an empty binary search tree. What is its **pre-order** traversal?',
+    options: [seq(ino(T031)), seq(pre(T031)), seq(post(T031)), seq(levelOrder(T031))],
+    correctIndex: 1,
     markScheme: {
       solution:
-        'The tree is a BST:\n\n' +
-        fence(draw(N(5, N(3, N(1), N(4)), N(8, undefined, N(9))))) +
-        '\n\n`walk` is an in-order traversal with the sides swapped: **right subtree, then the node, then left subtree**. On a BST that gives the keys from largest to smallest.\n\n' +
-        '| Call | What happens | `out` afterwards |\n| --- | --- | --- |\n' +
-        '| `walk(5)` | first walk the right subtree (8) | |\n| `walk(8)` | first walk its right subtree (9) | |\n' +
-        '| `walk(9)` | right is None, append 9, left is None | `[9]` |\n| back in `walk(8)` | append 8, left is None | `[9, 8]` |\n' +
-        '| back in `walk(5)` | append 5, then walk the left subtree (3) | `[9, 8, 5]` |\n| `walk(3)` | walk right (4): append 4 | `[9, 8, 5, 4]` |\n' +
-        '| back in `walk(3)` | append 3, then walk left (1): append 1 | `[9, 8, 5, 4, 3, 1]` |\n\n' +
-        'The list is passed by reference, so every call appends to the same `result` list.\n\n' +
-        'Answer: `[9, 8, 5, 4, 3, 1]`',
+        'Build the tree: 5 is the root; 3 goes left of 5; 8 goes right of 5; 1 goes left of 3; 4 goes right of 3.\n\n' +
+        fence(draw(T031)) +
+        '\n\nPre-order is node, left, right: 5, then the subtree at 3 (3, 1, 4), then 8.\n\n' +
+        `Answer: ${seq(pre(T031))}`,
       whyWrong: [
-        'This is the ordinary in-order traversal (left, node, right). The code walks `node.right` **first**, so the order is reversed.',
-        'This appends each node **before** walking its subtrees (node, right, left). In the code the `append` happens between the two recursive calls.',
-        'This appends each node **after** both recursive calls (right, left, node). In the code the `append` comes between the right call and the left call.',
+        'This is the **in-order** traversal, which lists a BST in sorted order.',
         null,
+        'This is the **post-order** traversal (left, right, node), which ends with the root 5.',
+        'This is the **level-order** traversal, row by row. It is the same as the insertion order here, but pre-order finishes the subtree at 3 before visiting 8.',
       ],
-      keyIdea: 'The position of the "visit" step relative to the two recursive calls decides the traversal; right-node-left on a BST gives descending order.',
+      keyIdea: 'Build the BST from the insertion order first, then apply the traversal rule.',
     },
-    python: { stdout: '[9, 8, 5, 4, 3, 1]\n' },
+    check: {
+      optionValues: [seq(ino(T031)), seq(pre(T031)), seq(post(T031)), seq(levelOrder(T031))],
+      compute: () => seq(pre(T031)),
+    },
+  },
+  {
+    id: 'trees-032',
+    subtopic: 'trees',
+    difficulty: 'exam',
+    stem: 'Which array is a valid max-heap stored level by level? (With arrays indexed from 1, the children of index $i$ are at $2i$ and $2i + 1$.)',
+    options: HEAP_OPTIONS,
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Check that every parent is at least as large as its children. For five items the parent-child pairs are index 1 with 2 and 3, and index 2 with 4 and 5.\n\n' +
+        '`[9, 5, 8, 2, 4]`: $9 \\ge 5$, $9 \\ge 8$, $5 \\ge 2$, $5 \\ge 4$. All hold, so it is a max-heap.\n\n' +
+        'The array need not be sorted: only each parent and its children are compared.',
+      whyWrong: [
+        null,
+        'Index 2 holds 5 and its left child at index 4 holds 6, so a parent is smaller than its child.',
+        'The root must be the largest value, but 5 is smaller than its child 9.',
+        'This is sorted in ascending order, which makes it a **min-heap**: the smallest value is at the root.',
+      ],
+      keyIdea: 'A max-heap needs every parent to be at least as large as its children; the rest of the array can be in any order.',
+    },
+    check: {
+      optionValues: HEAP_OPTIONS.map(strip),
+      compute: () => {
+        const ok = HEAP_OPTIONS.filter((o) => isMaxHeap(parseList(o)));
+        return ok.length === 1 ? strip(ok[0]) : 'none or several';
+      },
+    },
   },
 ];

@@ -3,117 +3,108 @@ import type { Lesson } from '../../../types';
 export const lesson: Lesson = {
   subtopic: 'lists-tuples',
   simple:
-    'A **list** is like a row of numbered lockers, each holding one value, and the numbering starts at 0, not 1. You can open one locker (`a[2]`), take a run of lockers (`a[1:4]`, which stops just before locker 4), or add and remove lockers. A **tuple** is the same row but sealed shut: you can look inside, but you cannot change it. Finally, a variable is just a name tag on a list, so two tags can point to the very same list.',
+    'An **array** is like a row of numbered lockers, each holding one value. In the pseudocode used here the numbering starts at **1**, so `A[1]` is the first locker and `A[length(A)]` is the last. You can open any locker straight away by its number, walk along the row with a loop to add things up or find the largest value, or move values between lockers. Moving values needs care, because putting a new value in a locker throws away what was there.',
   methods: [
-    { cue: 'A single index like `a[3]` or `a[-1]`', method: 'Write the indices 0, 1, 2, ... under the values first. Index `-1` is the last item, `-2` the one before it.' },
-    { cue: 'A slice `a[i:j]` or `a[i:j:s]`', method: 'Take indices $i, i + s, i + 2s, \\ldots$ while they are **less than** $j$ (the stop is excluded). A plain slice has $j - i$ items; a negative step starts from the end and walks backwards.' },
-    { cue: 'A sequence of `append`, `insert`, `pop`, `remove`, `extend` calls', method: 'Trace the list line by line. `remove(x)` works by **value**; `pop(i)` and `insert(i, x)` work by **index**; `extend` adds items one by one, `append` adds one item (even a whole list).' },
-    { cue: 'A result stored from `a.sort()` (or another in-place method)', method: 'In-place methods change the list and return `None`. Only `sorted(a)` returns a new list and leaves `a` alone.' },
-    { cue: '`b = a`, a function parameter, `a[:]`, `copy()` or `deepcopy`, then a change through one name', method: 'Ask "same list or new list?" for every `=`. Plain assignment and passing to a function share the list; slices, `copy()`, `+` and `sorted` make new ones; a shallow copy still shares inner lists.' },
-    { cue: 'A tuple being changed, or `a, b = b, a + b`', method: 'Assigning to `t[i]` on a tuple raises a `TypeError` (but a list stored inside a tuple can still be changed). For multiple assignment, work out the whole right side with the old values first, then assign.' },
-    { cue: 'A list comprehension `[expr for x in ... if ...]`', method: 'List the values of `x` (remember `range(a, b)` stops before `b`), keep only those that pass the `if`, then apply `expr` to each.' },
+    { cue: 'A single index like `A[3]` or `A[length(A)]`', method: 'Write the indices 1, 2, 3, ... above the values first, then read off the position. `length(A)` is the last index.' },
+    { cue: 'A `for i = 1 to length(A)` loop adding or counting', method: 'Make a table with one row per pass: `i`, `A[i]` and the running total or counter.' },
+    { cue: 'Finding a maximum or minimum, or its position', method: 'Track the best so far. Check what it starts as (a real element, or 0?), whether the test is `>` or `>=`, and whether the code prints the value or the index.' },
+    { cue: 'A swap of two elements', method: 'With `t` saving a value, the two elements exchange. Without `t`, the first assignment destroys a value and both positions end up the same.' },
+    { cue: 'A shift: `A[i] = A[i + 1]` or `A[i] = A[i - 1]`', method: 'Write the array after each pass. Going against the direction of the copy keeps every value; going with it spreads one value along the array.' },
+    { cue: 'A `while` loop with an index', method: 'Check that the index changes inside the loop. If nothing changes it, the answer is "Infinite loop".' },
+    { cue: 'A two-dimensional array `G[r][c]`', method: 'Choose the row first, then the item in that row, both counted from 1. An $m \\times n$ array has $mn$ elements.' },
   ],
   know:
-    '### Lists: an ordered row of boxes\n\n' +
-    'A **list** stores several values in order: `a = [10, 20, 30, 40, 50]`. Each value sits at a numbered position called an **index**, and Python counts from **0**. Negative indices count back from the end, so `a[-1]` is always the last item.\n\n' +
-    '| Value | 10 | 20 | 30 | 40 | 50 |\n| --- | --- | --- | --- | --- | --- |\n| Index | 0 | 1 | 2 | 3 | 4 |\n| Negative index | -5 | -4 | -3 | -2 | -1 |\n\n' +
-    'So `a[0]` is 10, `a[4]` is 50 and `a[-2]` is 40. A list of length $n$ has indices 0 to $n - 1$; `a[5]` here raises an `IndexError`. `len(a)` gives the number of items.\n\n' +
-    '### Slicing: taking a piece\n\n' +
-    '`a[start:stop]` gives a **new list** from index `start` up to **but not including** `stop`. So `a[1:4]` is `[20, 30, 40]`, which has $4 - 1 = 3$ items. Leave a number out to mean "from the beginning" or "to the end": `a[:2]` is the first 2 items, `a[-2:]` is the last 2 items, and `a[:]` is a copy of the whole list.\n\n' +
-    'A third number is the **step**: `a[::2]` takes every 2nd item (`[10, 30, 50]`). A **negative step** walks backwards from the end, so `a[::-1]` reverses the list. Slices never raise an error for going past the end; they just stop.\n\n' +
-    '### Changing a list: the methods\n\n' +
-    '| Code | What it does | Returns |\n| --- | --- | --- |\n' +
-    '| `a.append(x)` | adds `x` as ONE item at the end | `None` |\n' +
-    '| `a.extend([x, y])` | adds `x` and `y` separately at the end | `None` |\n' +
-    '| `a.insert(i, x)` | puts `x` **at** index `i`, shifting later items right | `None` |\n' +
-    '| `a.pop()` | removes the **last** item | that item |\n' +
-    '| `a.pop(i)` | removes the item at index `i` | that item |\n' +
-    '| `a.remove(x)` | removes the **first** item equal to `x` (by value) | `None` |\n' +
-    '| `a.sort()` | sorts `a` itself | `None` |\n\n' +
-    'Notice the pattern: methods that change the list in place return `None`. That is why `b = a.sort()` leaves `b` as `None`. The function `sorted(a)` is different: it leaves `a` alone and **returns** a new sorted list. Both accept `reverse=True` and `key=...`, for example `sorted(words, key=len)` sorts by length. Python\'s sort is **stable**: items with equal keys keep their original order.\n\n' +
-    '### List comprehensions\n\n' +
-    'A comprehension builds a list in one line. Read `[x * x for x in range(1, 6) if x % 2 == 1]` as: for each `x` from 1 to 5, if `x` is odd, keep `x * x`. Result: `[1, 9, 25]`. Remember `range(a, b)` stops **before** `b`.\n\n' +
-    '### Nested lists (grids and matrices)\n\n' +
-    'A list can hold other lists: `grid = [[1, 2, 3], [4, 5, 6]]`. Then `grid[r]` is a whole row and `grid[r][c]` is one item: first choose the row, then the column, both counted from 0. So `grid[1][0]` is 4. `len(grid)` counts rows (2), not numbers (6).\n\n' +
-    '### Tuples and unpacking\n\n' +
-    'A **tuple** is like a list in round brackets, `t = (1, 2, 3)`, but it is **immutable**: `t[0] = 9` raises a `TypeError`, and tuples have no `append` or `remove`. Indexing, slicing and `len` work exactly as for lists. A one-item tuple needs a comma: `(5,)`. Careful: a tuple holding a list, like `(1, [2, 3])`, cannot swap the list for another object, but the list inside can still be changed with `append`.\n\n' +
-    '**Unpacking** splits a sequence into names: `x, y = (3, 4)` sets $x = 3$, $y = 4$. In `a, b = b, a + b` Python works out the **whole right side first** using the old values, then assigns. That is why `a, b = b, a` swaps two values without a temporary variable.\n\n' +
-    '### Names, aliasing and copies (the big exam topic)\n\n' +
-    'A variable is a **name tag** stuck on an object. `b = a` does **not** copy the list; it sticks a second tag on the **same** list. Any change made through `b` (append, `b[0] = ...`, sort) shows up in `a`. The same happens when you pass a list to a function: the parameter is another tag on the caller\'s list.\n\n' +
-    'Reassigning is different: `b = [9]` or `b = b + [9]` builds a new list and moves only the tag `b`. For lists, `b += [9]` changes the list in place, so aliases see it.\n\n' +
-    'To get an independent list, copy it:\n\n' +
-    '- **Shallow copy**: `a[:]`, `a.copy()` or `list(a)`. The outer list is new, but any inner lists are **shared**.\n' +
-    '- **Deep copy**: `copy.deepcopy(a)` (after `import copy`). Every level is copied, so nothing is shared.\n\n' +
-    'For a flat list of numbers a shallow copy is enough. For a list of lists, changing `b[0].append(5)` after a shallow copy also changes `a[0]`. The same trap appears in `[[0] * 3] * 2`, which repeats **one** row object twice; build grids with `[[0] * 3 for _ in range(2)]` instead.',
+    '### Arrays: an ordered row of boxes\n\n' +
+    'An **array** stores several values in order: `A = [10, 20, 30, 40, 50]`. Each value sits at a numbered position called an **index**. The pseudocode here counts from **1**, and the question will say so ("Arrays are indexed from 1").\n\n' +
+    '| Index | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- |\n| Value | 10 | 20 | 30 | 40 | 50 |\n\n' +
+    'So `A[1]` is 10, `A[5]` is 50 and `length(A)` is 5. An array of length $n$ has indices 1 to $n$, so the last element is `A[length(A)]`. Reading or changing an element by its index takes the same time however long the array is: $O(1)$.\n\n' +
+    '### Traversing: visiting every element\n\n' +
+    'A loop from 1 to `length(A)` visits each element once. Almost every array question is a small change to this pattern:\n\n' +
+    '```pseudocode\nA = [3, 5, 2, 6]\ns = 0\nfor i = 1 to length(A)\n   s = s + A[i]\nend for\nprint(s)\n```\n\n' +
+    'Watch the limits: starting at `i = 2` misses the first element, and stopping at `length(A) - 1` misses the last.\n\n' +
+    '### Counting and filtering\n\n' +
+    'Put an `if` inside the loop. Adding 1 counts the elements that pass the test; adding `A[i]` totals them. Options often include both, so read which one the code does.\n\n' +
+    '### Maximum and minimum\n\n' +
+    'Start with the first element, then replace it whenever a better one appears:\n\n' +
+    '```pseudocode\nm = A[1]\nfor i = 2 to length(A)\n   if A[i] > m\n      m = A[i]\n   end if\nend for\n```\n\n' +
+    'Finding the minimum is the same with `<`. Starting from `m = 0` is a classic bug: with all positive values, a minimum search never replaces it. To report **where** the maximum is, keep its index `p` and compare `A[i] > A[p]`. With `>`, the first of two equal values is kept; with `>=`, the last.\n\n' +
+    '### Swapping\n\n' +
+    'An assignment overwrites, so a swap needs a temporary variable:\n\n' +
+    '```pseudocode\nt = A[i]\nA[i] = A[j]\nA[j] = t\n```\n\n' +
+    'Without `t`, the lines `A[i] = A[j]` and `A[j] = A[i]` leave both positions holding the old `A[j]`.\n\n' +
+    '### Shifting\n\n' +
+    'Inserting or removing an element in the middle means moving the others along, one assignment at a time. With `A = [1, 2, 3, 4]`:\n\n' +
+    '| Shift | Direction of loop | Result |\n| --- | --- | --- |\n' +
+    '| `A[i] = A[i + 1]` | from the left | `[2, 3, 4, 4]` |\n' +
+    '| `A[i] = A[i - 1]` | from the right | `[1, 1, 2, 3]` |\n' +
+    '| `A[i] = A[i - 1]` | from the left | `[1, 1, 1, 1]` |\n\n' +
+    'A shift is not a rotation: the value at one end is overwritten and lost, and the value at the other end appears twice. To reverse an array, swap mirror pairs `A[i]` and `A[n - i + 1]`, and only over the first half; a loop over the whole array swaps each pair back again.\n\n' +
+    '### Two-dimensional arrays\n\n' +
+    'An array can hold other arrays: `G = [[1, 2, 3], [4, 5, 6]]`. Then `G[r]` is a whole row and `G[r][c]` is one item: first choose the row, then the column, both counted from 1. So `G[2][1]` is 4. An array of **order** $m \\times n$ has $m$ rows and $n$ columns, so it holds $mn$ elements.',
   formulas: [
-    { label: 'Valid indices', tex: '0, 1, \\ldots, n - 1 \\quad \\text{and} \\quad -1, -2, \\ldots, -n', note: 'For a list of length $n$. Index $-1$ is the last item.' },
-    { label: 'Negative index', tex: 'a[-k] = a[n - k]' },
-    { label: 'Length of a slice', tex: '\\text{len}(a[i:j]) = j - i', note: 'When $0 \\le i \\le j \\le n$. The stop index $j$ is excluded.' },
-    { label: 'Length of a stepped slice', tex: '\\text{len}(a[i:j:s]) = \\left\\lceil \\frac{j - i}{s} \\right\\rceil', note: 'For a positive step $s$ and $0 \\le i \\le j \\le n$: the indices are $i, i + s, i + 2s, \\ldots$ while they are less than $j$. Round **up**: `a[1:8:3]` takes indices 1, 4, 7, which is $\\lceil 7 \\div 3 \\rceil = 3$ items.' },
-    { label: 'Last k items / all but last k', tex: 'a[-k:] \\quad \\text{vs} \\quad a[:-k]' },
-    { label: 'Nested list', tex: '\\text{grid}[r][c] = \\text{item in row } r \\text{, column } c' },
-    { label: 'Sorting', tex: '\\text{a.sort()} \\to \\text{None (changes a)}, \\quad \\text{sorted(a)} \\to \\text{new list}' },
-    { label: 'Aliasing vs copying', tex: '\\text{b = a: same list}, \\quad \\text{b = a[:]: new list}' },
+    { label: 'Valid indices', tex: '1, 2, \\ldots, n', note: 'For an array of length $n$ indexed from 1. The last element is `A[length(A)]`.' },
+    { label: 'Mirror position', tex: 'i \\leftrightarrow n - i + 1', note: 'Position 1 pairs with position $n$, position 2 with $n - 1$, and so on.' },
+    { label: 'Elements in a grid', tex: 'm \\times n \\text{ array} \\Rightarrow mn \\text{ elements}' },
+    { label: 'Two-dimensional index', tex: '\\text{G}[r][c] = \\text{item in row } r \\text{, column } c' },
+    { label: 'Cost of access', tex: '\\text{read by index: } O(1), \\qquad \\text{search an unsorted array: } O(n)' },
   ],
   examples: [
     {
-      title: 'Indexing and slicing',
-      problem: 'Given `a = [4, 8, 15, 16, 23, 42]`, what is printed by `print(a[2], a[-2], a[1:4])`?',
+      title: 'Indexing',
+      problem: 'Arrays are indexed from 1. What does this print?\n\n```pseudocode\nA = [4, 8, 15, 16, 23]\nprint(A[2] + A[length(A)])\n```',
       steps: [
-        'Write the indices under the values: 4 is at 0, 8 at 1, 15 at 2, 16 at 3, 23 at 4, 42 at 5.',
-        '`a[2]` is the item at index 2: 15.',
-        '`a[-2]` is the second-to-last item: 23.',
-        '`a[1:4]` takes indices 1, 2, 3 (4 is excluded): `[8, 15, 16]`.',
+        'Write the indices above the values: 4 is at 1, 8 at 2, 15 at 3, 16 at 4, 23 at 5.',
+        '`A[2]` is 8.',
+        '`length(A)` is 5, so `A[length(A)]` is `A[5]`, which is 23.',
+        '$8 + 23 = 31$.',
       ],
-      answer: '`15 23 [8, 15, 16]`',
+      answer: '31',
     },
     {
-      title: 'Tracing list methods',
-      problem: 'What is printed?\n\n`a = [3, 1, 4, 1]`, then `a.remove(1)`, `a.insert(0, 9)`, `a.extend([2, 6])`, `x = a.pop(2)`, then `print(a, x)`.',
+      title: 'Finding the position of the maximum',
+      problem: 'Arrays are indexed from 1. What does this print?\n\n```pseudocode\nA = [3, 7, 7, 2]\np = 1\nfor i = 2 to length(A)\n   if A[i] > A[p]\n      p = i\n   end if\nend for\nprint(p)\n```',
       steps: [
-        '`a.remove(1)` removes the **first** 1: `[3, 4, 1]`.',
-        '`a.insert(0, 9)` puts 9 at index 0: `[9, 3, 4, 1]`.',
-        '`a.extend([2, 6])` adds 2 and 6 separately: `[9, 3, 4, 1, 2, 6]`.',
-        '`a.pop(2)` removes the item at index 2, which is 4, and returns it: `a` is `[9, 3, 1, 2, 6]` and `x` is 4.',
+        '$i = 2$: $7 > 3$, so `p` becomes 2.',
+        '$i = 3$: $7 > 7$ is false, so `p` stays 2.',
+        '$i = 4$: $2 > 7$ is false, so `p` stays 2.',
+        'The code prints the position, not the value 7.',
       ],
-      answer: '`[9, 3, 1, 2, 6] 4`',
+      answer: '2',
     },
     {
-      title: 'Aliasing and sort',
-      problem: 'What is printed?\n\n`a = [5, 2, 7]`, `b = a`, `c = sorted(a)`, `b.append(1)`, `d = a.sort()`, then `print(a, c, d)`.',
+      title: 'Shifting left',
+      problem: 'Arrays are indexed from 1. What does this print?\n\n```pseudocode\nA = [6, 1, 9]\nfor i = 1 to length(A) - 1\n   A[i] = A[i + 1]\nend for\nprint(A)\n```',
       steps: [
-        '`b = a`: `b` is another name for the same list.',
-        '`c = sorted(a)`: a new list `[2, 5, 7]`; `a` is unchanged.',
-        '`b.append(1)`: the shared list becomes `[5, 2, 7, 1]`, so `a` changes too. `c` is separate and stays `[2, 5, 7]`.',
-        '`d = a.sort()`: sorts the shared list in place to `[1, 2, 5, 7]` and returns `None`, so `d` is `None`.',
+        '$i = 1$: `A[1] = A[2]` gives `[1, 1, 9]`.',
+        '$i = 2$: `A[2] = A[3]` gives `[1, 9, 9]`.',
+        'The first value 6 is lost, and the last value stays where it is, so it appears twice.',
       ],
-      answer: '`[1, 2, 5, 7] [2, 5, 7] None`',
+      answer: '`[1, 9, 9]`',
     },
     {
-      title: 'Shallow copy of a nested list (exam level)',
-      problem: 'What is printed?\n\n`a = [[1], [2]]`, `b = a[:]`, `b[0].append(3)`, `b[1] = [9]`, then `print(a)`.',
+      title: 'A loop that never ends (exam level)',
+      problem: 'Arrays are indexed from 1. What does this print?\n\n```pseudocode\nA = [5, 2]\ni = 1\nwhile (i <= length(A))\n   print(A[i])\nend while\n```',
       steps: [
-        '`b = a[:]` is a **shallow** copy: `b` is a new outer list, but `b[0]` and `a[0]` are the same inner list (likewise `b[1]` and `a[1]`).',
-        '`b[0].append(3)` changes that shared inner list, so `a[0]` becomes `[1, 3]`.',
-        '`b[1] = [9]` puts a brand-new list into position 1 of `b` only. It does not change the old inner list, so `a[1]` is still `[2]`.',
-        'So `a` is `[[1, 3], [2]]`.',
+        '$i = 1$ and the condition $1 \\le 2$ is true, so 5 is printed.',
+        'Nothing in the body changes `i`, so the condition is still true.',
+        'The same line runs again and again, and the loop never ends.',
       ],
-      answer: '`[[1, 3], [2]]`',
+      answer: 'Infinite loop',
     },
   ],
   traps: [
-    'Counting from 1. The first item is `a[0]`, and `a[-1]` is the last item (not the second-to-last).',
-    'Including the stop index in a slice. `a[2:5]` has $5 - 2 = 3$ items: indices 2, 3, 4.',
-    'Writing `b = a.sort()` and expecting a sorted list. In-place methods (`sort`, `append`, `insert`, `extend`, `remove`, `reverse`) return `None`; use `sorted(a)` for a new list.',
-    'Mixing up `append` and `extend`: `a.append([1, 2])` adds ONE nested item; `a.extend([1, 2])` adds two items.',
-    'Thinking `b = a` copies a list. It creates an alias, so changes through either name show in both. Use `a[:]` or `a.copy()` to copy, and `copy.deepcopy` for nested lists.',
-    'Building a grid with `[[0] * 3] * 3`: all rows are the same object, so changing one cell changes that column in every row.',
+    'Counting from the wrong place. In this pseudocode `A[1]` is the first element and `A[length(A)]` is the last, so `A[length(A)]` is a valid element, not one past the end.',
+    'Off-by-one loop limits. `for i = 1 to length(A) - 1` misses the last element, and `for i = 2 to length(A)` misses the first.',
+    'Swapping without a temporary variable. `A[1] = A[3]` then `A[3] = A[1]` copies one value into both positions.',
+    'Treating a shift as a rotation. A shift loses the value at one end, and the value at the other end appears twice.',
+    'Shifting right from the left end. Each pass copies the value just written, so the first value spreads across the whole array.',
+    'Printing the wrong thing. A maximum search can store the value or the position, so check which one reaches `print`.',
   ],
   examTip:
-    'These questions are almost always "what does this code print?" with four printed outputs that differ by **one** misconception each: counting from 1, including the slice stop, append versus extend, `sort()` returning `None`, alias versus copy, or shallow versus deep copy. Work as follows:\n\n' +
-    '1. Write the index numbers (0, 1, 2, ...) under the list on your scrap paper before reading any index or slice.\n' +
-    '2. Trace one line at a time, writing the list after each line, like a trace table.\n' +
-    '3. For every `=` with a list on the right, ask "new list or same list?" Slicing, `copy()`, `list()`, `sorted()`, `+`, list literals like `[1, 2]` and comprehensions make new lists; plain `b = a` and passing a list to a function never copy it.\n' +
-    '4. Use quick checks to eliminate options: a slice `a[i:j]` must have $j - i$ items; `len` counts a nested list as one item; an in-place method stored in a variable gives `None`.\n' +
-    '5. If one option says "error", check for a tuple being changed, an index past the end, or `remove` of a value that is not there.',
+    'These questions are almost always "what does this code print?" with four outputs that differ by **one** misconception each: counting from 0, a loop that stops one short, a value lost in a swap, or a shift mistaken for a rotation. Work as follows:\n\n' +
+    '1. Write the index numbers (1, 2, 3, ...) above the array on your scrap paper before reading any index.\n' +
+    '2. Make a table with one row per pass, writing the array or the running value after each pass.\n' +
+    '3. Use each assignment on the **current** array, not the original one.\n' +
+    '4. Use quick checks to eliminate options: the length of the array never changes in these questions, and a counter can never be larger than the length.\n' +
+    '5. If "Infinite loop" is an option and the loop is a `while`, check that its index really changes inside the body.',
 };

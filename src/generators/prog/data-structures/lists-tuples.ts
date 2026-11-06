@@ -1,403 +1,347 @@
 import type { GeneratedCore, Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
 
-type PyVal = number | PyVal[];
+const STEM = 'Arrays are indexed from 1. What does this pseudocode print?';
 
-/** Python repr of a (possibly nested) list of ints. */
-function repr(v: PyVal): string {
-  return Array.isArray(v) ? `[${v.map(repr).join(', ')}]` : String(v);
-}
+/** How the pseudocode prints an array. */
+const repr = (a: number[]) => `[${a.join(', ')}]`;
+const lit = (a: number[]) => `\`${repr(a)}\``;
 
-/** 1 -> '1st', 2 -> '2nd', 3 -> '3rd', 4 -> '4th'. */
-function ord(k: number): string {
-  const t = k % 100;
-  if (t >= 11 && t <= 13) return `${k}th`;
-  return `${k}${['th', 'st', 'nd', 'rd'][k % 10] ?? 'th'}`;
-}
+type Cand = { text: string; value: string | number; why: string };
 
-type Cand = { list: PyVal[] | null; why: string };
-
-/** Keep up to 3 candidates whose repr differs from the answer and from each other. */
-function pickDistinct(answer: string, pool: Cand[]): { text: string; value: string; why: string }[] {
-  const out: { text: string; value: string; why: string }[] = [];
+/** Keep up to 3 candidates whose text differs from the answer and from each other. */
+function pickDistinct(answer: string, pool: Cand[]): Cand[] {
+  const key = (s: string) => s.replace(/[\s`]/g, '');
+  const out: Cand[] = [];
   for (const c of pool) {
     if (out.length === 3) break;
-    if (!c.list) continue;
-    const r = repr(c.list);
-    if (r === answer || out.some((o) => o.value === r)) continue;
-    out.push({ text: `\`${r}\``, value: r, why: c.why });
+    if (key(c.text) === key(answer) || out.some((o) => key(o.text) === key(c.text))) continue;
+    out.push(c);
   }
   return out;
 }
 
-/** Python-style slice of a flat list (start/stop may be negative or omitted; step non-zero). */
-function pySlice(L: number[], start: number | null, stop: number | null, step = 1): number[] {
-  const n = L.length;
-  const norm = (x: number) => (x < 0 ? x + n : x);
-  const out: number[] = [];
-  if (step > 0) {
-    let s = start === null ? 0 : Math.max(0, Math.min(n, norm(start)));
-    const e = stop === null ? n : Math.max(0, Math.min(n, norm(stop)));
-    for (; s < e; s += step) out.push(L[s]);
-  } else {
-    let s = start === null ? n - 1 : Math.max(-1, Math.min(n - 1, norm(start)));
-    const e = stop === null ? -1 : Math.max(-1, Math.min(n - 1, norm(stop)));
-    for (; s > e; s += step) out.push(L[s]);
-  }
-  return out;
+const mkNum = (v: number, why: string): Cand => ({ text: String(v), value: v, why });
+const mkArr = (a: number[], why: string): Cand => ({ text: lit(a), value: repr(a), why });
+
+function valueRow(A: number[]): string {
+  return `| Index | ${A.map((_, i) => i + 1).join(' | ')} |\n| --- | ${A.map(() => '---').join(' | ')} |\n| Value | ${A.join(' | ')} |\n\n`;
 }
 
-function indexTable(L: number[]): string {
-  const n = L.length;
-  return (
-    `| Value | ${L.join(' | ')} |\n` +
-    `| --- | ${L.map(() => '---').join(' | ')} |\n` +
-    `| Index | ${L.map((_, i) => i).join(' | ')} |\n` +
-    `| Negative index | ${L.map((_, i) => i - n).join(' | ')} |\n\n`
-  );
-}
-
-// ---------------------------------------------------------------- generator 1: slicing
-function genSlice(rng: Rng): GeneratedCore {
+// ---------------------------------------------------------------- generator 1: read elements by index
+function genIndex(rng: Rng): GeneratedCore {
   for (;;) {
-    const n = rng.int(6, 8);
-    const pool1 = Array.from({ length: 39 }, (_, i) => i + 2);
-    const L = rng.sample(pool1, n);
-    const name = rng.pick(['nums', 'data', 'scores', 'vals', 'marks']);
-    const kind = rng.pick(['ab', 'ab', 'neg', 'step', 'rev'] as const);
-    let expr: string;
-    let correct: number[];
-    let explain: string;
+    const n = rng.int(4, 6);
+    const A = rng.sample(Array.from({ length: 39 }, (_, i) => i + 2), n);
+    const at = (i: number) => A[i - 1];
+    const kind = rng.pick(['single', 'sum', 'last'] as const);
+    let line: string;
+    let v: number;
     let pool: Cand[];
+    let working: string;
 
-    if (kind === 'ab') {
-      const a = rng.int(1, n - 3);
-      const b = rng.int(a + 2, n - 1);
-      expr = `${a}:${b}`;
-      correct = pySlice(L, a, b);
-      const idx = Array.from({ length: b - a }, (_, i) => a + i);
-      explain =
-        `\`${name}[${a}:${b}]\` starts at index ${a} and goes **up to but not including** index ${b}.\n\n` +
-        `1. Indices taken: ${idx.join(', ')} (index ${b} is excluded), which is $${b} - ${a} = ${b - a}$ items.\n` +
-        `2. The items at those indices are ${correct.join(', ')}.\n\n`;
+    if (kind === 'single') {
+      const i = rng.int(2, n - 1);
+      line = `print(A[${i}])`;
+      v = at(i);
+      working = `\`A[${i}]\` is the element at position ${i}, counting from 1, which is ${v}.`;
       pool = [
-        { list: pySlice(L, a, b + 1), why: `This includes the item at the stop index ${b}. The stop index is always excluded, so the slice has $${b} - ${a} = ${b - a}$ items.` },
-        { list: pySlice(L, a - 1, b - 1), why: `This counts positions from 1 instead of 0, so every item is one place too far left. Index ${a} is the item ${L[a]}, not ${L[a - 1]}.` },
-        { list: pySlice(L, a - 1, b), why: `This counts positions from 1 and also includes the stop position. Python counts from 0 and excludes index ${b}.` },
-        {
-          // only when a + b stays inside the list, so the "take b items" misreading really gives b items
-          list: a + b <= n ? pySlice(L, a, a + b) : null,
-          why: `This reads the second number as "how many items to take" (${b} items from index ${a}). It is the stop index: the slice ends just before index ${b}.`,
-        },
+        mkNum(at(i + 1), `This counts from 0, so index ${i} lands on position ${i + 1}. The first element is \`A[1]\`.`),
+        mkNum(at(i - 1), `This stops one position short: \`A[${i}]\` is position ${i}, not position ${i - 1}.`),
+        mkNum(i, 'This is the index itself. `A[i]` gives the value stored at that index.'),
+        mkNum(n, 'This is the length of the array, not the value at the index.'),
       ];
-    } else if (kind === 'neg') {
-      const k = rng.int(2, 4);
-      expr = `-${k}:`;
-      correct = pySlice(L, -k, null);
-      explain =
-        `Negative indices count back from the end: \`-1\` is the last item, \`-2\` the second-to-last, and so on.\n\n` +
-        `1. Index $-${k}$ is the same as index $${n} - ${k} = ${n - k}$, which holds ${L[n - k]}.\n` +
-        `2. \`${name}[-${k}:]\` runs from there to the end, in the normal left-to-right order: the last ${k} items, ${correct.join(', ')}.\n\n`;
+    } else if (kind === 'sum') {
+      const i = rng.int(1, n - 2);
+      const j = rng.int(i + 1, n - 1);
+      line = `print(A[${i}] + A[${j}])`;
+      v = at(i) + at(j);
+      working = `\`A[${i}]\` is ${at(i)} and \`A[${j}]\` is ${at(j)}, so the sum is ${v}.`;
       pool = [
-        { list: pySlice(L, null, -k), why: `This mixes up \`[-${k}:]\` with \`[:-${k}]\`, which takes everything **except** the last ${k} items.` },
-        { list: pySlice(L, k, null), why: `This ignores the minus sign and slices from index ${k}. Index $-${k}$ counts back from the end.` },
-        { list: pySlice(L, -k, null).reverse(), why: `This thinks a negative index makes the slice run backwards. Only a negative **step** reverses; \`[-${k}:]\` keeps the normal order.` },
-        {
-          list: pySlice(L, -(k + 1), null),
-          why: `This treats $-1$ as the second-to-last item, so it starts one item too early and takes ${k + 1} items. Index $-1$ is the last item, so $-${k}$ is the ${ord(k)} item from the end and the slice has exactly ${k} items.`,
-        },
-      ];
-    } else if (kind === 'step') {
-      const a = rng.int(0, 2);
-      const s = rng.int(2, 3);
-      expr = a === 0 ? `::${s}` : `${a}::${s}`;
-      correct = pySlice(L, a, null, s);
-      const idx: number[] = [];
-      for (let i = a; i < n; i += s) idx.push(i);
-      explain =
-        `A slice \`[start:stop:step]\` starts at \`start\` and jumps forward by \`step\` each time; a missing stop means "to the end".\n\n` +
-        `1. Start at index ${a} and add ${s} each time: indices ${idx.join(', ')} (the next one, ${idx[idx.length - 1] + s}, is past the end).\n` +
-        `2. The items at those indices are ${correct.join(', ')}.\n\n`;
-      pool = [
-        { list: pySlice(L, a, null, s + 1), why: `This treats step ${s} as "skip ${s} items between picks", which is really a step of ${s + 1}. Step ${s} moves forward ${s} indices each time.` },
-        {
-          list: a >= 1 ? pySlice(L, a - 1, null, s) : null,
-          why: `This counts positions from 1, so it starts at the ${ord(a)} item (index ${a - 1}). Python counts from 0: index ${a} is the item ${L[a]}.`,
-        },
-        { list: pySlice(L, s - 1, null, s), why: `This picks "every ${ord(s)} item counting from 1" (indices ${s - 1}, ${2 * s - 1}, ...). The slice starts at index ${a}, not at the ${ord(s)} item.` },
-        {
-          list: pySlice(L, a + 1, null, s),
-          why: `This treats the start index as excluded (like the stop), so it begins one place too late at index ${a + 1}. The start index is included: the slice begins with index ${a}, the item ${L[a]}.`,
-        },
-        { list: pySlice(L, a + s, null, s), why: `This skips the starting item, jumping ${s} places before taking the first one. The slice includes index ${a} itself (the item ${L[a]}).` },
-        { list: a < s ? pySlice(L, a, s) : null, why: `This misreads the double colon as a single colon, treating ${s} as the stop index instead of the step.` },
+        mkNum(at(i + 1) + at(j + 1), 'This counts from 0, so each index lands one position too far along. The first element is `A[1]`.'),
+        mkNum(i + j, 'This adds the indices. `A[i]` gives the value stored at that index.'),
+        mkNum(at(i) * at(j), 'This multiplies the two values. The code adds them.'),
+        mkNum(at(i) + at(j + 1), `This reads the second index as ${j + 1}, one position too far along.`),
       ];
     } else {
-      const s = rng.pick([1, 2]);
-      expr = s === 1 ? '::-1' : '::-2';
-      correct = pySlice(L, null, null, -s);
-      const idx: number[] = [];
-      for (let i = n - 1; i >= 0; i -= s) idx.push(i);
-      explain =
-        `A **negative step** walks backwards. With no start given, it starts at the **last** item and keeps going until it passes the beginning.\n\n` +
-        `1. Start at index ${n - 1} and subtract ${s} each time: indices ${idx.join(', ')}.\n` +
-        `2. The items at those indices are ${correct.join(', ')}.\n\n`;
-      pool =
-        s === 1
-          ? [
-              { list: L.slice(), why: 'This ignores the minus sign. A step of $-1$ walks backwards, so the whole list comes out reversed.' },
-              { list: pySlice(L, -2, null, -1), why: `This starts at the second-to-last item. With a negative step and no start, the slice starts at the very last item, ${L[n - 1]}.` },
-              { list: pySlice(L, null, 0, -1), why: `This stops before index 0, leaving out the first item ${L[0]}. With no stop given, a reversed slice runs right to the beginning.` },
-            ]
-          : [
-              { list: pySlice(L, null, null, 2), why: 'This ignores the minus sign and takes every 2nd item from the start. A negative step walks backwards from the end.' },
-              { list: pySlice(L, -2, null, -2), why: `This starts at the second-to-last item. With a negative step and no start, the slice starts at the very last item, ${L[n - 1]}.` },
-              { list: pySlice(L, null, null, 2).reverse(), why: 'This takes every 2nd item counting from the **front**, then reverses them. Counting starts from the last item, so the picked positions are different.' },
-              { list: pySlice(L, null, null, -1), why: 'This reverses the whole list but forgets the step size of 2, so it keeps every item instead of every 2nd one.' },
-            ];
+      line = 'print(A[length(A)])';
+      v = at(n);
+      working = `\`length(A)\` is ${n}, so this reads \`A[${n}]\`, the last element, ${v}.`;
+      pool = [
+        mkNum(at(n - 1), `This treats the last index as ${n - 1}, which is true when counting from 0. Counting from 1 it is ${n}.`),
+        mkNum(n, 'This is the length itself. The code uses it as an index into the array.'),
+        mkNum(at(1), 'This is the first element. `length(A)` is the index of the last one.'),
+      ];
     }
 
-    const ans = repr(correct);
-    const distractors = pickDistinct(ans, pool);
-    if (distractors.length < 3) continue; // re-roll parameters
-    const answer = `\`${ans}\``;
-    const src = `${name} = ${repr(L)}\nprint(${name}[${expr}])`;
+    const answer = String(v);
+    const ds = pickDistinct(answer, pool);
+    if (ds.length < 3) continue;
     return {
-      stem: 'What does this Python code print?',
-      code: { lang: 'python', source: src },
+      stem: STEM,
+      code: { lang: 'pseudocode', source: `A = ${repr(A)}\n${line}` },
       answer,
-      answerValue: ans,
-      distractors,
-      solution: indexTable(L) + explain + `A slice of a list is a new list, printed with square brackets.\n\nAnswer: ${answer}`,
-      keyIdea: 'In `a[start:stop:step]` the stop is excluded, negative indices count from the end (`-1` is the last item), and a negative step walks backwards.',
-      python: { stdout: ans + '\n' },
+      answerValue: v,
+      distractors: ds,
+      solution: `${valueRow(A)}${working}\n\nAnswer: ${answer}`,
+      keyIdea: 'In a 1-based array, `A[1]` is the first element and `A[length(A)]` is the last.',
     };
   }
 }
 
-// ---------------------------------------------------------------- generator 2: list methods trace
-type Op =
-  | { k: 'append'; x: number }
-  | { k: 'insert'; i: number; x: number }
-  | { k: 'pop' }
-  | { k: 'popi'; i: number }
-  | { k: 'remove'; x: number }
-  | { k: 'extend'; xs: [number, number] };
-
-type Mistake = 'none' | 'appendFront' | 'insertAfter' | 'insertReplace' | 'popFirst' | 'popNoRemove' | 'popiOneBased' | 'removeByIndex' | 'extendNested';
-
-function opCode(name: string, op: Op): string {
-  switch (op.k) {
-    case 'append':
-      return `${name}.append(${op.x})`;
-    case 'insert':
-      return `${name}.insert(${op.i}, ${op.x})`;
-    case 'pop':
-      return `${name}.pop()`;
-    case 'popi':
-      return `${name}.pop(${op.i})`;
-    case 'remove':
-      return `${name}.remove(${op.x})`;
-    case 'extend':
-      return `${name}.extend([${op.xs[0]}, ${op.xs[1]}])`;
-  }
-}
-
-/** Apply one op (with an optional misunderstanding). Returns false if it would raise an error. */
-function applyOp(a: PyVal[], op: Op, mk: Mistake): boolean {
-  switch (op.k) {
-    case 'append':
-      if (mk === 'appendFront') a.unshift(op.x);
-      else a.push(op.x);
-      return true;
-    case 'insert':
-      if (mk === 'insertAfter') a.splice(Math.min(op.i + 1, a.length), 0, op.x);
-      else if (mk === 'insertReplace') {
-        if (op.i >= a.length) return false;
-        a[op.i] = op.x;
-      } else a.splice(Math.min(op.i, a.length), 0, op.x);
-      return true;
-    case 'pop':
-      if (a.length === 0) return false;
-      if (mk === 'popNoRemove') return true;
-      if (mk === 'popFirst') a.shift();
-      else a.pop();
-      return true;
-    case 'popi': {
-      const i = mk === 'popiOneBased' ? op.i - 1 : op.i;
-      if (i < 0 || i >= a.length) return false;
-      if (mk === 'popNoRemove') return true;
-      a.splice(i, 1);
-      return true;
-    }
-    case 'remove': {
-      if (mk === 'removeByIndex') {
-        if (op.x >= a.length) return false;
-        a.splice(op.x, 1);
-        return true;
-      }
-      const j = a.findIndex((v) => v === op.x);
-      if (j < 0) return false;
-      a.splice(j, 1);
-      return true;
-    }
-    case 'extend':
-      if (mk === 'extendNested') a.push([op.xs[0], op.xs[1]]);
-      else a.push(op.xs[0], op.xs[1]);
-      return true;
-  }
-}
-
-/** Simulate the ops; the misunderstanding `mk` is applied only to the op at index `at`. */
-function simulate(start: number[], ops: Op[], mk: Mistake, at = -1): PyVal[] | null {
-  const a: PyVal[] = start.slice();
-  for (let j = 0; j < ops.length; j++) if (!applyOp(a, ops[j], j === at ? mk : 'none')) return null;
-  return a;
-}
-
-const MISTAKES: Record<Op['k'], { mk: Mistake; why: (op: Op) => string }[]> = {
-  append: [{ mk: 'appendFront', why: (op) => `This puts the appended value at the front. \`append(${(op as { x: number }).x})\` always adds to the **end** of the list.` }],
-  insert: [
-    {
-      mk: 'insertAfter',
-      why: (op) => {
-        const o = op as { i: number; x: number };
-        return `This puts ${o.x} **after** index ${o.i}. \`insert(${o.i}, ${o.x})\` places the new item **at** index ${o.i}, shifting the old item there one place right.`;
-      },
-    },
-    {
-      mk: 'insertReplace',
-      why: (op) => {
-        const o = op as { i: number; x: number };
-        return `This overwrites the item at index ${o.i}. \`insert\` never replaces anything: it adds ${o.x} and shifts the later items right, so the list gets longer.`;
-      },
-    },
-  ],
-  pop: [
-    { mk: 'popFirst', why: () => 'This removes the first item. With no argument, `pop()` removes the **last** item; `pop(0)` would remove the first.' },
-    { mk: 'popNoRemove', why: () => '`pop()` does not just look at the last item: it **removes** it from the list (and returns it).' },
-  ],
-  popi: [
-    {
-      mk: 'popiOneBased',
-      why: (op) => {
-        const i = (op as { i: number }).i;
-        return `This counts positions from 1, removing the ${ord(i)} item. \`pop(${i})\` removes the item at index ${i}, counting from 0.`;
-      },
-    },
-    { mk: 'popNoRemove', why: (op) => `\`pop(${(op as { i: number }).i})\` does not just read the item: it **removes** it from the list (and returns it).` },
-  ],
-  remove: [
-    {
-      mk: 'removeByIndex',
-      why: (op) => {
-        const x = (op as { x: number }).x;
-        return `This treats \`remove(${x})\` as "delete the item at index ${x}". \`remove\` deletes by **value**: it removes the first item equal to ${x}.`;
-      },
-    },
-  ],
-  extend: [
-    {
-      mk: 'extendNested',
-      why: (op) => {
-        const xs = (op as { xs: number[] }).xs;
-        return `This adds \`[${xs[0]}, ${xs[1]}]\` as one nested item, which is what \`append\` would do. \`extend\` adds each item separately.`;
-      },
-    },
-  ],
-};
-
-function opRule(op: Op): string {
-  switch (op.k) {
-    case 'append':
-      return `adds ${op.x} to the end`;
-    case 'insert':
-      return `puts ${op.x} at index ${op.i}, shifting later items right`;
-    case 'pop':
-      return 'removes the last item';
-    case 'popi':
-      return `removes the item at index ${op.i}`;
-    case 'remove':
-      return `removes the first item equal to ${op.x}`;
-    case 'extend':
-      return `adds ${op.xs[0]} and ${op.xs[1]} to the end, one by one`;
-  }
-}
-
-function genMethods(rng: Rng): GeneratedCore {
+// ---------------------------------------------------------------- generator 2: traverse with a loop
+function genTraverse(rng: Rng): GeneratedCore {
   for (;;) {
-    const name = rng.pick(['nums', 'items', 'a', 'stack', 'q']);
     const n = rng.int(4, 5);
-    const start = rng.sample([1, 2, 3, 4, 5, 6, 7, 8, 9], n);
-    const kinds = rng.sample(['append', 'insert', 'pop', 'popi', 'remove', 'extend'] as const, 3);
-    const big = rng.shuffle(Array.from({ length: 20 }, (_, i) => i + 10));
-    let bi = 0;
-    const cur = start.slice();
-    const ops: Op[] = [];
-    for (const k of kinds) {
-      let op: Op;
-      if (k === 'append') op = { k, x: big[bi++] };
-      else if (k === 'insert') op = { k, i: rng.int(1, cur.length - 1), x: big[bi++] };
-      else if (k === 'pop') op = { k };
-      else if (k === 'popi') op = { k, i: rng.int(1, cur.length - 2) };
-      else if (k === 'remove') op = { k, x: rng.pick(cur.filter((v) => v < 10)) };
-      else op = { k, xs: [big[bi++], big[bi++]] };
-      applyOp(cur, op, 'none');
-      ops.push(op);
-    }
-    const correct = simulate(start, ops, 'none')!;
-    if (correct.length < 3) continue; // keep the final list interesting
-    const ans = repr(correct);
-    const pool: Cand[] = [];
-    ops.forEach((op, j) => {
-      for (const m of MISTAKES[op.k]) {
-        let list = simulate(start, ops, m.mk, j);
-        // the nested-list mistake must still be visible in the final list (not popped off later)
-        if (m.mk === 'extendNested' && list && !list.some((v) => Array.isArray(v))) list = null;
-        pool.push({ list, why: m.why(op) });
-      }
-    });
-    const distractors = pickDistinct(ans, pool);
-    if (distractors.length < 3) continue;
+    const A = rng.sample([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], n);
+    const kind = rng.pick(['sum', 'maxPos', 'countAbove', 'min', 'even'] as const);
+    const head = `A = ${repr(A)}`;
+    let lines: string[];
+    let v: number;
+    let rows: string;
+    let pool: Cand[];
+    let keyIdea: string;
 
-    // trace table
-    let rows = `| Line | Rule | \`${name}\` afterwards |\n| --- | --- | --- |\n| \`${name} = ${repr(start)}\` | start | \`${repr(start)}\` |\n`;
-    const a: PyVal[] = start.slice();
-    for (const op of ops) {
-      applyOp(a, op, 'none');
-      rows += `| \`${opCode(name, op)}\` | ${opRule(op)} | \`${repr(a)}\` |\n`;
+    if (kind === 'sum') {
+      lines = [head, 's = 0', 'for i = 1 to length(A)', '   s = s + A[i]', 'end for', 'print(s)'];
+      let s = 0;
+      rows = '| i | A[i] | s |\n|---|---|---|\n' + A.map((x, i) => `| ${i + 1} | ${x} | ${(s += x)} |`).join('\n');
+      v = s;
+      pool = [
+        mkNum(v - A[n - 1], 'This stops one pass early. The loop runs up to and including the length.'),
+        mkNum(v - A[0], 'This starts at `i = 2`, leaving out the first element.'),
+        mkNum(A[n - 1], 'This is only the last element, as if the line were `s = A[i]`. The running total keeps every value.'),
+      ];
+      keyIdea = 'A running total starts at 0 and adds each element once.';
+    } else if (kind === 'maxPos') {
+      lines = [head, 'p = 1', 'for i = 2 to length(A)', '   if A[i] > A[p]', '      p = i', '   end if', 'end for', 'print(p)'];
+      let p = 0;
+      const out: string[] = [];
+      for (let i = 1; i < n; i++) {
+        const before = A[p];
+        if (A[i] > before) p = i;
+        out.push(`| ${i + 1} | ${A[i]} | ${before} | ${p + 1} |`);
+      }
+      rows = '| i | A[i] | A[p] before | p |\n|---|---|---|---|\n' + out.join('\n');
+      v = p + 1;
+      pool = [
+        mkNum(A[p], 'This is the largest **value**. The code prints `p`, its position.'),
+        mkNum(p, 'This counts positions from 0. Here the first element is at index 1.'),
+        mkNum(n, 'This is the last index. `p` only changes when a larger value is found.'),
+        mkNum(A.indexOf(Math.min(...A)) + 1, 'This is the position of the smallest value. The test is `A[i] > A[p]`, which looks for the largest.'),
+      ];
+      keyIdea = 'Track the position of the maximum separately from its value.';
+    } else if (kind === 'countAbove') {
+      const t = rng.pick(A);
+      lines = [head, 'c = 0', 'for i = 1 to length(A)', `   if A[i] > ${t}`, '      c = c + 1', '   end if', 'end for', 'print(c)'];
+      let c = 0;
+      rows = `| i | A[i] | A[i] > ${t}? | c |\n|---|---|---|---|\n` + A.map((x, i) => `| ${i + 1} | ${x} | ${x > t ? 'yes' : 'no'} | ${x > t ? ++c : c} |`).join('\n');
+      v = c;
+      pool = [
+        mkNum(c + 1, `This also counts the value equal to ${t}. The test is strictly greater than.`),
+        mkNum(n, 'This counts every element and ignores the `if`.'),
+        mkNum(A.filter((x) => x > t).reduce((s, x) => s + x, 0), 'This adds the values that pass the test. The code adds 1 each time.'),
+        mkNum(n - c, 'This counts the elements that fail the test.'),
+      ];
+      keyIdea = 'A counter adds 1 for each element that passes the test.';
+    } else if (kind === 'min') {
+      lines = [head, 'm = A[1]', 'for i = 2 to length(A)', '   if A[i] < m', '      m = A[i]', '   end if', 'end for', 'print(m)'];
+      let m = A[0];
+      const out: string[] = [];
+      for (let i = 1; i < n; i++) {
+        if (A[i] < m) m = A[i];
+        out.push(`| ${i + 1} | ${A[i]} | ${m} |`);
+      }
+      rows = '| i | A[i] | m |\n|---|---|---|\n' + out.join('\n');
+      v = m;
+      pool = [
+        mkNum(Math.max(...A), 'This is the largest value. The test `A[i] < m` keeps the smaller value.'),
+        mkNum(A[0], 'This is the starting value. `m` changes each time a smaller element is found.'),
+        mkNum(A[n - 1], 'This is the last element, as if `m` were overwritten on every pass. It changes only when the test is true.'),
+        mkNum(A.indexOf(m) + 1, 'This is the position of the smallest value. The code stores and prints the value.'),
+      ];
+      keyIdea = 'A minimum search starts from the first element and replaces it whenever a smaller one appears.';
+    } else {
+      lines = [head, 'c = 0', 'for i = 1 to length(A)', '   if mod(A[i],2) == 0 // mod is the modulus operator', '      c = c + 1', '   end if', 'end for', 'print(c)'];
+      let c = 0;
+      rows = '| i | A[i] | even? | c |\n|---|---|---|---|\n' + A.map((x, i) => `| ${i + 1} | ${x} | ${x % 2 === 0 ? 'yes' : 'no'} | ${x % 2 === 0 ? ++c : c} |`).join('\n');
+      v = c;
+      pool = [
+        mkNum(n - c, 'This counts the odd numbers. A remainder of 0 on dividing by 2 means even.'),
+        mkNum(A.filter((x) => x % 2 === 0).reduce((s, x) => s + x, 0), 'This adds the even values. The code adds 1 each time, not the value.'),
+        mkNum(n, 'This counts every element and ignores the `if`.'),
+        mkNum(c + 1, 'This is one too many: the counter starts at 0, so it ends on the number of even values.'),
+      ];
+      keyIdea = 'A counter adds 1 for each element that passes the test.';
     }
-    const answer = `\`${ans}\``;
+
+    const answer = String(v);
+    const ds = pickDistinct(answer, pool);
+    if (ds.length < 3) continue;
     return {
-      stem: `What does this Python code print?`,
-      code: { lang: 'python', source: `${name} = ${repr(start)}\n${ops.map((o) => opCode(name, o)).join('\n')}\nprint(${name})` },
+      stem: STEM,
+      code: { lang: 'pseudocode', source: lines.join('\n') },
       answer,
-      answerValue: ans,
-      distractors,
-      solution:
-        'Trace the list one line at a time. Each method changes the list **in place**.\n\n' +
-        rows +
-        '\nRemember: `remove` works by value, `pop` and `insert` work by index (counting from 0), and `extend` adds items one by one.\n\n' +
-        `Answer: ${answer}`,
-      keyIdea: '`append`/`extend` add to the end, `insert(i, x)` puts `x` at index `i`, `pop()` removes the last item (`pop(i)` the item at index `i`), and `remove(x)` deletes the first `x`.',
-      python: { stdout: ans + '\n' },
+      answerValue: v,
+      distractors: ds,
+      solution: `Follow the loop one pass at a time.\n\n${rows}\n\nAnswer: ${answer}`,
+      keyIdea,
+    };
+  }
+}
+
+// ---------------------------------------------------------------- generator 3: swap and shift
+function genShift(rng: Rng): GeneratedCore {
+  for (;;) {
+    const n = rng.int(3, 4);
+    const A = rng.sample([1, 2, 3, 4, 5, 6, 7, 8, 9], n);
+    const kind = rng.pick(['swap', 'badSwap', 'left', 'right', 'spread', 'stuck'] as const);
+    const head = `A = ${repr(A)}`;
+    const shiftedLeft = [...A.slice(1), A[n - 1]];
+    const shiftedRight = [A[0], ...A.slice(0, n - 1)];
+    const rotatedLeft = [...A.slice(1), A[0]];
+    const rotatedRight = [A[n - 1], ...A.slice(0, n - 1)];
+    const spread = A.map(() => A[0]);
+    let lines: string[];
+    let pool: Cand[];
+    let working: string;
+    let keyIdea: string;
+    let result: number[] | null;
+
+    const stepRows = (steps: [string, number[]][]) => '| Line | `A` afterwards |\n|---|---|\n' + steps.map(([l, a]) => `| \`${l}\` | ${lit(a)} |`).join('\n');
+
+    if (kind === 'swap' || kind === 'badSwap') {
+      const i = rng.int(1, n - 1);
+      const j = rng.int(i + 1, n);
+      const swapped = [...A];
+      swapped[i - 1] = A[j - 1];
+      swapped[j - 1] = A[i - 1];
+      const copied = [...A];
+      copied[i - 1] = A[j - 1];
+      const copiedBack = [...A];
+      copiedBack[j - 1] = A[i - 1];
+      if (kind === 'swap') {
+        lines = [head, `t = A[${i}]`, `A[${i}] = A[${j}]`, `A[${j}] = t`, 'print(A)'];
+        result = swapped;
+        working = `\`t\` saves ${A[i - 1]}.\n\n` + stepRows([[`A[${i}] = A[${j}]`, copied], [`A[${j}] = t`, swapped]]);
+        pool = [
+          mkArr(copied, `This stops before the last line. \`A[${j}] = t\` puts the saved value into position ${j}.`),
+          mkArr(copiedBack, `This writes the saved value but forgets that \`A[${i}]\` was changed.`),
+          mkArr(A, 'This assumes the lines cancel out. Each one really changes the array.'),
+        ];
+        keyIdea = 'A swap saves one value, overwrites it, then writes the saved value to the other position.';
+      } else {
+        lines = [head, `A[${i}] = A[${j}]`, `A[${j}] = A[${i}]`, 'print(A)'];
+        result = copied;
+        working = stepRows([[`A[${i}] = A[${j}]`, copied], [`A[${j}] = A[${i}]`, copied]]) + `\n\nThe first line has already overwritten ${A[i - 1]}, so the second line changes nothing.`;
+        pool = [
+          mkArr(swapped, `This assumes the two lines swap the values. The ${A[i - 1]} is lost on the first line, because it was not saved in a temporary variable.`),
+          mkArr(copiedBack, 'This does the two lines in the opposite order.'),
+          mkArr(A, 'This assumes the lines cancel out. The first line really changes the array.'),
+        ];
+        keyIdea = 'Without a temporary variable, two assignments copy one value instead of swapping.';
+      }
+    } else if (kind === 'left') {
+      lines = [head, 'for i = 1 to length(A) - 1', '   A[i] = A[i + 1]', 'end for', 'print(A)'];
+      result = shiftedLeft;
+      const steps: [string, number[]][] = [];
+      const a = [...A];
+      for (let i = 1; i < n; i++) {
+        a[i - 1] = a[i];
+        steps.push([`A[${i}] = A[${i + 1}]`, [...a]]);
+      }
+      working = stepRows(steps) + '\n\nThe first value is overwritten, and the last value is left in place, so it appears twice.';
+      pool = [
+        mkArr(rotatedLeft, 'This treats the shift as a rotation, moving the first value to the end. That value is overwritten and lost.'),
+        mkArr(shiftedRight, 'This shifts right. The code copies `A[i + 1]` into `A[i]`, which moves values to the left.'),
+        { text: 'Infinite loop', value: 'Infinite loop', why: 'A `for` loop runs a fixed number of passes, so it always ends.' },
+        mkArr(spread, 'This copies each value to its right. The code copies from right to left.'),
+      ];
+      keyIdea = 'Shifting left overwrites the first value and leaves the last value in place twice.';
+    } else if (kind === 'right') {
+      lines = [head, `i = ${n}`, 'while (i > 1)', '   A[i] = A[i - 1]', '   i = i - 1', 'end while', 'print(A)'];
+      result = shiftedRight;
+      const steps: [string, number[]][] = [];
+      const a = [...A];
+      for (let i = n; i > 1; i--) {
+        a[i - 1] = a[i - 2];
+        steps.push([`A[${i}] = A[${i - 1}]`, [...a]]);
+      }
+      working = stepRows(steps) + '\n\nWorking from the right keeps each value until it has been copied.';
+      pool = [
+        mkArr(spread, 'This is what happens when the loop runs from the left. Running from the right keeps each value until it has been copied.'),
+        { text: 'Infinite loop', value: 'Infinite loop', why: '`i` goes down by 1 on each pass, so it reaches 1 and the loop stops.' },
+        mkArr(rotatedRight, 'This treats the shift as a rotation. The last value is overwritten and lost.'),
+        mkArr(shiftedLeft, 'This shifts left. The code copies `A[i - 1]` into `A[i]`, which moves values to the right.'),
+      ];
+      keyIdea = 'To shift right without losing values, work from the last index down.';
+    } else if (kind === 'spread') {
+      lines = [head, 'for i = 2 to length(A)', '   A[i] = A[i - 1]', 'end for', 'print(A)'];
+      result = spread;
+      const steps: [string, number[]][] = [];
+      const a = [...A];
+      for (let i = 2; i <= n; i++) {
+        a[i - 1] = a[i - 2];
+        steps.push([`A[${i}] = A[${i - 1}]`, [...a]]);
+      }
+      working = stepRows(steps) + '\n\nEach pass copies the value that was just overwritten, so the first value spreads through the array.';
+      pool = [
+        mkArr(shiftedRight, 'This uses the old values on every pass. By the next pass, the element on the left has already been changed.'),
+        mkArr(shiftedLeft, 'This shifts left. The code copies `A[i - 1]` into `A[i]`, so values move to the right.'),
+        mkArr(rotatedRight, 'This treats the shift as a rotation. Nothing here moves the last value to the front.'),
+      ];
+      keyIdea = 'Shifting right from the left end spreads the first value through the whole array.';
+    } else {
+      lines = [head, `i = ${n}`, 'while (i > 1)', '   A[i] = A[i - 1]', 'end while', 'print(A)'];
+      result = null;
+      working = `Nothing in the loop body changes \`i\`, so it stays ${n}. The condition is always true, and the loop never reaches \`print\`.`;
+      pool = [
+        mkArr(shiftedRight, 'This is the result if the body also had `i = i - 1`. Without it, the loop never ends.'),
+        mkArr(spread, 'This assumes the loop finishes after copying the first value along. `i` never changes, so it never finishes.'),
+        (() => {
+          const once = [...A];
+          once[n - 1] = A[n - 2];
+          return mkArr(once, 'This assumes the loop runs once. The condition is tested again after each pass and is still true.');
+        })(),
+      ];
+      keyIdea = 'A `while` loop must change the variable in its condition, or it never ends.';
+    }
+
+    const answer = result ? lit(result) : 'Infinite loop';
+    const ds = pickDistinct(answer, pool);
+    if (ds.length < 3) continue;
+    return {
+      stem: STEM,
+      code: { lang: 'pseudocode', source: lines.join('\n') },
+      answer,
+      answerValue: result ? repr(result) : 'Infinite loop',
+      distractors: ds,
+      solution: `${working}\n\nAnswer: ${answer}`,
+      keyIdea,
     };
   }
 }
 
 export const generators: Generator[] = [
   {
-    id: 'gen-lists-tuples-slice',
+    id: 'gen-lists-tuples-index',
     subtopic: 'lists-tuples',
     difficulty: 'foundation',
-    title: 'Predict the output of a list slice',
-    generate: genSlice,
+    title: 'Read array elements by index',
+    generate: genIndex,
   },
   {
-    id: 'gen-lists-tuples-methods',
+    id: 'gen-lists-tuples-traverse',
     subtopic: 'lists-tuples',
     difficulty: 'exam',
-    title: 'Trace a sequence of list methods',
-    generate: genMethods,
+    title: 'Trace a loop over an array: sum, count, maximum, minimum',
+    generate: genTraverse,
+  },
+  {
+    id: 'gen-lists-tuples-shift',
+    subtopic: 'lists-tuples',
+    difficulty: 'exam',
+    title: 'Trace a swap or shift in an array',
+    generate: genShift,
   },
 ];

@@ -489,11 +489,10 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ------------------------------------------------------------------ challenge
   {
     id: 'integration-016',
     subtopic: 'integration',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Find the **total** area of the regions between the curve $y = x^{2} - 1$ and the $x$-axis for $0 \\le x \\le 2$.',
     options: ['$\\frac{2}{3}$', '$\\frac{4}{3}$', '$\\frac{8}{3}$', '$2$'],
     correctIndex: 3,
@@ -548,97 +547,67 @@ export const questions: StaticQuestion[] = [
       compute: () => bisect((k) => integrate((x) => 2 * x + 3, 0, k) - 10, 0.001, 10),
     },
   },
+  // ------------------------------------------------------------------ recall
   {
-    id: 'integration-018',
+    id: 'integration-021',
     subtopic: 'integration',
-    difficulty: 'challenge',
-    stem: 'Given that $\\int_{1}^{3} f(x)\\,dx = 7$ and $\\int_{3}^{1 } g(x)\\,dx = 2$, find $\\int_{1}^{3} \\left(2f(x) - 3g(x) + 1\\right)dx$.',
-    options: ['$10$', '$21$', '$22$', '$20$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Step 1: fix the limits on $g$.** Swapping the limits changes the sign: $\\int_{1}^{3} g(x)\\,dx = -\\int_{3}^{1 } g(x)\\,dx = -2$.\n\n' +
-        '**Step 2: split the integral term by term** (constants come out in front):\n\n' +
-        '$$\\int_{1}^{3} \\left(2f - 3g + 1\\right)dx = 2\\int_{1}^{3} f\\,dx - 3\\int_{1}^{3} g\\,dx + \\int_{1}^{3} 1\\,dx$$\n\n' +
-        '**Step 3: the constant term.** $\\int_{1}^{3} 1\\,dx = \\left[x\\right]_{1}^{3} = 3 - 1 = 2$ (the width of the interval).\n\n' +
-        '**Step 4: substitute.** $2(7) - 3(-2) + 2 = 14 + 6 + 2 = 22$.',
-      whyWrong: [
-        'This ignores the reversed limits and uses $\\int_{1}^{3} g\\,dx = 2$: $14 - 6 + 2 = 10$. Swapping the limits of an integral changes its sign.',
-        'This treats $\\int_{1}^{3} 1\\,dx$ as $1$. Integrating 1 gives $x$, so the value is the width $3 - 1 = 2$.',
-        null,
-        'This drops the $+1$ term completely, as if a constant integrates to $0$ (that happens when you differentiate, not integrate). It should contribute $2$.',
-      ],
-      keyIdea: 'Definite integrals split term by term, swapping the limits flips the sign, and $\\int_{a}^{b} 1\\,dx = b - a$.',
-    },
-    check: {
-      optionValues: [10, 21, 22, 20],
-      compute: () => {
-        const intF13 = 7;
-        const intG31 = 2;
-        const intG13 = -intG31; // reversing the limits flips the sign
-        return 2 * intF13 - 3 * intG13 + integrate(() => 1, 1, 3);
-      },
-    },
-  },
-  {
-    id: 'integration-019',
-    subtopic: 'integration',
-    difficulty: 'challenge',
-    stem: 'Given that $k > 0$ and $\\int_{0}^{k} e^{2x}\\,dx = 4$, find the exact value of $k$.',
-    options: ['$\\ln 3$', '$\\frac{1}{2}\\ln 8$', '$\\frac{1}{2}\\ln 5$', '$\\ln 9$'],
+    difficulty: 'foundation',
+    stem: 'Integration is the reverse of which operation?',
+    options: ['Differentiation', 'Multiplication', 'Substitution', 'Factorising'],
     correctIndex: 0,
     markScheme: {
       solution:
-        '**Step 1: integrate.** $\\int e^{2x}\\,dx = \\frac{1}{2}e^{2x}$.\n\n' +
-        '**Step 2: substitute the limits** (remember $e^{0} = 1$):\n\n' +
-        '$$\\left[\\frac{1}{2}e^{2x}\\right]_{0}^{k} = \\frac{1}{2}e^{2k} - \\frac{1}{2} = \\frac{e^{2k} - 1}{2}$$\n\n' +
-        '**Step 3: solve.** $\\frac{e^{2k} - 1}{2} = 4$, so $e^{2k} - 1 = 8$ and $e^{2k} = 9$.\n\n' +
-        '**Step 4: take natural logs.** $2k = \\ln 9$, so $k = \\frac{1}{2}\\ln 9 = \\ln 9^{\\frac{1}{2}} = \\ln 3$.\n\n' +
-        'Check: $\\frac{e^{2\\ln 3} - 1}{2} = \\frac{9 - 1}{2} = 4$. Correct.',
+        'If differentiating $F(x)$ gives $f(x)$, then integrating $f(x)$ gives back $F(x) + C$. So integration is differentiation run backwards.',
       whyWrong: [
         null,
-        'This takes $e^{0}$ as $0$, so the lower limit disappears: $\\frac{1}{2}e^{2k} = 4$ gives $e^{2k} = 8$. But $e^{0} = 1$, so $\\frac{1}{2}$ must be subtracted.',
-        'This forgets the $\\frac{1}{2}$ when integrating $e^{2x}$: $e^{2k} - 1 = 4$ gives $e^{2k} = 5$.',
-        'This finds $e^{2k} = 9$ correctly but then forgets to divide by 2: from $2k = \\ln 9$, $k = \\frac{1}{2}\\ln 9 = \\ln 3$, not $\\ln 9$.',
+        'The reverse of multiplication is division. Integration undoes a derivative.',
+        'Substitution means putting a value or expression in place of a variable. It is a step you may use, not the reverse of integration.',
+        'Factorising is reversed by expanding brackets. Integration undoes a derivative.',
       ],
-      keyIdea: 'Integrate, substitute both limits (with $e^{0} = 1$), then undo the exponential with $\\ln$ and the log laws.',
-    },
-    check: {
-      optionValues: [ln(3), ln(8) / 2, ln(5) / 2, ln(9)],
-      compute: () => bisect((k) => integrate((x) => E ** (2 * x), 0, k) - 4, 0.001, 3),
+      keyIdea: 'Integration is differentiation run backwards.',
     },
   },
   {
-    id: 'integration-020',
+    id: 'integration-022',
     subtopic: 'integration',
-    difficulty: 'challenge',
-    stem: 'A particle moves along a straight line with velocity $v(t) = 3t^{2} - 12$ metres per second, for $0 \\le t \\le 3$ seconds. What is the **total distance** travelled by the particle?',
-    options: ['$9$ m', '$-9$ m', '$7$ m', '$23$ m'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'What is the $C$ in $\\int f(x)\\,dx = F(x) + C$ called?',
+    options: ['The constant of integration', 'The limit of integration', 'The gradient', 'The integrand'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Distance is the area between the velocity graph and the $t$-axis, counting parts below the axis as positive.\n\n' +
-        '**Step 1: when does the particle change direction?** $3t^{2} - 12 = 0$ gives $t^{2} = 4$, so $t = 2$. For $0 \\le t < 2$, $v < 0$ (e.g. $v(0) = -12$, moving backwards); for $2 < t \\le 3$, $v > 0$.\n\n' +
-        '**Step 2: integrate each part.** Let $s(t) = t^{3} - 12t$, so $s(0) = 0$, $s(2) = 8 - 24 = -16$, $s(3) = 27 - 36 = -9$.\n\n' +
-        '- $\\int_{0}^{2} v\\,dt = s(2) - s(0) = -16$: it travels $16$ m backwards.\n' +
-        '- $\\int_{2}^{3} v\\,dt = s(3) - s(2) = -9 + 16 = 7$: it travels $7$ m forwards.\n\n' +
-        '**Step 3: add the distances.** $16 + 7 = 23$ m.\n\n' +
-        '(The **displacement** is $\\int_{0}^{3} v\\,dt = -9$ m, because the forward and backward parts partly cancel.)',
+        'A constant differentiates to $0$, so many functions share the same derivative. For example, $x^{2}$ and $x^{2} + 5$ both differentiate to $2x$. The unknown constant $C$ allows for this, and it is called the **constant of integration**.',
       whyWrong: [
-        'This is the size of the **displacement**, $\\left|\\int_{0}^{3} v\\,dt\\right| = 9$: the 16 m backwards and 7 m forwards partly cancel. Distance must add them.',
-        'This is the displacement $\\int_{0}^{3} v\\,dt = -9$, computed without splitting where $v$ changes sign. A distance can never be negative.',
-        'This counts only the forward part from $t = 2$ to $t = 3$ and ignores the 16 m travelled backwards while $v < 0$.',
         null,
+        'The limits of integration are the numbers $a$ and $b$ in a definite integral $\\int_{a}^{b}$.',
+        'The gradient is the derivative of a function. $C$ does not affect the gradient at all.',
+        'The integrand is the function being integrated, here $f(x)$.',
       ],
-      keyIdea: 'Parts of a graph below the axis give negative integrals; for total distance (or total area) split at the sign change and add the sizes.',
+      keyIdea: 'Every indefinite integral includes a constant of integration, $C$.',
+    },
+  },
+  {
+    id: 'integration-023',
+    subtopic: 'integration',
+    difficulty: 'foundation',
+    stem: 'What is the value of $\\int_{a}^{a} f(x)\\,dx$?',
+    options: ['$0$', '$f(a)$', '$a$', '$2f(a)$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A definite integral is top limit minus bottom limit, $F(b) - F(a)$. When both limits are $a$, this is $F(a) - F(a) = 0$. A region of zero width has zero area.',
+      whyWrong: [
+        null,
+        'This is the height of the curve at $x = a$. An integral gives an area, and here the width is $0$.',
+        'This reads off the limit itself. The integral is $F(a) - F(a)$, which cancels to $0$.',
+        'This adds the values at the two limits. A definite integral subtracts, and it uses $F$, not $f$.',
+      ],
+      keyIdea: 'If the two limits are equal, a definite integral is $0$.',
     },
     check: {
-      optionValues: [9, -9, 7, 23],
-      compute: () => {
-        const v = (t: number) => 3 * t ** 2 - 12;
-        const t0 = bisect(v, 0, 3);
-        return Math.abs(integrate(v, 0, t0)) + Math.abs(integrate(v, t0, 3));
-      },
+      // the options for f(x) = x^2 + 1 and a = 2
+      optionValues: [0, 5, 2, 10],
+      compute: () => integrate((x) => x ** 2 + 1, 2, 2),
     },
   },
 ];

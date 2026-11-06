@@ -142,7 +142,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'modular-arithmetic-005',
     subtopic: 'modular-arithmetic',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     stem: 'What is the highest common factor (HCF, also called GCD) of $84$ and $126$?',
     options: ['$252$', '$21$', '$42$', '$6$'],
     correctIndex: 2,
@@ -260,12 +260,12 @@ export const questions: StaticQuestion[] = [
     id: 'modular-arithmetic-009',
     subtopic: 'modular-arithmetic',
     difficulty: 'exam',
-    stem: 'When the whole number $a$ is divided by 8 the remainder is 3, and when $b$ is divided by 8 the remainder is 6. What is the remainder when $a^2 b$ is divided by 8?',
+    stem: 'If $a \\equiv 3 \\pmod{8}$ and $b \\equiv 6 \\pmod{8}$, what is the remainder when $a^2 b$ is divided by 8?',
     options: ['$54$', '$2$', '$6$', '$4$'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'We know $a \\equiv 3 \\pmod{8}$ and $b \\equiv 6 \\pmod{8}$. In modular arithmetic you may replace each number by its remainder before multiplying.\n\n' +
+        '$a \\equiv 3 \\pmod{8}$ means $a$ leaves remainder 3 when divided by 8, and likewise $b$ leaves remainder 6. In modular arithmetic you may replace each number by its remainder before multiplying.\n\n' +
         '1. $a^2 \\equiv 3^2 = 9 \\equiv 1 \\pmod{8}$\n' +
         '2. $a^2 b \\equiv 1 \\times 6 = 6 \\pmod{8}$\n\n' +
         'Check with real numbers: $a = 11$, $b = 14$ gives $a^2 b = 121 \\times 14 = 1694 = 8 \\times 211 + 6$. Remainder 6.',
@@ -325,24 +325,23 @@ export const questions: StaticQuestion[] = [
     id: 'modular-arithmetic-011',
     subtopic: 'modular-arithmetic',
     difficulty: 'exam',
-    stem: 'Bus A leaves the station every 12 minutes and bus B leaves every 18 minutes. Both buses leave together at 08:00. At what time do they next leave together?',
-    options: ['08:30', '08:36', '08:06', '11:36'],
+    stem: 'What is the lowest common multiple (LCM) of $12$ and $18$?',
+    options: ['$30$', '$36$', '$6$', '$216$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'The buses leave together after a number of minutes that is a multiple of both 12 and 18. The **first** such time is the lowest common multiple.\n\n' +
+        'Write both numbers as products of primes:\n\n' +
         '- $12 = 2^2 \\times 3$\n' +
         '- $18 = 2 \\times 3^2$\n\n' +
         'LCM: every prime with its **higher** power: $2^2 \\times 3^2 = 36$.\n\n' +
-        '(Listing also works: multiples of 18 are 18, 36, ...; 36 is the first that 12 divides.)\n\n' +
-        '36 minutes after 08:00 is **08:36**.',
+        '(Listing also works: multiples of 18 are 18, 36, ...; 36 is the first that 12 divides.)',
       whyWrong: [
-        'This adds the intervals, $12 + 18 = 30$ minutes. At 30 minutes bus A has not left (30 is not a multiple of 12).',
+        'This adds the numbers, $12 + 18 = 30$. But 30 is not a multiple of 12.',
         null,
-        'This uses the HCF, $\\gcd(12, 18) = 6$ minutes. At 08:06 neither bus leaves; you need a common **multiple**, not a common factor.',
-        'This uses the product $12 \\times 18 = 216$ minutes (3 hours 36 minutes). They do meet then, but they already met earlier at 36 minutes.',
+        'This is the HCF, $\\gcd(12, 18) = 6$. You need a common **multiple**, not a common factor.',
+        'This is the product $12 \\times 18 = 216$. It is a common multiple, but not the lowest, because 12 and 18 share the factor 6.',
       ],
-      keyIdea: '"When do they next coincide?" is a lowest common multiple (LCM) question.',
+      keyIdea: 'The LCM takes every prime with its higher power, and it is also the answer to "when do they next coincide?"',
     },
     check: { optionValues: [30, 36, 6, 216], compute: () => lcm(12, 18) },
   },
@@ -373,25 +372,24 @@ export const questions: StaticQuestion[] = [
     id: 'modular-arithmetic-013',
     subtopic: 'modular-arithmetic',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: 'print(-17 % 5, -17 // 5)' },
-    options: ['`3 -4`', '`-2 -3`', '`3 -3`', '`-2 -4`'],
+    stem: 'What is the remainder $r$, with $0 \\le r < 5$, when $-17$ is divided by $5$?',
+    options: ['$3$', '$-2$', '$2$', '$-4$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'In Python, `//` is **floor division**: it rounds **down** (towards minus infinity), and `%` gives the matching remainder, which always has the same sign as the divisor (here positive).\n\n' +
-        '1. $-17 \\div 5 = -3.4$. Rounding **down** gives $-4$, so `-17 // 5` is `-4`.\n' +
-        '2. The remainder satisfies $-17 = 5 \\times (-4) + r$, so $r = -17 + 20 = 3$. So `-17 % 5` is `3`.\n\n' +
-        'Check: $5 \\times (-4) + 3 = -17$. The output is `3 -4`.',
+        'Write $-17 = 5q + r$ with $0 \\le r < 5$.\n\n' +
+        '1. $-17 \\div 5 = -3.4$. Rounding **down** gives $q = -4$.\n' +
+        '2. Then $r = -17 - 5 \\times (-4) = -17 + 20 = 3$.\n\n' +
+        'Check: $5 \\times (-4) + 3 = -17$, and $3$ is between 0 and 4.',
       whyWrong: [
         null,
-        'This is how languages such as C and Java behave: they round $-3.4$ towards zero (to $-3$) and give a negative remainder. Python rounds down instead.',
-        'This mixes the two rules: the remainder 3 is right, but $-3.4$ rounded **down** is $-4$, not $-3$. Check: $5 \\times (-3) + 3 = -12$, not $-17$.',
-        'The quotient $-4$ is right, but then the remainder must satisfy $5 \\times (-4) + r = -17$, giving $r = 3$, not $-2$.',
+        'This rounds $-3.4$ towards zero, using $q = -3$. Then $r = -2$, which breaks the condition $0 \\le r < 5$.',
+        'This is the remainder of $+17$. The minus sign has been ignored.',
+        'This is the quotient $q$, not the remainder $r$.',
       ],
-      keyIdea: 'In Python, `a // b` rounds down and `a % b` has the sign of `b`, so `a == b * (a // b) + a % b` always holds.',
+      keyIdea: 'A remainder lies between 0 and $n - 1$: for a negative number, round the quotient down, then $r = a - nq$.',
     },
-    python: { stdout: '3 -4\n' },
+    check: { optionValues: [3, -2, 2, -4], compute: () => mod(-17, 5) },
   },
   {
     id: 'modular-arithmetic-014',
@@ -460,9 +458,9 @@ export const questions: StaticQuestion[] = [
     stem: 'What is printed by this pseudocode?',
     code: {
       lang: 'pseudocode',
-      source: 'a = 1071\nb = 462\nwhile b != 0:\n    r = a mod b\n    a = b\n    b = r\nprint(a)',
+      source: 'a = 1071\nb = 462\nwhile (b != 0)\n   r = mod(a,b) // mod is the modulus operator\n   a = b\n   b = r\nend while\nprint(a)',
     },
-    options: ['$0$', '$147$', '$3$', '$21$'],
+    options: ['0', '147', 'Infinite loop', '21'],
     correctIndex: 3,
     markScheme: {
       solution:
@@ -477,61 +475,23 @@ export const questions: StaticQuestion[] = [
       whyWrong: [
         'This is the final value of `b` (and of `r`). The loop stops when `b` becomes 0, but the program prints `a`.',
         'This is the remainder after the first pass. The loop keeps going while `b` is not 0, so there are two more passes.',
-        'This is the number of passes of the loop, not the value printed.',
+        'A remainder is always smaller than the divisor, so `b` shrinks on every pass and must reach 0.',
         null,
       ],
       keyIdea: 'In the Euclidean algorithm loop, `a` holds the GCD when `b` reaches 0.',
     },
     check: {
-      optionValues: [0, 147, 3, 21],
+      optionValues: [0, 147, 'Infinite loop', 21],
       compute: () => {
         let a = 1071;
         let b = 462;
-        while (b !== 0) {
+        for (let pass = 0; b !== 0; pass++) {
+          if (pass > 1000) return 'Infinite loop';
           const r = a % b;
           a = b;
           b = r;
         }
         return a;
-      },
-    },
-  },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'modular-arithmetic-017',
-    subtopic: 'modular-arithmetic',
-    difficulty: 'challenge',
-    stem: 'What is the remainder when $1! + 2! + 3! + \\cdots + 100!$ is divided by $7$?',
-    options: ['$0$', '$6$', '$2$', '$5$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'From $7!$ onwards every factorial contains the factor 7 ($7! = 1 \\times 2 \\times \\cdots \\times 7$), so $7!, 8!, \\ldots, 100!$ all leave remainder 0. Only $1!$ to $6!$ matter.\n\n' +
-        '| $n$ | 1 | 2 | 3 | 4 | 5 | 6 |\n' +
-        '| --- | --- | --- | --- | --- | --- | --- |\n' +
-        '| $n!$ | 1 | 2 | 6 | 24 | 120 | 720 |\n\n' +
-        '$$1 + 2 + 6 + 24 + 120 + 720 = 873$$\n\n' +
-        '$873 = 7 \\times 124 + 5$, so the remainder is 5.\n\n' +
-        '(Or reduce as you go: $24 \\equiv 3$, $120 \\equiv 1$, $720 \\equiv 6$, and $1 + 2 + 6 + 3 + 1 + 6 = 19 \\equiv 5 \\pmod{7}$.)',
-      whyWrong: [
-        'This assumes every term is a multiple of 7. Only the terms from $7!$ onwards are; $1!$ to $6!$ do not contain the factor 7.',
-        'This stops after $5!$ ($153 \\equiv 6$), as if $6!$ were already a multiple of 7. $6! = 720$ contains no factor 7 ($720 = 7 \\times 102 + 6$).',
-        'This stops after $3!$ ($9 \\equiv 2$), as if $4!$ onwards were multiples of 7. That shortcut works for dividing by 12 or 24, not by 7.',
-        null,
-      ],
-      keyIdea: 'Every $n!$ with $n \\ge p$ is divisible by $p$, so only the first few factorials affect the remainder.',
-    },
-    check: {
-      optionValues: [0, 6, 2, 5],
-      compute: () => {
-        let total = 0;
-        let f = 1;
-        for (let n = 1; n <= 100; n++) {
-          f = (f * n) % 7;
-          total = (total + f) % 7;
-        }
-        return total;
       },
     },
   },
@@ -564,79 +524,6 @@ export const questions: StaticQuestion[] = [
     check: { optionValues: [8, 0, 2, 18], compute: () => (powMod(3, 2026, 10) + powMod(7, 2026, 10)) % 10 },
   },
   {
-    id: 'modular-arithmetic-019',
-    subtopic: 'modular-arithmetic',
-    difficulty: 'challenge',
-    stem: 'What is the **smallest** positive integer that leaves remainder 1 when divided by each of $2, 3, 4, 5$ and $6$, and is also divisible by $7$?',
-    options: ['$61$', '$421$', '$301$', '$721$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '1. "Remainder 1 when divided by 2, 3, 4, 5 and 6" means $N - 1$ is divisible by all of them, so $N - 1$ is a multiple of their LCM.\n' +
-        '2. $\\operatorname{lcm}(2, 3, 4, 5, 6) = 2^2 \\times 3 \\times 5 = 60$. So $N = 60k + 1$: 61, 121, 181, 241, 301, ...\n' +
-        '3. Test each for divisibility by 7:\n\n' +
-        '| $N$ | 61 | 121 | 181 | 241 | 301 |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| $N \\bmod 7$ | 5 | 2 | 6 | 3 | 0 |\n\n' +
-        'The first one divisible by 7 is $301 = 7 \\times 43$.',
-      whyWrong: [
-        '61 leaves remainder 1 when divided by 2, 3, 4, 5 and 6, but it ignores the last condition: $61 = 7 \\times 8 + 5$ is not divisible by 7.',
-        'This is $60 \\times 7 + 1$, multiplying the LCM by 7. But $421 = 7 \\times 60 + 1$ leaves remainder 1 when divided by 7, so it is not divisible by 7.',
-        null,
-        'This uses the product $2 \\times 3 \\times 4 \\times 5 \\times 6 = 720$ instead of the LCM 60. $721 = 7 \\times 103$ does satisfy every condition, but it is not the smallest.',
-      ],
-      keyIdea: 'Same remainder for several divisors means $N - r$ is a multiple of their LCM; then search the list $\\operatorname{lcm} \\times k + r$.',
-    },
-    check: {
-      optionValues: [61, 421, 301, 721],
-      compute: () => {
-        for (let n = 1; ; n++) if ([2, 3, 4, 5, 6].every((d) => n % d === 1) && n % 7 === 0) return n;
-      },
-    },
-  },
-  {
-    id: 'modular-arithmetic-020',
-    subtopic: 'modular-arithmetic',
-    difficulty: 'challenge',
-    stem: 'How many zeros are there at the end of $100!$ (when it is written out in full)?',
-    options: ['$20$', '$24$', '$10$', '$11$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Each zero at the end comes from a factor $10 = 2 \\times 5$. There are far more factors of 2 than of 5 in $100!$, so count the factors of 5.\n\n' +
-        '1. Multiples of 5 up to 100: $\\left\\lfloor \\frac{100}{5} \\right\\rfloor = 20$, each giving at least one 5.\n' +
-        '2. Multiples of $25 = 5^2$ (25, 50, 75, 100) contain a **second** 5: $\\left\\lfloor \\frac{100}{25} \\right\\rfloor = 4$ more.\n' +
-        '3. Multiples of $125$: none below 100.\n\n' +
-        'Total factors of 5: $20 + 4 = 24$, so $100!$ ends in **24** zeros.',
-      whyWrong: [
-        'This counts only the multiples of 5. Numbers like 25, 50, 75 and 100 contain $5^2$, so each gives two factors of 5.',
-        null,
-        'This only counts the multiples of 10. A zero is also made by a 5 from an odd multiple of 5 (like 15) paired with any spare 2.',
-        'This counts the multiples of 10, plus one extra zero for 100. It still misses all the odd multiples of 5 and the extra 5s in 25, 50 and 75.',
-      ],
-      keyIdea: 'Trailing zeros of $n!$ = number of factors of 5 = $\\left\\lfloor \\frac{n}{5} \\right\\rfloor + \\left\\lfloor \\frac{n}{25} \\right\\rfloor + \\cdots$.',
-    },
-    check: {
-      optionValues: [20, 24, 10, 11],
-      compute: () => {
-        let twos = 0;
-        let fives = 0;
-        for (let k = 1; k <= 100; k++) {
-          let x = k;
-          while (x % 2 === 0) {
-            x /= 2;
-            twos++;
-          }
-          while (x % 5 === 0) {
-            x /= 5;
-            fives++;
-          }
-        }
-        return Math.min(twos, fives);
-      },
-    },
-  },
-  {
     id: 'modular-arithmetic-021',
     subtopic: 'modular-arithmetic',
     difficulty: 'exam',
@@ -665,6 +552,172 @@ export const questions: StaticQuestion[] = [
         let c = 0;
         for (let k = 1; k <= 200; k++) if (k % 4 === 0 || k % 6 === 0) c++;
         return c;
+      },
+    },
+  },
+  {
+    id: 'modular-arithmetic-022',
+    subtopic: 'modular-arithmetic',
+    difficulty: 'foundation',
+    stem: 'The statement $a \\equiv b \\pmod{n}$ means that $a$ and $b$:',
+    options: ['leave the same remainder when divided by $n$', 'are both multiples of $n$', 'add up to $n$', 'are equal'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$a \\equiv b \\pmod{n}$ is read "$a$ is **congruent** to $b$ modulo $n$". It means $a$ and $b$ leave the same remainder when divided by $n$, or equivalently that $n$ divides $a - b$.\n\n' +
+        'For example $17 \\equiv 2 \\pmod{5}$, since both leave remainder 2.',
+      whyWrong: [
+        null,
+        'Multiples of $n$ are only the case with remainder 0. For example $17 \\equiv 2 \\pmod{5}$, and neither is a multiple of 5.',
+        'Congruence compares the remainders. It says nothing about the sum: $17 + 2$ is not 5.',
+        'Equal numbers are congruent, but congruent numbers need not be equal: $17 \\ne 2$.',
+      ],
+      keyIdea: 'Congruent modulo $n$ means the same remainder when divided by $n$.',
+    },
+  },
+  {
+    id: 'modular-arithmetic-023',
+    subtopic: 'modular-arithmetic',
+    difficulty: 'foundation',
+    stem: 'What is the only even **prime** number?',
+    options: ['$2$', '$4$', '$0$', '$1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A prime has exactly two factors: 1 and itself. The number 2 has exactly these two factors, so it is prime.\n\n' +
+        'Every other even number is divisible by 2 as well as by 1 and itself, so it has more than two factors.',
+      whyWrong: [
+        null,
+        '$4 = 2 \\times 2$ has three factors (1, 2 and 4), so it is not prime.',
+        '0 is divisible by every positive whole number, so it is not prime.',
+        '1 has only one factor and is not counted as prime. It is not even either.',
+      ],
+      keyIdea: 'A prime has exactly two factors, and 2 is the only even prime.',
+    },
+    check: {
+      optionValues: [2, 4, 0, 1],
+      compute: () => {
+        const evens = [];
+        for (let k = 0; k <= 100; k += 2) if (isPrime(k)) evens.push(k);
+        return evens.length === 1 ? evens[0] : -1;
+      },
+    },
+  },
+  {
+    id: 'modular-arithmetic-024',
+    subtopic: 'modular-arithmetic',
+    difficulty: 'foundation',
+    stem: 'Which list gives all the possible remainders when a whole number is divided by $4$?',
+    options: ['$0, 1, 2, 3$', '$1, 2, 3, 4$', '$0, 1, 2, 3, 4$', '$1, 2, 3$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A remainder when dividing by $n$ is always at least 0 and less than $n$.\n\n' +
+        'With $n = 4$ the possible remainders are $0, 1, 2, 3$.',
+      whyWrong: [
+        null,
+        'A remainder of 4 would mean 4 could go in one more time. Multiples of 4 leave remainder 0, which this list leaves out.',
+        'A remainder must be **less** than 4, so 4 cannot appear.',
+        'This forgets remainder 0, which is what every multiple of 4 leaves.',
+      ],
+      keyIdea: 'Dividing by $n$ leaves a remainder from 0 to $n - 1$.',
+    },
+    check: {
+      optionValues: ['0,1,2,3', '1,2,3,4', '0,1,2,3,4', '1,2,3'],
+      compute: () => {
+        const rs = new Set<number>();
+        for (let k = 0; k < 100; k++) rs.add(mod(k, 4));
+        return [...rs].sort((p, q) => p - q).join(',');
+      },
+    },
+  },
+  {
+    id: 'modular-arithmetic-025',
+    subtopic: 'modular-arithmetic',
+    difficulty: 'exam',
+    stem: 'What does this pseudocode print?',
+    code: {
+      lang: 'pseudocode',
+      source: 'n = 23\nc = 0\nwhile (n > 0)\n   if mod(n,3) == 0 // mod is the modulus operator\n      c = c + 1\n   end if\n   n = n - 4\nend while\nprint(c)',
+    },
+    options: ['2', '1', '6', 'Infinite loop'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The loop adds 1 to `c` each time `n` is a multiple of 3.\n\n' +
+        '| `n` | `mod(n,3)` | `c` |\n' +
+        '| --- | --- | --- |\n' +
+        '| 23 | 2 | 0 |\n' +
+        '| 19 | 1 | 0 |\n' +
+        '| 15 | 0 | 1 |\n' +
+        '| 11 | 2 | 1 |\n' +
+        '| 7 | 1 | 1 |\n' +
+        '| 3 | 0 | 2 |\n\n' +
+        'After the last row `n` becomes $-1$, so the loop stops and prints **2**.',
+      whyWrong: [
+        null,
+        'This stops too early and misses `n = 3`. The condition is `n > 0`, so the pass with `n = 3` still runs.',
+        'This is the number of passes of the loop. `c` only goes up when `mod(n,3)` is 0.',
+        '`n` falls by 4 on every pass, so it reaches $-1$ and the condition `n > 0` becomes false.',
+      ],
+      keyIdea: '`mod(n,3) == 0` tests whether `n` is a multiple of 3; list each value of `n` in a table.',
+    },
+    check: {
+      optionValues: [2, 1, 6, 'Infinite loop'],
+      compute: () => {
+        let n = 23;
+        let c = 0;
+        for (let pass = 0; n > 0; pass++) {
+          if (pass > 1000) return 'Infinite loop';
+          if (mod(n, 3) === 0) c++;
+          n -= 4;
+        }
+        return c;
+      },
+    },
+  },
+  {
+    id: 'modular-arithmetic-026',
+    subtopic: 'modular-arithmetic',
+    difficulty: 'exam',
+    stem: 'What does this pseudocode print?',
+    code: {
+      lang: 'pseudocode',
+      source: 'n = 10\ns = 0\nwhile (n != 0)\n   s = s + mod(n,2) // mod is the modulus operator\n   n = n - 3\nend while\nprint(s)',
+    },
+    options: ['Infinite loop', '2', '4', '3'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Follow the values of `n`:\n\n' +
+        '| `n` | `mod(n,2)` | `s` |\n' +
+        '| --- | --- | --- |\n' +
+        '| 10 | 0 | 0 |\n' +
+        '| 7 | 1 | 1 |\n' +
+        '| 4 | 0 | 1 |\n' +
+        '| 1 | 1 | 2 |\n' +
+        '| $-2$ | 0 | 2 |\n' +
+        '| $-5$ | 1 | 3 |\n\n' +
+        'The values of `n` jump from 1 to $-2$ and keep falling, so `n` is never exactly 0. The condition `n != 0` stays true, so the result is an **infinite loop**.',
+      whyWrong: [
+        null,
+        'This is the value of `s` when `n` first goes below 0, but the condition is `n != 0`, not `n > 0`.',
+        'This counts the passes with `n` equal to 10, 7, 4 and 1. The loop does not stop at that point, and `s` does not count passes.',
+        'This is the value of `s` after the pass with `n = -5`. The loop has no reason to stop there, because `n` never equals 0.',
+      ],
+      keyIdea: 'A loop with `!=` only stops if the value lands exactly on the target: check that it does not jump over it.',
+    },
+    check: {
+      optionValues: ['Infinite loop', 2, 4, 3],
+      compute: () => {
+        let n = 10;
+        let s = 0;
+        for (let pass = 0; n !== 0; pass++) {
+          if (pass > 1000) return 'Infinite loop';
+          s += mod(n, 2);
+          n -= 3;
+        }
+        return s;
       },
     },
   },

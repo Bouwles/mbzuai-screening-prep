@@ -57,7 +57,7 @@ function staticProblems(q: StaticQuestion, path: string): string[] {
   const p: string[] = [];
   if (!/^[a-z0-9-]+$/.test(q.id ?? '')) p.push('id must be lowercase letters/digits/dashes');
   p.push(...placementProblems(path, q.subtopic));
-  if (!['foundation', 'exam', 'challenge'].includes(q.difficulty)) p.push(`bad difficulty ${q.difficulty}`);
+  if (!['foundation', 'exam'].includes(q.difficulty)) p.push(`bad difficulty ${q.difficulty}`);
   if (!q.stem || q.stem.trim().length < 10) p.push('stem too short');
   if (!Array.isArray(q.options) || q.options.length !== 4) return [...p, 'must have exactly 4 options'];
   if (!Number.isInteger(q.correctIndex) || q.correctIndex < 0 || q.correctIndex > 3) p.push('correctIndex must be 0..3');
@@ -73,8 +73,8 @@ function staticProblems(q: StaticQuestion, path: string): string[] {
     ms.whyWrong.forEach((w, i) => {
       if (i === q.correctIndex && w !== null) p.push('whyWrong[correctIndex] must be null');
       if (i !== q.correctIndex && (typeof w !== 'string' || w.trim().length < 15)) p.push(`whyWrong[${i}] needs a real explanation`);
-      if (i !== q.correctIndex && !q.fixedOrder && typeof w === 'string' && /\b(option|answer|choice) [A-D]\b|\(([A-D])\)/.test(w))
-        p.push(`whyWrong[${i}] refers to an option letter, but options are shuffled`);
+      if (i !== q.correctIndex && typeof w === 'string' && /\b(option|answer|choice) [A-D]\b|(?<![\w$])\(([A-D])\)/.test(w))
+        p.push(`whyWrong[${i}] refers to an option letter, but options have no letters`);
     });
   const fields: [string, string][] = [
     ['stem', q.stem],
@@ -201,7 +201,7 @@ describe('generators', () => {
         const problems: string[] = [];
         if (!/^gen-[a-z0-9-]+$/.test(g.id)) problems.push('id must start with "gen-"');
         problems.push(...placementProblems(f.path, g.subtopic));
-        if (!['foundation', 'exam', 'challenge'].includes(g.difficulty)) problems.push('bad difficulty');
+        if (!['foundation', 'exam'].includes(g.difficulty)) problems.push('bad difficulty');
         if (!g.title) problems.push('missing title');
         const stems = new Set<string>();
         const pyCases: { seed: number; code: string; core: GeneratedCore }[] = [];
@@ -289,7 +289,7 @@ describe('lessons', () => {
 
 describe('coverage', () => {
   const subs = FILTER.length ? SUBTOPICS.filter((s) => FILTER.includes(s.id)) : SUBTOPICS;
-  it('every subtopic has a lesson, >= 15 static questions and >= 1 generator', () => {
+  it('every subtopic has a lesson, >= 15 static questions (>= 6 Exam, >= 5 Foundation) and >= 1 generator', () => {
     const p: string[] = [];
     for (const s of subs) {
       const nq = allStatic.filter((q) => q.subtopic === s.id).length;
@@ -298,8 +298,9 @@ describe('coverage', () => {
       if (nq < 15) p.push(`${s.id}: ${nq} static questions`);
       if (ng < 1) p.push(`${s.id}: no generator`);
       if (nl !== 1) p.push(`${s.id}: ${nl} lessons`);
-      const diffs = new Set(allStatic.filter((q) => q.subtopic === s.id).map((q) => q.difficulty));
-      if (nq && diffs.size < 3) p.push(`${s.id}: needs foundation, exam and challenge questions`);
+      const count = (d: string) => allStatic.filter((q) => q.subtopic === s.id && q.difficulty === d).length;
+      if (count('exam') < 6) p.push(`${s.id}: ${count('exam')} Exam questions`);
+      if (count('foundation') < 5) p.push(`${s.id}: ${count('foundation')} Foundation questions`);
     }
     expect(p).toEqual([]);
   });

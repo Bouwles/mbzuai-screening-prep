@@ -28,6 +28,7 @@ interface TwoCtx {
   a: string; // "study French"
   b: string; // "study Spanish"
   both: string; // "study both French and Spanish"
+  bothShort: string; // "study both"
   neither: string; // "study neither language"
   exactlyOne: string; // "study exactly one of the two languages"
   aOnly: string; // "study French but not Spanish"
@@ -44,6 +45,7 @@ const TWO_CTX: TwoCtx[] = [
     a: 'study French',
     b: 'study Spanish',
     both: 'study both French and Spanish',
+    bothShort: 'study both',
     neither: 'study neither language',
     exactlyOne: 'study exactly one of the two languages',
     aOnly: 'study French but not Spanish',
@@ -53,11 +55,12 @@ const TWO_CTX: TwoCtx[] = [
     nameB: 'Spanish',
   },
   {
-    intro: (n) => `In a survey of ${n} people,`,
+    intro: (n) => `Of ${n} people,`,
     group: 'people',
     a: 'own a cat',
     b: 'own a dog',
     both: 'own both a cat and a dog',
+    bothShort: 'own both',
     neither: 'own neither pet',
     exactlyOne: 'own exactly one of the two pets',
     aOnly: 'own a cat but not a dog',
@@ -67,11 +70,12 @@ const TWO_CTX: TwoCtx[] = [
     nameB: 'dog',
   },
   {
-    intro: (n) => `On one morning, ${n} customers visited a bakery. Of these customers,`,
+    intro: (n) => `Of ${n} bakery customers,`,
     group: 'customers',
     a: 'bought bread',
     b: 'bought cake',
     both: 'bought both bread and cake',
+    bothShort: 'bought both',
     neither: 'bought neither bread nor cake',
     exactlyOne: 'bought exactly one of bread and cake',
     aOnly: 'bought bread but not cake',
@@ -81,11 +85,12 @@ const TWO_CTX: TwoCtx[] = [
     nameB: 'cake',
   },
   {
-    intro: (n) => `A gym has ${n} members. Of these members,`,
+    intro: (n) => `Of ${n} gym members,`,
     group: 'members',
     a: 'use the pool',
     b: 'use the weights room',
     both: 'use both the pool and the weights room',
+    bothShort: 'use both',
     neither: 'use neither the pool nor the weights room',
     exactlyOne: 'use exactly one of the pool and the weights room',
     aOnly: 'use the pool but not the weights room',
@@ -95,11 +100,12 @@ const TWO_CTX: TwoCtx[] = [
     nameB: 'weights',
   },
   {
-    intro: (n) => `${n} students applied for an AI internship. Of these applicants,`,
+    intro: (n) => `Of ${n} job applicants,`,
     group: 'applicants',
     a: 'know Python',
     b: 'know SQL',
     both: 'know both Python and SQL',
+    bothShort: 'know both',
     neither: 'know neither language',
     exactlyOne: 'know exactly one of the two languages',
     aOnly: 'know Python but not SQL',
@@ -149,7 +155,7 @@ function twoSet(rng: Rng) {
       const d = pickDistinct(ans.value(), answer, pool);
       if (d.length < 3) continue;
       return {
-        stem: `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.both}. One of the ${ctx.group} is chosen at random. What is the probability that they ${ctx.neither}?`,
+        stem: `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.bothShort}. One is chosen at random. What is the probability that they ${ctx.neither}?`,
         answer,
         answerValue: ans.value(),
         distractors: d.map((x) => ({ text: x.text, value: x.v, why: x.why })),
@@ -169,7 +175,7 @@ function twoSet(rng: Rng) {
     let keyIdea: string;
     if (ask === 'both') {
       ansV = both;
-      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${neither} ${ctx.neither}. How many ${ctx.group} ${ctx.both}?`;
+      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${neither} ${ctx.neither}. How many ${ctx.bothShort}?`;
       steps =
         `1. In at least one group: ${m(`${N} - ${neither} = ${union}`)}.\n` +
         `2. Inclusion-exclusion: ${m(`${nU} = ${nA} + ${nB} - ${nAB}`)}, so ${m(`${union} = ${a} + ${b} - ${nAB} = ${a + b} - ${nAB}`)}.\n` +
@@ -183,7 +189,7 @@ function twoSet(rng: Rng) {
       keyIdea = 'Remove the "neither" group first, then the overlap is $n(A) + n(B) - n(A \\cup B)$.';
     } else if (ask === 'exactlyOne') {
       ansV = aOnly + bOnly;
-      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.both}. How many ${ctx.group} ${ctx.exactlyOne}?`;
+      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.bothShort}. How many ${ctx.exactlyOne}?`;
       steps =
         `Fill the Venn diagram from the middle outwards.\n\n` +
         `1. Both: ${m(String(both))}.\n` +
@@ -200,7 +206,7 @@ function twoSet(rng: Rng) {
       keyIdea = '"Exactly one" means the two "only" regions: $n(A) + n(B) - 2\\,n(A \\cap B)$.';
     } else if (ask === 'neither') {
       ansV = neither;
-      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.both}. How many ${ctx.group} ${ctx.neither}?`;
+      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.bothShort}. How many ${ctx.neither}?`;
       steps =
         `1. Inclusion-exclusion: ${m(`${nU} = ${nA} + ${nB} - ${nAB} = ${a} + ${b} - ${both} = ${union}`)}.\n` +
         `2. Neither: ${m(`${N} - ${union} = ${neither}`)}.`;
@@ -213,7 +219,7 @@ function twoSet(rng: Rng) {
       keyIdea = 'Neither $= n(U) - n(A \\cup B)$, with $n(A \\cup B) = n(A) + n(B) - n(A \\cap B)$.';
     } else {
       ansV = aOnly;
-      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${neither} ${ctx.neither}. How many ${ctx.group} ${ctx.aOnly}?`;
+      stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${neither} ${ctx.neither}. How many ${ctx.aOnly}?`;
       steps =
         `1. In at least one group: ${m(`${N} - ${neither} = ${union}`)}.\n` +
         `2. Everyone in the union who is **not** in the ${ctx.nameB} group is in the ${ctx.nameA}-only region: ${m(`${union} - ${b} = ${aOnly}`)}.\n\n` +
@@ -258,13 +264,13 @@ const THREE_CTX: ThreeCtx[] = [
   { group: 'learners', verb: 'completed', items: ['the Python course', 'the Statistics course', 'the Machine Learning course'], letters: ['P', 'S', 'L'], short: ['Python', 'Statistics', 'ML'], noun: 'courses' },
 ];
 
-type ThreeAsk = 'none' | 'exactlyOne' | 'onlyFirst';
+type ThreeAsk = 'none' | 'onlyFirst';
 
 function threeSet(rng: Rng) {
   const ctx = rng.pick(THREE_CTX);
-  const ask = rng.pick<ThreeAsk>(['none', 'exactlyOne', 'onlyFirst']);
+  const ask = rng.pick<ThreeAsk>(['none', 'onlyFirst']);
   const [A, B, C] = ctx.letters;
-  const [iA, iB, iC] = ctx.items;
+  const iA = ctx.items[0];
   const [sA, sB, sC] = ctx.short;
   const [cA, cB, cC] = ctx.short.map(cap);
   for (;;) {
@@ -288,18 +294,20 @@ function threeSet(rng: Rng) {
     const S2 = nAB + nAC + nBC;
     const union = S1 - S2 + x;
 
-    const data =
-      `Of ${N} ${ctx.group}, ${nA} ${ctx.verb} ${iA}, ${nB} ${ctx.verb} ${iB} and ${nC} ${ctx.verb} ${iC}. ` +
-      `${nAB} ${ctx.verb} ${iA} and ${iB}, ${nAC} ${ctx.verb} ${iA} and ${iC}, ${nBC} ${ctx.verb} ${iB} and ${iC}, and ${x} ${ctx.verb} all three. ` +
-      `(Each "two ${ctx.noun}" count includes the ${ctx.group} who ${ctx.verb} all three.)`;
+    const data = `The table gives counts for ${N} ${ctx.group}; each pair count includes those in all three.`;
+    const table = {
+      headers: [cap(ctx.noun), `Number of ${ctx.group}`],
+      rows: [
+        [cA, nA],
+        [cB, nB],
+        [cC, nC],
+        [`${cA} and ${sB}`, nAB],
+        [`${cA} and ${sC}`, nAC],
+        [`${cB} and ${sC}`, nBC],
+        ['All three', x],
+      ] as (string | number)[][],
+    };
     const ieFormula = `n(${A} \\cup ${B} \\cup ${C}) = n(${A}) + n(${B}) + n(${C}) - n(${A} \\cap ${B}) - n(${A} \\cap ${C}) - n(${B} \\cap ${C}) + n(${A} \\cap ${B} \\cap ${C})`;
-    const regions =
-      `- ${cA} and ${sB} only: ${m(`${nAB} - ${x} = ${ab}`)}\n` +
-      `- ${cA} and ${sC} only: ${m(`${nAC} - ${x} = ${ac}`)}\n` +
-      `- ${cB} and ${sC} only: ${m(`${nBC} - ${x} = ${bc}`)}\n` +
-      `- ${cA} only: ${m(`${nA} - ${ab} - ${ac} - ${x} = ${oA}`)}\n` +
-      `- ${cB} only: ${m(`${nB} - ${ab} - ${bc} - ${x} = ${oB}`)}\n` +
-      `- ${cC} only: ${m(`${nC} - ${ac} - ${bc} - ${x} = ${oC}`)}`;
 
     let ansV: number;
     let stem: string;
@@ -323,25 +331,9 @@ function threeSet(rng: Rng) {
         intCand(S1 - S2, `This is ${m(`${S1} - ${S2}`)}: it forgets to add back the triple and also stops before subtracting from ${N}.`),
       ];
       keyIdea = 'Three-set inclusion-exclusion: add the singles, subtract the pairs, add back the triple; then subtract from the total.';
-    } else if (ask === 'exactlyOne') {
-      ansV = oA + oB + oC;
-      stem = `${data} How many ${ctx.group} ${ctx.verb} **exactly one** of the three?`;
-      steps =
-        `Fill the Venn diagram from the centre outwards. All three: ${m(String(x))}.\n\n${regions}\n\n` +
-        `Exactly one: ${m(`${oA} + ${oB} + ${oC} = ${ansV}`)}.`;
-      pool = [
-        // only offer this slip when it gives non-negative "only" regions (otherwise a student would notice at once)
-        ...(Math.min(oA, oB, oC) > x
-          ? [intCand(ansV - 3 * x, `This finds each "only" region by subtracting the full pair totals, e.g. ${m(`${nA} - ${nAB} - ${nAC} = ${oA - x}`)}. That removes the ${x} in the centre twice, so ${x} must be added back to each region.`)]
-          : []),
-        intCand(ansV + 3 * x, `This subtracts the "two only" regions from each single total but forgets to subtract the ${x} in the centre, e.g. ${m(`${nA} - ${ab} - ${ac} = ${oA + x}`)}.`),
-        intCand(ab + ac + bc, `This is the number who ${ctx.verb} **exactly two** of the three (${m(`${ab} + ${ac} + ${bc}`)}), not exactly one.`),
-        intCand(union, `This is the number who ${ctx.verb} **at least one** (${m(`${S1} - ${S2} + ${x}`)}). It still includes those in two or three groups.`),
-      ];
-      keyIdea = 'Start in the centre, then the "two only" regions, then the "one only" regions.';
     } else {
       ansV = oA;
-      stem = `${data} How many ${ctx.group} ${ctx.verb} ${iA} **only** (and neither of the other two)?`;
+      stem = `${data} How many ${ctx.group} ${ctx.verb} ${iA} **only**?`;
       steps =
         `Fill the ${sA} circle from the centre outwards.\n\n` +
         `1. All three: ${m(String(x))}.\n` +
@@ -362,6 +354,7 @@ function threeSet(rng: Rng) {
     if (d.length < 3) continue;
     return {
       stem,
+      table,
       answer,
       answerValue: ansV,
       distractors: d.map((v) => ({ text: v.text, value: v.v, why: v.why })),

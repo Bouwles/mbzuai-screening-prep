@@ -168,13 +168,13 @@ interface Lit {
   v: number;
   neg: B;
 }
-type Mode = 'math' | 'python';
+type Mode = 'math' | 'code';
 const MATH_NAMES = [
   ['A', 'B', 'C'],
   ['P', 'Q', 'R'],
   ['X', 'Y', 'Z'],
 ];
-const PY_NAMES = [
+const CODE_NAMES = [
   ['a', 'b', 'c'],
   ['x', 'y', 'z'],
   ['p', 'q', 'r'],
@@ -202,8 +202,8 @@ const genDeMorgan: Generator = {
   difficulty: 'exam',
   title: "Apply De Morgan's law to find an equivalent expression",
   generate(rng: Rng): GeneratedCore {
-    const mode: Mode = rng.bool(0.5) ? 'math' : 'python';
-    const names = rng.pick(mode === 'math' ? MATH_NAMES : PY_NAMES);
+    const mode: Mode = rng.bool(0.5) ? 'math' : 'code';
+    const names = rng.pick(mode === 'math' ? MATH_NAMES : CODE_NAMES);
     const n = rng.bool(0.6) ? 2 : 3;
     const op: 'and' | 'or' = rng.bool(0.5) ? 'and' : 'or';
     const flip: 'and' | 'or' = op === 'and' ? 'or' : 'and';
@@ -276,7 +276,7 @@ const genDeMorgan: Generator = {
       );
     } else {
       steps.push(
-        "**De Morgan's laws in Python:** `not (p and q)` is the same as `not p or not q`, and `not (p or q)` is the same as `not p and not q`. Negate **every** part and swap `and` with `or`.",
+        "**De Morgan's laws in code:** `not (p and q)` is the same as `not p or not q`, and `not (p or q)` is the same as `not p and not q`. Negate **every** part and swap `and` with `or`.",
       );
       steps.push(`1. Start with \`${original}\`.`);
       steps.push(`2. Change \`${op}\` to \`${flip}\`.`);
@@ -292,7 +292,7 @@ const genDeMorgan: Generator = {
     const stem =
       mode === 'math'
         ? `Which expression is logically equivalent to $${original}$? ($\\land$ = AND, $\\lor$ = OR, $\\neg$ = NOT.)`
-        : `In Python, \`${names.slice(0, n).join('`, `')}\` are Boolean variables. Which condition is equivalent to \`${original}\` for every combination of values?`;
+        : `\`${names.slice(0, n).join('`, `')}\` are Boolean variables. Which condition is equivalent to \`${original}\` for every combination of values?`;
 
     return {
       stem,
@@ -305,80 +305,4 @@ const genDeMorgan: Generator = {
   },
 };
 
-// ======================================================================= generator 3: Python and/or return values
-const genPyAndOr: Generator = {
-  id: 'gen-boolean-logic-python-and-or',
-  subtopic: 'boolean-logic',
-  difficulty: 'exam',
-  title: 'What Python and / or / not return',
-  generate(rng: Rng): GeneratedCore {
-    const x = rng.bool(0.35) ? 0 : rng.int(1, 9);
-    const y = rng.bool(0.35) ? 0 : rng.int(1, 9);
-    const notOf = rng.pick(['x', 'y'] as const);
-    const nv = notOf === 'x' ? x : y;
-
-    const andV = x ? y : x;
-    const orV = x ? x : y;
-    const notV = nv === 0 ? 'True' : 'False';
-    const outStr = `${andV} ${orV} ${notV}`;
-    const answer = `\`${outStr}\``;
-    const pyBool = (v: number) => (v ? 'True' : 'False');
-
-    const cand: { s: string; why: string }[] = [
-      {
-        s: `${pyBool(andV)} ${pyBool(orV)} ${notV}`,
-        why: 'This assumes `and` and `or` always give `True` or `False`. In Python they return one of their operands (only `not` always returns a bool).',
-      },
-      {
-        s: `${orV} ${andV} ${notV}`,
-        why: 'This swaps the rules for `and` and `or`. `and` returns the first falsy value (or the last value if none is falsy); `or` returns the first truthy value (or the last value if none is truthy).',
-      },
-      {
-        s: `${x} ${orV} ${notV}`,
-        why: '`x and y` does not just return `x`. If `x` is truthy, `and` has to look at `y` and returns `y`; it only returns `x` when `x` is falsy (0).',
-      },
-      {
-        s: `${andV} ${orV} ${-nv}`,
-        why: '`not` is logical negation, not a minus sign: it returns `True` or `False`.',
-      },
-      {
-        s: `${andV} ${orV} ${notV === 'True' ? 'False' : 'True'}`,
-        why: 'This mixes up truthiness: 0 is falsy, so `not 0` is `True`, while any non-zero number is truthy, so `not` of it is `False`.',
-      },
-      {
-        s: `${andV} ${y} ${notV}`,
-        why: '`x or y` does not just return `y`. If `x` is truthy, `or` stops straight away and returns `x`.',
-      },
-    ];
-    const chosen: { text: string; value: string; why: string }[] = [];
-    for (const c of cand) {
-      if (chosen.length === 3) break;
-      if (c.s === outStr || chosen.some((d) => d.value === c.s)) continue;
-      chosen.push({ text: `\`${c.s}\``, value: c.s, why: c.why });
-    }
-    if (chosen.length < 3) throw new Error('py-and-or: not enough distractors');
-
-    const truth = (v: number) => (v ? `${v} is truthy` : '0 is falsy');
-    const steps = [
-      'In Python the number 0 is **falsy** and every other number is **truthy**. `and` and `or` return one of their operands:',
-      '- `a and b`: if `a` is falsy, return `a`; otherwise return `b`.\n- `a or b`: if `a` is truthy, return `a`; otherwise return `b`.\n- `not a`: always `True` or `False`.',
-      `1. \`x and y\` with \`x = ${x}\`: ${truth(x)}, so ${x ? `\`and\` moves on and returns \`y\`, which is \`${y}\`` : `\`and\` stops and returns \`x\`, which is \`${x}\``}.`,
-      `2. \`x or y\`: ${truth(x)}, so ${x ? `\`or\` stops and returns \`x\`, which is \`${x}\`` : `\`or\` moves on and returns \`y\`, which is \`${y}\``}.`,
-      `3. \`not ${notOf}\` with \`${notOf} = ${nv}\`: ${truth(nv)}, so the result is \`${notV}\`.`,
-      `\`print\` separates its arguments with spaces. Answer: ${answer}`,
-    ];
-
-    return {
-      stem: 'What does this Python code print?',
-      code: { lang: 'python', source: `x = ${x}\ny = ${y}\nprint(x and y, x or y, not ${notOf})` },
-      answer,
-      answerValue: outStr,
-      distractors: chosen,
-      solution: steps.join('\n\n'),
-      keyIdea: '`and` returns the first falsy operand (else the last one), `or` returns the first truthy operand (else the last one), and `not` always returns a bool.',
-      python: { stdout: `${outStr}\n` },
-    };
-  },
-};
-
-export const generators: Generator[] = [genCount, genDeMorgan, genPyAndOr];
+export const generators: Generator[] = [genCount, genDeMorgan];

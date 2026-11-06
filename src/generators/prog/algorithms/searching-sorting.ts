@@ -10,6 +10,12 @@ const passWord = (k: number) => (k === 1 ? '1 pass' : `${k} passes`);
 
 type Alg = 'bubble' | 'selection' | 'insertion';
 const ALG_NAME: Record<Alg, string> = { bubble: 'bubble sort', selection: 'selection sort', insertion: 'insertion sort' };
+/** One-clause rule for the stem. */
+const ALG_SHORT: Record<Alg, string> = {
+  bubble: 'each swapping neighbours left to right when the left is bigger',
+  selection: 'each swapping the smallest unsorted item into the first unsorted position',
+  insertion: 'each inserting the next item into the sorted front part, starting with the second item',
+};
 const ALG_RULE: Record<Alg, string> = {
   bubble: 'In one pass of bubble sort, each pair of neighbouring items is compared from left to right and swapped if the left one is bigger.',
   selection:
@@ -89,21 +95,25 @@ function probes(
   return seen;
 }
 
-const BS_CODE =
-  'low ← 0\n' +
-  'high ← length(A) - 1\n' +
-  'WHILE low <= high DO\n' +
-  '    mid ← (low + high) DIV 2      // round down\n' +
-  '    compare A[mid] with target\n' +
-  '    IF A[mid] = target THEN\n' +
-  '        RETURN mid\n' +
-  '    ELSE IF A[mid] < target THEN\n' +
-  '        low ← mid + 1\n' +
-  '    ELSE\n' +
-  '        high ← mid - 1\n' +
-  '    ENDIF\n' +
-  'ENDWHILE\n' +
-  'RETURN -1                         // not found';
+const BS_CODE = [
+  'function search(A, target)',
+  '   low = 1',
+  '   high = length(A)',
+  '   while (low <= high)',
+  '      mid = div(low + high, 2) // div is integer division',
+  '      if A[mid] == target',
+  '         return mid',
+  '      else',
+  '         if A[mid] < target',
+  '            low = mid + 1',
+  '         else',
+  '            high = mid - 1',
+  '         end if',
+  '      end if',
+  '   end while',
+  '   return 0',
+  'end function',
+].join('\n');
 
 type Cand<T> = { v: T; text: string; why: string };
 function pickThree<T>(answerText: string, pool: Cand<T>[]): Cand<T>[] {
@@ -174,7 +184,7 @@ export const generators: Generator[] = [
           states.map((s, i) => `- **Pass ${i + 1}:** ${notes[i]}. List: ${show(s)}`).join('\n') +
           `\n\n${what}\n\nAnswer: ${answer}`;
         return {
-          stem: `The list ${show(list)} is sorted into ascending order using **${ALG_NAME[alg]}**. ${ALG_RULE[alg]} What is the list after **${passWord(k)}**?`,
+          stem: `${passWord(k).charAt(0).toUpperCase() + passWord(k).slice(1)} of **${ALG_NAME[alg]}**, ${ALG_SHORT[alg]}, ${k === 1 ? 'is' : 'are'} applied to ${show(list)}. What is the list afterwards?`,
           answer,
           answerValue: ans.join(','),
           distractors: picked.map((c) => ({ text: c.text, value: c.v, why: c.why })),
@@ -219,7 +229,7 @@ export const generators: Generator[] = [
           cands.push({
             v: fmtSeq(ceil),
             text: fmtSeq(ceil),
-            why: 'This rounds the middle index **up** when low + high is odd. DIV 2 rounds down.',
+            why: 'This rounds the middle index **up** when low + high is odd. `div` rounds down.',
           });
         const flip = probes(a, target, { flip: true });
         if (flip)
@@ -257,8 +267,8 @@ export const generators: Generator[] = [
         if (picked.length < 3) throw new Error('binary-trace: not enough distractors');
 
         // trace table
-        let lo = 0;
-        let hi = n - 1;
+        let lo = 1;
+        let hi = n;
         const rows: string[] = [];
         let step = 0;
         let found = false;
@@ -266,27 +276,28 @@ export const generators: Generator[] = [
           step++;
           const mid = Math.floor((lo + hi) / 2);
           const half = (lo + hi) % 2 === 1 ? `$${lo + hi} \\div 2 = ${(lo + hi) / 2}$, round down to ${mid}` : `$${lo + hi} \\div 2 = ${mid}$`;
+          const value = a[mid - 1];
           let act: string;
-          if (a[mid] === target) {
+          if (value === target) {
             act = 'found';
             found = true;
-          } else if (a[mid] < target) act = `$${a[mid]} < ${target}$, so low = ${mid + 1}`;
-          else act = `$${a[mid]} > ${target}$, so high = ${mid - 1}`;
-          rows.push(`| ${step} | ${lo} | ${hi} | ${half} | ${a[mid]} | ${act} |`);
+          } else if (value < target) act = `$${value} < ${target}$, so low = ${mid + 1}`;
+          else act = `$${value} > ${target}$, so high = ${mid - 1}`;
+          rows.push(`| ${step} | ${lo} | ${hi} | ${half} | ${value} | ${act} |`);
           if (found) break;
-          if (a[mid] < target) lo = mid + 1;
+          if (value < target) lo = mid + 1;
           else hi = mid - 1;
         }
         const ending = found
           ? `${target} is found after ${step} comparison${step === 1 ? '' : 's'}.`
           : `Now low = ${lo} is bigger than high = ${hi}, so the loop stops and the search reports that ${target} is not in the list.`;
         const solution =
-          `The list has ${n} items, so low = 0 and high = ${n - 1} at the start.\n\n` +
+          `The array has ${n} items, so low = 1 and high = ${n} at the start. \`div\` rounds down.\n\n` +
           '| Step | low | high | mid | A[mid] | Decision |\n| --- | --- | --- | --- | --- | --- |\n' +
           rows.join('\n') +
           `\n\n${ending}\n\nAnswer: ${answer}`;
         return {
-          stem: `The binary search below is used to look for **${target}** in the sorted list ${show(a)} (indexes start at 0). Which values are compared with ${target}, in order? (The target may or may not be in the list.)`,
+          stem: `This binary search looks for **${target}** in the sorted array ${show(a)}. Arrays are indexed from 1. Which values are compared with ${target}, in order?`,
           code: { lang: 'pseudocode', source: BS_CODE },
           answer,
           answerValue: answer,
@@ -300,7 +311,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-searching-sorting-merge-count',
     subtopic: 'searching-sorting',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     title: 'Count the comparisons in a merge step',
     generate(rng: Rng) {
       const m = rng.int(2, 4);
@@ -360,7 +371,7 @@ export const generators: Generator[] = [
         `\n\nNow the ${emptied} list is empty, so ${restList.join(', ')} ${restList.length === 1 ? 'is' : 'are'} copied across with no more comparisons, giving \`${pyList([...out, ...restList])}\`.\n\n` +
         `Counting the rows of the table gives the number of comparisons.\n\nAnswer: ${answer}`;
       return {
-        stem: `In merge sort, two sorted lists are merged by repeatedly comparing the front items of each list and moving the smaller one to the output. When one list becomes empty, the rest of the other list is copied across with no more comparisons. How many comparisons are made when merging ${show(x)} and ${show(y)}?`,
+        stem: `When merging ${show(x)} and ${show(y)}, each comparison moves the smaller front item to the output, and leftovers are copied without comparing. How many comparisons are made?`,
         answer,
         answerValue: c,
         distractors: picked.map((p) => ({ text: p.text, value: p.v, why: p.why })),

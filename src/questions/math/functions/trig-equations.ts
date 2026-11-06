@@ -1,5 +1,4 @@
 import type { StaticQuestion } from '../../../types';
-import { det3 } from '../../../lib/mathx';
 
 // ---- helpers used only by the answer checks (re-derive answers by brute force) ----
 const rad = (d: number) => (d * Math.PI) / 180;
@@ -15,8 +14,6 @@ const solvePi12 = (f: (x: number) => number, kMax: number): number[] => {
   for (let k = 0; k <= kMax; k++) if (Math.abs(f((k * Math.PI) / 12)) < 1e-9) out.push(k);
   return out;
 };
-/** Angle in radians -> number of twelfths of pi (rounded). */
-const twelfths = (x: number) => Math.round(x / (Math.PI / 12));
 
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------------ foundation
@@ -76,32 +73,6 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'trig-equations-003',
-    subtopic: 'trig-equations',
-    difficulty: 'foundation',
-    stem: 'Which expression is equal to $\\sin 2\\theta$ for **every** angle $\\theta$?',
-    options: ['$2\\sin\\theta$', '$\\cos^2\\theta - \\sin^2\\theta$', '$\\sin\\theta\\cos\\theta$', '$2\\sin\\theta\\cos\\theta$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The double-angle formula for sine is\n\n$$\\sin 2\\theta = 2\\sin\\theta\\cos\\theta$$\n\n' +
-        'Test it with $\\theta = 30^\\circ$: $\\sin 60^\\circ = \\frac{\\sqrt{3}}{2}$ and $2\\sin 30^\\circ\\cos 30^\\circ = 2 \\times \\frac{1}{2} \\times \\frac{\\sqrt{3}}{2} = \\frac{\\sqrt{3}}{2}$. They match.\n\n' +
-        'The same test rules out the others: $2\\sin 30^\\circ = 1$, $\\cos^2 30^\\circ - \\sin^2 30^\\circ = \\frac{3}{4} - \\frac{1}{4} = \\frac{1}{2}$, and $\\sin 30^\\circ\\cos 30^\\circ = \\frac{\\sqrt{3}}{4}$.',
-      whyWrong: [
-        'This treats the 2 as if it can be pulled out of the sine. It cannot: with $\\theta = 90^\\circ$, $\\sin 180^\\circ = 0$ but $2\\sin 90^\\circ = 2$.',
-        'This is the double-angle formula for $\\cos 2\\theta$, not for $\\sin 2\\theta$.',
-        'Right ingredients but the factor 2 is missing: $\\sin\\theta\\cos\\theta$ is only half of $\\sin 2\\theta$.',
-        null,
-      ],
-      keyIdea: '$\\sin 2\\theta = 2\\sin\\theta\\cos\\theta$; a quick test with one angle such as $30^\\circ$ exposes wrong formulas.',
-    },
-    check: {
-      // evaluate every option at theta = 0.7 rad and compare with sin(1.4)
-      optionValues: [2 * Math.sin(0.7), Math.cos(0.7) ** 2 - Math.sin(0.7) ** 2, Math.sin(0.7) * Math.cos(0.7), 2 * Math.sin(0.7) * Math.cos(0.7)],
-      compute: () => Math.sin(2 * 0.7),
-    },
-  },
-  {
     id: 'trig-equations-004',
     subtopic: 'trig-equations',
     difficulty: 'foundation',
@@ -128,33 +99,6 @@ export const questions: StaticQuestion[] = [
     check: {
       optionValues: ['30,150', '30', '30,330', '30,210'],
       compute: () => solveDeg((x) => Math.sin(x) - 0.5, 0, 360),
-    },
-  },
-  {
-    id: 'trig-equations-005',
-    subtopic: 'trig-equations',
-    difficulty: 'foundation',
-    stem: 'If $\\cos\\theta = 0.6$, what is $\\cos 2\\theta$?',
-    options: ['$1.2$', '$0.36$', '$-0.28$', '$0.28$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Use the version of the double-angle formula that only needs $\\cos\\theta$:\n\n$$\\cos 2\\theta = 2\\cos^2\\theta - 1$$\n\n' +
-        '1. $\\cos^2\\theta = 0.6^2 = 0.36$\n' +
-        '2. $2 \\times 0.36 = 0.72$\n' +
-        '3. $0.72 - 1 = -0.28$\n\n' +
-        'So $\\cos 2\\theta = -0.28$.',
-      whyWrong: [
-        'This is $2\\cos\\theta$. The 2 is inside the cosine, so $\\cos 2\\theta \\ne 2\\cos\\theta$.',
-        'This is just $\\cos^2\\theta$: the formula still needs doubling and then subtracting 1.',
-        null,
-        'This uses $1 - 2\\cos^2\\theta$, the formula with the signs reversed. The sine version is $1 - 2\\sin^2\\theta$; the cosine version is $2\\cos^2\\theta - 1$.',
-      ],
-      keyIdea: '$\\cos 2\\theta = 2\\cos^2\\theta - 1 = 1 - 2\\sin^2\\theta = \\cos^2\\theta - \\sin^2\\theta$.',
-    },
-    check: {
-      optionValues: [1.2, 0.36, -0.28, 0.28],
-      compute: () => Math.cos(2 * Math.acos(0.6)),
     },
   },
   // ------------------------------------------------------------------ exam
@@ -221,69 +165,6 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'trig-equations-008',
-    subtopic: 'trig-equations',
-    difficulty: 'exam',
-    stem: 'Solve $2\\sin^2 x - \\sin x - 1 = 0$ for $0^\\circ \\le x \\le 360^\\circ$.',
-    options: ['$90^\\circ$, $210^\\circ$, $330^\\circ$', '$30^\\circ$, $150^\\circ$, $270^\\circ$', '$90^\\circ$ only', '$90^\\circ$, $330^\\circ$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'This is a quadratic in $\\sin x$. Let $s = \\sin x$:\n\n$$2s^2 - s - 1 = 0$$\n\n' +
-        '1. Factorise: $(2s + 1)(s - 1) = 0$. (Check: $2s^2 - 2s + s - 1 = 2s^2 - s - 1$.)\n' +
-        '2. So $s = 1$ or $s = -\\frac{1}{2}$. Both are between $-1$ and $1$, so both are allowed.\n' +
-        '3. $\\sin x = 1$: $x = 90^\\circ$.\n' +
-        '4. $\\sin x = -\\frac{1}{2}$: reference angle $30^\\circ$; sine is negative in the third and fourth quadrants, so $x = 180^\\circ + 30^\\circ = 210^\\circ$ or $x = 360^\\circ - 30^\\circ = 330^\\circ$.\n\n' +
-        'Solutions: $90^\\circ$, $210^\\circ$, $330^\\circ$.',
-      whyWrong: [
-        null,
-        'The signs in the factorisation are swapped: $(2s - 1)(s + 1) = 2s^2 + s - 1$, which is not the given quadratic. That gives $\\sin x = \\frac{1}{2}$ or $-1$ instead.',
-        'This throws away $\\sin x = -\\frac{1}{2}$ as if sine could not be negative. Only values outside $-1 \\le \\sin x \\le 1$ are rejected.',
-        'The calculator gives $-30^\\circ$ for $\\sin x = -\\frac{1}{2}$; adding $360^\\circ$ gives $330^\\circ$, but the third-quadrant solution $180^\\circ + 30^\\circ = 210^\\circ$ was missed.',
-      ],
-      keyIdea: 'Treat $\\sin x$ as the unknown of a quadratic, factorise, then solve each simpler equation over the whole interval.',
-    },
-    check: {
-      optionValues: ['90,210,330', '30,150,270', '90', '90,330'],
-      compute: () => solveDeg((x) => 2 * Math.sin(x) ** 2 - Math.sin(x) - 1, 0, 360),
-    },
-  },
-  {
-    id: 'trig-equations-009',
-    subtopic: 'trig-equations',
-    difficulty: 'exam',
-    stem: 'Solve $2\\cos^2 x + 3\\sin x - 3 = 0$ for $0^\\circ \\le x \\le 360^\\circ$.',
-    options: [
-      '$210^\\circ$, $270^\\circ$, $330^\\circ$',
-      '$30^\\circ$, $90^\\circ$',
-      '$30^\\circ$, $90^\\circ$, $150^\\circ$',
-      '$30^\\circ$, $90^\\circ$, $150^\\circ$, $270^\\circ$',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'There is a mix of $\\cos^2 x$ and $\\sin x$, so replace $\\cos^2 x$ with $1 - \\sin^2 x$ to get everything in terms of $\\sin x$.\n\n' +
-        '1. $2(1 - \\sin^2 x) + 3\\sin x - 3 = 0$\n' +
-        '2. $2 - 2\\sin^2 x + 3\\sin x - 3 = 0$, so $-2\\sin^2 x + 3\\sin x - 1 = 0$\n' +
-        '3. Multiply by $-1$: $2\\sin^2 x - 3\\sin x + 1 = 0$\n' +
-        '4. Factorise: $(2\\sin x - 1)(\\sin x - 1) = 0$, so $\\sin x = \\frac{1}{2}$ or $\\sin x = 1$.\n' +
-        '5. $\\sin x = \\frac{1}{2}$: $x = 30^\\circ$ or $x = 180^\\circ - 30^\\circ = 150^\\circ$.\n' +
-        '6. $\\sin x = 1$: $x = 90^\\circ$ (only once per turn).\n\n' +
-        'Solutions: $30^\\circ$, $90^\\circ$, $150^\\circ$.',
-      whyWrong: [
-        'A sign error in the factorisation gives $\\sin x = -\\frac{1}{2}$ or $\\sin x = -1$. Check: $(2\\sin x + 1)(\\sin x + 1)$ expands to $2\\sin^2 x + 3\\sin x + 1$, which is the wrong quadratic.',
-        'This misses $150^\\circ$: $\\sin x = \\frac{1}{2}$ has a second solution $180^\\circ - 30^\\circ = 150^\\circ$.',
-        null,
-        '$\\sin x = 1$ has only one solution per turn, $90^\\circ$. At $270^\\circ$ the sine is $-1$, not $1$.',
-      ],
-      keyIdea: 'Use $\\cos^2 x = 1 - \\sin^2 x$ to turn a mixed equation into a quadratic in one trig function.',
-    },
-    check: {
-      optionValues: ['210,270,330', '30,90', '30,90,150', '30,90,150,270'],
-      compute: () => solveDeg((x) => 2 * Math.cos(x) ** 2 + 3 * Math.sin(x) - 3, 0, 360),
-    },
-  },
-  {
     id: 'trig-equations-010',
     subtopic: 'trig-equations',
     difficulty: 'exam',
@@ -317,35 +198,6 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'trig-equations-011',
-    subtopic: 'trig-equations',
-    difficulty: 'exam',
-    stem: 'How many solutions does $\\sin 2x = \\sin x$ have for $0^\\circ \\le x \\le 360^\\circ$?',
-    options: ['2', '3', '4', '5'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Expand $\\sin 2x$ with the double-angle formula, then bring everything to one side and **factorise** rather than dividing.\n\n' +
-        '1. Use $\\sin 2x = 2\\sin x\\cos x$: $2\\sin x\\cos x = \\sin x$.\n' +
-        '2. Bring everything to one side: $2\\sin x\\cos x - \\sin x = 0$.\n' +
-        '3. Factorise (do **not** divide by $\\sin x$): $\\sin x\\,(2\\cos x - 1) = 0$.\n' +
-        '4. $\\sin x = 0$: $x = 0^\\circ$, $180^\\circ$, $360^\\circ$ (three solutions, both endpoints are included).\n' +
-        '5. $2\\cos x - 1 = 0$, so $\\cos x = \\frac{1}{2}$: $x = 60^\\circ$ or $x = 360^\\circ - 60^\\circ = 300^\\circ$.\n\n' +
-        'Solutions: $0^\\circ$, $60^\\circ$, $180^\\circ$, $300^\\circ$, $360^\\circ$, which is **5** solutions.',
-      whyWrong: [
-        'This divides both sides by $\\sin x$, which throws away every solution of $\\sin x = 0$. Only $60^\\circ$ and $300^\\circ$ are left.',
-        'This solves only the factor $\\sin x = 0$ ($0^\\circ$, $180^\\circ$, $360^\\circ$) and forgets the second factor $2\\cos x - 1 = 0$.',
-        'This misses one endpoint: in a closed interval $\\sin x = 0$ has three solutions, $0^\\circ$, $180^\\circ$ and $360^\\circ$.',
-        null,
-      ],
-      keyIdea: 'Never divide by a trig function that could be zero; factorise instead so no solutions are lost.',
-    },
-    check: {
-      optionValues: [2, 3, 4, 5],
-      compute: () => solveDeg((x) => Math.sin(2 * x) - Math.sin(x), 0, 360).split(',').length,
-    },
-  },
-  {
     id: 'trig-equations-012',
     subtopic: 'trig-equations',
     difficulty: 'exam',
@@ -373,218 +225,321 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'trig-equations-013',
+    id: 'trig-equations-019',
     subtopic: 'trig-equations',
-    difficulty: 'exam',
-    stem: 'Given that $\\sin\\theta = \\frac{3}{5}$ and $\\theta$ is obtuse ($90^\\circ < \\theta < 180^\\circ$), find the exact value of $\\sin 2\\theta$.',
-    options: ['$\\frac{24}{25}$', '$\\frac{6}{5}$', '$-\\frac{24}{25}$', '$\\frac{7}{25}$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Which identity is true for every angle $\\theta$?',
+    options: ['$\\sin^2\\theta + \\cos^2\\theta = 1$', '$\\sin\\theta + \\cos\\theta = 1$', '$\\sin^2\\theta - \\cos^2\\theta = 1$', '$\\sin\\theta\\cos\\theta = 1$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        '$\\sin 2\\theta = 2\\sin\\theta\\cos\\theta$, so first find $\\cos\\theta$, taking care with its sign for an obtuse angle.\n\n' +
-        '1. Find $\\cos\\theta$: $\\cos^2\\theta = 1 - \\frac{9}{25} = \\frac{16}{25}$, so $\\cos\\theta = \\pm\\frac{4}{5}$.\n' +
-        '2. $\\theta$ is obtuse (second quadrant), where cosine is negative: $\\cos\\theta = -\\frac{4}{5}$.\n' +
-        '3. $\\sin 2\\theta = 2\\sin\\theta\\cos\\theta = 2 \\times \\frac{3}{5} \\times \\left(-\\frac{4}{5}\\right) = -\\frac{24}{25}$.\n\n' +
-        'Sense check: $\\theta \\approx 143^\\circ$, so $2\\theta \\approx 286^\\circ$, in the fourth quadrant where sine is negative.',
+        'A point on the circle of radius $1$ has coordinates $(\\cos\\theta, \\sin\\theta)$. Pythagoras then gives $\\cos^2\\theta + \\sin^2\\theta = 1$ for every angle.',
       whyWrong: [
-        'This takes $\\cos\\theta = +\\frac{4}{5}$, ignoring that cosine is negative for an obtuse angle.',
-        'This is $2\\sin\\theta$. The 2 belongs inside the sine; $\\sin 2\\theta = 2\\sin\\theta\\cos\\theta$.',
         null,
-        'This is $1 - 2\\sin^2\\theta = \\frac{7}{25}$, which is the formula for $\\cos 2\\theta$, not $\\sin 2\\theta$.',
+        'This forgets the squares. At $\\theta = 45^\\circ$ the left side is about $1.41$.',
+        'The two squares are added, not subtracted. At $\\theta = 0^\\circ$ this would say $0 - 1 = 1$.',
+        'This multiplies instead of adding squares. At $\\theta = 0^\\circ$ the left side is $0$.',
       ],
-      keyIdea: 'For $\\sin 2\\theta$ you need both $\\sin\\theta$ and $\\cos\\theta$, with the signs fixed by the quadrant.',
+      keyIdea: '$\\sin^2\\theta + \\cos^2\\theta = 1$ is Pythagoras on the unit circle.',
     },
     check: {
-      optionValues: [24 / 25, 6 / 5, -24 / 25, 7 / 25],
-      compute: () => Math.sin(2 * (Math.PI - Math.asin(3 / 5))),
-    },
-  },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'trig-equations-014',
-    subtopic: 'trig-equations',
-    difficulty: 'challenge',
-    stem:
-      'Find the angles $(\\alpha, \\beta, \\gamma)$, with $0 \\le \\alpha \\le \\frac{\\pi}{2}$, $0 \\le \\beta \\le \\frac{\\pi}{2}$ and $0 \\le \\gamma < \\frac{\\pi}{2}$, such that\n\n' +
-      '$$\\begin{aligned} 2\\sin\\alpha + 3\\cos\\beta + \\tan\\gamma &= 2 \\\\ 4\\sin\\alpha - \\cos\\beta + 2\\tan\\gamma &= 4 \\\\ 6\\sin\\alpha + 2\\cos\\beta - \\tan\\gamma &= 2 \\end{aligned}$$',
-    options: [
-      '$\\left(\\frac{\\pi}{3}, \\frac{\\pi}{2}, \\frac{\\pi}{4}\\right)$',
-      '$\\left(\\frac{\\pi}{6}, \\frac{\\pi}{2}, \\frac{\\pi}{4}\\right)$',
-      '$\\left(\\frac{\\pi}{6}, 0, \\frac{\\pi}{4}\\right)$',
-      '$\\left(\\frac{\\pi}{6}, \\frac{\\pi}{2}, \\frac{\\pi}{2}\\right)$',
-    ],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Let $u = \\sin\\alpha$, $v = \\cos\\beta$, $w = \\tan\\gamma$. The system is now ordinary linear simultaneous equations:\n\n' +
-        '$$\\begin{aligned} 2u + 3v + w &= 2 \\quad (1) \\\\ 4u - v + 2w &= 4 \\quad (2) \\\\ 6u + 2v - w &= 2 \\quad (3) \\end{aligned}$$\n\n' +
-        '1. Eliminate $w$ using (2) minus $2 \\times$ (1): $(4u - 4u) + (-v - 6v) + (2w - 2w) = 4 - 4$, so $-7v = 0$ and $v = 0$.\n' +
-        '2. Eliminate $w$ using (1) + (3): $8u + 5v = 4$. With $v = 0$: $8u = 4$, so $u = \\frac{1}{2}$.\n' +
-        '3. Back into (1): $2 \\times \\frac{1}{2} + 3 \\times 0 + w = 2$, so $w = 1$.\n' +
-        '4. Check in (3): $6 \\times \\frac{1}{2} + 2 \\times 0 - 1 = 2$. Correct.\n\n' +
-        'Now convert back to angles in the given ranges:\n\n' +
-        '- $\\sin\\alpha = \\frac{1}{2}$ gives $\\alpha = \\frac{\\pi}{6}$\n' +
-        '- $\\cos\\beta = 0$ gives $\\beta = \\frac{\\pi}{2}$\n' +
-        '- $\\tan\\gamma = 1$ gives $\\gamma = \\frac{\\pi}{4}$\n\n' +
-        'Answer: $\\left(\\frac{\\pi}{6}, \\frac{\\pi}{2}, \\frac{\\pi}{4}\\right)$.',
-      whyWrong: [
-        'This mixes up the sine and cosine values: $\\sin\\frac{\\pi}{3} = \\frac{\\sqrt{3}}{2}$, not $\\frac{1}{2}$. It is $\\cos\\frac{\\pi}{3}$ that equals $\\frac{1}{2}$.',
-        null,
-        'This uses $\\beta = 0$ for $\\cos\\beta = 0$, but $\\cos 0 = 1$. It is $\\sin 0$ that equals 0; $\\cos\\frac{\\pi}{2} = 0$.',
-        'This treats $\\tan\\gamma = 1$ like $\\sin\\gamma = 1$. In fact $\\tan\\frac{\\pi}{4} = 1$, and $\\tan\\frac{\\pi}{2}$ is not defined (it is not even in the allowed range).',
-      ],
-      keyIdea: 'Substitute $u = \\sin\\alpha$, $v = \\cos\\beta$, $w = \\tan\\gamma$, solve the linear system, then turn each value back into an angle.',
-    },
-    check: {
-      // multiples of pi/12: pi/6 = 2, pi/3 = 4, pi/2 = 6, pi/4 = 3
-      optionValues: ['4,6,3', '2,6,3', '2,0,3', '2,6,6'],
+      optionValues: ['squares added', 'plain sum', 'squares subtracted', 'product'],
       compute: () => {
-        const A = [
-          [2, 3, 1],
-          [4, -1, 2],
-          [6, 2, -1],
+        const ids: [string, (t: number) => number][] = [
+          ['squares added', (t) => Math.sin(t) ** 2 + Math.cos(t) ** 2],
+          ['plain sum', (t) => Math.sin(t) + Math.cos(t)],
+          ['squares subtracted', (t) => Math.sin(t) ** 2 - Math.cos(t) ** 2],
+          ['product', (t) => Math.sin(t) * Math.cos(t)],
         ];
-        const b = [2, 4, 2];
-        const D = det3(A);
-        const col = (j: number) => A.map((row, i) => row.map((v, k) => (k === j ? b[i] : v)));
-        const [u, v, w] = [0, 1, 2].map((j) => det3(col(j)) / D); // Cramer's rule
-        return [twelfths(Math.asin(u)), twelfths(Math.acos(v)), twelfths(Math.atan(w))].join(',');
+        return ids.filter(([, f]) => [10, 47, 123, 290].every((d) => Math.abs(f(rad(d)) - 1) < 1e-9))[0][0];
       },
     },
   },
   {
-    id: 'trig-equations-015',
+    id: 'trig-equations-020',
     subtopic: 'trig-equations',
-    difficulty: 'exam',
-    stem: 'Solve $\\cos 2x = \\cos x$ for $0^\\circ \\le x < 360^\\circ$.',
-    options: [
-      '$60^\\circ$, $180^\\circ$, $300^\\circ$',
-      '$120^\\circ$, $240^\\circ$',
-      '$0^\\circ$, $120^\\circ$, $240^\\circ$, $360^\\circ$',
-      '$0^\\circ$, $120^\\circ$, $240^\\circ$',
-    ],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Choose the double-angle formula that only involves $\\cos x$: $\\cos 2x = 2\\cos^2 x - 1$.\n\n' +
-        '1. $2\\cos^2 x - 1 = \\cos x$, so $2\\cos^2 x - \\cos x - 1 = 0$.\n' +
-        '2. Let $c = \\cos x$: $2c^2 - c - 1 = (2c + 1)(c - 1) = 0$, so $c = 1$ or $c = -\\frac{1}{2}$.\n' +
-        '3. $\\cos x = 1$: $x = 0^\\circ$ ($360^\\circ$ is **not** allowed because the interval is $x < 360^\\circ$).\n' +
-        '4. $\\cos x = -\\frac{1}{2}$: reference angle $60^\\circ$, cosine negative in quadrants 2 and 3, so $x = 180^\\circ - 60^\\circ = 120^\\circ$ or $x = 180^\\circ + 60^\\circ = 240^\\circ$.\n\n' +
-        'Solutions: $0^\\circ$, $120^\\circ$, $240^\\circ$.',
-      whyWrong: [
-        'This uses the wrong double-angle formula $\\cos 2x = 1 - 2\\cos^2 x$, which leads to $\\cos x = \\frac{1}{2}$ or $\\cos x = -1$. The correct one is $2\\cos^2 x - 1$ (or $1 - 2\\sin^2 x$).',
-        'This misses the root $\\cos x = 1$, which gives $x = 0^\\circ$.',
-        'This includes $360^\\circ$, but the interval is $0^\\circ \\le x < 360^\\circ$, so $360^\\circ$ is excluded.',
-        null,
-      ],
-      keyIdea: 'Pick the form of $\\cos 2x$ that matches the rest of the equation, solve the quadratic, and respect strict or non-strict interval ends.',
-    },
-    check: {
-      optionValues: ['60,180,300', '120,240', '0,120,240,360', '0,120,240'],
-      compute: () => solveDeg((x) => Math.cos(2 * x) - Math.cos(x), 0, 359),
-    },
-  },
-  {
-    id: 'trig-equations-016',
-    subtopic: 'trig-equations',
-    difficulty: 'exam',
-    stem:
-      'Find $x$ and $y$, with $0^\\circ \\le x \\le 180^\\circ$ and $0^\\circ \\le y \\le 180^\\circ$, such that\n\n' +
-      '$$\\begin{aligned} \\sin x + 2\\cos y &= 2 \\\\ 3\\sin x - 2\\cos y &= 2 \\end{aligned}$$',
-    options: ['$x = 90^\\circ$, $y = 60^\\circ$', '$x = 90^\\circ$, $y = 30^\\circ$', '$x = 0^\\circ$, $y = 60^\\circ$', '$x = 90^\\circ$, $y = 120^\\circ$'],
+    difficulty: 'foundation',
+    stem: 'Which expression equals $\\tan\\theta$ whenever $\\cos\\theta \\ne 0$?',
+    options: ['$\\frac{\\sin\\theta}{\\cos\\theta}$', '$\\frac{\\cos\\theta}{\\sin\\theta}$', '$\\sin\\theta\\cos\\theta$', '$\\frac{1}{\\sin\\theta}$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Treat $\\sin x$ and $\\cos y$ as two unknowns.\n\n' +
-        '1. Add the equations: the $2\\cos y$ terms cancel, giving $4\\sin x = 4$, so $\\sin x = 1$.\n' +
-        '2. Substitute into the first equation: $1 + 2\\cos y = 2$, so $2\\cos y = 1$ and $\\cos y = \\frac{1}{2}$.\n' +
-        '3. $\\sin x = 1$ with $0^\\circ \\le x \\le 180^\\circ$: $x = 90^\\circ$.\n' +
-        '4. $\\cos y = \\frac{1}{2}$ with $0^\\circ \\le y \\le 180^\\circ$: $y = 60^\\circ$ (the other cosine solution, $300^\\circ$, is outside the range).\n\n' +
-        'Check in the second equation: $3 \\times 1 - 2 \\times \\frac{1}{2} = 2$. Correct.\n\n' +
-        'Answer: $x = 90^\\circ$, $y = 60^\\circ$.',
+        'In a right-angled triangle, $\\tan\\theta = \\frac{\\text{opposite}}{\\text{adjacent}}$. Dividing the top and bottom by the hypotenuse gives $\\frac{\\sin\\theta}{\\cos\\theta}$.',
       whyWrong: [
         null,
-        'This uses the sine value: $\\sin 30^\\circ = \\frac{1}{2}$, but the equation is $\\cos y = \\frac{1}{2}$, and $\\cos 30^\\circ = \\frac{\\sqrt{3}}{2}$.',
-        'This confuses $\\sin x = 1$ with $\\cos x = 1$: $\\sin 0^\\circ = 0$, and it is $\\sin 90^\\circ$ that equals 1.',
-        'A sign slip when back-substituting gives $\\cos y = -\\frac{1}{2}$. From $1 + 2\\cos y = 2$ we get $\\cos y = +\\frac{1}{2}$.',
+        'This is the fraction upside down. Tangent is sine over cosine.',
+        'This multiplies the two ratios instead of dividing them.',
+        'This uses only the sine. It is the reciprocal of $\\sin\\theta$, and it does not involve the adjacent side at all.',
       ],
-      keyIdea: 'In a system of trig equations, treat each trig expression as an unknown, eliminate, then convert the values back to angles within the given ranges.',
+      keyIdea: '$\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta}$.',
     },
     check: {
-      optionValues: ['90,60', '90,30', '0,60', '90,120'],
-      compute: () => {
-        // [1 2; 3 -2] [u v]^T = [2 2]^T by Cramer's rule
-        const d = 1 * -2 - 2 * 3;
-        const u = (2 * -2 - 2 * 2) / d;
-        const v = (1 * 2 - 3 * 2) / d;
-        const toDeg = (r: number) => Math.round((r * 180) / Math.PI);
-        return `${toDeg(Math.asin(u))},${toDeg(Math.acos(v))}`;
-      },
+      optionValues: [
+        Math.sin(rad(50)) / Math.cos(rad(50)),
+        Math.cos(rad(50)) / Math.sin(rad(50)),
+        Math.sin(rad(50)) * Math.cos(rad(50)),
+        1 / Math.sin(rad(50)),
+      ],
+      compute: () => Math.tan(rad(50)),
     },
   },
   {
-    id: 'trig-equations-017',
+    id: 'trig-equations-021',
     subtopic: 'trig-equations',
-    difficulty: 'challenge',
-    stem: 'What is the **sum** of all the solutions of $2\\sin^2 x = 1 + \\cos x$ for $0 \\le x \\le 2\\pi$?',
-    options: ['$2\\pi$', '$4\\pi$', '$3\\pi$', '$\\frac{4\\pi}{3}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'The equation mixes $\\sin^2 x$ and $\\cos x$, so write everything in terms of $\\cos x$ to get a quadratic. Find **every** solution in the interval before adding.\n\n' +
-        '1. Replace $\\sin^2 x$ with $1 - \\cos^2 x$: $2(1 - \\cos^2 x) = 1 + \\cos x$.\n' +
-        '2. Expand and collect: $2 - 2\\cos^2 x - 1 - \\cos x = 0$, so $2\\cos^2 x + \\cos x - 1 = 0$.\n' +
-        '3. Factorise with $c = \\cos x$: $(2c - 1)(c + 1) = 0$, so $\\cos x = \\frac{1}{2}$ or $\\cos x = -1$.\n' +
-        '4. $\\cos x = \\frac{1}{2}$: $x = \\frac{\\pi}{3}$ or $x = 2\\pi - \\frac{\\pi}{3} = \\frac{5\\pi}{3}$.\n' +
-        '5. $\\cos x = -1$: $x = \\pi$.\n' +
-        '6. Sum: $\\frac{\\pi}{3} + \\pi + \\frac{5\\pi}{3} = \\frac{\\pi + 3\\pi + 5\\pi}{3} = \\frac{9\\pi}{3} = 3\\pi$.',
-      whyWrong: [
-        'This loses the solution $x = \\pi$. That happens if you write $2(1 - \\cos x)(1 + \\cos x) = 1 + \\cos x$ and divide by $1 + \\cos x$, which is zero when $\\cos x = -1$.',
-        'A sign error in the factorisation gives $\\cos x = -\\frac{1}{2}$ or $\\cos x = 1$, with solutions $0$, $\\frac{2\\pi}{3}$, $\\frac{4\\pi}{3}$, $2\\pi$ that add to $4\\pi$.',
-        null,
-        'This adds only the calculator values $\\frac{\\pi}{3}$ and $\\pi$, missing the second cosine solution $\\frac{5\\pi}{3}$.',
-      ],
-      keyIdea: 'Use $\\sin^2 x = 1 - \\cos^2 x$ to make a quadratic in $\\cos x$, find every solution in the interval, and never divide by an expression that can be zero.',
-    },
-    check: {
-      optionValues: [2 * Math.PI, 4 * Math.PI, 3 * Math.PI, (4 * Math.PI) / 3],
-      compute: () =>
-        solvePi12((x) => 2 * Math.sin(x) ** 2 - 1 - Math.cos(x), 24)
-          .map((k) => (k * Math.PI) / 12)
-          .reduce((a, b) => a + b, 0),
-    },
-  },
-  {
-    id: 'trig-equations-018',
-    subtopic: 'trig-equations',
-    difficulty: 'challenge',
-    stem: 'Given that $\\sin x + \\cos x = \\frac{7}{5}$, find the value of $\\sin 2x$.',
-    options: ['$\\frac{24}{25}$', '$-\\frac{24}{25}$', '$\\frac{12}{25}$', '$\\frac{49}{25}$'],
+    difficulty: 'foundation',
+    stem: 'How many solutions does $\\sin x = 2$ have for $0^\\circ \\le x < 360^\\circ$?',
+    options: ['$0$', '$1$', '$2$', '$4$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Square both sides, because squaring creates both $\\sin^2 x + \\cos^2 x$ and $2\\sin x\\cos x$.\n\n' +
-        '1. $(\\sin x + \\cos x)^2 = \\left(\\frac{7}{5}\\right)^2 = \\frac{49}{25}$\n' +
-        '2. Expand the left side: $\\sin^2 x + 2\\sin x\\cos x + \\cos^2 x = \\frac{49}{25}$\n' +
-        '3. Use $\\sin^2 x + \\cos^2 x = 1$ and $2\\sin x\\cos x = \\sin 2x$: $1 + \\sin 2x = \\frac{49}{25}$\n' +
-        '4. $\\sin 2x = \\frac{49}{25} - 1 = \\frac{24}{25}$\n\n' +
-        'Check with a 3-4-5 triangle: $\\sin x = \\frac{3}{5}$, $\\cos x = \\frac{4}{5}$ gives $\\sin x + \\cos x = \\frac{7}{5}$ and $\\sin 2x = 2 \\times \\frac{3}{5} \\times \\frac{4}{5} = \\frac{24}{25}$.',
+        'The sine of an angle always lies between $-1$ and $1$.\n\n' +
+        'Since $2 > 1$, no angle has a sine of $2$, so there are no solutions.',
       whyWrong: [
         null,
-        'This expands $(\\sin x + \\cos x)^2$ with a minus sign in the middle, $\\sin^2 x - 2\\sin x\\cos x + \\cos^2 x$. That is the expansion of $(\\sin x - \\cos x)^2$.',
-        'This is $\\sin x\\cos x$, i.e. the factor 2 in $\\sin 2x = 2\\sin x\\cos x$ was forgotten.',
-        'This is $(\\sin x + \\cos x)^2$ itself; the $\\sin^2 x + \\cos^2 x = 1$ part was never subtracted. It is also bigger than 1, which a sine can never be.',
+        'A calculator gives an error for $\\sin^{-1} 2$, not one answer: no angle has this sine.',
+        'Two is the usual count for one full turn, but only when the value lies between $-1$ and $1$.',
+        'Four solutions in one turn would need something like $\\sin 2x = k$. Here the value $2$ is out of reach for any angle.',
       ],
-      keyIdea: '$(\\sin x + \\cos x)^2 = 1 + \\sin 2x$, so squaring a sum of sine and cosine gives the double angle directly.',
+      keyIdea: '$\\sin x = k$ and $\\cos x = k$ have no solutions when $k$ is outside $[-1, 1]$.',
     },
     check: {
-      optionValues: [24 / 25, -24 / 25, 12 / 25, 49 / 25],
+      optionValues: [0, 1, 2, 4],
       compute: () => {
-        // sin x + cos x = sqrt(2) sin(x + pi/4) = 7/5
-        const x = Math.asin(7 / 5 / Math.SQRT2) - Math.PI / 4;
-        return Math.sin(2 * x);
+        const s = solveDeg((x) => Math.sin(x) - 2, 0, 359);
+        return s === '' ? 0 : s.split(',').length;
       },
     },
   },
-];
+  {
+    id: 'trig-equations-022',
+    subtopic: 'trig-equations',
+    difficulty: 'foundation',
+    stem: 'Solve $\\tan x = 1$ for $0^\\circ \\le x < 360^\\circ$.',
+    options: ['$x = 45^\\circ$ or $x = 225^\\circ$', '$x = 45^\\circ$ only', '$x = 45^\\circ$ or $x = 135^\\circ$', '$x = 45^\\circ$ or $x = 315^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Tangent repeats every $180^\\circ$.\n\n' +
+        '1. $\\tan 45^\\circ = 1$, so $x = 45^\\circ$ is one solution.\n' +
+        '2. Add $180^\\circ$: $x = 225^\\circ$.\n' +
+        '3. Adding another $180^\\circ$ gives $405^\\circ$, which is outside the interval.',
+      whyWrong: [
+        null,
+        'This is only the calculator value. Tangent is positive in two quadrants, the first and third.',
+        'This uses the sine pattern $180^\\circ - x$. But $\\tan 135^\\circ = -1$.',
+        'This uses the cosine pattern $360^\\circ - x$. But $\\tan 315^\\circ = -1$.',
+      ],
+      keyIdea: 'For $\\tan x = k$, the two solutions in one turn are $180^\\circ$ apart.',
+    },
+    check: {
+      optionValues: ['45,225', '45', '45,135', '45,315'],
+      compute: () => solveDeg((x) => Math.tan(x) - 1, 0, 359),
+    },
+  },
+  {
+    id: 'trig-equations-023',
+    subtopic: 'trig-equations',
+    difficulty: 'foundation',
+    stem: 'How many solutions does $\\cos x = 0.3$ have for $0^\\circ \\le x < 360^\\circ$?',
+    options: ['$2$', '$1$', '$0$', '$4$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The value $0.3$ lies between $-1$ and $1$, and it is not $\\pm 1$.\n\n' +
+        'The cosine graph crosses a horizontal line at this height twice in one full turn: once in the first quadrant and once in the fourth, where cosine is positive. So there are $2$ solutions.',
+      whyWrong: [
+        null,
+        'This counts only the calculator value. Cosine is positive in **two** quadrants, so there is a second solution.',
+        '$0.3$ is inside the range of cosine, so solutions do exist, even though the angle is not a standard one.',
+        'Four solutions in one turn would need something like $\\cos 2x = k$, not $\\cos x = k$.',
+      ],
+      keyIdea: 'For $-1 < k < 1$, $\\cos x = k$ has exactly two solutions in one full turn.',
+    },
+    check: {
+      optionValues: [2, 1, 0, 4],
+      compute: () => {
+        let crossings = 0;
+        for (let d = 0; d < 360; d++) if ((Math.cos(rad(d)) - 0.3) * (Math.cos(rad(d + 1)) - 0.3) < 0) crossings++;
+        return crossings;
+      },
+    },
+  },
+  {
+    id: 'trig-equations-024',
+    subtopic: 'trig-equations',
+    difficulty: 'exam',
+    stem: 'Solve $\\cos x = -\\frac{\\sqrt{3}}{2}$ for $0^\\circ \\le x \\le 360^\\circ$.',
+    options: ['$x = 150^\\circ$ or $x = 210^\\circ$', '$x = 30^\\circ$ or $x = 330^\\circ$', '$x = 150^\\circ$ or $x = 330^\\circ$', '$x = 120^\\circ$ or $x = 240^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '1. Reference angle: $\\cos 30^\\circ = \\frac{\\sqrt{3}}{2}$, so it is $30^\\circ$.\n' +
+        '2. Cosine is negative in the second and third quadrants.\n' +
+        '3. Second quadrant: $x = 180^\\circ - 30^\\circ = 150^\\circ$.\n' +
+        '4. Third quadrant: $x = 180^\\circ + 30^\\circ = 210^\\circ$.',
+      whyWrong: [
+        null,
+        'This ignores the minus sign. These angles solve $\\cos x = \\frac{\\sqrt{3}}{2}$.',
+        '$330^\\circ$ is in the fourth quadrant, where cosine is positive. These two quadrants are where **tangent** is negative.',
+        'This uses the reference angle $60^\\circ$, which belongs to $\\cos x = -\\frac{1}{2}$.',
+      ],
+      keyIdea: 'Find the reference angle from the positive value, then use the sign to choose the two quadrants.',
+    },
+    check: {
+      optionValues: ['150,210', '30,330', '150,330', '120,240'],
+      compute: () => solveDeg((x) => Math.cos(x) + Math.sqrt(3) / 2, 0, 360),
+    },
+  },
+  {
+    id: 'trig-equations-025',
+    subtopic: 'trig-equations',
+    difficulty: 'exam',
+    stem: 'Solve $\\sqrt{2}\\sin x + 1 = 0$ for $0 \\le x < 2\\pi$.',
+    options: ['$x = \\frac{5\\pi}{4}$ or $x = \\frac{7\\pi}{4}$', '$x = \\frac{\\pi}{4}$ or $x = \\frac{3\\pi}{4}$', '$x = \\frac{3\\pi}{4}$ or $x = \\frac{5\\pi}{4}$', '$x = \\frac{7\\pi}{6}$ or $x = \\frac{11\\pi}{6}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '1. Rearrange: $\\sin x = -\\frac{1}{\\sqrt{2}}$.\n' +
+        '2. Reference angle: $\\sin\\frac{\\pi}{4} = \\frac{1}{\\sqrt{2}}$, so it is $\\frac{\\pi}{4}$.\n' +
+        '3. Sine is negative in the third and fourth quadrants.\n' +
+        '4. Third quadrant: $x = \\pi + \\frac{\\pi}{4} = \\frac{5\\pi}{4}$.\n' +
+        '5. Fourth quadrant: $x = 2\\pi - \\frac{\\pi}{4} = \\frac{7\\pi}{4}$.',
+      whyWrong: [
+        null,
+        'A sign slip when rearranging: these angles solve $\\sin x = +\\frac{1}{\\sqrt{2}}$.',
+        'These are the quadrants where **cosine** is negative. Sine is negative in the third and fourth quadrants.',
+        'This uses the reference angle $\\frac{\\pi}{6}$, which belongs to $\\sin x = -\\frac{1}{2}$. The $\\sqrt{2}$ was not divided correctly.',
+      ],
+      keyIdea: 'Get $\\sin x$ on its own, then the reference angle and the sign give the two solutions.',
+    },
+    check: {
+      // answers written as multiples of pi/12
+      optionValues: ['15,21', '3,9', '9,15', '14,22'],
+      compute: () => solvePi12((x) => Math.sqrt(2) * Math.sin(x) + 1, 23).join(','),
+    },
+  },
+  {
+    id: 'trig-equations-026',
+    subtopic: 'trig-equations',
+    difficulty: 'exam',
+    stem: 'Solve $\\cos 2x = \\frac{1}{2}$ for $0^\\circ \\le x \\le 180^\\circ$.',
+    options: ['$x = 30^\\circ$ or $x = 150^\\circ$', '$x = 60^\\circ$ or $x = 300^\\circ$', '$x = 30^\\circ$ only', '$x = 30^\\circ$ or $x = 330^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '1. Let $u = 2x$. Since $0^\\circ \\le x \\le 180^\\circ$, we have $0^\\circ \\le u \\le 360^\\circ$.\n' +
+        '2. Solve $\\cos u = \\frac{1}{2}$: $u = 60^\\circ$ or $u = 360^\\circ - 60^\\circ = 300^\\circ$.\n' +
+        '3. Halve: $x = 30^\\circ$ or $x = 150^\\circ$.',
+      whyWrong: [
+        null,
+        'These are the values of $2x$. You still have to halve them to get $x$.',
+        'This is only the first solution. Solving for $u$ over $0^\\circ$ to $360^\\circ$ gives a second one.',
+        'This applies the partner rule $360^\\circ - x$ to $x$ instead of to $2x$. And $330^\\circ$ is outside the interval.',
+      ],
+      keyIdea: 'For a multiple angle, solve for $u = 2x$ over the doubled interval, then halve.',
+    },
+    check: {
+      optionValues: ['30,150', '60,300', '30', '30,330'],
+      compute: () => solveDeg((x) => Math.cos(2 * x) - 0.5, 0, 180),
+    },
+  },
+  {
+    id: 'trig-equations-027',
+    subtopic: 'trig-equations',
+    difficulty: 'exam',
+    stem: 'Solve $\\sin(x - 30^\\circ) = \\frac{\\sqrt{3}}{2}$ for $0^\\circ \\le x \\le 360^\\circ$.',
+    options: ['$x = 90^\\circ$ or $x = 150^\\circ$', '$x = 60^\\circ$ or $x = 120^\\circ$', '$x = 30^\\circ$ or $x = 90^\\circ$', '$x = 90^\\circ$ only'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '1. Let $u = x - 30^\\circ$, so $-30^\\circ \\le u \\le 330^\\circ$.\n' +
+        '2. Solve $\\sin u = \\frac{\\sqrt{3}}{2}$: $u = 60^\\circ$ or $u = 180^\\circ - 60^\\circ = 120^\\circ$.\n' +
+        '3. Add $30^\\circ$: $x = 90^\\circ$ or $x = 150^\\circ$.',
+      whyWrong: [
+        null,
+        'These are the values of $x - 30^\\circ$. You still have to add $30^\\circ$ to get $x$.',
+        'This subtracts $30^\\circ$ from $u$. Since $u = x - 30^\\circ$, undoing it means adding $30^\\circ$.',
+        'This keeps only one value of $u$. Sine is positive in two quadrants, so $u = 120^\\circ$ gives a second solution.',
+      ],
+      keyIdea: 'Replace the bracket by $u$, solve for $u$, then undo the shift.',
+    },
+    check: {
+      optionValues: ['90,150', '60,120', '30,90', '90'],
+      compute: () => solveDeg((x) => Math.sin(x - rad(30)) - Math.sqrt(3) / 2, 0, 360),
+    },
+  },
+  {
+    id: 'trig-equations-028',
+    subtopic: 'trig-equations',
+    difficulty: 'exam',
+    stem: 'Solve $\\cos^2 x = \\frac{1}{4}$ for $0^\\circ \\le x < 360^\\circ$.',
+    options: ['$60^\\circ$, $120^\\circ$, $240^\\circ$, $300^\\circ$', '$60^\\circ$, $300^\\circ$', '$120^\\circ$, $240^\\circ$', '$30^\\circ$, $150^\\circ$, $210^\\circ$, $330^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '1. Take the square root, with both signs: $\\cos x = \\frac{1}{2}$ or $\\cos x = -\\frac{1}{2}$.\n' +
+        '2. $\\cos x = \\frac{1}{2}$: $x = 60^\\circ$ or $x = 300^\\circ$.\n' +
+        '3. $\\cos x = -\\frac{1}{2}$: $x = 120^\\circ$ or $x = 240^\\circ$.',
+      whyWrong: [
+        null,
+        'This takes only the positive square root. $\\cos x = -\\frac{1}{2}$ also squares to $\\frac{1}{4}$.',
+        'This takes only the negative square root. $\\cos x = \\frac{1}{2}$ also squares to $\\frac{1}{4}$.',
+        'These angles solve $\\sin^2 x = \\frac{1}{4}$. The reference angle for $\\cos x = \\frac{1}{2}$ is $60^\\circ$, not $30^\\circ$.',
+      ],
+      keyIdea: 'A square root has two signs, so solve both $\\cos x = k$ and $\\cos x = -k$.',
+    },
+    check: {
+      optionValues: ['60,120,240,300', '60,300', '120,240', '30,150,210,330'],
+      compute: () => solveDeg((x) => Math.cos(x) ** 2 - 0.25, 0, 359),
+    },
+  },
+  {
+    id: 'trig-equations-029',
+    subtopic: 'trig-equations',
+    difficulty: 'exam',
+    stem: 'Solve $\\sin x \\cos x = 0$ for $0^\\circ \\le x < 360^\\circ$.',
+    options: ['$0^\\circ$, $90^\\circ$, $180^\\circ$, $270^\\circ$', '$0^\\circ$, $180^\\circ$', '$90^\\circ$, $270^\\circ$', '$45^\\circ$, $225^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A product is zero when either factor is zero.\n\n' +
+        '1. $\\sin x = 0$: $x = 0^\\circ$ or $x = 180^\\circ$.\n' +
+        '2. $\\cos x = 0$: $x = 90^\\circ$ or $x = 270^\\circ$.\n\n' +
+        'Together these give four solutions.',
+      whyWrong: [
+        null,
+        'This solves only $\\sin x = 0$, as if $\\cos x$ had been divided away. Dividing by $\\cos x$ loses the solutions where it is zero.',
+        'This solves only $\\cos x = 0$, as if $\\sin x$ had been divided away. Dividing by $\\sin x$ loses the solutions where it is zero.',
+        'These angles solve $\\sin x = \\cos x$. The product is zero when one factor is zero, not when the two are equal.',
+      ],
+      keyIdea: 'If a product equals zero, set each factor to zero; never divide by a trig function that can be zero.',
+    },
+    check: {
+      optionValues: ['0,90,180,270', '0,180', '90,270', '45,225'],
+      compute: () => solveDeg((x) => Math.sin(x) * Math.cos(x), 0, 359),
+    },
+  },
+  {
+    id: 'trig-equations-030',
+    subtopic: 'trig-equations',
+    difficulty: 'foundation',
+    stem: 'What is the principal value of $\\sin^{-1}\\left(\\frac{1}{2}\\right)$?',
+    options: ['$30^\\circ$', '$60^\\circ$', '$150^\\circ$', '$45^\\circ$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **principal value** is the single angle that a calculator returns. For $\\sin^{-1}$, it lies between $-90^\\circ$ and $90^\\circ$.\n\n' +
+        'Since $\\sin 30^\\circ = \\frac{1}{2}$ and $30^\\circ$ is in that interval, the principal value is $30^\\circ$.',
+      whyWrong: [
+        null,
+        '$\\cos 60^\\circ = \\frac{1}{2}$, but $\\sin 60^\\circ = \\frac{\\sqrt{3}}{2}$. This mixes up sine and cosine.',
+        '$\\sin 150^\\circ = \\frac{1}{2}$ is true, but $150^\\circ$ is outside the interval for the principal value. It is the second solution of the equation.',
+        '$\\sin 45^\\circ = \\frac{\\sqrt{2}}{2}$, not $\\frac{1}{2}$.',
+      ],
+      keyIdea: 'The principal value of $\\sin^{-1} k$ is the one angle between $-90^\\circ$ and $90^\\circ$ whose sine is $k$.',
+    },
+    check: {
+      optionValues: [30, 60, 150, 45],
+      compute: () => (Math.asin(0.5) * 180) / Math.PI,
+    },
+  },];

@@ -62,8 +62,7 @@ export const lesson: Lesson = {
     '### The pigeonhole principle\n\n' +
     'If you put more objects ("pigeons") into boxes ("pigeonholes") than there are boxes, some box gets at least two. With 12 months, 13 people guarantee two share a birth month. 12 people do not: they could all be different.\n\n' +
     '**Generalised version**: $N$ objects in $k$ boxes force some box to hold at least $\\left\\lceil \\frac{N}{k} \\right\\rceil$ objects, where $\\lceil \\; \\rceil$ means round **up**. 50 students and 7 weekdays: $\\frac{50}{7} \\approx 7.14$, so some day has at least 8 students.\n\n' +
-    '**Working backwards**: to force at least $r$ objects into one of $k$ boxes, imagine the worst case with $r - 1$ in **every** box, then add one: $k(r - 1) + 1$. Socks in 5 colours, three of a colour: $5 \\times 2 + 1 = 11$.\n\n' +
-    'Harder questions hide the boxes. For "choose numbers from 1 to 20 so that two add to 21", the boxes are the pairs $\\{1, 20\\}, \\{2, 19\\}, \\ldots, \\{10, 11\\}$.',
+    '**Working backwards**: to force at least $r$ objects into one of $k$ boxes, imagine the worst case with $r - 1$ in **every** box, then add one: $k(r - 1) + 1$. Socks in 5 colours, three of a colour: $5 \\times 2 + 1 = 11$.',
   formulas: [
     { label: 'Sum rule (one choice, separate groups)', tex: '\\text{ways}(A \\text{ or } B) = a + b', note: 'Use when the groups do not overlap and you choose one thing.' },
     { label: 'Product rule (choices in stages)', tex: '\\text{ways}(A \\text{ then } B) = a \\times b' },

@@ -45,17 +45,17 @@ interface RateCtx {
   group: string; // "class"
   names: [string, string];
   item: string; // "students"
-  success: string; // "passed the test"
+  success: string; // column heading: "Passed the test"
   rateWord: string; // "pass rate"
   failWord: string; // "fail rate"
 }
 
 const RATE_CTX: RateCtx[] = [
-  { group: 'class', names: ['Class A', 'Class B'], item: 'students', success: 'passed the test', rateWord: 'pass rate', failWord: 'fail rate' },
-  { group: 'hospital', names: ['Hospital North', 'Hospital South'], item: 'patients', success: 'recovered', rateWord: 'recovery rate', failWord: 'non-recovery rate' },
-  { group: 'model test set', names: ['Test set 1', 'Test set 2'], item: 'images', success: 'were classified correctly', rateWord: 'accuracy', failWord: 'error rate' },
-  { group: 'factory', names: ['Factory East', 'Factory West'], item: 'items', success: 'passed the quality check', rateWord: 'pass rate', failWord: 'reject rate' },
-  { group: 'campaign', names: ['Email campaign', 'Phone campaign'], item: 'customers contacted', success: 'made a purchase', rateWord: 'success rate', failWord: 'no-purchase rate' },
+  { group: 'class', names: ['Class A', 'Class B'], item: 'students', success: 'Passed the test', rateWord: 'pass rate', failWord: 'fail rate' },
+  { group: 'hospital', names: ['Hospital North', 'Hospital South'], item: 'patients', success: 'Recovered', rateWord: 'recovery rate', failWord: 'non-recovery rate' },
+  { group: 'model test set', names: ['Test set 1', 'Test set 2'], item: 'images', success: 'Classified correctly', rateWord: 'accuracy', failWord: 'error rate' },
+  { group: 'factory', names: ['Factory East', 'Factory West'], item: 'items', success: 'Passed the quality check', rateWord: 'pass rate', failWord: 'reject rate' },
+  { group: 'campaign', names: ['Email campaign', 'Phone campaign'], item: 'customers contacted', success: 'Made a purchase', rateWord: 'success rate', failWord: 'no-purchase rate' },
 ];
 
 export const generators: Generator[] = [
@@ -119,8 +119,8 @@ export const generators: Generator[] = [
       ];
       const distractors = pickDistinct(answer, pool);
       const stem =
-        `The bar chart compares ${ctx.what} for ${nA} (${a}) and ${nB} (${b}). Its vertical axis starts at ${yMin}, so on the chart ${nB}'s bar looks ${kWord} as tall as ${nA}'s bar. ` +
-        `By what percentage is ${nB}'s value **actually** higher than ${nA}'s? (Give answers to 1 decimal place where needed.)`;
+        `The chart compares ${ctx.what}: ${nA} ${a}, ${nB} ${b}. Its vertical axis starts at ${yMin}, so ${nB}'s bar looks ${kWord} as tall as ${nA}'s. ` +
+        `By what percentage is ${nB}'s value **actually** higher?`;
       const solution =
         `Step 1: Read the real values: ${nA} = ${a}, ${nB} = ${b}.\n\n` +
         `Step 2: Difference: $${b} - ${a} = ${d}$.\n\n` +
@@ -211,9 +211,7 @@ export const generators: Generator[] = [
         },
       ];
       const distractors = pickDistinct(answer, pool);
-      const stem =
-        `In ${g1}, ${k1} out of ${n1} ${ctx.item} ${ctx.success} (${r1p}%). In ${g2}, ${k2} out of ${n2} ${ctx.item} ${ctx.success} (${r2p}%). ` +
-        `What is the ${ctx.rateWord} for the two groups **combined**? (Give answers to 1 decimal place where needed.)`;
+      const stem = `The table gives the results for two groups of ${ctx.item}. What is the ${ctx.rateWord} for the two groups **combined**?`;
       const solution =
         `Step 1: Add the successes: $${k1} + ${k2} = ${K}$.\n\n` +
         `Step 2: Add the group sizes: $${n1} + ${n2} = ${N}$.\n\n` +
@@ -224,7 +222,7 @@ export const generators: Generator[] = [
       return {
         stem,
         table: {
-          headers: ['Group', `Number of ${ctx.item}`, 'Successes', 'Rate'],
+          headers: ['Group', `Number of ${ctx.item}`, ctx.success, 'Rate'],
           rows: [
             [g1, n1, k1, `${r1p}%`],
             [g2, n2, k2, `${r2p}%`],

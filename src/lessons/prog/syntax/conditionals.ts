@@ -3,64 +3,47 @@ import type { Lesson } from '../../../types';
 export const lesson: Lesson = {
   subtopic: 'conditionals',
   simple:
-    'A **condition** is a yes/no question the computer asks, such as "is the temperature above 30?". Python writes the answer as `True` or `False`. An `if` statement is like a fork in a road: the indented lines under it run only when the answer is `True`. With `if / elif / else`, Python tries each question from the top and takes the **first** road whose answer is yes, ignoring the rest; `else` is the road taken when every answer is no.',
+    'A **condition** is a yes/no question the computer asks, such as "is the temperature above 30?". The answer is `true` or `false`. An `if` statement is like a fork in a road: the indented lines under it run only when the answer is `true`, and the lines under `else` run when it is `false`. Inside an `else` you can ask another question, so the computer works down from the top and takes the **first** road whose answer is yes.',
   methods: [
-    { cue: 'An `if / elif / else` chain and "what is printed?"', method: 'Test the conditions from the top down and stop at the **first** True one; only that branch runs. Watch for `>` versus `>=` when the value sits exactly on a boundary.' },
-    { cue: 'A condition joining tests with `and`, `or`, `not`', method: 'Use precedence comparisons, then `not`, then `and`, then `or`. `x == 1 or 2` is `(x == 1) or 2`, which is always truthy.' },
-    { cue: 'Counting how many items in a list pass a condition', method: 'Make a table with one row per item and one column per part of the condition, then count the rows where the whole condition is True.' },
-    { cue: 'A value with no comparison used as a condition (`if v:` or `not v`)', method: 'Apply truthiness: `0`, `0.0`, empty `""`/`[]`/`{}`, `None` and `False` are falsy; everything else (even `"0"` or `" "`) is truthy.' },
-    { cue: 'A risky part such as `b / a` inside `and`/`or`, or functions with side effects', method: 'Short-circuit: `and` stops at the first False, `or` at the first True, so later parts are never evaluated. Evaluate strictly left to right.' },
-    { cue: 'A chained comparison such as `1 < x < 10`', method: 'Read it as `1 < x and x < 10`, never as `(1 < x) < 10`.' },
+    { cue: 'A chain of `if` and `else`, and "what is printed?"', method: 'Test the conditions from the top down and stop at the **first** true one; only that branch runs. Watch for `>` versus `>=` when the value sits exactly on a boundary.' },
+    { cue: 'A condition joining tests with `and`, `or`, `not`', method: 'Use the order comparisons, then `not`, then `and`, then `or`. So `a or b and c` means `a or (b and c)`.' },
+    { cue: 'Counting how many items in an array pass a condition', method: 'Make a table with one row per item and one column per part of the condition, then count the rows where the whole condition is true.' },
+    { cue: 'Two separate `if` statements, one after the other', method: 'Both are checked. If the first one changes a variable, the second one sees the new value.' },
+    { cue: 'An `if` inside a loop', method: 'Trace one row per pass and choose the branch using the current value. Check that the variable can still change on every pass, otherwise the loop may never end.' },
     { cue: 'Asked which condition is **equivalent** to `not (A and B)` or `not (A or B)`', method: 'De Morgan: negate each part and swap `and` with `or`. The opposite of `>` is `<=`, and of `<` is `>=`.' },
+    { cue: 'The code is labelled Python', method: 'Read `elif` as "else if", and the indented block after a colon as the body. Python writes the values as `True` and `False`.' },
   ],
   know:
-    '### True, False and comparisons\n\n' +
-    'A **Boolean** is a value that is either `True` or `False` (capital letters in Python). You usually get one by **comparing** two values:\n\n' +
-    '| Python | Meaning | Example | Result |\n' +
+    '### True, false and comparisons\n\n' +
+    'A **Boolean** is a value that is either `true` or `false`. You usually get one by **comparing** two values:\n\n' +
+    '| Operator | Meaning | Example | Result |\n' +
     '|---|---|---|---|\n' +
-    '| `==` | equal to | `3 == 3` | `True` |\n' +
-    '| `!=` | not equal to | `3 != 3` | `False` |\n' +
-    '| `<` and `>` | strictly less / greater | `5 > 5` | `False` |\n' +
-    '| `<=` and `>=` | less / greater **or equal** | `5 >= 5` | `True` |\n\n' +
+    '| `==` | equal to | `3 == 3` | `true` |\n' +
+    '| `!=` | not equal to | `3 != 3` | `false` |\n' +
+    '| `<` and `>` | strictly less / greater | `5 > 5` | `false` |\n' +
+    '| `<=` and `>=` | less / greater **or equal** | `5 >= 5` | `true` |\n\n' +
     'Do not mix up `=` (store a value: `x = 5`) with `==` (ask a question: `x == 5`). An `if` always needs a question.\n\n' +
-    'Strings compare **character by character** using character codes: digits come before uppercase letters, which come before lowercase letters. So `"Zebra" < "apple"` is True and `"10" < "9"` is True (the first characters 1 and 9 decide). Floats can carry tiny rounding errors: `0.1 + 0.2 == 0.3` is False, so compare floats with a tolerance such as `abs(a - b) < 1e-9`.\n\n' +
     '### Combining conditions: and, or, not\n\n' +
-    '- `A and B` is True only if **both** are True.\n' +
-    '- `A or B` is True if **at least one** is True.\n' +
-    '- `not A` flips True and False.\n\n' +
-    '**Order of operations** (strongest first): arithmetic such as `%`, then comparisons, then `not`, then `and`, then `or`. So `x > 0 or y > 0 and z > 0` means `x > 0 or (y > 0 and z > 0)`, and `not x == 5` means `not (x == 5)`. When in doubt, add brackets.\n\n' +
-    'A classic bug: `if x == 1 or 2:` means `(x == 1) or 2`, and the lone `2` is always truthy, so the condition is always satisfied. Write `x == 1 or x == 2`.\n\n' +
-    '### Truthiness: every value can act as a condition\n\n' +
-    'You can write `if name:` or `if items:` without a comparison. Python then asks whether the value is **truthy** or **falsy**. The falsy values are:\n\n' +
-    '- zero: `0`, `0.0`\n' +
-    '- empty containers: `""`, `[]`, `{}`, `()`\n' +
-    '- `None` and `False`\n\n' +
-    'Everything else is truthy, including `"0"`, `" "` (a space), `"False"` and `[0]`, because they are not empty.\n\n' +
-    '### Short-circuit evaluation\n\n' +
-    'Python works through `and`/`or` **left to right and stops as soon as the answer is known**:\n\n' +
-    '- `False and anything` is False, so the right side is skipped.\n' +
-    '- `True or anything` is True, so the right side is skipped.\n\n' +
-    'This protects risky code: `if a != 0 and b / a > 2:` never divides by zero. But swap the order and the division happens first and crashes. Also, `and`/`or` return **one of their operands**, not always True/False: `0 or 5` gives `5`, `3 and 0` gives `0`, `"" or "hi"` gives `"hi"`.\n\n' +
-    '### Chained comparisons\n\n' +
-    'Python lets you write `1 < x < 10`, meaning `1 < x and x < 10`. It is **not** `(1 < x) < 10` as in C or Java. So with `x = 7`, `8 < x < 10` is False and `3 < x == 7` is True.\n\n' +
-    '### if / elif / else: order of checking\n\n' +
-    'In a chain, Python tests the conditions **from the top down** and runs **only the first branch whose condition is True**. The `else` runs only if all of them are False. If conditions overlap, order matters:\n\n' +
+    '- `A and B` is true only if **both** are true.\n' +
+    '- `A or B` is true if **at least one** is true. It is false only when both are false.\n' +
+    '- `not A` flips true and false.\n\n' +
+    '**Order of operations** (strongest first): arithmetic and `mod`, then comparisons, then `not`, then `and`, then `or`. So `x > 0 or y > 0 and z > 0` means `x > 0 or (y > 0 and z > 0)`, and `not x == 5` means `not (x == 5)`. When in doubt, add brackets.\n\n' +
+    'To test whether `x` is 1 or 2, write each comparison in full: `x == 1 or x == 2`. To test whether `x` lies between two values, join two comparisons: `x > 1 and x < 10`.\n\n' +
+    '**Exclusive or** means one or the other but not both, which is `(p or q) and not (p and q)`.\n\n' +
+    '### if and else: order of checking\n\n' +
+    'An `if` runs its block when the condition is true. An `else` block runs when it is false, so exactly one of the two runs. There is no separate "else if" in the pseudocode: put another `if` inside the `else`, as in the example below.\n\n' +
+    '```pseudocode\nif score >= 90\n   print("top")\nelse\n   if score >= 50\n      print("pass")\n   else\n      print("fail")\n   end if\nend if\n```\n\n' +
+    'Tests run **from the top down**, and only the first true branch runs. If conditions overlap, order matters:\n\n' +
     '| Order written | score = 95 gives |\n' +
     '|---|---|\n' +
-    '| `>= 90` then `>= 70` then `>= 50` | A (correct) |\n' +
-    '| `>= 50` then `>= 70` then `>= 90` | C (bug: 95 is caught by the first test) |\n\n' +
+    '| `>= 90` then `>= 70` then `>= 50` | the top band (correct) |\n' +
+    '| `>= 50` then `>= 70` then `>= 90` | the lowest passing band (bug: 95 is caught by the first test) |\n\n' +
     'So test the **most restrictive** condition first. Separate `if` statements are different: each one is checked, so several can run.\n\n' +
-    '### Nested conditions and one-line if\n\n' +
-    'An `if` inside another `if` is only reached when the outer condition is True. **Indentation** shows which `else` belongs to which `if`. Once any branch of a chain runs, the rest of that chain is skipped.\n\n' +
-    'Python also has a one-line form: `A if condition else B` gives A when the condition is True, otherwise B. These can be chained: `"neg" if n < 0 else "zero" if n == 0 else "pos"` works like if/elif/else.\n\n' +
-    '### Pseudocode\n\n' +
-    'Exam pseudocode writes the same ideas as `if ... then`, `else if`, `end if`, uses `AND`, `OR`, `NOT`, `MOD` for the remainder (like `%` in Python), and often `=` for comparison and `←` for assignment. The logic is exactly the same as in Python.',
+    '### Nested conditions\n\n' +
+    'An `if` inside another `if` is only reached when the outer condition is true. **Indentation** and the `end if` lines show which `else` belongs to which `if`. Once an outer branch is chosen, the other outer branch is skipped.\n\n' +
+    '### Reading the same ideas in Python\n\n' +
+    'Some questions use short pieces of Python, and the stem says so. Python ends the condition line with a colon and uses indentation instead of `end if`. It writes "else if" as one word, `elif`, and the logic is the same: only the first true branch of a chain runs. It also writes the two Boolean values with capitals: `True` and `False`.',
   formulas: [
-    {
-      label: 'Chained comparison',
-      tex: 'a < b < c \\;\\Longleftrightarrow\\; (a < b) \\text{ and } (b < c)',
-      note: 'Python meaning of `a < b < c`; it is never `(a < b) < c`.',
-    },
     {
       label: 'Precedence (strongest first)',
       tex: '\\text{arithmetic} \\;\\succ\\; \\text{comparisons} \\;\\succ\\; \\text{not} \\;\\succ\\; \\text{and} \\;\\succ\\; \\text{or}',
@@ -80,80 +63,69 @@ export const lesson: Lesson = {
       note: 'The opposite of `>` is `<=` (not `<`): the boundary value switches sides.',
     },
     {
-      label: 'What and returns',
-      tex: 'x \\text{ and } y = \\begin{cases} x & \\text{if } x \\text{ is falsy} \\\\ y & \\text{otherwise} \\end{cases}',
-      note: 'If `x` is falsy, `y` is never evaluated (short-circuit).',
-    },
-    {
-      label: 'What or returns',
-      tex: 'x \\text{ or } y = \\begin{cases} x & \\text{if } x \\text{ is truthy} \\\\ y & \\text{otherwise} \\end{cases}',
-      note: 'If `x` is truthy, `y` is never evaluated (short-circuit).',
-    },
-    {
-      label: 'Falsy values',
-      tex: '0,\\ 0.0,\\ \\text{empty string},\\ \\text{empty list / dict / tuple},\\ \\text{None},\\ \\text{False}',
-      note: 'Everything else is truthy, including `"0"`, `" "` and `[0]`.',
+      label: 'Exclusive or',
+      tex: '(p \\text{ or } q) \\text{ and not } (p \\text{ and } q)',
+      note: 'True when exactly one of $p$ and $q$ is true.',
     },
   ],
   examples: [
     {
-      title: 'Reading an if/elif/else chain',
-      problem: 'What does this print?\n\n```\nmark = 70\nif mark >= 80:\n    print("merit")\nelif mark >= 70:\n    print("pass+")\nelif mark >= 50:\n    print("pass")\nelse:\n    print("fail")\n```',
+      title: 'Reading a chain of if and else',
+      problem: 'What does this print?\n\n```pseudocode\nmark = 70\nif mark >= 80\n   print("merit")\nelse\n   if mark >= 70\n      print("credit")\n   else\n      print("fail")\n   end if\nend if\n```',
       steps: [
-        'Test `mark >= 80`: `70 >= 80` is False, so move on.',
-        'Test `mark >= 70`: `70 >= 70` is True (the boundary counts with `>=`), so print `pass+`.',
-        'Stop: the remaining `elif` and `else` are skipped, even though `70 >= 50` is also True.',
+        'Test `mark >= 80`: `70 >= 80` is false, so go to the `else`.',
+        'Test `mark >= 70`: `70 >= 70` is true (the boundary counts with `>=`), so print `credit`.',
+        'The inner `else` is skipped.',
       ],
-      answer: '`pass+`',
+      answer: '`credit`',
     },
     {
-      title: 'Truthiness and what or/and return',
-      problem: 'What does `print([] or "empty", 0 and 1/0)` print?',
+      title: 'The same logic in Python',
+      problem: 'What does this Python code print?\n\n```python\nn = 12\nif n % 2 == 1:\n    print("odd")\nelif n > 10:\n    print("big even")\nelse:\n    print("small even")\n```',
       steps: [
-        '`[] or "empty"`: the empty list is falsy, so `or` returns its right operand, `"empty"`.',
-        '`0 and 1/0`: `0` is falsy, so `and` returns `0` straight away and never evaluates `1/0` (short-circuit), so there is no error.',
-        '`print` shows the two values separated by a space, strings without quotes.',
+        '`%` is the remainder, and `12 % 2` is 0, so the first test is False.',
+        '`12 > 10` is True, so `big even` is printed.',
+        'The `else` is skipped, because a branch of the chain has already run.',
       ],
-      answer: '`empty 0`',
+      answer: '`big even`',
     },
     {
-      title: 'Chained comparison vs C-style reading',
-      problem: 'With `x = 2`, what is the value of `5 < x < 10` in Python?',
+      title: 'Using not and or together',
+      problem: 'With `x = 5` and `y = 2`, what is the value of `not x > 3 or y == 2`?',
       steps: [
-        'Python reads it as `5 < x and x < 10`.',
-        '`5 < 2` is False, so the whole `and` is False (and `x < 10` is not even checked).',
-        'Compare the C-style reading `(5 < x) < 10`: that would be `False < 10`, i.e. `0 < 10`, which is True. That is the trap answer.',
+        'Comparisons come first: `x > 3` is true and `y == 2` is true.',
+        '`not` comes next: `not true` is false.',
+        '`or` comes last: `false or true` is true.',
       ],
-      answer: '`False`',
+      answer: '`true`',
     },
     {
-      title: 'Exam level: precedence and short-circuit together',
-      problem: 'For how many n in `[4, 9, 12, 15, 20]` is `n % 3 == 0 or n > 10 and n % 2 == 0` True?',
+      title: 'Exam level: precedence over an array',
+      problem: 'For how many `n` in the array `[4, 9, 12, 15, 20]` is `mod(n,3) == 0 or n > 10 and mod(n,2) == 0` true?',
       steps: [
-        '`and` binds before `or`, so the condition is `n % 3 == 0 or (n > 10 and n % 2 == 0)`.',
-        'n = 4: `4 % 3 == 0` False; `4 > 10` False, so the bracket is False. Result False.',
-        'n = 9: `9 % 3 == 0` True, so `or` stops. Result True.',
-        'n = 12: `12 % 3 == 0` True. Result True.',
-        'n = 15: `15 % 3 == 0` True. Result True.',
-        'n = 20: `20 % 3 == 0` False; `20 > 10` True and `20 % 2 == 0` True, so the bracket is True. Result True.',
-        'Count the Trues: 9, 12, 15, 20.',
+        '`and` is done before `or`, so the condition is `mod(n,3) == 0 or (n > 10 and mod(n,2) == 0)`.',
+        'n = 4: not a multiple of 3, and `4 > 10` is false, so the bracket is false. Result false.',
+        'n = 9: a multiple of 3. Result true.',
+        'n = 12: a multiple of 3. Result true.',
+        'n = 15: a multiple of 3. Result true.',
+        'n = 20: not a multiple of 3, but `20 > 10` is true and 20 is even, so the bracket is true. Result true.',
+        'Count the true results: 9, 12, 15, 20.',
       ],
       answer: '4 values',
     },
   ],
   traps: [
-    'Thinking several branches of an if/elif chain can run. Only the first true branch runs; the `else` runs only when everything above it is False.',
+    'Thinking several branches of a chain can run. Only the first true branch runs, and the final `else` runs only when everything above it is false.',
     'Putting overlapping conditions in the wrong order (for example `>= 50` before `>= 90`), so the later, more specific branches can never be reached.',
-    'Writing `if x == 1 or 2:`. It means `(x == 1) or 2`, which is always truthy. Write `x == 1 or x == 2` or `x in (1, 2)`.',
-    'Believing `"0"`, `" "`, `"False"` or `[0]` are falsy. Only zero, empty containers, `None` and `False` are falsy.',
-    'Forgetting short-circuiting: in `a != 0 and b / a > 2` the division is skipped when `a` is 0, but in `b / a > 2 and a != 0` it crashes with `ZeroDivisionError`.',
+    'Treating two separate `if` statements as one chain. Each `end if` closes its own statement, so the second test still runs.',
+    'Using an old value in a later test. If an earlier line changed `x`, the next `if` sees the new value.',
+    'Working `a or b and c` from left to right. `and` is done first, so it means `a or (b and c)`.',
     'Negating `x > 3` as `x < 3` (it is `x <= 3`), or negating `A and B` without changing `and` to `or` (De Morgan).',
   ],
   examTip:
     'These questions are usually "what does this code print?" with four outputs. Trace it on paper: write the variable values, then test each condition **in order**, writing T or F next to it. Fast eliminations:\n\n' +
-    '- An option showing **two or more** words from one if/elif chain is wrong (only one branch runs), unless the code uses separate `if`s.\n' +
+    '- An option showing **two or more** words from one chain is wrong (only one branch runs), unless the code uses separate `if` statements.\n' +
     '- Check the **boundary** first: if a variable equals a threshold, `>` vs `>=` usually decides between two options.\n' +
-    '- If an option is "an error is raised", look for a division by zero or a bad operation that short-circuiting might (or might not) skip; remember operands are evaluated left to right.\n' +
-    '- For `and`/`or` printing values, remember they return an **operand**, so options showing only True/False may be traps.\n' +
-    '- For "which condition is equivalent", plug a boundary value (such as x = 3 for `x > 3`) into each option; it kills the `<` vs `<=` and `and` vs `or` traps in seconds.',
+    '- If an option is "Infinite loop", check whether the variable in the loop condition changes on every branch.\n' +
+    '- For "which condition is equivalent", plug a boundary value (such as x = 3 for `x > 3`) into each option; it removes the `<` vs `<=` and `and` vs `or` traps in seconds.',
 };

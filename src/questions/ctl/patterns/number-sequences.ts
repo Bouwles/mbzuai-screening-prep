@@ -398,27 +398,41 @@ export const questions: StaticQuestion[] = [
     id: 'number-sequences-014',
     subtopic: 'number-sequences',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'What does this code print, in order?',
     code: {
-      lang: 'python',
-      source: 'a, b = 1, 2\nseq = []\nfor _ in range(6):\n    seq.append(a)\n    a, b = b, a + b\nprint(seq)',
+      lang: 'pseudocode',
+      source: 'a = 1\nb = 2\nfor i = 1 to 6\n   print(a)\n   c = a + b\n   a = b\n   b = c\nend for',
     },
-    options: ['`[1, 2, 3, 5, 8, 13]`', '`[1, 2, 4, 8, 16, 32]`', '`[2, 3, 5, 8, 13, 21]`', '`[1, 2, 3, 5, 8]`'],
+    options: ['`1 2 3 5 8 13`', '`1 2 4 8 16 32`', '`2 3 5 8 13 21`', '`1 2 3 5 8`'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'The line `a, b = b, a + b` works out **both** right-hand values first (using the old `a` and `b`), then assigns them. The loop runs 6 times, and each time it appends `a` **before** updating.\n\n' +
-        '| loop | appended `a` | new `a` | new `b` |\n|---|---|---|---|\n| 1 | 1 | 2 | 3 |\n| 2 | 2 | 3 | 5 |\n| 3 | 3 | 5 | 8 |\n| 4 | 5 | 8 | 13 |\n| 5 | 8 | 13 | 21 |\n| 6 | 13 | 21 | 34 |\n\n' +
-        'So `seq` is `[1, 2, 3, 5, 8, 13]`: a Fibonacci-like sequence where each term is the sum of the two before it.',
+        'The loop runs 6 times. Each time it prints `a` **before** updating, and `c` holds the sum so that the old values are used.\n\n' +
+        '| i | printed `a` | `c` | new `a` | new `b` |\n|---|---|---|---|---|\n| 1 | 1 | 3 | 2 | 3 |\n| 2 | 2 | 5 | 3 | 5 |\n| 3 | 3 | 8 | 5 | 8 |\n| 4 | 5 | 13 | 8 | 13 |\n| 5 | 8 | 21 | 13 | 21 |\n| 6 | 13 | 34 | 21 | 34 |\n\n' +
+        'So it prints `1 2 3 5 8 13`: a Fibonacci-like sequence where each term is the sum of the two before it.',
       whyWrong: [
         null,
-        'This is what you get if the swap is done in two separate steps, `a = b` then `b = a + b`: the second step uses the **new** `a`, so `b` doubles each time. Python\'s tuple assignment uses the old values.',
-        'This is what you get if `a` is appended **after** the update, so the starting value 1 is never stored.',
-        'This has only 5 values. `range(6)` runs the loop 6 times (0 to 5), so 6 values are appended.',
+        'This is what you get from `a = b` followed by `b = a + b` with no `c`: the second step uses the **new** `a`, so `b` doubles each time.',
+        'This is what you get if `a` is printed **after** the update, so the starting value 1 is never printed.',
+        'This has only 5 values. `for i = 1 to 6` includes both ends, so the loop runs 6 times.',
       ],
-      keyIdea: 'In `a, b = b, a + b` the right side is evaluated in full before assigning, which generates a Fibonacci-like sequence.',
+      keyIdea: 'Saving the sum in a third variable before updating generates a Fibonacci-like sequence.',
     },
-    python: { stdout: '[1, 2, 3, 5, 8, 13]' },
+    check: {
+      optionValues: ['1 2 3 5 8 13', '1 2 4 8 16 32', '2 3 5 8 13 21', '1 2 3 5 8'],
+      compute: () => {
+        let a = 1;
+        let b = 2;
+        const out: number[] = [];
+        for (let i = 1; i <= 6; i++) {
+          out.push(a);
+          const c = a + b;
+          a = b;
+          b = c;
+        }
+        return out.join(' ');
+      },
+    },
   },
   {
     id: 'number-sequences-015',
@@ -482,7 +496,6 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ================================================================ challenge
   {
     id: 'number-sequences-017',
     subtopic: 'number-sequences',
@@ -542,107 +555,112 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'number-sequences-019',
+    id: 'number-sequences-022',
     subtopic: 'number-sequences',
-    difficulty: 'challenge',
-    stem: 'In a sequence, every term from the 3rd onwards is the **sum of the two terms before it**. The 3rd term is $11$ and the 6th term is $47$. What is the 2nd term?',
-    options: ['$4$', '$18$', '$7$', '$12$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'A sequence with a constant difference between neighbouring terms is called:',
+    options: ['linear (arithmetic)', 'geometric', 'quadratic', 'Fibonacci-like'],
+    correctIndex: 0,
     markScheme: {
-      solution:
-        'Call the first two terms $a$ and $b$. Build the sequence with the rule:\n\n' +
-        '| term | 1st | 2nd | 3rd | 4th | 5th | 6th |\n|---|---|---|---|---|---|---|\n| value | $a$ | $b$ | $a + b$ | $a + 2b$ | $2a + 3b$ | $3a + 5b$ |\n\n' +
-        'So $a + b = 11$ and $3a + 5b = 47$.\n\n' +
-        'From the first equation, $a = 11 - b$. Substitute:\n\n' +
-        '$$3(11 - b) + 5b = 47 \\Rightarrow 33 + 2b = 47 \\Rightarrow 2b = 14 \\Rightarrow b = 7$$\n\n' +
-        'Then $a = 4$. Check: $4, 7, 11, 18, 29, 47$. Correct, so the 2nd term is $7$.',
+      solution: 'A constant **difference** means you add the same amount each time, as in $7, 10, 13, 16, \\dots$ This is a linear, or arithmetic, sequence.',
       whyWrong: [
-        'This is the **1st** term $a$, not the 2nd term $b$.',
-        'This is the **4th** term ($7 + 11$), not the 2nd.',
         null,
-        'This treats the sequence as linear: $\\frac{47 - 11}{3} = 12$ per step. But a sum-of-previous-two rule does not add a constant amount.',
+        'A geometric sequence has a constant **ratio**: you multiply by the same number each time.',
+        'A quadratic sequence has a constant **second** difference; its first differences change.',
+        'In a Fibonacci-like sequence each term is the sum of the two before it, so the differences change.',
       ],
-      keyIdea: 'Write each term in terms of the first two unknowns, then solve the resulting simultaneous equations.',
-    },
-    check: {
-      optionValues: [4, 18, 7, 12],
-      compute: () => {
-        const sols: number[] = [];
-        for (let b = -100; b <= 100; b++) {
-          const t = [11 - b, b];
-          while (t.length < 6) t.push(t[t.length - 1] + t[t.length - 2]);
-          if (t[2] === 11 && t[5] === 47) sols.push(b);
-        }
-        if (sols.length !== 1) throw new Error('not unique');
-        return sols[0];
-      },
+      keyIdea: 'Constant difference: linear. Constant ratio: geometric. Constant second difference: quadratic.',
     },
   },
   {
-    id: 'number-sequences-020',
+    id: 'number-sequences-023',
     subtopic: 'number-sequences',
-    difficulty: 'challenge',
-    stem: 'The sequence $1, 100, 3, 95, 5, 90, 7, 85, \\dots$ continues with the same pattern. What is its 20th term?',
-    options: ['$39$', '$5$', '$50$', '$55$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Split into two interleaved sequences:\n\n' +
-        '- Odd positions: $1, 3, 5, 7, \\dots$ (odd numbers)\n' +
-        '- Even positions: $100, 95, 90, 85, \\dots$ (subtract 5 each time)\n\n' +
-        'Position 20 is even. Position 2 is the 1st even-position term, position 4 the 2nd, ..., so position 20 is the $\\frac{20}{2} = 10$th term of $100, 95, 90, \\dots$\n\n' +
-        '$$100 + (10 - 1) \\times (-5) = 100 - 45 = 55$$',
-      whyWrong: [
-        'This is $2 \\times 20 - 1$, the rule for the **odd** positions. Position 20 is even, so it belongs to the decreasing sequence.',
-        'This is $100 - 5 \\times 19$: it treats position 20 as the 20th term of the decreasing sequence. Position 20 is only its 10th term, because every other position belongs to the odd numbers.',
-        'This is $100 - 5 \\times 10$: the position within the sub-sequence (10th) is right, but it uses 10 jumps instead of $10 - 1 = 9$.',
-        null,
-      ],
-      keyIdea: 'In an interleaved sequence, position $2k$ is the $k$th term of the even-position sequence.',
-    },
-    check: {
-      optionValues: [39, 5, 50, 55],
-      compute: () => {
-        const t: number[] = [];
-        let odd = 1;
-        let even = 100;
-        while (t.length < 20) {
-          t.push(odd);
-          t.push(even);
-          odd += 2;
-          even -= 5;
-        }
-        return t[19];
-      },
-    },
-  },
-  {
-    id: 'number-sequences-021',
-    subtopic: 'number-sequences',
-    difficulty: 'challenge',
-    stem: 'A sequence is defined by $u_1 = 5$ and $u_{n+1} = 2u_n - 3$. What is $u_{10}$?',
-    options: ['$515$', '$1027$', '$1021$', '$2560$'],
+    difficulty: 'foundation',
+    stem: 'What is the common ratio of the geometric sequence $3, 12, 48, 192, \\dots$?',
+    options: ['$3$', '$4$', '$9$', '$36$'],
     correctIndex: 1,
     markScheme: {
-      solution:
-        'Generate a few terms: $u_1 = 5$, $u_2 = 2(5) - 3 = 7$, $u_3 = 2(7) - 3 = 11$, $u_4 = 19$, $u_5 = 35$.\n\n' +
-        'Spot the pattern: $5 = 2 + 3$, $7 = 4 + 3$, $11 = 8 + 3$, $19 = 16 + 3$, $35 = 32 + 3$. Each term is a power of 2 plus 3:\n\n' +
-        '$$u_n = 2^{n} + 3$$\n\n' +
-        'So $u_{10} = 2^{10} + 3 = 1024 + 3 = 1027$.\n\n' +
-        '(Or keep applying the rule: $35 \\to 67 \\to 131 \\to 259 \\to 515 \\to 1027$.)',
+      solution: 'Divide any term by the one before it: $12 \\div 3 = 4$. Check: $48 \\div 12 = 4$. The common ratio is $4$.',
       whyWrong: [
-        'This is $u_9 = 2^{9} + 3$: one application of the rule was missed.',
+        'This is the first term, not the ratio.',
         null,
-        'This is $2^{10} - 3$: the powers of 2 were spotted but the constant has the wrong sign. Check $n = 1$: $2 - 3 = -1$, not 5.',
-        'This is $5 \\times 2^{9}$: it treats the sequence as geometric (doubling) and ignores the $-3$ in the rule. Check: $5 \\times 2 = 10$, not 7.',
+        'This is $12 - 3$, the first **difference**. A ratio comes from dividing.',
+        'This is $48 - 12$, a gap between neighbouring terms. A ratio comes from dividing.',
       ],
-      keyIdea: 'For a recursive rule, write out several terms and compare them with a familiar sequence (here powers of 2).',
+      keyIdea: 'The common ratio is any term divided by the term before it.',
+    },
+    check: { optionValues: [3, 4, 9, 36], compute: () => 12 / 3 },
+  },
+  {
+    id: 'number-sequences-024',
+    subtopic: 'number-sequences',
+    difficulty: 'foundation',
+    stem: 'A linear sequence has first term $a$ and common difference $d$. What is its $n$th term?',
+    options: ['$a + (n - 1)d$', '$a + nd$', '$ar^{n-1}$', '$(a + n)d$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'From the 1st term to the $n$th term there are $n - 1$ jumps of size $d$, so the $n$th term is $a + (n - 1)d$.',
+      whyWrong: [
+        null,
+        'This makes $n$ jumps. At $n = 1$ it gives $a + d$, which is the second term, not the first.',
+        'This is the $n$th term of a **geometric** sequence with ratio $r$.',
+        'This multiplies by $d$ instead of adding jumps of $d$. At $n = 1$ it does not give $a$.',
+      ],
+      keyIdea: 'The $n$th term of a linear sequence is $a + (n - 1)d$: there are $n - 1$ jumps.',
+    },
+    // each option evaluated at a = 5, d = 3, n = 4 (r = d for the geometric form)
+    check: { optionValues: [14, 17, 135, 27], compute: () => nthByDifferences([5, 8, 11], 4) },
+  },
+  {
+    id: 'number-sequences-025',
+    subtopic: 'number-sequences',
+    difficulty: 'foundation',
+    stem: 'Which of these is a triangular number?',
+    options: ['$14$', '$21$', '$25$', '$32$'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'The triangular numbers are $1, 3, 6, 10, 15, 21, 28, \\dots$, each found by adding the next whole number. So $21 = 1 + 2 + 3 + 4 + 5 + 6$ is triangular.',
+      whyWrong: [
+        'This lies between the triangular numbers 10 and 15, so it is not one of them.',
+        null,
+        'This is $5^2$, a **square** number. The triangular numbers near it are 21 and 28.',
+        'This is $2^5$, a **power of 2**. The triangular numbers near it are 28 and 36.',
+      ],
+      keyIdea: 'The triangular numbers are $1, 3, 6, 10, 15, 21, 28, 36, \\dots$',
     },
     check: {
-      optionValues: [515, 1027, 1021, 2560],
+      optionValues: [14, 21, 25, 32],
       compute: () => {
-        let u = 5;
-        for (let n = 1; n < 10; n++) u = 2 * u - 3;
+        const tri = (x: number) => Array.from({ length: x }, (_, i) => ((i + 1) * (i + 2)) / 2).includes(x);
+        return [14, 21, 25, 32].filter(tri).join('+');
+      },
+    },
+  },
+  {
+    id: 'number-sequences-026',
+    subtopic: 'number-sequences',
+    difficulty: 'exam',
+    stem: 'A sequence is defined by $u_1 = 3$ and $u_{n+1} = 2u_n - 1$. Find $u_5$.',
+    options: ['$33$', '$17$', '$65$', '$18$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $u_n$ means the $n$th term, and the rule gives each term from the one before it: double, then subtract 1.\n\n' +
+        '| $n$ | 1 | 2 | 3 | 4 | 5 |\n|---|---|---|---|---|---|\n| $u_n$ | 3 | 5 | 9 | 17 | 33 |\n\n' +
+        'So $u_5 = 2 \\times 17 - 1 = 33$.',
+      whyWrong: [
+        null,
+        'This is $u_4$: one step too few. From $u_1$ to $u_5$ the rule is applied 4 times.',
+        'This is $u_6$: one step too many.',
+        'This uses $2(u_n - 1)$, subtracting before doubling. The rule doubles first, then subtracts 1.',
+      ],
+      keyIdea: 'For a term-to-term rule, apply it one step at a time and keep track of the position.',
+    },
+    check: {
+      optionValues: [33, 17, 65, 18],
+      compute: () => {
+        let u = 3;
+        for (let n = 1; n < 5; n++) u = 2 * u - 1;
         return u;
       },
     },

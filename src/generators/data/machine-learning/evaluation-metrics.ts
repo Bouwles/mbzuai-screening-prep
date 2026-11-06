@@ -216,9 +216,8 @@ function genConfusion(rng: Rng): GeneratedCore {
     if (cands.length < 3) continue;
 
     const stem =
-      `${ctx.model} is tested on ${n} ${ctx.items}. The positive class is **${ctx.pos}**. ` +
-      `The results are shown in the confusion matrix${rowsArePredicted ? ' (note: the **rows** are the **predicted** class)' : ''}. ` +
-      `What is the model's **${metric}**?`;
+      `${ctx.model} is tested on ${n} ${ctx.items}, with **${ctx.pos}** as the positive class. ` +
+      `From the confusion matrix${rowsArePredicted ? ' (the **rows** are the **predicted** class)' : ''}, what is its **${metric}**?`;
 
     const solution =
       `First read the four cells (${rowsArePredicted ? 'rows are the **predicted** class, columns the **actual** class' : 'rows are the **actual** class, columns the **predicted** class'}):\n\n` +
@@ -295,8 +294,8 @@ function genThreshold(rng: Rng): GeneratedCore {
       rows: rows.map((r, i) => [i + 1, sStr(r.s), r.pos ? ctx.pos : ctx.neg]),
     };
     const stem =
-      `${ctx.model} gives each of 10 ${ctx.items} a score and predicts the class **${ctx.pos}** (the positive class) when the score is **at least** $${tStr}$. ` +
-      `The scores and the true labels are shown. What is the **${metric}** at this threshold?`;
+      `${ctx.model} scores 10 ${ctx.items} and predicts **${ctx.pos}** (the positive class) when the score is **at least** $${tStr}$. ` +
+      `Using the scores and true labels in the table, what is the **${metric}**?`;
 
     const outcome = (r: { s: number; pos: boolean }) => {
       const pred = r.s >= t;

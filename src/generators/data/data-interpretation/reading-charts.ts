@@ -192,7 +192,7 @@ export const generators: Generator[] = [
       return {
         stem:
           `The ${kind === 'bar' ? 'bar chart' : 'line graph'} shows ${ctx.noun} each year. ` +
-          `Between which two consecutive years was the **increase** largest? (Compare the actual increase, not the percentage increase.)`,
+          `Between which two consecutive years was the actual **increase** largest?`,
         chart,
         answer,
         answerValue: answer,
@@ -314,7 +314,7 @@ export const generators: Generator[] = [
           `Check: the four angles are ${listAnd(counts.map((x) => deg((x * 360) / N)))}, and $${counts.map((x) => num((x * 360) / N)).join(' + ')} = 360$, as they should be for a full circle.\n\nAnswer: ${answer}`;
 
         return {
-          stem: `${ctx.question(N)} The pie chart shows how many ${ctx.people} gave each answer. What is the angle of the **${ctx.labels[t]}** sector?`,
+          stem: `${ctx.question(N)} The pie chart shows the results. What is the angle of the **${ctx.labels[t]}** sector?`,
           chart: { kind: 'pie', title: 'Number of ' + ctx.people, slices: ctx.labels.map((l, i) => ({ label: l, value: counts[i] })) },
           answer,
           answerValue: angle,

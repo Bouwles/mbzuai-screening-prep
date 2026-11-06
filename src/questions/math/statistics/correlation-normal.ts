@@ -149,7 +149,7 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-004',
     subtopic: 'correlation-normal',
     difficulty: 'foundation',
-    stem: 'The heights of adult men in a town are normally distributed with mean $170$ cm and standard deviation $6$ cm. According to the 68-95-99.7 rule, roughly what percentage of the men are between $164$ cm and $176$ cm tall?',
+    stem: 'Men\'s heights in a town are normally distributed with mean $170$ cm and standard deviation $6$ cm. By the 68-95-99.7 rule, roughly what percentage are between $164$ cm and $176$ cm?',
     options: ['95%', '34%', '68%', '99.7%'],
     correctIndex: 2,
     markScheme: {
@@ -176,12 +176,12 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-005',
     subtopic: 'correlation-normal',
     difficulty: 'foundation',
-    stem: 'Over one year, a city recorded daily ice-cream sales and the daily number of people needing rescue at its beaches. The correlation coefficient was $r = 0.9$. Which conclusion is valid?',
+    stem: 'A city finds $r = 0.9$ between daily ice-cream sales and daily beach rescues. Which conclusion is valid?',
     options: [
-      'The two variables tend to rise together, but this does not show that one causes the other; hot weather could increase both.',
-      'Eating ice cream causes people to get into trouble while swimming.',
-      'Banning ice-cream sales would reduce the number of beach rescues.',
-      'Because $r$ is not exactly $1$, there is no real relationship between the two variables.',
+      'They tend to rise together, but one need not cause the other',
+      'Eating ice cream causes beach rescues',
+      'Banning ice cream would reduce beach rescues',
+      'Since $r \\ne 1$, there is no real relationship',
     ],
     correctIndex: 0,
     markScheme: {
@@ -237,7 +237,7 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-007',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'The scatter plot shows hours spent revising, $x$, and test score, $y$, for 9 students. The line of best fit is $y = 2.5x + 30$. Use it to predict the score of a student who revises for $8$ hours.',
+    stem: 'The scatter plot shows hours revised, $x$, and test score, $y$, with line of best fit $y = 2.5x + 30$. Predict the score of a student who revises for $8$ hours.',
     chart: {
       kind: 'scatter',
       title: 'Revision and test score',
@@ -275,12 +275,12 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-008',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'A shop finds that the line of best fit for daily cold-drink sales, $y$, against midday temperature in degrees Celsius, $x$, is $y = 1.8x + 12$. What does the value $1.8$ tell you?',
+    stem: 'The line of best fit for daily cold-drink sales $y$ against midday temperature $x$ (in degrees Celsius) is $y = 1.8x + 12$. What does the value $1.8$ tell you?',
     options: [
-      'When the temperature is $0$ degrees, about $1.8$ drinks are sold.',
-      'For each extra degree of temperature, about $1.8$ more drinks are sold on average.',
-      'The correlation coefficient is $1.8$, so the correlation is very strong.',
-      'For each extra drink sold, the temperature rises by about $1.8$ degrees.',
+      'About $1.8$ drinks are sold at $0$ degrees',
+      'About $1.8$ more drinks per extra degree, on average',
+      'The correlation coefficient is $1.8$',
+      'Temperature rises $1.8$ degrees per extra drink',
     ],
     correctIndex: 1,
     markScheme: {
@@ -302,7 +302,7 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-009',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'Lina\'s results in three exams are shown in the table, together with the mean and standard deviation of the whole class in each exam. In which exam did Lina do best **compared with her class**?',
+    stem: 'The table shows Lina\'s mark in three exams, with the mean and standard deviation of her class in each. In which exam did she do best **compared with her class**?',
     table: {
       headers: ['Exam', 'Lina\'s mark', 'Class mean', 'Class SD'],
       rows: [
@@ -408,10 +408,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'exam',
     stem: 'Which statement about the correlation coefficient $r$ is **true**?',
     options: [
-      '$r = 0$ means there is no relationship of any kind between the two variables.',
-      '$r = 0.9$ proves that changes in one variable cause changes in the other.',
-      '$r = -0.8$ shows a stronger linear relationship than $r = 0.6$.',
-      'A negative value of $r$ means the relationship is weak.',
+      '$r = 0$ means no relationship of any kind',
+      '$r = 0.9$ proves that one variable causes the other',
+      '$r = -0.8$ is a stronger linear relationship than $r = 0.6$',
+      'A negative $r$ means a weak relationship',
     ],
     correctIndex: 2,
     markScheme: {
@@ -434,7 +434,7 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-013',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'For a group of adults, the correlation between height (in cm) and weight (in kg) is $r = 0.72$. All the heights are converted to inches (divide by $2.54$) and all the weights to pounds (multiply by $2.2$). What is the correlation coefficient for the converted data?',
+    stem: 'The correlation between height in cm and weight in kg is $r = 0.72$. Heights are converted to inches (divide by $2.54$) and weights to pounds (multiply by $2.2$). What is $r$ for the converted data?',
     options: ['$0.72$', '$1.83$', '$0.28$', '$-0.72$'],
     correctIndex: 0,
     markScheme: {
@@ -541,7 +541,7 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-016',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'A biologist uses plants aged between $2$ and $10$ weeks to find the line of best fit $h = 3w + 4$, where $h$ is height in cm and $w$ is age in weeks. Which prediction is the **least reliable**?',
+    stem: 'A line of best fit $h = 3w + 4$ is found for plants aged $2$ to $10$ weeks, with height $h$ in cm and age $w$ in weeks. Which prediction is the **least reliable**?',
     options: [
       'The height at $5$ weeks, $19$ cm',
       'The height at $9$ weeks, $31$ cm',
@@ -574,40 +574,10 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'correlation-normal-017',
-    subtopic: 'correlation-normal',
-    difficulty: 'challenge',
-    stem: 'The lifetimes of a type of battery are normally distributed with mean $40$ hours and standard deviation $4$ hours. Using the 68-95-99.7 rule, what percentage of batteries last between $36$ and $48$ hours?',
-    options: ['95%', '68%', '47.5%', '81.5%'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The interval is **not** symmetric about the mean, so split it at the mean.\n\n' +
-        '1. $36 = 40 - 4$ is $1$ SD below the mean; $48 = 40 + 2 \\times 4$ is $2$ SDs above.\n' +
-        '2. From $36$ to $40$ (mean minus 1 SD up to the mean): half of 68%, which is 34%.\n' +
-        '3. From $40$ to $48$ (the mean up to 2 SDs above): half of 95%, which is 47.5%.\n' +
-        '4. Add: $34\\% + 47.5\\% = 81.5\\%$.\n\n' +
-        'So about 81.5% of batteries last between $36$ and $48$ hours.',
-      whyWrong: [
-        '95% would be correct for $32$ to $48$ hours (2 SDs on **both** sides). The lower end $36$ is only 1 SD below the mean.',
-        '68% would be correct for $36$ to $44$ hours (1 SD on both sides). The upper end $48$ is 2 SDs above the mean.',
-        '47.5% is only the part from the mean $40$ up to $48$. You also need the 34% between $36$ and $40$.',
-        null,
-      ],
-      keyIdea: 'For an interval that is not symmetric, split it at the mean and add half of each rule percentage.',
-    },
-    check: {
-      optionValues: [95, 68, 47.5, 81.5],
-      compute: () => between((36 - 40) / 4, (48 - 40) / 4),
-    },
-  },
   {
     id: 'correlation-normal-018',
     subtopic: 'correlation-normal',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'For a set of paired data, $S_{xx} = \\sum (x - \\bar{x})^2 = 16$, $S_{yy} = \\sum (y - \\bar{y})^2 = 64$ and $S_{xy} = \\sum (x - \\bar{x})(y - \\bar{y}) = -24$. What is the correlation coefficient $r$?',
     options: ['$-0.75$', '$-1.5$', '$0.75$', '$-0.3$'],
     correctIndex: 0,
@@ -641,7 +611,7 @@ export const questions: StaticQuestion[] = [
     id: 'correlation-normal-019',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'The times taken by $400$ runners to complete a $100$ m race are normally distributed with mean $14$ s and standard deviation $0.5$ s. Runners qualify for the final if their time is **less than** $13$ s. Using the 68-95-99.7 rule, about how many runners qualify?',
+    stem: 'Race times of $400$ runners are normally distributed with mean $14$ s and standard deviation $0.5$ s. Runners qualify with a time **under** $13$ s. By the 68-95-99.7 rule, about how many qualify?',
     options: ['$20$', '$10$', '$190$', '$390$'],
     correctIndex: 1,
     markScheme: {
@@ -667,47 +637,10 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'correlation-normal-020',
-    subtopic: 'correlation-normal',
-    difficulty: 'challenge',
-    stem: 'A quantity is normally distributed. About 16% of values are **greater than** $58$, and about 2.5% of values are **greater than** $66$. Using the 68-95-99.7 rule, find the mean $\\mu$ and standard deviation $\\sigma$.',
-    options: ['$\\mu = 54$, $\\sigma = 4$', '$\\mu = 42$, $\\sigma = 8$', '$\\mu = 50$, $\\sigma = 8$', '$\\mu = 58$, $\\sigma = 8$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Step 1: turn each percentage into a number of SDs.**\n\n' +
-        '- Above $\\mu + \\sigma$: $\\frac{100\\% - 68\\%}{2} = 16\\%$. So $58$ is 1 SD above the mean.\n' +
-        '- Above $\\mu + 2\\sigma$: $\\frac{100\\% - 95\\%}{2} = 2.5\\%$. So $66$ is 2 SDs above the mean.\n\n' +
-        '**Step 2: write the equations.**\n\n' +
-        '$$\\mu + \\sigma = 58 \\qquad \\mu + 2\\sigma = 66$$\n\n' +
-        '**Step 3: solve.** Subtract the first from the second: $\\sigma = 66 - 58 = 8$. Then $\\mu = 58 - 8 = 50$.\n\n' +
-        'Check: $50 + 8 = 58$ (16% above) and $50 + 16 = 66$ (2.5% above). So $\\mu = 50$, $\\sigma = 8$.',
-      whyWrong: [
-        'This assumes 2.5% above means 3 SDs above, solving $\\mu + \\sigma = 58$ and $\\mu + 3\\sigma = 66$. In fact 2.5% above is 2 SDs (half of the 5% outside 2 SDs).',
-        'This shifts both by one SD, solving $\\mu + 2\\sigma = 58$ and $\\mu + 3\\sigma = 66$. But 16% above is 1 SD ($\\frac{100\\% - 68\\%}{2}$) and 2.5% above is 2 SDs.',
-        null,
-        'This finds $\\sigma = 8$ correctly but then takes $58$ as the mean. $58$ is 1 SD **above** the mean, so step back: $\\mu = 58 - 8 = 50$.',
-      ],
-      keyIdea: 'Use the rule backwards: 16% above is $\\mu + \\sigma$ and 2.5% above is $\\mu + 2\\sigma$, then solve the simultaneous equations.',
-    },
-    check: {
-      optionValues: ['54,4', '42,8', '50,8', '58,8'],
-      compute: () => {
-        // find the k (number of SDs) whose upper tail matches each percentage, then solve mu + k1*s = 58, mu + k2*s = 66
-        const kFor = (pct: number) => [1, 2, 3].find((k) => Math.abs(above(k) - pct) < 1e-9)!;
-        const k1 = kFor(16);
-        const k2 = kFor(2.5);
-        const s = (66 - 58) / (k2 - k1);
-        const mu = 58 - k1 * s;
-        return `${mu},${s}`;
-      },
-    },
-  },
-  {
     id: 'correlation-normal-021',
     subtopic: 'correlation-normal',
     difficulty: 'exam',
-    stem: 'Aisha scored $78$ in test A, which had mean $66$ and standard deviation $8$. Test B had mean $50$ and standard deviation $12$. What score in test B would be **equally good** compared with the other candidates?',
+    stem: 'Aisha scored $78$ on test A (mean $66$, standard deviation $8$). Test B has mean $50$ and standard deviation $12$. What score on test B is **equally good** compared with the other candidates?',
     options: ['$62$', '$84$', '$18$', '$68$'],
     correctIndex: 3,
     markScheme: {
@@ -733,4 +666,87 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-];
+  {
+    id: 'correlation-normal-022',
+    subtopic: 'correlation-normal',
+    difficulty: 'foundation',
+    stem: 'A correlation coefficient of $r = -1$ means:',
+    options: ['Perfect negative linear correlation', 'Perfect positive linear correlation', 'No correlation', 'Weak negative correlation'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The sign of $r$ gives the direction and its size gives the strength.\n\n' +
+        '$r = -1$ means that all the points lie exactly on a straight line that slopes downwards.',
+      whyWrong: [
+        null,
+        'Perfect positive correlation is $r = +1$, where the points lie on a line that slopes upwards.',
+        'No linear correlation is $r = 0$. Here the size of $r$ is as large as it can be.',
+        'A negative sign gives the direction, not the strength. $|r| = 1$ is the strongest value possible.',
+      ],
+      keyIdea: '$r = \\pm 1$ means that the points lie exactly on a straight line; the sign gives the direction.',
+    },
+    check: {
+      optionValues: [-1, 1, 0, -0.3],
+      compute: () => pearson([1, 2, 3, 4].map((x) => ({ x, y: 10 - 2 * x }))),
+    },
+  },
+  {
+    id: 'correlation-normal-023',
+    subtopic: 'correlation-normal',
+    difficulty: 'foundation',
+    stem: 'In a normal distribution, how do the mean, median and mode compare?',
+    options: ['All three are equal', '$\\text{mean} > \\text{median} > \\text{mode}$', '$\\text{mode} > \\text{median} > \\text{mean}$', 'They have no fixed relationship'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A normal curve is symmetric, with one peak in the middle.\n\n' +
+        'The peak is the mode. The middle of the area is the median. The balance point is the mean. Because of the symmetry, all three are at the same place.',
+      whyWrong: [
+        null,
+        'This order describes a distribution with a long tail to the right. A normal curve has no skew.',
+        'This order describes a distribution with a long tail to the left. A normal curve has no skew.',
+        'Symmetry fixes the relationship: all three sit on the line of symmetry.',
+      ],
+      keyIdea: 'A normal distribution is symmetric, so its mean, median and mode are equal.',
+    },
+  },
+  {
+    id: 'correlation-normal-024',
+    subtopic: 'correlation-normal',
+    difficulty: 'foundation',
+    stem: 'A value has a $z$-score of $0$. What does this mean?',
+    options: ['It equals the mean', 'It equals $0$', 'It is one standard deviation above the mean', 'It is the smallest value'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A $z$-score counts standard deviations from the mean: $z = \\frac{x - \\mu}{\\sigma}$.\n\n' +
+        'If $z = 0$, then $x - \\mu = 0$, so $x = \\mu$: the value equals the mean.',
+      whyWrong: [
+        null,
+        'This confuses the value with its $z$-score. With mean $70$, a mark of $70$ has $z = 0$.',
+        'One standard deviation above the mean is $z = 1$.',
+        'A $z$-score of $0$ sits in the middle. Values below the mean have negative $z$-scores.',
+      ],
+      keyIdea: 'The $z$-score counts standard deviations from the mean, so $z = 0$ is the mean itself.',
+    },
+  },
+  {
+    id: 'correlation-normal-025',
+    subtopic: 'correlation-normal',
+    difficulty: 'foundation',
+    stem: 'The **standard normal distribution** has which mean and standard deviation?',
+    options: ['Mean $0$, standard deviation $1$', 'Mean $1$, standard deviation $0$', 'Mean $0$, standard deviation $0$', 'Mean $1$, standard deviation $1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **standard normal distribution** is the normal distribution of $z$-scores.\n\n' +
+        'Subtracting the mean moves the centre to $0$, and dividing by the standard deviation makes the spread $1$.',
+      whyWrong: [
+        null,
+        'This swaps the two values. A standard deviation of $0$ would mean no spread at all.',
+        'A standard deviation of $0$ would mean that every value equals the mean, which is not a normal curve.',
+        'The mean is $0$: $z$-scores are measured from the centre of the data.',
+      ],
+      keyIdea: 'Standard normal means mean $0$ and standard deviation $1$, the distribution of $z$-scores.',
+    },
+  },];

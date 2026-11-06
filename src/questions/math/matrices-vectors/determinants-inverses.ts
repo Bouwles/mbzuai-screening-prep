@@ -349,43 +349,6 @@ export const questions: StaticQuestion[] = [
     check: { optionValues: [11, 30, 16, 15], compute: () => det2(matMul([[2, 1], [1, 3]], [[1, 4], [-1, 2]])) },
   },
   {
-    id: 'determinants-inverses-011',
-    subtopic: 'determinants-inverses',
-    difficulty: 'challenge',
-    stem: t`$A$ and $B$ are $3 \times 3$ matrices with $\det(A) = 3$ and $\det(B) = -6$. Find $\det\left(2A^{T}B^{-1}\right)$.`,
-    options: ['$-1$', '$-144$', '$-4$', '$-2$'],
-    correctIndex: 2,
-    markScheme: {
-      solution: L(
-        'Use four rules, one at a time:',
-        '',
-        t`- $\det(kM) = k^{n}\det(M)$, with $n = 3$, so the scalar $2$ gives a factor $2^{3} = 8$`,
-        t`- $\det(PQ) = \det(P)\det(Q)$`,
-        t`- $\det\left(A^{T}\right) = \det(A) = 3$`,
-        t`- $\det\left(B^{-1}\right) = \frac{1}{\det(B)} = -\frac{1}{6}$`,
-        '',
-        'Put them together:',
-        '',
-        t`$$\det\left(2A^{T}B^{-1}\right) = 2^{3} \times 3 \times \left(-\frac{1}{6}\right) = -\frac{24}{6} = -4$$`,
-      ),
-      whyWrong: [
-        t`This uses the factor $2$ instead of $2^{3}$: $2 \times 3 \times \left(-\frac{1}{6}\right) = -1$. Scaling a $3 \times 3$ matrix by $2$ scales all three rows.`,
-        t`This uses $\det B = -6$ instead of $\det\left(B^{-1}\right) = -\frac{1}{6}$: $8 \times 3 \times \left(-6\right) = -144$.`,
-        null,
-        t`This uses $2^{2} = 4$ (the $2 \times 2$ rule): $4 \times 3 \times \left(-\frac{1}{6}\right) = -2$. For $3 \times 3$ matrices the power is $3$.`,
-      ],
-      keyIdea: 'Break the expression into pieces: scalars give k to the power n, transposes change nothing, inverses give 1 over the determinant, and products multiply.',
-    },
-    check: {
-      optionValues: [-1, -144, -4, -2],
-      compute: () => {
-        const A: Mat = [[3, 1, 2], [0, 1, 4], [0, 0, 1]]; // det 3
-        const Binv: Mat = [[-1 / 6, 0, 0], [0, 1, 0], [0, 0, 1]]; // inverse of diag(-6, 1, 1)
-        return det3(matMul(scale(2, transpose(A)), Binv));
-      },
-    },
-  },
-  {
     id: 'determinants-inverses-012',
     subtopic: 'determinants-inverses',
     difficulty: 'exam',
@@ -460,35 +423,29 @@ export const questions: StaticQuestion[] = [
     id: 'determinants-inverses-014',
     subtopic: 'determinants-inverses',
     difficulty: 'exam',
-    stem: t`For which value of $k$ is $${M([[1, 2, 'k'], [0, 1, 2], [2, 1, 4]])}$ singular?`,
-    options: ['$k = 5$', '$k = -3$', '$k = -5$', '$k = 1$'],
+    stem: t`For which value of $k$ is $${M([[2, 0, 0], [1, 'k', 3], [4, 2, 1]])}$ singular?`,
+    options: ['$k = 6$', '$k = -6$', '$k = \\frac{3}{2}$', '$k = 0$'],
     correctIndex: 0,
     markScheme: {
       solution: L(
-        t`Expand along the first row with signs $+\;-\;+$:`,
+        t`Expand along the first row, because two of its entries are $0$ and their terms vanish:`,
         '',
-        t`$$\det = 1\begin{vmatrix} 1 & 2 \\ 1 & 4 \end{vmatrix} - 2\begin{vmatrix} 0 & 2 \\ 2 & 4 \end{vmatrix} + k\begin{vmatrix} 0 & 1 \\ 2 & 1 \end{vmatrix}$$`,
+        t`$$\det = 2\begin{vmatrix} k & 3 \\ 2 & 1 \end{vmatrix} = 2\left(k \times 1 - 3 \times 2\right) = 2(k - 6)$$`,
         '',
-        t`- $1 \times 4 - 2 \times 1 = 2$`,
-        t`- $0 \times 4 - 2 \times 2 = -4$`,
-        t`- $0 \times 1 - 1 \times 2 = -2$`,
-        '',
-        t`$$\det = 1(2) - 2\left(-4\right) + k\left(-2\right) = 2 + 8 - 2k = 10 - 2k$$`,
-        '',
-        t`Singular means $\det = 0$: $10 - 2k = 0$, so $k = 5$.`,
+        t`Singular means $\det = 0$: $2(k - 6) = 0$, so $k = 6$.`,
       ),
       whyWrong: [
         null,
-        t`This forgets the minus sign on the middle term: $2 + 2\left(-4\right) - 2k = -6 - 2k = 0$ gives $k = -3$.`,
-        t`This works out the last minor in the wrong order ($bc - ad$), getting $2$ instead of $-2$, so $10 + 2k = 0$ and $k = -5$.`,
-        t`This adds inside every minor instead of subtracting: $1(4 + 2) - 2(0 + 4) + k(0 + 2) = 2k - 2 = 0$ gives $k = 1$.`,
+        t`This adds inside the minor, using $ad + bc$: $k + 6 = 0$ gives $k = -6$. The determinant is $ad - bc$.`,
+        t`This multiplies the wrong pairs in the minor, solving $2k - 3 = 0$. Use the diagonals: $k \times 1 - 3 \times 2$.`,
+        t`This keeps only the first diagonal product, $2 \times k \times 1 = 0$, and forgets to subtract $3 \times 2$.`,
       ],
-      keyIdea: 'Find the 3 by 3 determinant in terms of k by cofactor expansion, then set it equal to 0.',
+      keyIdea: 'Expand a 3 by 3 determinant along a row with zeros to shorten it, then set it equal to 0.',
     },
     check: {
-      optionValues: [5, -3, -5, 1],
+      optionValues: [6, -6, 3 / 2, 0],
       compute: () => {
-        for (let k = -20; k <= 20; k++) if (det3([[1, 2, k], [0, 1, 2], [2, 1, 4]]) === 0) return k;
+        for (let k = -20; k <= 20; k++) if (det3([[2, 0, 0], [1, k, 3], [4, 2, 1]]) === 0) return k;
         return NaN;
       },
     },
@@ -564,180 +521,189 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-  // ------------------------------------------------------------------ challenge
+  // ------------------------------------------------------------------ recall and rules
   {
-    id: 'determinants-inverses-017',
+    id: 'determinants-inverses-021',
     subtopic: 'determinants-inverses',
-    difficulty: 'challenge',
-    stem: L(
-      'Consider the system',
-      '',
-      t`$$x + y + z = 1, \qquad x + 2y + 3z = 2, \qquad x + 3y + kz = 3$$`,
-      '',
-      t`There is exactly one value of $k$ for which the system does **not** have a unique solution. What is that value, and how many solutions are there then?`,
-    ),
-    options: [
-      '$k = 5$; infinitely many solutions',
-      '$k = 5$; no solution',
-      t`$k = \frac{9}{2}$; infinitely many solutions`,
-      '$k = 7$; infinitely many solutions',
-    ],
+    difficulty: 'foundation',
+    stem: t`What is the determinant of $${M([['a', 'b'], ['c', 'd']])}$?`,
+    options: ['$ad - bc$', '$ad + bc$', '$ab - cd$', '$ac - bd$'],
     correctIndex: 0,
     markScheme: {
       solution: L(
-        t`**Step 1: find when $\det(A) = 0$.** With $A = ${M([[1, 1, 1], [1, 2, 3], [1, 3, 'k']])}$, expand along the first row:`,
+        'The determinant of a $2 \\times 2$ matrix is the leading diagonal product **minus** the other diagonal product:',
         '',
-        t`$$\det(A) = 1(2k - 9) - 1(k - 3) + 1(3 - 2) = 2k - 9 - k + 3 + 1 = k - 5$$`,
-        '',
-        t`So the solution is not unique exactly when $k = 5$.`,
-        '',
-        t`**Step 2: decide between none and infinitely many.** Put $k = 5$ and subtract the first equation from the other two:`,
-        '',
-        t`- Equation 2 minus equation 1: $y + 2z = 1$`,
-        t`- Equation 3 minus equation 1: $2y + 4z = 2$`,
-        '',
-        t`The second is exactly twice the first, so there is no contradiction: only two independent equations for three unknowns. Pick any $z$, then $y = 1 - 2z$ and $x = 1 - y - z = z$. That is **infinitely many** solutions.`,
-        '',
-        t`So $k = 5$, with infinitely many solutions.`,
+        t`$$\det = ad - bc$$`,
       ),
       whyWrong: [
         null,
-        t`$\det A = 0$ does not automatically mean "no solution". You must check the constants: here equation 3 minus equation 1 is exactly twice equation 2 minus equation 1, so the system is consistent.`,
-        t`This keeps only the first term of the expansion, $2k - 9 = 0$, and forgets the other two terms.`,
-        t`This works out the last minor as $1 \times 2 - 1 \times 3 = -1$ instead of $1 \times 3 - 2 \times 1 = 1$, giving $\det = k - 7$.`,
+        'This adds the two diagonal products. The second product is subtracted.',
+        'This multiplies along the rows ($a$ with $b$, and $c$ with $d$). The determinant uses the diagonals.',
+        'This multiplies down the columns ($a$ with $c$, and $b$ with $d$). The determinant uses the diagonals.',
       ],
-      keyIdea: 'Find the parameter value that makes det = 0, then substitute it back and use elimination to see whether the equations are consistent.',
+      keyIdea: 'For a 2 by 2 matrix, the determinant is ad minus bc.',
     },
     check: {
-      optionValues: ['5,inf', '5,none', '4.5,inf', '7,inf'],
+      // the options at a = 2, b = 3, c = 5, d = 7
+      optionValues: [14 - 15, 14 + 15, 6 - 35, 10 - 21],
+      compute: () => det2([[2, 3], [5, 7]]),
+    },
+  },
+  {
+    id: 'determinants-inverses-022',
+    subtopic: 'determinants-inverses',
+    difficulty: 'foundation',
+    stem: 'When does a square matrix $A$ have an inverse?',
+    options: ['Exactly when $\\det(A) \\ne 0$', 'Exactly when $\\det(A) = 0$', 'Exactly when every entry is non-zero', 'Exactly when $A$ is symmetric'],
+    correctIndex: 0,
+    markScheme: {
+      solution: L(
+        t`A square matrix has an inverse exactly when its determinant is not $0$. A matrix with $\det(A) = 0$ is called **singular**, and it has no inverse.`,
+        '',
+        t`For a $2 \times 2$ matrix you can see this in the formula for $A^{-1}$, which divides by $\det(A)$.`,
+      ),
+      whyWrong: [
+        null,
+        'This is the condition for having **no** inverse. The inverse formula divides by the determinant, so it cannot be $0$.',
+        t`Zero entries do not stop a matrix being invertible: $${M([[0, 1], [1, 0]])}$ has determinant $-1$ and is its own inverse.`,
+        t`Being symmetric has nothing to do with it: $${M([[1, 1], [1, 1]])}$ is symmetric but has determinant $0$.`,
+      ],
+      keyIdea: 'A square matrix is invertible exactly when its determinant is not 0.',
+    },
+  },
+  {
+    id: 'determinants-inverses-023',
+    subtopic: 'determinants-inverses',
+    difficulty: 'foundation',
+    stem: 'For an invertible $n \\times n$ matrix $A$, what is $AA^{-1}$?',
+    options: ['$I_{n}$, the unit matrix of order $n$', 'The zero matrix', 'The number $1$', '$A^{2}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: L(
+        t`The inverse is defined by $AA^{-1} = A^{-1}A = I_{n}$.`,
+        '',
+        t`The **unit matrix of order $n$**, $I_{n}$, is the $n \times n$ identity matrix: $1$s on the main diagonal and $0$s elsewhere.`,
+      ),
+      whyWrong: [
+        null,
+        'This treats $A^{-1}$ like $-A$, as if the two cancel to zero. An inverse undoes a product, so the result is the identity.',
+        'A matrix product is a matrix, not a number. The unit matrix plays the role that the number $1$ plays for ordinary numbers.',
+        'This reads $A^{-1}$ as another copy of $A$. The power $-1$ means the inverse.',
+      ],
+      keyIdea: 'A matrix times its inverse gives the unit matrix of the same order.',
+    },
+    check: {
+      optionValues: ['1,0,0,1', '0,0,0,0', '1', '39,16,56,23'],
       compute: () => {
-        for (let k2 = -40; k2 <= 40; k2++) {
-          const k = k2 / 2;
-          const A: Mat = [[1, 1, 1], [1, 2, 3], [1, 3, k]];
-          if (det3(A) !== 0) continue;
-          const aug: Mat = A.map((r, i) => [...r, [1, 2, 3][i]]);
-          return `${k},${rank(A) === rank(aug) ? 'inf' : 'none'}`;
-        }
-        return 'unique';
+        const A: Mat = [[5, 2], [7, 3]];
+        const Ai = inv2(A);
+        return enc(A.map((r) => [0, 1].map((j) => Ai[0][j].mul(r[0]).add(Ai[1][j].mul(r[1])))));
       },
     },
   },
   {
-    id: 'determinants-inverses-018',
+    id: 'determinants-inverses-024',
     subtopic: 'determinants-inverses',
-    difficulty: 'challenge',
-    stem: t`$A$ is an **invertible** $2 \times 2$ matrix with $A^{2} = 3A$. What is $\det(A)$?`,
-    options: ['$3$', '$0$', '$27$', '$9$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: t`What is $\det(I_{3})$, where $I_{3}$ is the unit matrix of order $3$?`,
+    options: ['$1$', '$3$', '$0$', '$9$'],
+    correctIndex: 0,
     markScheme: {
       solution: L(
-        '**Method 1 (determinants).** Take the determinant of both sides of $A^{2} = 3A$:',
+        t`The **unit matrix of order $3$**, $I_{3}$, is the $3 \times 3$ identity matrix. It is diagonal, so its determinant is the product of its diagonal entries:`,
         '',
-        t`- Left: $\det\left(A^{2}\right) = \det(A)\det(A) = \det(A)^{2}$`,
-        t`- Right: $\det(3A) = 3^{2}\det(A) = 9\det(A)$ (a $2 \times 2$ matrix has two rows to scale)`,
-        '',
-        t`So $\det(A)^{2} = 9\det(A)$, i.e. $\det(A)\left(\det(A) - 9\right) = 0$. Because $A$ is invertible, $\det(A) \ne 0$, so $\det(A) = 9$.`,
-        '',
-        t`**Method 2 (inverse).** Multiply $A^{2} = 3A$ on the left by $A^{-1}$: $A = 3I = ${M([[3, 0], [0, 3]])}$, so $\det(A) = 3 \times 3 = 9$.`,
+        t`$$\det(I_{3}) = 1 \times 1 \times 1 = 1$$`,
       ),
       whyWrong: [
-        t`This uses $\det(3A) = 3\det A$, forgetting the power: for a $2 \times 2$ matrix it is $3^{2}\det A$.`,
-        t`This is the other root of $\det A\left(\det A - 9\right) = 0$, but an invertible matrix cannot have determinant $0$.`,
-        t`This uses $3^{3}$, the factor for a $3 \times 3$ matrix. $A$ is $2 \times 2$, so the factor is $3^{2}$.`,
         null,
+        'This adds the diagonal entries, which gives the trace. The determinant of a diagonal matrix is their **product**.',
+        'Zeros off the diagonal do not make the determinant $0$. Only a zero on the diagonal of a diagonal matrix would.',
+        'This counts the entries of the matrix. The determinant is the product of the diagonal entries.',
       ],
-      keyIdea: 'Taking determinants turns a matrix equation into a number equation; remember det(kA) = k to the n times det(A) and that invertible means det is not 0.',
+      keyIdea: 'The determinant of a unit matrix of any order is 1.',
     },
     check: {
-      optionValues: [3, 0, 27, 9],
+      optionValues: [1, 3, 0, 9],
+      compute: () => det3([[1, 0, 0], [0, 1, 0], [0, 0, 1]]),
+    },
+  },
+  {
+    id: 'determinants-inverses-025',
+    subtopic: 'determinants-inverses',
+    difficulty: 'foundation',
+    stem: t`An invertible matrix $A$ has $\det(A) = 4$. What is $\det\left(A^{-1}\right)$?`,
+    options: ['$\\frac{1}{4}$', '$-4$', '$4$', '$\\frac{1}{16}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: L(
+        t`Since $AA^{-1} = I$ and $\det(I) = 1$, the product rule gives $\det(A)\det\left(A^{-1}\right) = 1$.`,
+        '',
+        t`So $\det\left(A^{-1}\right) = \frac{1}{\det(A)} = \frac{1}{4}$.`,
+      ),
+      whyWrong: [
+        null,
+        'This treats the power $-1$ as a change of sign. It means the reciprocal: $\\frac{1}{4}$, not $-4$.',
+        'This assumes inverting leaves the determinant unchanged. That is true of the transpose, not the inverse.',
+        'This squares the $4$ before taking the reciprocal. The rule is simply one over the determinant.',
+      ],
+      keyIdea: 'The determinant of the inverse is the reciprocal of the determinant.',
+    },
+    check: {
+      optionValues: [1 / 4, -4, 4, 1 / 16],
       compute: () => {
-        // A^2 = 3A with A invertible forces A = 3I; confirm the equation holds, then take det.
-        const A: Mat = [[3, 0], [0, 3]];
-        const ok = JSON.stringify(matMul(A, A)) === JSON.stringify(scale(3, A)) && det2(A) !== 0;
-        return ok ? det2(A) : NaN;
+        const Ai = inv2([[4, 0], [0, 1]]);
+        return Ai[0][0].mul(Ai[1][1]).sub(Ai[0][1].mul(Ai[1][0])).value();
       },
     },
   },
   {
-    id: 'determinants-inverses-019',
+    id: 'determinants-inverses-026',
     subtopic: 'determinants-inverses',
-    difficulty: 'challenge',
-    stem: t`Given that $\begin{vmatrix} a & b \\ c & d \end{vmatrix} = 5$, find $\begin{vmatrix} 2a & 2b \\ c - 3a & d - 3b \end{vmatrix}$.`,
-    options: ['$20$', '$10$', '$-30$', '$5$'],
-    correctIndex: 1,
+    difficulty: 'exam',
+    stem: 'For invertible $n \\times n$ matrices $A$ and $B$, what is $(AB)^{-1}$?',
+    options: ['$B^{-1}A^{-1}$', '$A^{-1}B^{-1}$', '$BA$', '$A^{-1} + B^{-1}$'],
+    correctIndex: 0,
     markScheme: {
       solution: L(
-        'Expand directly with $ad - bc$:',
+        t`Test the candidate by multiplying it by $AB$:`,
         '',
-        t`$$2a(d - 3b) - 2b(c - 3a) = 2ad - 6ab - 2bc + 6ab = 2(ad - bc)$$`,
+        t`$$(AB)\left(B^{-1}A^{-1}\right) = A\left(BB^{-1}\right)A^{-1} = AIA^{-1} = AA^{-1} = I$$`,
         '',
-        t`The $6ab$ terms cancel, leaving $2(ad - bc) = 2 \times 5 = 10$.`,
-        '',
-        'The row-operation view gives the same answer quickly:',
-        '',
-        t`- Multiplying **one row** by $2$ multiplies the determinant by $2$.`,
-        t`- Subtracting a multiple of one row from another row does **not** change the determinant.`,
-        '',
-        'So the new determinant is $2 \times 5 = 10$.',
+        t`So $(AB)^{-1} = B^{-1}A^{-1}$: the order reverses, just as it does for the transpose of a product.`,
       ),
       whyWrong: [
-        t`This uses $\det(2A) = 2^{2}\det A$, but only **one** row was doubled, not the whole matrix.`,
         null,
-        t`This treats "subtract $3$ times row 1" as multiplying the determinant by $-3$. Adding or subtracting a multiple of another row leaves the determinant unchanged.`,
-        t`This assumes no row operation changes the determinant. Subtracting a multiple of a row does not, but doubling a row does multiply it by $2$.`,
+        t`This keeps the same order. In $(AB)\left(A^{-1}B^{-1}\right)$ nothing cancels, because $B$ and $A^{-1}$ are not next to their own inverses.`,
+        t`This reverses the order but forgets to invert the two matrices.`,
+        t`Inverses do not split over a product by adding. The rule is a product in reverse order.`,
       ],
-      keyIdea: 'Scaling one row by k scales the determinant by k, but adding a multiple of one row to another leaves it unchanged.',
-    },
-    check: {
-      optionValues: [20, 10, -30, 5],
-      compute: () => {
-        const [a, b, c, d] = [3, 2, 2, 3]; // ad - bc = 5
-        if (det2([[a, b], [c, d]]) !== 5) return NaN;
-        return det2([[2 * a, 2 * b], [c - 3 * a, d - 3 * b]]);
-      },
+      keyIdea: 'The inverse of a product reverses the order: (AB) inverse is B inverse times A inverse.',
     },
   },
   {
-    id: 'determinants-inverses-020',
+    id: 'determinants-inverses-027',
     subtopic: 'determinants-inverses',
-    difficulty: 'challenge',
-    stem: t`Let $A = ${M([[1, 2], [1, 3]])}$ and $B = ${M([[2, 5], [1, 4]])}$. Find the matrix $X$ such that $XA = B$.`,
-    options: [
-      `$${M([[4, 7], [-1, -1]])}$`,
-      `$${M([[7, 19], [5, 14]])}$`,
-      `$${M([[1, 1], [-1, 2]])}$`,
-      `$${M([[-3, 11], [-3, 10]])}$`,
-    ],
-    correctIndex: 2,
+    difficulty: 'exam',
+    stem: t`$A$ is a $2 \times 2$ matrix with $\det(A) = 3$. What is $\det\left(2A^{T}\right)$?`,
+    options: ['$12$', '$6$', '$24$', '$3$'],
+    correctIndex: 0,
     markScheme: {
       solution: L(
-        t`$A$ is on the **right** of $X$, so multiply both sides on the **right** by $A^{-1}$: $XAA^{-1} = BA^{-1}$, so $X = BA^{-1}$.`,
-        '',
-        t`**Step 1.** $\det(A) = 1 \times 3 - 2 \times 1 = 1$, so $A^{-1} = ${M([[3, -2], [-1, 1]])}$.`,
-        '',
-        t`**Step 2.** $X = BA^{-1} = ${M([[2, 5], [1, 4]])}${M([[3, -2], [-1, 1]])}$, row by column:`,
-        '',
-        t`- Row 1: $\left(2 \times 3 + 5 \times \left(-1\right),\ 2 \times \left(-2\right) + 5 \times 1\right) = \left(1, 1\right)$`,
-        t`- Row 2: $\left(1 \times 3 + 4 \times \left(-1\right),\ 1 \times \left(-2\right) + 4 \times 1\right) = \left(-1, 2\right)$`,
-        '',
-        t`Check: $XA = ${M([[1, 1], [-1, 2]])}${M([[1, 2], [1, 3]])} = ${M([[2, 5], [1, 4]])} = B$.`,
-        '',
-        t`So $X = ${M([[1, 1], [-1, 2]])}$.`,
+        t`1. Transposing does not change the determinant: $\det\left(A^{T}\right) = 3$.`,
+        t`2. Multiplying a $2 \times 2$ matrix by $2$ doubles both rows, so the determinant is multiplied by $2^{2} = 4$.`,
+        t`3. $\det\left(2A^{T}\right) = 4 \times 3 = 12$.`,
       ),
       whyWrong: [
-        t`This is $A^{-1}B$, which solves $AX = B$. Matrix multiplication is not commutative, so for $XA = B$ the inverse must go on the right: $X = BA^{-1}$.`,
-        t`This is $BA$: $B$ was multiplied by $A$ instead of by $A^{-1}$.`,
         null,
-        t`This uses $${M([[1, -2], [-1, 3]])}$ as $A^{-1}$: the signs were changed but $1$ and $3$ were not swapped.`,
+        t`This multiplies by $2$ only once. Both rows are doubled, so the factor is $2^{2}$.`,
+        t`This uses $2^{3}$, the factor for a $3 \times 3$ matrix. Here $n = 2$.`,
+        t`This ignores the scalar $2$. Transposing leaves the determinant alone, but the scalar does not.`,
       ],
-      keyIdea: 'Order matters: XA = B gives X = B times A inverse (inverse on the right), while AX = B gives X = A inverse times B.',
+      keyIdea: 'For an n by n matrix, det(kA) is k to the power n times det(A), and transposing changes nothing.',
     },
     check: {
-      optionValues: ['4,7,-1,-1', '7,19,5,14', '1,1,-1,2', '-3,11,-3,10'],
-      compute: () => {
-        const Ai = inv2([[1, 2], [1, 3]]).map((r) => r.map((f) => f.value()));
-        return matMul([[2, 5], [1, 4]], Ai).flat().join(',');
-      },
+      optionValues: [12, 6, 24, 3],
+      compute: () => det2(scale(2, transpose([[3, 1], [0, 1]]))),
     },
   },
 ];

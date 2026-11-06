@@ -159,9 +159,146 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'quadratics-005',
+    id: 'quadratics-022',
     subtopic: 'quadratics',
     difficulty: 'foundation',
+    stem: 'For $ax^2 + bx + c = 0$, which expression is the discriminant?',
+    options: ['$b^2 - 4ac$', '$b^2 + 4ac$', '$\\sqrt{b^2 - 4ac}$', '$-\\frac{b}{2a}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **discriminant** is the part under the square root in the quadratic formula\n\n' +
+        '$$x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$$\n\n' +
+        'So it is $b^2 - 4ac$, often written $\\Delta$. Its sign tells you how many real roots there are.',
+      whyWrong: [
+        null,
+        'The sign is wrong: the formula has $-4ac$, so the discriminant is $b^2 - 4ac$.',
+        'This is the whole square root. The discriminant is only the expression **under** the root sign.',
+        'This is the $x$-coordinate of the vertex of the parabola, not the discriminant.',
+      ],
+      keyIdea: 'The discriminant is $b^2 - 4ac$, the expression under the square root in the quadratic formula.',
+    },
+    check: {
+      // each option evaluated for a = 1, b = 5, c = 4, where the discriminant is (difference of the roots)^2
+      optionValues: [25 - 16, 25 + 16, Math.sqrt(25 - 16), -5 / 2],
+      compute: () => {
+        const r = realRoots(1, 5, 4);
+        return (r[1] - r[0]) ** 2;
+      },
+    },
+  },
+  {
+    id: 'quadratics-023',
+    subtopic: 'quadratics',
+    difficulty: 'foundation',
+    stem: 'A quadratic equation has discriminant $0$. How many distinct real roots does it have?',
+    options: ['One', 'Two', 'None', 'Infinitely many'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'In the quadratic formula, $\\pm\\sqrt{0} = 0$, so both roots equal $-\\frac{b}{2a}$. That is one repeated root.\n\n' +
+        'On a graph, the parabola just touches the $x$-axis at one point.',
+      whyWrong: [
+        null,
+        'Two distinct real roots need a **positive** discriminant, so that $\\pm\\sqrt{\\Delta}$ gives two different values.',
+        'No real roots needs a **negative** discriminant, because the square root of a negative number is not real.',
+        'A quadratic equation can never have more than two roots, because a parabola meets a straight line at most twice.',
+      ],
+      keyIdea: 'Discriminant positive: two real roots. Zero: one repeated root. Negative: no real roots.',
+    },
+    check: {
+      // x^2 + 2x + 1 = 0 has discriminant 0
+      optionValues: [1, 2, 0, null],
+      compute: () => realRoots(1, 2, 1).length,
+    },
+  },
+  {
+    id: 'quadratics-024',
+    subtopic: 'quadratics',
+    difficulty: 'foundation',
+    stem: 'The roots of $ax^2 + bx + c = 0$ are $\\alpha$ and $\\beta$. What is their product $\\alpha\\beta$?',
+    options: ['$\\frac{c}{a}$', '$-\\frac{b}{a}$', '$\\frac{a}{c}$', '$-\\frac{c}{a}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A quadratic with roots $\\alpha$ and $\\beta$ can be written $a(x - \\alpha)(x - \\beta)$, which expands to\n\n' +
+        '$$ax^2 - a(\\alpha + \\beta)x + a\\alpha\\beta$$\n\n' +
+        'Comparing the constant terms gives $a\\alpha\\beta = c$, so $\\alpha\\beta = \\frac{c}{a}$.',
+      whyWrong: [
+        null,
+        'This is the **sum** of the roots, not the product.',
+        'This is upside down. The $x^2$ coefficient $a$ goes on the bottom: for $2x^2 - 8x + 6 = 0$ the roots 1 and 3 have product $\\frac{6}{2} = 3$.',
+        'The minus sign belongs to the sum of the roots only. For $x^2 - 5x + 6 = 0$ the roots 2 and 3 have product $+6$.',
+      ],
+      keyIdea: 'Sum of roots $= -\\frac{b}{a}$ and product of roots $= \\frac{c}{a}$.',
+    },
+    check: {
+      // each option evaluated for a = 2, b = -8, c = 6, whose roots are 1 and 3
+      optionValues: [6 / 2, 8 / 2, 2 / 6, -6 / 2],
+      compute: () => {
+        const r = realRoots(2, -8, 6);
+        return r[0] * r[1];
+      },
+    },
+  },
+  {
+    id: 'quadratics-025',
+    subtopic: 'quadratics',
+    difficulty: 'foundation',
+    stem: 'What is the degree of the polynomial $3x^4 - 2x^2 + 7$?',
+    options: ['$4$', '$2$', '$3$', '$7$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **degree** of a polynomial is its highest power of $x$ with a non-zero coefficient.\n\n' +
+        'The powers here are 4, 2 and 0, so the degree is 4.',
+      whyWrong: [
+        null,
+        '$2$ is the power in the middle term. The degree is the **highest** power.',
+        '$3$ is the coefficient of $x^4$, not a power of $x$.',
+        '$7$ is the constant term, not a power of $x$.',
+      ],
+      keyIdea: 'The degree of a polynomial is its highest power of $x$.',
+    },
+    check: {
+      optionValues: [4, 2, 3, 7],
+      compute: () => [3, 0, -2, 0, 7].length - 1, // descending coefficients
+    },
+  },
+  {
+    id: 'quadratics-026',
+    subtopic: 'quadratics',
+    difficulty: 'foundation',
+    stem: 'Which of the following is the axis of symmetry of the parabola $y = ax^2 + bx + c$?',
+    options: ['$x = -\\frac{b}{2a}$', '$x = \\frac{b}{2a}$', '$y = c$', '$x = -\\frac{b}{a}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A parabola is symmetric about a vertical line half-way between its roots, and this line passes through the vertex.\n\n' +
+        'The roots are $\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. Their average is $-\\frac{b}{2a}$, so the axis of symmetry is $x = -\\frac{b}{2a}$.',
+      whyWrong: [
+        null,
+        'The sign is lost: the formula starts with $-b$.',
+        '$y = c$ is a horizontal line through the $y$-intercept. The axis of symmetry of this parabola is vertical.',
+        '$-\\frac{b}{a}$ is the **sum** of the roots. The axis is at their average, which is half of that.',
+      ],
+      keyIdea: 'The axis of symmetry is $x = -\\frac{b}{2a}$, half-way between the roots.',
+    },
+    check: {
+      // each option evaluated for a = 1, b = -6, c = 8, whose roots are 2 and 4
+      optionValues: [3, -3, 8, 6],
+      compute: () => {
+        const r = realRoots(1, -6, 8);
+        return (r[0] + r[1]) / 2;
+      },
+    },
+  },
+
+  // ------------------------------------------------------------------ exam
+  {
+    id: 'quadratics-005',
+    subtopic: 'quadratics',
+    difficulty: 'exam',
     stem: 'Write $x^2 - 6x + 11$ in the form $(x - p)^2 + q$.',
     options: ['$(x - 3)^2 + 2$', '$(x - 3)^2 + 20$', '$(x - 6)^2 - 25$', '$(x + 3)^2 + 2$'],
     correctIndex: 0,
@@ -186,8 +323,6 @@ export const questions: StaticQuestion[] = [
       compute: () => polyAt([1, -6, 11], 1),
     },
   },
-
-  // ------------------------------------------------------------------ exam
   {
     id: 'quadratics-006',
     subtopic: 'quadratics',
@@ -495,7 +630,6 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ------------------------------------------------------------------ challenge
   {
     id: 'quadratics-016',
     subtopic: 'quadratics',
@@ -528,169 +662,6 @@ export const questions: StaticQuestion[] = [
         sig((x) => x >= 2),
       ],
       compute: () => sig((x) => (x - 1) * (x + 2) >= 4),
-    },
-  },
-  {
-    id: 'quadratics-017',
-    subtopic: 'quadratics',
-    difficulty: 'challenge',
-    stem: 'The two roots of $x^2 - 7x + k = 0$ differ by 3. Find $k$.',
-    options: ['$11.5$', '$10$', '$20$', '$-10$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Let the roots be $\\alpha$ and $\\beta$ with $\\alpha - \\beta = 3$.\n\n' +
-        'Sum of roots: $\\alpha + \\beta = -\\frac{b}{a} = 7$. Product: $\\alpha\\beta = k$.\n\n' +
-        '**Method 1 (simultaneous equations):** adding $\\alpha + \\beta = 7$ and $\\alpha - \\beta = 3$ gives $2\\alpha = 10$, so $\\alpha = 5$ and $\\beta = 2$. Then $k = \\alpha\\beta = 5 \\times 2 = 10$.\n\n' +
-        '**Method 2 (identity):** $(\\alpha - \\beta)^2 = (\\alpha + \\beta)^2 - 4\\alpha\\beta$, so $9 = 49 - 4k$, giving $4k = 40$ and $k = 10$.\n\n' +
-        'Check: $x^2 - 7x + 10 = (x - 2)(x - 5)$, roots 2 and 5, which differ by 3.',
-      whyWrong: [
-        'This sets $49 - 4k = 3$, forgetting to square the difference: it is $(\\alpha - \\beta)^2 = 9$, not 3.',
-        null,
-        'This uses $(\\alpha - \\beta)^2 = (\\alpha + \\beta)^2 - 2\\alpha\\beta$, mixing it up with the identity for $\\alpha^2 + \\beta^2$. The correct identity has $4\\alpha\\beta$.',
-        'This uses $(\\alpha - \\beta)^2 = (\\alpha + \\beta)^2 + 4\\alpha\\beta$ with the wrong sign, so $9 = 49 + 4k$.',
-      ],
-      keyIdea: 'Combine the root difference with the sum $-\\frac{b}{a}$ to find the roots, then the product $\\frac{c}{a}$ gives the unknown.',
-    },
-    check: {
-      optionValues: [11.5, 10, 20, -10],
-      compute: () => {
-        for (let i = -200; i <= 200; i++) {
-          const k = i / 2;
-          const r = realRoots(1, -7, k);
-          if (r.length === 2 && Math.abs(r[1] - r[0] - 3) < 1e-9) return k;
-        }
-        return NaN;
-      },
-    },
-  },
-  {
-    id: 'quadratics-018',
-    subtopic: 'quadratics',
-    difficulty: 'challenge',
-    stem: 'Let $f(x) = x^3 + ax^2 + bx - 6$. Given that $(x - 1)$ is a factor of $f(x)$, and that the remainder when $f(x)$ is divided by $(x + 1)$ is $-4$, find $a$ and $b$.',
-    options: ['$a = 3$, $b = 2$', '$a = -2$, $b = 1$', '$a = 4$, $b = 1$', '$a = 4$, $b = -3$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Factor theorem:** $(x - 1)$ is a factor, so $f(1) = 0$:\n\n' +
-        '$$1 + a + b - 6 = 0 \\quad \\Rightarrow \\quad a + b = 5$$\n\n' +
-        '**Remainder theorem:** dividing by $(x + 1)$ leaves $f(-1)$, so $f(-1) = -4$:\n\n' +
-        '$$(-1)^3 + a(-1)^2 + b(-1) - 6 = -1 + a - b - 6 = -4 \\quad \\Rightarrow \\quad a - b = 3$$\n\n' +
-        'Add the two equations: $2a = 8$, so $a = 4$. Then $b = 5 - 4 = 1$.\n\n' +
-        'Check: $f(x) = x^3 + 4x^2 + x - 6 = (x - 1)(x + 2)(x + 3)$ and $f(-1) = -1 + 4 - 1 - 6 = -4$.',
-      whyWrong: [
-        'This works out $(-1)^3$ as $+1$, giving $1 + a - b - 6 = -4$, i.e. $a - b = 1$. An odd power of $-1$ is $-1$.',
-        'This forgets the constant term $-6$ in both equations ($1 + a + b = 0$ and $-1 + a - b = -4$).',
-        null,
-        'This swaps the two conditions: it uses $f(-1) = 0$ and $f(1) = -4$. The factor $(x - 1)$ means $f(1) = 0$; the divisor $(x + 1)$ means use $f(-1)$.',
-      ],
-      keyIdea: 'Each factor or remainder condition gives one equation via $f(h)$; two conditions give two simultaneous equations.',
-    },
-    check: {
-      optionValues: ['3,2', '-2,1', '4,1', '4,-3'],
-      compute: () => {
-        for (let a = -20; a <= 20; a++)
-          for (let b = -20; b <= 20; b++)
-            if (polyAt([1, a, b, -6], 1) === 0 && synthDiv([1, a, b, -6], -1).r === -4) return `${a},${b}`;
-        return 'none';
-      },
-    },
-  },
-  {
-    id: 'quadratics-019',
-    subtopic: 'quadratics',
-    difficulty: 'challenge',
-    stem: 'Find all values of $k$ for which $2x^2 + kx + 8 > 0$ for **every** real number $x$.',
-    options: ['$k < -8$ or $k > 8$', '$-4\\sqrt{2} < k < 4\\sqrt{2}$', '$-8 \\le k \\le 8$', '$-8 < k < 8$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The parabola $y = 2x^2 + kx + 8$ opens upwards ($a = 2 > 0$). It is above the $x$-axis for every $x$ exactly when it **never touches** the axis, i.e. it has no real roots: $\\Delta < 0$.\n\n' +
-        '$$\\Delta = k^2 - 4(2)(8) = k^2 - 64 < 0$$\n\n' +
-        'So $(k - 8)(k + 8) < 0$, which is true **between** the roots:\n\n' +
-        '$$-8 < k < 8$$\n\n' +
-        'The endpoints are excluded: when $k = 8$, $2x^2 + 8x + 8 = 2(x + 2)^2$, which equals 0 at $x = -2$, so it is not $> 0$ for every $x$.',
-      whyWrong: [
-        'This is where $\\Delta > 0$: then the parabola crosses the axis twice and dips below it, so it is not positive everywhere.',
-        'This forgets $a = 2$ in $4ac$ and solves $k^2 - 4(8) < 0$, i.e. $k^2 < 32$.',
-        'This includes $\\Delta = 0$. At $k = \\pm 8$ the parabola touches the axis, so the expression equals 0 somewhere and is not strictly positive.',
-        null,
-      ],
-      keyIdea: 'An upward parabola is positive for all $x$ exactly when $\\Delta < 0$ (no real roots).',
-    },
-    check: {
-      optionValues: [
-        sig((k) => k < -8 || k > 8),
-        sig((k) => k * k < 32),
-        sig((k) => -8 <= k && k <= 8),
-        sig((k) => -8 < k && k < 8),
-      ],
-      // the parabola's lowest point is at x = -k/4; positive everywhere iff that lowest value is > 0
-      compute: () => sig((k) => polyAt([2, k, 8], -k / 4) > 0),
-    },
-  },
-  {
-    id: 'quadratics-020',
-    subtopic: 'quadratics',
-    difficulty: 'challenge',
-    stem: 'Find all **real** solutions of $x^4 - 3x^2 - 4 = 0$.',
-    options: ['$x = 4$ or $x = -1$', '$x = \\pm 2$', '$x = \\pm 2$ or $x = \\pm 1$', '$x = 2$ only'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'This is a quadratic "in disguise". Let $u = x^2$, so $x^4 = u^2$:\n\n' +
-        '$$u^2 - 3u - 4 = 0 \\quad \\Rightarrow \\quad (u - 4)(u + 1) = 0 \\quad \\Rightarrow \\quad u = 4 \\text{ or } u = -1$$\n\n' +
-        'Now go back to $x$:\n\n' +
-        '- $x^2 = 4$ gives $x = 2$ or $x = -2$.\n' +
-        '- $x^2 = -1$ has **no real solutions** (a real square is never negative).\n\n' +
-        'So the real solutions are $x = \\pm 2$. Check: $2^4 - 3(2^2) - 4 = 16 - 12 - 4 = 0$, and the same for $-2$.',
-      whyWrong: [
-        'These are the values of $u = x^2$, not of $x$. You still need to solve $x^2 = 4$ and $x^2 = -1$.',
-        null,
-        'This treats $x^2 = -1$ as giving $x = \\pm 1$. But $1^2 = 1$, not $-1$; check: $1 - 3 - 4 = -6 \\ne 0$.',
-        'This forgets the negative square root: $x^2 = 4$ also has $x = -2$, since $(-2)^4 - 3(-2)^2 - 4 = 0$.',
-      ],
-      keyIdea: 'Substitute $u = x^2$ to get a quadratic, solve for $u$, then solve $x^2 = u$, rejecting negative $u$ and keeping both $\\pm$ roots.',
-    },
-    check: {
-      optionValues: ['-1,4', '-2,2', '-2,-1,1,2', '2'],
-      compute: () => {
-        const xs: number[] = [];
-        for (const u of realRoots(1, -3, -4)) if (u >= 0) xs.push(-Math.sqrt(u), Math.sqrt(u));
-        return xs
-          .map((x) => Math.round(x))
-          .sort((p, q) => p - q)
-          .join(',');
-      },
-    },
-  },
-  {
-    id: 'quadratics-021',
-    subtopic: 'quadratics',
-    difficulty: 'challenge',
-    stem: 'The roots of $x^2 - 3x + 1 = 0$ are $\\alpha$ and $\\beta$. Which equation has roots $\\alpha^2$ and $\\beta^2$?',
-    options: ['$x^2 - 7x + 1 = 0$', '$x^2 - 9x + 1 = 0$', '$x^2 + 7x + 1 = 0$', '$x^2 - 11x + 1 = 0$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'From the original equation: $\\alpha + \\beta = 3$ and $\\alpha\\beta = 1$.\n\n' +
-        'A quadratic with roots $p$ and $q$ is $x^2 - (p + q)x + pq = 0$. So we need the sum and product of the **new** roots $\\alpha^2$ and $\\beta^2$:\n\n' +
-        '- Sum: $\\alpha^2 + \\beta^2 = (\\alpha + \\beta)^2 - 2\\alpha\\beta = 9 - 2 = 7$\n' +
-        '- Product: $\\alpha^2\\beta^2 = (\\alpha\\beta)^2 = 1^2 = 1$\n\n' +
-        'New equation: $x^2 - 7x + 1 = 0$.',
-      whyWrong: [
-        null,
-        'This uses $(\\alpha + \\beta)^2 = 9$ as the new sum, forgetting to subtract $2\\alpha\\beta$.',
-        'This gets the sign of the middle term wrong. The equation is $x^2 - (\\text{sum})x + \\text{product} = 0$, so a sum of 7 gives $-7x$.',
-        'This adds $2\\alpha\\beta$ instead of subtracting it: $9 + 2 = 11$.',
-      ],
-      keyIdea: 'A quadratic with roots $p$ and $q$ is $x^2 - (p + q)x + pq = 0$; find the new sum and product from the old ones.',
-    },
-    check: {
-      // coefficient of x in each option; the true one is -(alpha^2 + beta^2) from the actual roots
-      optionValues: [-7, -9, 7, -11],
-      compute: () => -realRoots(1, -3, 1).reduce((s, r) => s + r * r, 0),
     },
   },
 ];

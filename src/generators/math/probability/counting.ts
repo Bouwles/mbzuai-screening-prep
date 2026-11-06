@@ -44,9 +44,9 @@ function retry<T>(rng: Rng, build: (rng: Rng) => T | null): T {
 // so there are always enough distinct "forgot a repeat" mistakes.
 const WORDS = [
   'BANANA', 'LETTER', 'PEPPER', 'COFFEE', 'BALLOON', 'SUCCESS', 'ADDRESS', 'LEVEL', 'MAMMAL',
-  'CHEESE', 'PARALLEL', 'GOOGLE', 'COMMITTEE', 'TOMATO', 'POTATO', 'CANNON', 'DIVIDED', 'ELEVEN',
-  'ERROR', 'KAYAK', 'ARRANGE', 'SEESAW', 'COCOA', 'STATISTICS', 'ASSESS', 'TATTOO', 'REFERRER',
-  'BOOKKEEPER', 'MISSISSIPPI', 'DEEDED', 'ACCESS', 'NINETEEN',
+  'CHEESE', 'GOOGLE', 'TOMATO', 'POTATO', 'CANNON', 'DIVIDED', 'ELEVEN',
+  'ERROR', 'KAYAK', 'ARRANGE', 'SEESAW', 'COCOA', 'ASSESS', 'TATTOO',
+  'DEEDED', 'ACCESS',
 ];
 
 /** Letter counts in order of first appearance. */

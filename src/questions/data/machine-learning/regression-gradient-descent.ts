@@ -13,7 +13,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-001',
     subtopic: SUB,
     difficulty: 'foundation',
-    stem: 'A linear regression model predicts a delivery time (in minutes) from the distance $x$ (in km) using $\\hat{y} = 2.5x + 4$. What does the model predict for a distance of $6$ km?',
+    stem: 'A linear regression model predicts delivery time in minutes from distance $x$ in km: $\\hat{y} = 2.5x + 4$. What does it predict for $x = 6$?',
     options: ['$15$ minutes', '$26.5$ minutes', '$19$ minutes', '$25$ minutes'],
     correctIndex: 2,
     markScheme: {
@@ -38,10 +38,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'Which of these tasks is **logistic regression** designed for?',
     options: [
-      'Predicting the selling price of a flat in AED',
+      'Predicting the selling price of a flat',
       'Predicting whether an email is spam or not spam',
-      'Predicting tomorrow\'s temperature in degrees Celsius',
-      'Splitting customers into groups when no labels are given',
+      'Predicting tomorrow\'s temperature',
+      'Grouping customers when no labels are given',
     ],
     correctIndex: 1,
     markScheme: {
@@ -63,7 +63,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-003',
     subtopic: SUB,
     difficulty: 'foundation',
-    stem: 'During gradient descent, a weight currently has the value $w = 3$. The gradient of the loss with respect to this weight is $\\frac{\\partial L}{\\partial w} = 4$ and the learning rate is $\\eta = 0.1$. What is the new value of $w$ after one update?',
+    stem: 'A weight is $w = 3$, the gradient of the loss is $\\frac{\\partial L}{\\partial w} = 4$ and the learning rate is $\\eta = 0.1$. What is $w$ after one gradient descent update?',
     options: ['$3.4$', '$-1$', '$-0.4$', '$2.6$'],
     correctIndex: 3,
     markScheme: {
@@ -111,10 +111,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'Which statement best describes **one step of gradient descent** when training a model?',
     options: [
-      'Compute the derivative of the loss with respect to the inputs $x$, then change the training data to reduce the loss',
-      'Compute the derivative of the prediction with respect to each weight, then move each weight in the same direction as that derivative',
-      'Compute the loss, then set every weight equal to the value of the loss',
-      'Compute the derivative of the loss with respect to each weight, then move each weight a small step in the opposite direction to that derivative',
+      'Differentiate the loss with respect to the inputs, then change the data',
+      'Differentiate the prediction, then step with the derivative',
+      'Set every weight equal to the loss',
+      'Differentiate the loss with respect to each weight, then step against it',
     ],
     correctIndex: 3,
     markScheme: {
@@ -137,19 +137,24 @@ export const questions: StaticQuestion[] = [
     subtopic: SUB,
     difficulty: 'foundation',
     fixedOrder: true,
-    stem: 'Which of the following is TRUE about loss functions?\n\nA. Mean squared error (MSE) is the usual loss for linear regression\n\nB. Cross-entropy (log loss) is the usual loss for logistic regression',
-    options: ['A only', 'B only', 'Both A and B', 'None of the above'],
+    stem: 'Statement 1: mean squared error (MSE) is the usual loss for linear regression.\n\nStatement 2: cross-entropy (log loss) is the usual loss for logistic regression.\n\nWhich is true?',
+    options: [
+      'Statement 1 only',
+      'Statement 2 only',
+      'Both statements',
+      'Neither statement',
+    ],
     correctIndex: 2,
     markScheme: {
       solution:
-        '**Statement A is true.** Linear regression predicts a number, so we measure how far each prediction is from the truth and average the squares: $\\text{MSE} = \\frac{1}{n}\\sum (y_i - \\hat{y}_i)^2$.\n\n' +
-        '**Statement B is true.** Logistic regression outputs a probability $p$. Cross-entropy, $L = -[y \\ln p + (1 - y)\\ln(1 - p)]$, punishes confident wrong probabilities very heavily, and it is the standard loss for classification.\n\n' +
-        'Both statements are true, so the answer is "Both A and B".',
+        '**Statement 1 is true.** Linear regression predicts a number, so we measure how far each prediction is from the truth and average the squares: $\\text{MSE} = \\frac{1}{n}\\sum (y_i - \\hat{y}_i)^2$.\n\n' +
+        '**Statement 2 is true.** Logistic regression outputs a probability $p$. Cross-entropy, $L = -[y \\ln p + (1 - y)\\ln(1 - p)]$, punishes confident wrong probabilities very heavily, and it is the standard loss for classification.\n\n' +
+        'Both statements are true.',
       whyWrong: [
-        'A is true, but B is also true: cross-entropy is the standard loss for logistic regression, so "A only" is incomplete.',
-        'B is true, but A is also true: MSE is the standard loss for linear regression, so "B only" is incomplete.',
+        'Statement 1 is true, but so is Statement 2: cross-entropy is the standard loss for logistic regression.',
+        'Statement 2 is true, but so is Statement 1: MSE is the standard loss for linear regression.',
         null,
-        'Both statements are standard facts, so "None of the above" is wrong.',
+        'Both statements are standard facts, so it cannot be that neither is true.',
       ],
       keyIdea: 'Regression (numbers) uses MSE; classification with probabilities (logistic regression) uses cross-entropy.',
     },
@@ -160,7 +165,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-007',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'A model makes the predictions $\\hat{y}$ shown in the table for four houses (values in hundreds of thousands of AED). What is the mean squared error (MSE) of these predictions?',
+    stem: 'The table shows a model\'s predictions $\\hat{y}$ for four houses. What is the mean squared error (MSE) of these predictions?',
     table: {
       headers: ['House', 'Actual $y$', 'Predicted $\\hat{y}$'],
       rows: [
@@ -200,7 +205,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-008',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'The scatter plot shows hours of revision $x$ against test score $y$ for five students, with the fitted regression line $\\hat{y} = 0.5x + 2$. The points are $(2, 3)$, $(4, 4.5)$, $(6, 7)$, $(8, 5.5)$ and $(10, 7)$. What is the **residual** (actual minus predicted) for the student who revised for $6$ hours?',
+    stem: 'The scatter plot shows revision hours $x$ against score $y$, with the fitted line $\\hat{y} = 0.5x + 2$. What is the **residual** (actual minus predicted) at $x = 6$?',
     chart: {
       kind: 'scatter',
       title: 'Revision time and test score',
@@ -219,7 +224,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 3,
     markScheme: {
       solution:
-        'The student who revised for $6$ hours scored $y = 7$.\n\n' +
+        'Read the point at $x = 6$ from the plot: $y = 7$.\n\n' +
         'Predicted score from the line: $\\hat{y} = 0.5 \\times 6 + 2 = 3 + 2 = 5$.\n\n' +
         'Residual $= y - \\hat{y} = 7 - 5 = 2$.\n\n' +
         'A positive residual means the point lies **above** the line (the model under-predicted this student).',
@@ -237,7 +242,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-009',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'A model with no bias, $\\hat{y} = wx$, is trained on a single example $(x, y) = (3, 10)$ with the squared-error loss $L = (wx - y)^2$. If currently $w = 2$, what is the gradient $\\frac{dL}{dw}$?',
+    stem: 'A model $\\hat{y} = wx$ is trained on the single example $(x, y) = (3, 10)$ with loss $L = (wx - y)^2$. If $w = 2$, what is the gradient $\\frac{dL}{dw}$?',
     options: ['$24$', '$16$', '$-24$', '$-8$'],
     correctIndex: 2,
     markScheme: {
@@ -266,7 +271,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-010',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'A loss function is $L(w) = (w - 5)^2 + 1$. Gradient descent starts at $w_0 = 1$ with learning rate $\\eta = 0.1$. What is $w_1$, the value of $w$ after one step?',
+    stem: 'A loss is $L(w) = (w - 5)^2 + 1$. Gradient descent starts at $w_0 = 1$ with learning rate $\\eta = 0.1$. What is $w_1$, the value after one step?',
     options: ['$1.8$', '$0.2$', '$9$', '$1.4$'],
     correctIndex: 0,
     markScheme: {
@@ -294,7 +299,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-011',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'A logistic regression model computes $z = 2x - 3$ and outputs $p = \\sigma(z) = \\frac{1}{1 + e^{-z}}$, the probability of class 1. It predicts class 1 when $p \\ge 0.5$. For an input $x = 1$, what are $p$ (to 2 decimal places) and the predicted class?',
+    stem: 'A logistic regression model has $z = 2x - 3$ and $p = \\sigma(z) = \\frac{1}{1 + e^{-z}}$, and predicts class 1 when $p \\ge 0.5$. For $x = 1$, what are $p$ (to 2 decimal places) and the predicted class?',
     options: ['$p = 0.73$, class 1', '$p = 0.27$, class 0', '$p = 0.37$, class 0', '$p = 0.27$, class 1'],
     correctIndex: 1,
     markScheme: {
@@ -321,7 +326,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-012',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'For one training example whose true label is $y = 1$, a logistic regression model outputs $p = 0.8$. Using the binary cross-entropy loss $L = -[y \\ln p + (1 - y)\\ln(1 - p)]$ with the natural logarithm, what is the loss (to 2 decimal places)?',
+    stem: 'For a true label $y = 1$, a logistic regression model outputs $p = 0.8$. Using the binary cross-entropy loss $L = -[y \\ln p + (1 - y)\\ln(1 - p)]$, what is the loss (to 2 decimal places)?',
     options: ['$1.61$', '$0.20$', '$0.04$', '$0.22$'],
     correctIndex: 3,
     markScheme: {
@@ -348,37 +353,53 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-013',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'The Python code runs gradient descent on the loss $L(w) = (w - 4)^2$, whose gradient is $2(w - 4)$. What does it print? (The three printed lines are shown separated by spaces.)',
+    stem: 'This pseudocode runs gradient descent on the loss $L(w) = (w - 4)^2$, whose gradient is $2(w - 4)$. What does it print?',
     code: {
-      lang: 'python',
-      source: 'w = 0.0\nlr = 0.1\nfor step in range(3):\n    grad = 2 * (w - 4)\n    w = w - lr * grad\n    print(round(w, 2))',
+      lang: 'pseudocode',
+      source: 'w = 0\nlr = 0.1\nfor i = 1 to 3\n   grad = 2 * (w - 4)\n   w = w - lr * grad\nend for\nprint(w)',
     },
-    options: ['`0.8 1.6 2.4`', '`0.8 1.44 1.95`', '`-0.8 -1.76 -2.91`', '`8.0 0.0 8.0`'],
-    correctIndex: 1,
+    options: [
+      '$1.952$',
+      '$2.4$',
+      '$-2.912$',
+      '$8$',
+    ],
+    correctIndex: 0,
     markScheme: {
       solution:
         'Trace the loop. The gradient is recomputed from the **current** $w$ every time.\n\n' +
-        '| step | $w$ at start | `grad = 2*(w-4)` | `w - lr*grad` | printed |\n' +
-        '|---|---|---|---|---|\n' +
-        '| 0 | 0.0 | $2 \\times (-4) = -8$ | $0 + 0.8 = 0.8$ | `0.8` |\n' +
-        '| 1 | 0.8 | $2 \\times (-3.2) = -6.4$ | $0.8 + 0.64 = 1.44$ | `1.44` |\n' +
-        '| 2 | 1.44 | $2 \\times (-2.56) = -5.12$ | $1.44 + 0.512 = 1.952$ | `1.95` |\n\n' +
-        'Output (one value per line): `0.8`, `1.44`, `1.95`. Notice the steps get smaller as $w$ approaches the minimum at $4$, because the gradient shrinks.',
+        '| $i$ | $w$ at start | `grad` | new $w$ |\n' +
+        '|---|---|---|---|\n' +
+        '| 1 | 0 | $2 \\times (-4) = -8$ | $0 + 0.8 = 0.8$ |\n' +
+        '| 2 | 0.8 | $2 \\times (-3.2) = -6.4$ | $0.8 + 0.64 = 1.44$ |\n' +
+        '| 3 | 1.44 | $2 \\times (-2.56) = -5.12$ | $1.44 + 0.512 = 1.952$ |\n\n' +
+        'After the loop it prints $1.952$. The steps get smaller as $w$ approaches the minimum at $4$, because the gradient shrinks.',
       whyWrong: [
-        'This keeps using the first gradient $-8$ every time (steps of $0.8$). The gradient is recalculated inside the loop from the new $w$, so it shrinks: $-8$, then $-6.4$, then $-5.12$.',
         null,
+        'This keeps using the first gradient $-8$ every time, giving steps of $0.8$. The gradient is recalculated inside the loop from the new $w$, so it shrinks.',
         'This adds `lr * grad` instead of subtracting it (gradient ascent), so $w$ runs away from the minimum at $4$: $-0.8$, $-1.76$, $-2.912$.',
-        'This ignores `lr` and subtracts the whole gradient: $0 - (-8) = 8$, then $8 - 8 = 0$, then $8$ again, bouncing for ever.',
+        'This ignores `lr` and subtracts the whole gradient: $w$ goes $8$, then $0$, then $8$ again, bouncing for ever.',
       ],
       keyIdea: 'Each gradient-descent step recomputes the gradient at the current weight, so steps shrink near the minimum.',
     },
-    python: { stdout: '0.8\n1.44\n1.95\n' },
+    check: {
+      optionValues: [1.952, 2.4, -2.912, 8],
+      compute: () => {
+        let w = 0;
+        const lr = 0.1;
+        for (let i = 1; i <= 3; i++) {
+          const grad = 2 * (w - 4);
+          w = w - lr * grad;
+        }
+        return round(w, 6);
+      },
+    },
   },
   {
     id: 'regression-gradient-descent-014',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'The graph shows the training loss for three runs of gradient descent on the same model. The runs used learning rates $0.0001$, $0.01$ and $2$, not necessarily in that order. Which matching is most likely?',
+    stem: 'The graph shows training loss for three runs on one model, using learning rates $0.0001$, $0.01$ and $2$ in some order. Which matching is most likely?',
     chart: {
       kind: 'line',
       title: 'Training loss by epoch',
@@ -417,7 +438,7 @@ export const questions: StaticQuestion[] = [
     id: 'regression-gradient-descent-015',
     subtopic: SUB,
     difficulty: 'exam',
-    stem: 'Two linear regression models are tested on the data in the table: Model A is $\\hat{y} = 2x + 1$ and Model B is $\\hat{y} = 1.5x + 2$. Which model has the lower mean squared error, and what is that MSE?',
+    stem: 'On the data in the table, Model A is $\\hat{y} = 2x + 1$ and Model B is $\\hat{y} = 1.5x + 2$. Which model has the lower mean squared error, and what is that MSE?',
     table: {
       headers: ['$x$', '1', '2', '3', '4'],
       rows: [['$y$', 3, 6, 7, 8]],
@@ -452,117 +473,10 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'regression-gradient-descent-016',
-    subtopic: SUB,
-    difficulty: 'challenge',
-    stem: 'A model $\\hat{y} = wx + b$ is trained on two points, $(1, 3)$ and $(2, 5)$, using the loss\n\n$$L = \\frac{1}{n}\\sum_{i=1}^{n} (\\hat{y}_i - y_i)^2$$\n\nso that $\\frac{\\partial L}{\\partial w} = \\frac{2}{n}\\sum (\\hat{y}_i - y_i)x_i$ and $\\frac{\\partial L}{\\partial b} = \\frac{2}{n}\\sum (\\hat{y}_i - y_i)$. Starting from $w = 0$, $b = 0$ with learning rate $\\eta = 0.1$, what are $w$ and $b$ after one gradient descent step?',
-    options: ['$w = -1.3$, $b = -0.8$', '$w = 2.6$, $b = 1.6$', '$w = 1.3$, $b = 0.8$', '$w = 0.65$, $b = 0.4$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'With $w = b = 0$ both predictions are $0$. Here $n = 2$, so $\\frac{2}{n} = 1$.\n\n' +
-        '| $x$ | $y$ | $\\hat{y}$ | $\\hat{y} - y$ | $(\\hat{y} - y)x$ |\n' +
-        '|---|---|---|---|---|\n' +
-        '| 1 | 3 | 0 | $-3$ | $-3$ |\n' +
-        '| 2 | 5 | 0 | $-5$ | $-10$ |\n\n' +
-        'Gradients:\n\n' +
-        '- $\\frac{\\partial L}{\\partial w} = 1 \\times (-3 - 10) = -13$\n' +
-        '- $\\frac{\\partial L}{\\partial b} = 1 \\times (-3 - 5) = -8$\n\n' +
-        'Updates:\n\n' +
-        '- $w = 0 - 0.1 \\times (-13) = 1.3$\n' +
-        '- $b = 0 - 0.1 \\times (-8) = 0.8$\n\n' +
-        'Both increase, which makes sense: the model was predicting $0$, far too low.',
-      whyWrong: [
-        'This adds $\\eta \\times$ gradient instead of subtracting it, moving uphill. With negative gradients, descent must **increase** $w$ and $b$.',
-        'This forgets the $\\frac{1}{n}$ in the mean, using gradients $2\\sum(\\ldots) = -26$ and $-16$. That doubles both steps.',
-        null,
-        'This drops the factor $2$ from differentiating the square, using $\\frac{1}{n}\\sum(\\ldots)$: gradients $-6.5$ and $-4$, which halves both steps.',
-      ],
-      keyIdea: 'For MSE, each gradient averages error times input (for $w$) or just error (for $b$), times 2; then every parameter steps against its own gradient.',
-    },
-    check: {
-      optionValues: ['-1.3,-0.8', '2.6,1.6', '1.3,0.8', '0.65,0.4'],
-      compute: () => {
-        const xs = [1, 2];
-        const ys = [3, 5];
-        const loss = (w: number, b: number) => mse(ys, xs.map((x) => w * x + b));
-        const gw = numDeriv((w) => loss(w, 0), 0);
-        const gb = numDeriv((b) => loss(0, b), 0);
-        return `${round(0 - 0.1 * gw, 4)},${round(0 - 0.1 * gb, 4)}`;
-      },
-    },
-  },
-  {
-    id: 'regression-gradient-descent-017',
-    subtopic: SUB,
-    difficulty: 'challenge',
-    stem: 'A logistic regression model predicts whether a student passes an exam from $x_1$ = hours of study and $x_2$ = number of practice tests taken:\n\n$$p = \\sigma(0.5x_1 + 2x_2 - 9)$$\n\nIt predicts "pass" when $p \\ge 0.5$. A student studies for $10$ hours. What is the smallest number of practice tests they must take to be predicted to pass?',
-    options: ['$4$', '$7$', '$4.5$', '$2$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Since $\\sigma(0) = 0.5$ and the sigmoid is increasing, $p \\ge 0.5$ exactly when $z \\ge 0$.\n\n' +
-        'So we need $0.5x_1 + 2x_2 - 9 \\ge 0$.\n\n' +
-        'Substitute $x_1 = 10$: $5 + 2x_2 - 9 \\ge 0$, so $2x_2 - 4 \\ge 0$.\n\n' +
-        'Therefore $2x_2 \\ge 4$, giving $x_2 \\ge 2$.\n\n' +
-        'Check: with $x_2 = 2$, $z = 5 + 4 - 9 = 0$ and $p = 0.5$, so the student is (just) predicted to pass. With $x_2 = 1$, $z = -2$ and $p < 0.5$.',
-      whyWrong: [
-        'This is $9 - 5 = 4$: it forgets to divide by the weight $2$ on $x_2$. Each practice test adds $2$ to $z$, not $1$.',
-        'This makes a sign error, writing $2x_2 = 9 + 5$, so $x_2 = 7$. Moving $+5$ across the inequality should give $2x_2 \\ge 9 - 5$.',
-        'This ignores the $10$ hours of study and solves $2x_2 = 9$. The term $0.5x_1 = 5$ must be included.',
-        null,
-      ],
-      keyIdea: 'The decision boundary of logistic regression is where $z = 0$ (because $\\sigma(0) = 0.5$), so solve $wx + b \\ge 0$.',
-    },
-    check: {
-      optionValues: [4, 7, 4.5, 2],
-      compute: () => {
-        // smallest whole number of tests with p >= 0.5
-        for (let t = 0; t <= 20; t++) if (sigmoid(0.5 * 10 + 2 * t - 9) >= 0.5) return t;
-        return -1;
-      },
-    },
-  },
-  {
-    id: 'regression-gradient-descent-018',
-    subtopic: SUB,
-    difficulty: 'challenge',
-    stem: 'For a binary classifier, two training examples have true labels $y = 1$ and $y = 0$. The model outputs probabilities (of class 1) $p = 0.9$ and $p = 0.2$ respectively. What is the **mean** binary cross-entropy loss $-[y \\ln p + (1 - y)\\ln(1 - p)]$ over the two examples, using natural logs, to 2 decimal places?',
-    options: ['$0.86$', '$0.16$', '$0.33$', '$0.07$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Example 1 ($y = 1$, $p = 0.9$): only the first term survives, $L_1 = -\\ln 0.9 \\approx 0.1054$.\n\n' +
-        'Example 2 ($y = 0$, $p = 0.2$): only the second term survives, $L_2 = -\\ln(1 - 0.2) = -\\ln 0.8 \\approx 0.2231$.\n\n' +
-        'Mean loss:\n\n' +
-        '$$\\frac{0.1054 + 0.2231}{2} = \\frac{0.3285}{2} \\approx 0.16$$\n\n' +
-        'Both predictions are on the correct side, so a small loss makes sense.',
-      whyWrong: [
-        'This uses $-\\ln 0.2 \\approx 1.609$ for the second example, giving $\\frac{0.105 + 1.609}{2} \\approx 0.86$. When $y = 0$ the loss uses $\\ln(1 - p) = \\ln 0.8$, because $1 - p$ is the probability given to the true class.',
-        null,
-        'This is the **total** $0.1054 + 0.2231 \\approx 0.33$; the question asks for the mean, so divide by $2$.',
-        'This uses the base-10 $\\log$ key instead of $\\ln$: $-\\log 0.9 \\approx 0.0458$ and $-\\log 0.8 \\approx 0.0969$, whose mean is about $0.07$. The question says to use natural logs, so use the $\\ln$ key.',
-      ],
-      keyIdea: 'Cross-entropy takes $-\\ln$ of the probability the model gave to the true class, then averages over the examples.',
-    },
-    check: {
-      optionValues: [0.86, 0.16, 0.33, 0.07],
-      compute: () => {
-        const ex = [
-          { y: 1, p: 0.9 },
-          { y: 0, p: 0.2 },
-        ];
-        return round(mean(ex.map(({ y, p }) => -(y * Math.log(p) + (1 - y) * Math.log(1 - p)))), 2);
-      },
-    },
-  },
   {
     id: 'regression-gradient-descent-019',
     subtopic: SUB,
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'Gradient descent is run on $L(w) = w^2$ (gradient $2w$) starting from $w_0 = 1$ with learning rate $\\eta = 1.5$. What is $w$ after **two** steps?',
     options: ['$-2$', '$-8$', '$16$', '$4$'],
     correctIndex: 3,
@@ -590,35 +504,66 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+
+  // ---------------------------------------------------------------- recall
   {
-    id: 'regression-gradient-descent-020',
+    id: 'regression-gradient-descent-021',
     subtopic: SUB,
-    difficulty: 'challenge',
-    stem: 'A loss function is $L(w) = (w - 3)^2$, and gradient descent starts at $w_0 = 7$. Which learning rate $\\eta$ makes the very first step land **exactly** on the minimum?',
-    options: ['$1$', '$2$', '$0.875$', '$0.5$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'In the model $\\hat{y} = wx + b$, which symbol is the slope (gradient) of the line?',
+    options: ['$w$', '$b$', '$x$', '$\\hat{y}$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'The minimum of $(w - 3)^2$ is at $w = 3$.\n\n' +
-        'Gradient: $L\'(w) = 2(w - 3)$, so at $w_0 = 7$ the gradient is $2 \\times 4 = 8$.\n\n' +
-        'One step gives $w_1 = 7 - 8\\eta$. We want $w_1 = 3$:\n\n' +
-        '$$7 - 8\\eta = 3 \\quad\\Rightarrow\\quad 8\\eta = 4 \\quad\\Rightarrow\\quad \\eta = 0.5$$\n\n' +
-        'Check: $7 - 0.5 \\times 8 = 3$.',
+        'Compare with the straight line $y = mx + c$: the number multiplying $x$ is the slope, also called the gradient.\n\n' +
+        'So $w$ (the **weight**) is the slope, and $b$ (the **bias**) is the intercept.',
       whyWrong: [
-        'This forgets the factor $2$ in the derivative, using a gradient of $4$: $7 - 4\\eta = 3$ gives $\\eta = 1$. With the true gradient $8$, $\\eta = 1$ would jump to $-1$.',
-        'This inverts the fraction: $\\frac{8}{4} = 2$ instead of $\\frac{4}{8}$. The learning rate multiplies the gradient, so $\\eta = \\frac{\\text{distance}}{\\text{gradient}}$.',
-        'This divides the starting value by the gradient, $\\frac{7}{8} = 0.875$, instead of the distance to the minimum, $7 - 3 = 4$.',
         null,
+        '$b$ is the **intercept**: the value of $\\hat{y}$ when $x = 0$. It moves the line up or down without changing its slope.',
+        '$x$ is the input variable, not a fixed property of the line.',
+        '$\\hat{y}$ is the prediction, the output of the model.',
       ],
-      keyIdea: 'Write the update $w_1 = w_0 - \\eta L\'(w_0)$, set it equal to the target, and solve for $\\eta$.',
+      keyIdea: 'In $\\hat{y} = wx + b$, the weight $w$ is the slope and the bias $b$ is the intercept.',
     },
-    check: {
-      optionValues: [1, 2, 0.875, 0.5],
-      compute: () => {
-        const w0 = 7;
-        const g = numDeriv((w) => (w - 3) ** 2, w0);
-        return round((w0 - 3) / g, 6);
-      },
+  },
+  {
+    id: 'regression-gradient-descent-022',
+    subtopic: SUB,
+    difficulty: 'foundation',
+    stem: 'What does the **learning rate** control in gradient descent?',
+    options: ['The size of each update step', 'The number of input features', 'The number of training examples', 'The value of the final loss'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Each update is $w \\leftarrow w - \\eta \\frac{\\partial L}{\\partial w}$, and the learning rate $\\eta$ multiplies the gradient.\n\n' +
+        'So $\\eta$ sets the **size of each step**. Too small and training is slow; too large and the steps overshoot the minimum.',
+      whyWrong: [
+        null,
+        'The number of features is fixed by the data, not by the update rule.',
+        'The number of examples is fixed by the dataset. The learning rate only scales the step taken with them.',
+        'The final loss is a result of training. The learning rate affects it only indirectly, through the steps taken.',
+      ],
+      keyIdea: 'The learning rate $\\eta$ scales the gradient, so it sets the size of each step.',
+    },
+  },
+  {
+    id: 'regression-gradient-descent-023',
+    subtopic: SUB,
+    difficulty: 'foundation',
+    stem: 'What is a **residual** in regression?',
+    options: ['Actual value minus predicted value', 'Predicted value minus actual value', 'The square of the predicted value', 'The gradient of the fitted line'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **residual** is what is left over after the prediction: $y - \\hat{y}$, the actual value minus the predicted value.\n\n' +
+        'A positive residual means the point lies above the fitted line.',
+      whyWrong: [
+        null,
+        'This has the sign reversed. The residual is defined as actual minus predicted.',
+        'Squaring is used on the **residual** in the MSE. The square of a prediction is not a measure of error.',
+        'The gradient describes the slope of the line. A residual is a vertical gap between a point and the line.',
+      ],
+      keyIdea: 'Residual $= y - \\hat{y}$, the vertical gap from the fitted line to the point.',
     },
   },
 ];

@@ -207,8 +207,7 @@ export const questions: StaticQuestion[] = [
     id: 'graph-theory-006',
     subtopic: 'graph-theory',
     difficulty: 'exam',
-    stem:
-      'The table shows the adjacency matrix of an undirected simple graph: an entry of 1 means the two vertices are joined by an edge, 0 means they are not. How many **edges** does the graph have?',
+    stem: 'The table shows the adjacency matrix of an undirected simple graph (1 means an edge, 0 means no edge). How many **edges** does the graph have?',
     table: {
       headers: ['', 'A', 'B', 'C', 'D'],
       rows: [
@@ -280,8 +279,7 @@ export const questions: StaticQuestion[] = [
     id: 'graph-theory-008',
     subtopic: 'graph-theory',
     difficulty: 'exam',
-    stem:
-      'Each option lists the vertex degrees of a **connected** graph. Which graph has an **Euler path** (a route that uses every edge exactly once) but **not** an Euler circuit (such a route that finishes where it started)?',
+    stem: 'Each option lists the degrees of a **connected** graph. Which has an **Euler path** (uses every edge exactly once) but **no** Euler circuit (such a path ending where it started)?',
     options: ['$2, 2, 2, 2$', '$3, 3, 2, 2$', '$3, 3, 3, 3$', '$3, 1, 1, 1$'],
     correctIndex: 1,
     markScheme: {
@@ -324,8 +322,7 @@ export const questions: StaticQuestion[] = [
     id: 'graph-theory-009',
     subtopic: 'graph-theory',
     difficulty: 'exam',
-    stem:
-      'The table lists the roads in a small network and their lengths in km. Every road can be used in both directions. What is the length of the **shortest route** from A to E?',
+    stem: 'The table gives the length in km of each road in a network, and roads can be used both ways. What is the length of the **shortest route** from A to E?',
     table: {
       headers: ['Road', 'Length (km)'],
       rows: [
@@ -382,23 +379,22 @@ export const questions: StaticQuestion[] = [
     id: 'graph-theory-010',
     subtopic: 'graph-theory',
     difficulty: 'exam',
-    stem: 'In a league, every team plays every other team exactly **once**. A total of 66 matches are played. How many teams are in the league?',
+    stem: 'The complete graph $K_n$ has 66 edges. What is $n$?',
     options: ['$11$', '$12$', '$33$', '$132$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Model the league as a complete graph $K_n$: teams are vertices and each match is an edge between two teams.\n\n' +
         '$K_n$ has $\\frac{n(n-1)}{2}$ edges, so\n\n' +
         '$$\\frac{n(n-1)}{2} = 66 \\quad\\Rightarrow\\quad n(n-1) = 132$$\n\n' +
         'Look for two consecutive whole numbers that multiply to 132: $12 \\times 11 = 132$.\n\n' +
-        'So $n = 12$ teams. (Check: $\\frac{12 \\times 11}{2} = 66$.)',
+        'So $n = 12$. (Check: $\\frac{12 \\times 11}{2} = 66$.)',
       whyWrong: [
-        'This comes from solving $\\frac{n(n+1)}{2} = 66$. Each team plays the **other** $n - 1$ teams, so the formula is $\\frac{n(n-1)}{2}$; with 11 teams there would be only $55$ matches.',
+        'This comes from solving $\\frac{n(n+1)}{2} = 66$. Each vertex joins the **other** $n - 1$ vertices, so the formula is $\\frac{n(n-1)}{2}$; $K_{11}$ has only $55$ edges.',
         null,
-        'This is $66 \\div 2$. The 66 matches are already the edges; halving them does not give the number of teams.',
+        'This is $66 \\div 2$. Halving the number of edges does not give the number of vertices.',
         'This is $2 \\times 66 = 132$, which equals $n(n-1)$. You still need to find $n$: $12 \\times 11 = 132$.',
       ],
-      keyIdea: 'Everyone-plays-everyone problems are complete graphs: matches $= \\frac{n(n-1)}{2}$.',
+      keyIdea: 'Everyone-plays-everyone problems are complete graphs: $K_n$ has $\\frac{n(n-1)}{2}$ edges.',
     },
     check: {
       optionValues: [11, 12, 33, 132],
@@ -522,12 +518,12 @@ export const questions: StaticQuestion[] = [
     stem:
       'A connected graph has these 7 edges:\n\n' +
       'A–B, A–C, B–C, B–D, C–D, C–E, D–E\n\n' +
-      'You want to trace every edge exactly once without lifting your pen (an Euler path). Which statement is correct?',
+      'Which statement about an **Euler path** (a route using every edge exactly once) is correct?',
     options: [
-      'It must start at A and end at E (or the other way round).',
-      'It must start at B and end at D (or the other way round).',
+      'Its two ends must be A and E.',
+      'Its two ends must be B and D.',
       'It must start and finish at C.',
-      'It can start at any vertex, because the graph is connected.',
+      'It can start at any vertex.',
     ],
     correctIndex: 1,
     markScheme: {
@@ -575,24 +571,23 @@ export const questions: StaticQuestion[] = [
     id: 'graph-theory-015',
     subtopic: 'graph-theory',
     difficulty: 'exam',
-    stem:
-      'An engineer finds that connecting every pair of computers in a lab directly (a complete network) would need 45 cables. What is the **minimum** number of cables needed to connect the same computers so that every computer can reach every other one (possibly through other computers)?',
+    stem: 'A complete graph has 45 edges. What is the **minimum** number of edges of a connected graph on the same vertices?',
     options: ['$44$', '$10$', '$36$', '$9$'],
     correctIndex: 3,
     markScheme: {
       solution:
-        '**Step 1: find the number of computers.** A complete network is $K_n$ with $\\frac{n(n-1)}{2}$ edges:\n\n' +
+        '**Step 1: find the number of vertices.** A complete graph $K_n$ has $\\frac{n(n-1)}{2}$ edges:\n\n' +
         '$$\\frac{n(n-1)}{2} = 45 \\quad\\Rightarrow\\quad n(n-1) = 90 = 10 \\times 9$$\n\n' +
-        'so $n = 10$ computers.\n\n' +
-        '**Step 2: the cheapest connected network.** The smallest connected graph on $n$ vertices is a **tree**, which has $n - 1$ edges.\n\n' +
-        'Minimum cables $= 10 - 1 = 9$.',
+        'so $n = 10$ vertices.\n\n' +
+        '**Step 2: the smallest connected graph.** The smallest connected graph on $n$ vertices is a **tree**, which has $n - 1$ edges.\n\n' +
+        'Minimum edges $= 10 - 1 = 9$.',
       whyWrong: [
-        'This subtracts 1 from the number of **cables** (45). The tree rule $E = V - 1$ uses the number of **vertices** (computers), which is 10.',
-        'This is the number of computers. A connected network on 10 computers needs only $10 - 1 = 9$ cables (a tree).',
-        'This is $45 - 9 = 36$, the number of cables **saved**, not the number needed.',
+        'This subtracts 1 from the number of **edges** (45). The tree rule $E = V - 1$ uses the number of **vertices**, which is 10.',
+        'This is the number of vertices. A connected graph on 10 vertices needs only $10 - 1 = 9$ edges (a tree).',
+        'This is $45 - 9 = 36$, the number of edges **removed**, not the number kept.',
         null,
       ],
-      keyIdea: 'Use $\\frac{n(n-1)}{2}$ to find $n$, then the minimum connected network is a tree with $n - 1$ edges.',
+      keyIdea: 'Use $\\frac{n(n-1)}{2}$ to find $n$, then the smallest connected graph is a tree with $n - 1$ edges.',
     },
     check: {
       optionValues: [44, 10, 36, 9],
@@ -603,88 +598,11 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ================================================================ challenge
-  {
-    id: 'graph-theory-016',
-    subtopic: 'graph-theory',
-    difficulty: 'challenge',
-    stem:
-      'The table is the adjacency matrix $M$ of an undirected graph. The entry in row $i$, column $j$ of $M^3$ counts the walks of length 3 from vertex $i$ to vertex $j$. What is the entry in row B, column B of $M^3$?',
-    table: {
-      headers: ['', 'A', 'B', 'C', 'D'],
-      rows: [
-        ['A', 0, 1, 1, 0],
-        ['B', 1, 0, 1, 1],
-        ['C', 1, 1, 0, 1],
-        ['D', 0, 1, 1, 0],
-      ],
-    },
-    options: ['$2$', '$3$', '$4$', '$0$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'A walk of length 3 from B back to B uses 3 edges and returns to B, so it goes round a **triangle** through B.\n\n' +
-        'Edges: A–B, A–C, B–C, B–D, C–D. Triangles containing B:\n\n' +
-        '- B, A, C (edges B–A, A–C, C–B all exist)\n' +
-        '- B, C, D (edges B–C, C–D, D–B all exist)\n' +
-        '- B, A, D is not a triangle (no edge A–D).\n\n' +
-        'Each triangle can be walked in **two directions**, so the walks are:\n\n' +
-        'B–A–C–B, B–C–A–B, B–C–D–B, B–D–C–B: that is $2 \\times 2 = 4$ walks.\n\n' +
-        'Matrix check: row B of $M^2$ is the sum of the rows of B\'s neighbours A, C, D: $(0,1,1,0) + (1,1,0,1) + (0,1,1,0) = (1,3,2,1)$. Multiply by column B of $M$, which is $(1,0,1,1)$: $1 \\times 1 + 3 \\times 0 + 2 \\times 1 + 1 \\times 1 = 4$.\n\n' +
-        'So $(M^3)_{BB} = 4$.',
-      whyWrong: [
-        'This counts the two triangles through B but forgets that each triangle can be walked in two directions (B–A–C–B and B–C–A–B are different walks).',
-        'This is $(M^2)_{BB}$, which equals the degree of B (walks of length 2 go out along an edge and straight back). The question asks about $M^3$.',
-        null,
-        'This copies the diagonal of $M$ itself, which is 0 because there are no loops. Powers of $M$ can have non-zero diagonal entries.',
-      ],
-      keyIdea: '$(M^k)_{ij}$ counts walks of length $k$ from $i$ to $j$; the diagonal of $M^3$ counts triangles through a vertex, twice each.',
-    },
-    check: {
-      optionValues: [2, 3, 4, 0],
-      compute: () => matMul(matMul(ADJ_4, ADJ_4), ADJ_4)[1][1],
-    },
-  },
-  {
-    id: 'graph-theory-017',
-    subtopic: 'graph-theory',
-    difficulty: 'challenge',
-    stem: 'A tree has 10 vertices, and every vertex has degree either $1$ or $3$. How many vertices of degree $1$ (leaves) does the tree have?',
-    options: ['$4$', '$6$', '$5$', '$9$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Let $L$ be the number of leaves (degree 1) and $T$ the number of vertices of degree 3.\n\n' +
-        '**Count the vertices:** $L + T = 10$.\n\n' +
-        '**Count the edges:** a tree with 10 vertices has $10 - 1 = 9$ edges, so by the handshake lemma the degrees add to $2 \\times 9 = 18$:\n\n' +
-        '$$L + 3T = 18$$\n\n' +
-        '**Solve:** subtract the first equation from the second: $2T = 8$, so $T = 4$ and $L = 10 - 4 = 6$.\n\n' +
-        'Check: $6 \\times 1 + 4 \\times 3 = 18$. (Such a tree exists: a path of 4 degree-3 vertices with 2 leaves on each end vertex and 1 leaf on each middle vertex.)\n\n' +
-        'So there are $6$ leaves.',
-      whyWrong: [
-        'This is $T$, the number of vertices of degree **3**. The question asks for the degree-1 vertices: $L = 10 - 4 = 6$.',
-        null,
-        'This uses $E = V = 10$, so the degrees add to $20$, giving $L + 3T = 20$ and $L = T = 5$. A tree has $V - 1 = 9$ edges, so the sum is $18$.',
-        'This is the number of edges of the tree ($10 - 1$), not the number of leaves.',
-      ],
-      keyIdea: 'Combine $E = V - 1$ for trees with the handshake lemma (sum of degrees $= 2E$) to set up simultaneous equations.',
-    },
-    check: {
-      optionValues: [4, 6, 5, 9],
-      compute: () => {
-        const V = 10;
-        for (let L = 0; L <= V; L++) if (L * 1 + (V - L) * 3 === 2 * (V - 1)) return L;
-        return -1;
-      },
-    },
-  },
   {
     id: 'graph-theory-018',
     subtopic: 'graph-theory',
     difficulty: 'exam',
-    stem:
-      'The table is the adjacency matrix of a **directed** graph: the entry in row X, column Y is 1 if there is an edge $X \\to Y$, and 0 otherwise. How many directed walks of length 2 (two edges, following the arrows) go **from P to S**?',
+    stem: 'The table is the adjacency matrix of a **directed** graph (row X, column Y is 1 if there is an edge $X \\to Y$). How many walks of length 2 go **from P to S**?',
     table: {
       headers: ['From / To', 'P', 'Q', 'R', 'S'],
       rows: [
@@ -727,7 +645,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'graph-theory-019',
     subtopic: 'graph-theory',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem:
       'A graph with 20 vertices has **no cycles** and is made of exactly 3 separate connected pieces (components). How many edges does it have?',
     options: ['$19$', '$20$', '$17$', '$23$'],
@@ -756,39 +674,80 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'graph-theory-020',
+    id: 'graph-theory-021',
     subtopic: 'graph-theory',
-    difficulty: 'challenge',
-    stem: 'What is the **largest** number of edges a simple graph with 8 vertices can have while still being **disconnected**?',
-    options: ['$28$', '$21$', '$27$', '$7$'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'What is the largest possible degree of a vertex in a simple graph of **order** $n$?',
+    options: ['$n - 1$', '$n$', '$2n$', '$\\frac{n(n-1)}{2}$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'If the graph is disconnected, the vertices split into two groups with **no** edges between them. To get as many edges as possible, make each group complete.\n\n' +
-        'With groups of size $k$ and $8 - k$ the maximum is $\\binom{k}{2} + \\binom{8-k}{2}$:\n\n' +
-        '| Split | Edges |\n' +
-        '|---|---|\n' +
-        '| $7 + 1$ | $21$ (the single vertex has no edges) |\n' +
-        '| $6 + 2$ | $15 + 1 = 16$ |\n' +
-        '| $5 + 3$ | $10 + 3 = 13$ |\n' +
-        '| $4 + 4$ | $6 + 6 = 12$ |\n\n' +
-        'The best is to make 7 vertices into a complete graph $K_7$ and leave one vertex on its own: $\\frac{7 \\times 6}{2} = 21$ edges.\n\n' +
-        'One more edge would have to touch the lonely vertex and would connect the graph.',
+        'The **order** of a graph is its number of vertices.\n\n' +
+        'A simple graph has no loops and no repeated edges, so a vertex can be joined at most once to each of the other $n - 1$ vertices.',
       whyWrong: [
-        'This is the number of edges of $K_8$, which is connected. A disconnected graph must be missing at least all the edges from some vertex group to the rest.',
         null,
-        'This is $28 - 1$. Removing one edge from $K_8$ does not disconnect it: the two end vertices are still joined through any of the other 6 vertices.',
-        'This is $8 - 1 = 7$, the **minimum** number of edges a connected graph on 8 vertices needs (a tree). It answers a different question.',
+        'This counts the vertex itself, but a simple graph has no edge from a vertex to itself.',
+        'This doubles the vertex count. No vertex can be joined to any other more than once in a simple graph.',
+        'This is the number of edges of the complete graph $K_n$, not the degree of one vertex.',
       ],
-      keyIdea: 'A disconnected graph on $n$ vertices has at most $\\binom{n-1}{2}$ edges: a complete $K_{n-1}$ plus one isolated vertex.',
+      keyIdea: 'In a simple graph of order $n$, the degree of a vertex is at most $n - 1$.',
     },
-    check: {
-      optionValues: [28, 21, 27, 7],
-      compute: () => {
-        let best = 0;
-        for (let k = 1; k <= 7; k++) best = Math.max(best, nCr(k, 2) + nCr(8 - k, 2));
-        return best;
-      },
+  },
+  {
+    id: 'graph-theory-022',
+    subtopic: 'graph-theory',
+    difficulty: 'foundation',
+    stem: 'In a graph, a **loop** is:',
+    options: ['an edge from a vertex to itself', 'a vertex of degree 1', 'two edges joining the same pair', 'a route visiting every vertex'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **loop** is an edge whose two ends are the same vertex.\n\n' +
+        'A simple graph has no loops and no repeated edges.',
+      whyWrong: [
+        null,
+        'A vertex of degree 1 is called a leaf when the graph is a tree. It is a vertex, not an edge.',
+        'These are repeated (multiple) edges. They join two different vertices.',
+        'This describes a route through the graph, not a single edge.',
+      ],
+      keyIdea: 'A loop joins a vertex to itself; a simple graph has none.',
+    },
+  },
+  {
+    id: 'graph-theory-023',
+    subtopic: 'graph-theory',
+    difficulty: 'foundation',
+    stem: 'A vertex of degree 1 in a tree is called a:',
+    options: ['leaf', 'root', 'cycle', 'bridge'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A vertex of a tree with degree 1 is called a **leaf**: it is joined to just one other vertex, like a leaf at the end of a branch.',
+      whyWrong: [
+        null,
+        'A root is a vertex chosen as the top of the tree, and it can have any degree.',
+        'A cycle is a closed route, not a vertex. A tree contains no cycles.',
+        'A bridge is an edge whose removal disconnects the graph, not a vertex.',
+      ],
+      keyIdea: 'Vertices of degree 1 in a tree are called leaves.',
+    },
+  },
+  {
+    id: 'graph-theory-024',
+    subtopic: 'graph-theory',
+    difficulty: 'foundation',
+    stem: 'The adjacency matrix of an undirected simple graph is always:',
+    options: ['symmetric', 'invertible', 'the identity matrix', 'non-zero on its diagonal'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'In an undirected graph, an edge between $i$ and $j$ gives a 1 in row $i$, column $j$ **and** in row $j$, column $i$. So the matrix equals its transpose, which means it is **symmetric**.',
+      whyWrong: [
+        null,
+        'A graph with no edges has the zero matrix as its adjacency matrix, and that is not invertible.',
+        'The identity has 1s on the diagonal, which would mean every vertex has a loop. A simple graph has no loops.',
+        'The diagonal is all 0s, because a simple graph has no loops.',
+      ],
+      keyIdea: 'An undirected simple graph has a symmetric adjacency matrix with 0s on the diagonal.',
     },
   },
 ];

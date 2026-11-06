@@ -128,7 +128,7 @@ describe('learning flow', () => {
     }
   });
 
-  it('mock exams contain no Challenge questions', () => {
-    for (let seed = 1; seed <= 10; seed++) expect(buildMock(53, seed).map((r) => serve(r)!).filter((q) => q.difficulty === 'challenge')).toEqual([]);
+  it('mock exams contain only Foundation and Exam questions', () => {
+    for (let seed = 1; seed <= 10; seed++) expect(buildMock(53, seed).map((r) => serve(r)!).filter((q) => !['foundation', 'exam'].includes(q.difficulty))).toEqual([]);
   });
 });

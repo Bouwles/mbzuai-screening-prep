@@ -17,10 +17,10 @@ function pickDistinct(answerText: string, answerValue: string | number, pool: Ca
 
 const code = (s: string) => `\`${s}\``;
 
-// ---------------------------------------------------------------- 1. which branch of an if/elif/else chain runs
+// ---------------------------------------------------------------- 1. which branch of a nested if/else runs
 interface Theme {
   v: string;
-  /** Labels from the lowest band (the else) to the highest band. */
+  /** Labels from the lowest band (the final else) to the highest band. */
   labels: [string, string, string, string];
   base: [number, number];
   step: [number, number];
@@ -28,13 +28,26 @@ interface Theme {
 
 const THEMES: Theme[] = [
   { v: 'temp', labels: ['cold', 'mild', 'warm', 'hot'], base: [5, 15], step: [5, 10] },
-  { v: 'score', labels: ['F', 'C', 'B', 'A'], base: [40, 55], step: [10, 15] },
+  { v: 'score', labels: ['fail', 'pass', 'merit', 'top'], base: [40, 55], step: [10, 15] },
   { v: 'speed', labels: ['slow', 'normal', 'fast', 'speeding'], base: [20, 40], step: [10, 30] },
   { v: 'level', labels: ['empty', 'low', 'ok', 'full'], base: [10, 25], step: [15, 25] },
 ];
 
 type Op = '>=' | '>';
 const passes = (x: number, op: Op, t: number) => (op === '>=' ? x >= t : x > t);
+
+/** Lines of a chain written as nested if/else, 3 spaces per level. */
+function nestedIf(v: string, op: Op, conds: { t: number; label: string }[], elseLabel: string, i = 0, depth = 0): string[] {
+  const pad = '   '.repeat(depth);
+  if (i === conds.length) return [`${pad}print("${elseLabel}")`];
+  return [
+    `${pad}if ${v} ${op} ${conds[i].t}`,
+    `${pad}   print("${conds[i].label}")`,
+    `${pad}else`,
+    ...nestedIf(v, op, conds, elseLabel, i + 1, depth + 1),
+    `${pad}end if`,
+  ];
+}
 
 function elifBranch(rng: Rng): GeneratedCore {
   const th = rng.pick(THEMES);
@@ -64,10 +77,7 @@ function elifBranch(rng: Rng): GeneratedCore {
   const trueConds = conds.filter((k) => passes(x, op, k.t));
   const firstTrue = trueConds[0];
 
-  const src =
-    `${th.v} = ${x}\n` +
-    conds.map((k, i) => `${i === 0 ? 'if' : 'elif'} ${th.v} ${op} ${k.t}:\n    print("${k.label}")`).join('\n') +
-    `\nelse:\n    print("${L0}")`;
+  const src = [`${th.v} = ${x}`, ...nestedIf(th.v, op, conds, L0)].join('\n');
 
   const pool: Cand[] = [];
   if (trueConds.length >= 2) {
@@ -75,13 +85,13 @@ function elifBranch(rng: Rng): GeneratedCore {
     pool.push({
       text: code(all),
       value: all,
-      why: 'This runs every branch whose condition is True, as if each `elif` were a separate `if`. In an if/elif/else chain only the first true branch runs.',
+      why: 'This runs every branch whose condition is true. Each later `if` sits inside an `else`, so it is reached only when the tests above it are false.',
     });
     const last = trueConds[trueConds.length - 1];
     pool.push({
       text: code(last.label),
       value: last.label,
-      why: `This picks the last condition that is True (${code(`${th.v} ${op} ${last.t}`)}). Python checks from the top and runs the first true branch, which is ${code(`${th.v} ${op} ${firstTrue.t}`)}.`,
+      why: `This picks the last condition that is true (${code(`${th.v} ${op} ${last.t}`)}). The tests run from the top, and the first true one is ${code(`${th.v} ${op} ${firstTrue.t}`)}.`,
     });
   }
   const flipped = run(flip);
@@ -90,7 +100,7 @@ function elifBranch(rng: Rng): GeneratedCore {
     pool.push({
       text: code(flipped),
       value: flipped,
-      why: `This treats ${code(op)} as ${code(flip)}. Here ${th.v} equals the boundary ${edge.t}, and ${code(`${x} ${op} ${edge.t}`)} is ${passes(x, op, edge.t) ? 'True' : 'False'}, while ${code(`${x} ${flip} ${edge.t}`)} would be ${passes(x, flip, edge.t) ? 'True' : 'False'}.`,
+      why: `This treats ${code(op)} as ${code(flip)}. Here ${th.v} equals the boundary ${edge.t}, and ${code(`${x} ${op} ${edge.t}`)} is ${passes(x, op, edge.t) ? 'true' : 'false'}, while ${code(`${x} ${flip} ${edge.t}`)} would be ${passes(x, flip, edge.t) ? 'true' : 'false'}.`,
     });
   }
   if (correct !== L0) {
@@ -98,7 +108,7 @@ function elifBranch(rng: Rng): GeneratedCore {
     pool.push({
       text: code(both),
       value: both,
-      why: 'This also runs the `else` branch. `else` runs only when every condition above it is False.',
+      why: 'This also runs the final `else`. It runs only when every test above it is false.',
     });
   }
   // Fallbacks: every other single label, with the exact reason it cannot be printed.
@@ -106,12 +116,12 @@ function elifBranch(rng: Rng): GeneratedCore {
     if (L === correct) continue;
     let why: string;
     if (L === L0) {
-      why = `The ${code('else')} branch only runs when every condition is False, but ${code(`${x} ${op} ${firstTrue ? firstTrue.t : 0}`)} is True.`;
+      why = `The final ${code('else')} only runs when every test is false, but ${code(`${x} ${op} ${firstTrue ? firstTrue.t : 0}`)} is true.`;
     } else {
       const k = conds.find((q) => q.label === L)!;
       why = passes(x, op, k.t)
-        ? `${code(`${x} ${op} ${k.t}`)} is True, but an earlier condition in the chain is also True, and Python only runs the first true branch.`
-        : `This branch needs ${code(`${th.v} ${op} ${k.t}`)}, but ${code(`${x} ${op} ${k.t}`)} is False, so it cannot run.`;
+        ? `${code(`${x} ${op} ${k.t}`)} is true, but an earlier test is also true, so this one is never reached.`
+        : `This branch needs ${code(`${th.v} ${op} ${k.t}`)}, but ${code(`${x} ${op} ${k.t}`)} is false, so it cannot run.`;
     }
     pool.push({ text: code(L), value: L, why });
   }
@@ -122,42 +132,42 @@ function elifBranch(rng: Rng): GeneratedCore {
   let i = 1;
   for (const k of conds) {
     if (passes(x, op, k.t)) {
-      steps.push(`${i}. ${code(`${th.v} ${op} ${k.t}`)}: ${code(`${x} ${op} ${k.t}`)} is True, so Python prints ${code(k.label)} and skips the rest of the chain.`);
+      steps.push(`${i}. ${code(`${th.v} ${op} ${k.t}`)}: ${code(`${x} ${op} ${k.t}`)} is true, so ${code(k.label)} is printed and the matching ${code('else')} is skipped.`);
       break;
     }
-    steps.push(`${i}. ${code(`${th.v} ${op} ${k.t}`)}: ${code(`${x} ${op} ${k.t}`)} is False, so move on.`);
+    steps.push(`${i}. ${code(`${th.v} ${op} ${k.t}`)}: ${code(`${x} ${op} ${k.t}`)} is false, so move on to the ${code('else')}.`);
     i++;
   }
-  if (!firstTrue) steps.push(`${i}. None of the conditions is True, so the ${code('else')} branch runs and prints ${code(L0)}.`);
+  if (!firstTrue) steps.push(`${i}. None of the tests is true, so the final ${code('else')} prints ${code(L0)}.`);
   const later = trueConds.slice(1);
   const note = later.length
-    ? `\n\nLater conditions such as ${code(`${th.v} ${op} ${later[0].t}`)} are also True, but they are never checked, because only the first true branch runs.`
+    ? `\n\nLater tests such as ${code(`${th.v} ${op} ${later[0].t}`)} are also true, but they are never reached.`
     : '';
 
   return {
-    stem: 'What does this Python code print? (If more than one line is printed, the lines are shown separated by spaces.)',
-    code: { lang: 'python', source: src },
+    stem: 'What does this pseudocode print? Output lines are shown separated by a space.',
+    code: { lang: 'pseudocode', source: src },
     answer,
     answerValue: correct,
     distractors,
     solution:
-      'Python checks the conditions **from the top down** and runs only the **first** branch whose condition is True. ' +
+      'The tests run **from the top down**, and each later test is reached only if the ones above it are false. ' +
       `Here ${code(th.v)} is ${x} and every test uses ${code(op)}${op === '>=' ? ' (the boundary value counts)' : ' (strict: the boundary value does not count)'}.\n\n` +
       steps.join('\n') +
       note +
       `\n\nAnswer: ${answer}`,
-    keyIdea: 'In an if/elif/else chain only the first branch (from the top) whose condition is True runs; the `else` runs only if every condition is False.',
-    python: { stdout: `${correct}\n` },
+    keyIdea: 'In a chain of nested if/else, only the first true branch from the top runs; the final else runs only if every test is false.',
   };
 }
 
-// ---------------------------------------------------------------- 2. count list items passing a compound condition
-type Form = 'and' | 'or' | 'chain' | 'not';
+// ---------------------------------------------------------------- 2. count array items passing a compound condition
+type Form = 'and' | 'or' | 'between' | 'not';
 
 interface CountSetup {
   form: Form;
   nums: number[];
   cond: string;
+  usesMod: boolean;
   correct: (n: number) => boolean;
   pool: { f: (n: number) => boolean | number; why: string }[];
   /** Columns of the trace table: header + evaluator. */
@@ -165,34 +175,32 @@ interface CountSetup {
 }
 
 function countSetup(rng: Rng): CountSetup {
-  const form = rng.pick(['and', 'or', 'chain', 'not'] as const);
+  const form = rng.pick(['and', 'or', 'between', 'not'] as const);
   const all = Array.from({ length: 40 }, (_, i) => i + 1);
-  const nums = rng.sample(all, 8);
+  const nums = rng.sample(all, 6);
   const ensure = (v: number) => {
     if (!nums.includes(v)) nums[rng.int(0, nums.length - 1)] = v;
   };
-  if (form === 'chain') {
+  if (form === 'between') {
     const lo = rng.int(5, 15);
     const hi = lo + rng.int(8, 18);
     if (rng.bool(0.7)) ensure(lo);
     if (rng.bool(0.7)) ensure(hi);
-    const cond = `${lo} < n <= ${hi}`;
+    const cond = `n > ${lo} and n <= ${hi}`;
     return {
       form,
       nums,
       cond,
+      usesMod: false,
       correct: (n) => lo < n && n <= hi,
       pool: [
-        {
-          f: () => true,
-          why: `This evaluates the chain left to right like C or Java, as ${code(`(${lo} < n) <= ${hi}`)}. Then ${code(`${lo} < n`)} gives True or False (1 or 0), which is always ${code(`<= ${hi}`)}, so every number would be counted. Python reads it as ${code(`${lo} < n and n <= ${hi}`)}.`,
-        },
-        { f: (n) => lo <= n && n <= hi, why: `This counts ${lo} itself, treating the strict ${code('<')} as ${code('<=')}.` },
+        { f: (n) => lo <= n && n <= hi, why: `This counts ${lo} itself, treating the strict ${code('>')} as ${code('>=')}.` },
         { f: (n) => lo < n && n < hi, why: `This leaves out ${hi}, treating ${code('<=')} as the strict ${code('<')}.` },
-        { f: (n) => lo < n, why: `This only checks ${code(`${lo} < n`)} and forgets the upper limit ${code(`n <= ${hi}`)}.` },
+        { f: (n) => lo < n, why: `This only checks ${code(`n > ${lo}`)} and forgets the upper limit ${code(`n <= ${hi}`)}.` },
+        { f: (n) => lo < n || n <= hi, why: 'This reads `and` as `or`, counting numbers that pass either test. `and` needs both tests to be true.' },
       ],
       cols: [
-        { h: code(`${lo} < n`), f: (n) => lo < n },
+        { h: code(`n > ${lo}`), f: (n) => lo < n },
         { h: code(`n <= ${hi}`), f: (n) => n <= hi },
       ],
     };
@@ -201,18 +209,19 @@ function countSetup(rng: Rng): CountSetup {
   const t = rng.bool(0.6) ? k * rng.int(Math.ceil(10 / k), Math.floor(30 / k)) : rng.int(10, 30);
   if (rng.bool(0.7)) ensure(t);
   const div = (n: number) => n % k === 0;
-  const divH = code(`n % ${k} == 0`);
+  const divH = code(`mod(n,${k}) == 0`);
   if (form === 'and') {
     return {
       form,
       nums,
-      cond: `n % ${k} == 0 and n > ${t}`,
+      cond: `mod(n,${k}) == 0 and n > ${t}`,
+      usesMod: true,
       correct: (n) => div(n) && n > t,
       pool: [
-        { f: (n) => div(n) || n > t, why: 'This reads `and` as `or`, counting numbers that pass either test. `and` needs both tests to be True.' },
+        { f: (n) => div(n) || n > t, why: 'This reads `and` as `or`, counting numbers that pass either test. `and` needs both tests to be true.' },
         { f: (n) => div(n) && n >= t, why: `This counts ${t} itself, treating the strict ${code('>')} as ${code('>=')}.` },
         { f: (n) => div(n), why: `This only checks ${divH} and ignores the second test ${code(`n > ${t}`)}.` },
-        { f: (n) => n > t, why: `This only checks ${code(`n > ${t}`)} and ignores the divisibility test ${divH}.` },
+        { f: (n) => n > t, why: `This only checks ${code(`n > ${t}`)} and ignores the first test ${divH}.` },
       ],
       cols: [
         { h: divH, f: div },
@@ -224,10 +233,11 @@ function countSetup(rng: Rng): CountSetup {
     return {
       form,
       nums,
-      cond: `n % ${k} == 0 or n > ${t}`,
+      cond: `mod(n,${k}) == 0 or n > ${t}`,
+      usesMod: true,
       correct: (n) => div(n) || n > t,
       pool: [
-        { f: (n) => div(n) && n > t, why: 'This reads `or` as `and`, counting only numbers that pass both tests. `or` needs just one of them to be True.' },
+        { f: (n) => div(n) && n > t, why: 'This reads `or` as `and`, counting only numbers that pass both tests. `or` needs just one of them to be true.' },
         {
           f: (n) => (div(n) ? 1 : 0) + (n > t ? 1 : 0),
           why: 'This adds the number of multiples to the number of large values, so a number that passes both tests is counted twice. Each number can add at most 1 to `count`.',
@@ -245,20 +255,21 @@ function countSetup(rng: Rng): CountSetup {
   return {
     form,
     nums,
-    cond: `not n % ${k} == 0 and n < ${t}`,
+    cond: `not mod(n,${k}) == 0 and n < ${t}`,
+    usesMod: true,
     correct: (n) => !div(n) && n < t,
     pool: [
       {
         f: (n) => !(div(n) && n < t),
-        why: `This applies ${code('not')} to the whole condition, as if it were ${code(`not (n % ${k} == 0 and n < ${t})`)}. But ${code('not')} binds more tightly than ${code('and')}, so it only negates ${divH}.`,
+        why: `This applies ${code('not')} to the whole condition, as if it were ${code(`not (mod(n,${k}) == 0 and n < ${t})`)}. But ${code('not')} is done before ${code('and')}, so it only negates ${divH}.`,
       },
       { f: (n) => div(n) && n < t, why: `This ignores the ${code('not')}, counting the multiples of ${k} below ${t} instead of the non-multiples.` },
       { f: (n) => !div(n) && n <= t, why: `This counts ${t} itself, treating the strict ${code('<')} as ${code('<=')}.` },
-      { f: (n) => !div(n) || n < t, why: 'This reads `and` as `or`, counting numbers that pass either test. `and` needs both parts to be True.' },
+      { f: (n) => !div(n) || n < t, why: 'This reads `and` as `or`, counting numbers that pass either test. `and` needs both parts to be true.' },
     ],
     cols: [
       { h: divH, f: div },
-      { h: code(`not n % ${k} == 0`), f: (n) => !div(n) },
+      { h: code(`not mod(n,${k}) == 0`), f: (n) => !div(n) },
       { h: code(`n < ${t}`), f: (n) => n < t },
     ],
   };
@@ -290,9 +301,19 @@ function countCompound(rng: Rng): GeneratedCore {
     });
   }
 
-  const { nums, cond, cols, correct } = setup;
-  const src = `nums = [${nums.join(', ')}]\ncount = 0\nfor n in nums:\n    if ${cond}:\n        count += 1\nprint(count)`;
-  const tf = (b: boolean) => (b ? 'True' : 'False');
+  const { nums, cond, cols, correct, usesMod } = setup;
+  const src = [
+    `A = [${nums.join(', ')}]`,
+    'count = 0',
+    'for i = 1 to length(A)',
+    '   n = A[i]',
+    `   if ${cond}${usesMod ? ' // mod is the modulus operator' : ''}`,
+    '      count = count + 1',
+    '   end if',
+    'end for',
+    'print(count)',
+  ].join('\n');
+  const tf = (b: boolean) => (b ? 'true' : 'false');
   let running = 0;
   const rows = nums.map((n) => {
     const ok = correct(n);
@@ -301,26 +322,25 @@ function countCompound(rng: Rng): GeneratedCore {
   });
   const header = `| n | ${cols.map((c) => c.h).join(' | ')} | condition | count |\n|${'---|'.repeat(cols.length + 3)}`;
   const intro: Record<Form, string> = {
-    and: '`and` is True only when **both** tests are True.',
-    or: '`or` is True when **at least one** test is True.',
-    chain: `A chained comparison like ${code(cond)} means ${code(cond.replace(' < n <= ', ' < n and n <= '))}: n must be above the lower limit (strictly) and at most the upper limit.`,
-    not: `${code('not')} binds more tightly than ${code('and')} (but less tightly than ${code('==')}), so the condition means ${code(`(not (${cond.slice(4, cond.indexOf(' and '))})) and ${cond.slice(cond.indexOf(' and ') + 5)}`)}: n must **not** be a multiple and must be below the limit.`,
+    and: '`and` is true only when **both** tests are true.',
+    or: '`or` is true when **at least one** test is true.',
+    between: 'Both parts must hold: `n` must be above the lower limit (strictly) and at most the upper limit.',
+    not: `${code('not')} is done before ${code('and')} (but after ${code('==')}), so it negates only the test next to it: n must **not** be a multiple and must be below the limit.`,
   };
   const answer = code(String(ans));
 
   return {
-    stem: 'What does this Python code print?',
-    code: { lang: 'python', source: src },
+    stem: 'What does this pseudocode print? Arrays are indexed from 1.',
+    code: { lang: 'pseudocode', source: src },
     answer,
     answerValue: ans,
     distractors,
     solution:
-      `The loop adds 1 to ${code('count')} for every number that makes ${code(cond)} True. ${intro[setup.form]}\n\n` +
+      `The loop adds 1 to ${code('count')} for every number that makes ${code(cond)} true. ${intro[setup.form]}\n\n` +
       `${header}\n${rows.join('\n')}\n\n` +
-      `The condition is True for ${ans} of the ${nums.length} numbers, so ${code('count')} ends at ${ans}.\n\n` +
+      `The condition is true for ${ans} of the ${nums.length} numbers, so ${code('count')} ends at ${ans}.\n\n` +
       `Answer: ${answer}`,
-    keyIdea: 'Check every item against the whole condition, using the precedence comparisons > `not` > `and` > `or`, and add 1 only when the full condition is True.',
-    python: { stdout: `${ans}\n` },
+    keyIdea: 'Check every item against the whole condition, in the order comparisons, `not`, `and`, `or`, and add 1 only when the full condition is true.',
   };
 }
 
@@ -329,7 +349,7 @@ export const generators: Generator[] = [
     id: 'gen-conditionals-elif-branch',
     subtopic: 'conditionals',
     difficulty: 'exam',
-    title: 'Which branch of an if/elif/else chain runs?',
+    title: 'Which branch of a nested if/else runs?',
     generate: elifBranch,
   },
   {

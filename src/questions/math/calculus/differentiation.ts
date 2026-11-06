@@ -436,172 +436,73 @@ export const questions: StaticQuestion[] = [
       compute: () => D((x) => Math.log(x) / x, 2),
     },
   },
-  // ------------------------------------------------------------------ challenge
+  // ------------------------------------------------------------------ recall
   {
-    id: 'differentiation-016',
+    id: 'differentiation-021',
     subtopic: 'differentiation',
-    difficulty: 'challenge',
-    stem: 'Differentiate $f(x) = x(2x + 1)^{3}$ and give the answer in fully factorised form.',
-    options: ['$(2x + 1)^{2}(5x + 1)$', '$6(2x + 1)^{2}$', '$(2x + 1)^{2}(1 - 4x)$', '$(2x + 1)^{2}(8x + 1)$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'This is a **product** $uv$ where one factor needs the **chain rule**.\n\n' +
-        '- $u = x$, so $u\' = 1$\n' +
-        '- $v = (2x + 1)^{3}$, so by the chain rule $v\' = 3(2x + 1)^{2} \\times 2 = 6(2x + 1)^{2}$\n\n' +
-        'Product rule:\n\n' +
-        '$$f\'(x) = u\'v + uv\' = (2x + 1)^{3} + 6x(2x + 1)^{2}$$\n\n' +
-        'Take out the common factor $(2x + 1)^{2}$:\n\n' +
-        '$$f\'(x) = (2x + 1)^{2}\\left[(2x + 1) + 6x\\right] = (2x + 1)^{2}(8x + 1)$$\n\n' +
-        'Quick check at $x = 0$: $f\'(0) = 1^{3} + 6(0)(1)^{2} = 1$, and $(1)^{2}(0 + 1) = 1$. It matches.',
-      whyWrong: [
-        'This forgets the chain-rule factor $2$ when differentiating $(2x + 1)^{3}$, giving $v\' = 3(2x + 1)^{2}$ and so $(2x + 1) + 3x = 5x + 1$ in the bracket.',
-        'This multiplies the two derivatives ($1 \\times 6(2x + 1)^{2}$) instead of using the product rule.',
-        'This uses a minus sign between the two product-rule terms ($u\'v - uv\'$), as if it were the quotient rule, giving $(2x + 1) - 6x = 1 - 4x$.',
-        null,
-      ],
-      keyIdea: 'Product rule with a chain rule inside it, then factor out the common bracket.',
-    },
-    check: {
-      optionValues: [25 * 11, 6 * 25, 25 * (1 - 8), 25 * 17],
-      compute: () => D((x) => x * (2 * x + 1) ** 3, 2),
-    },
-  },
-  {
-    id: 'differentiation-017',
-    subtopic: 'differentiation',
-    difficulty: 'challenge',
-    stem: 'The function $f(x) = ax^{3} + bx^{2} + cx$ satisfies $f\'(0) = -4$, $f\'\'(0) = 6$ and $f\'(1) = 5$. Find $a$, $b$ and $c$.',
-    options: [
-      '$a = -1,\\ b = 6,\\ c = -4$',
-      '$a = 3,\\ b = 6,\\ c = -4$',
-      '$a = 1,\\ b = 3,\\ c = -4$',
-      '$a = -\\frac{1}{3},\\ b = 3,\\ c = -4$',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Step 1: find the derivatives.**\n\n' +
-        '$$f\'(x) = 3ax^{2} + 2bx + c \\qquad f\'\'(x) = 6ax + 2b$$\n\n' +
-        '**Step 2: use each condition.**\n\n' +
-        '1. $f\'(0) = c = -4$, so $c = -4$.\n' +
-        '2. $f\'\'(0) = 2b = 6$, so $b = 3$.\n' +
-        '3. $f\'(1) = 3a + 2b + c = 5$, so $3a + 6 - 4 = 5$, giving $3a = 3$ and $a = 1$.\n\n' +
-        '**Step 3: check.** $f\'(x) = 3x^{2} + 6x - 4$, so $f\'(1) = 3 + 6 - 4 = 5$. Correct.\n\n' +
-        'So $a = 1$, $b = 3$, $c = -4$.',
-      whyWrong: [
-        'This takes $f\'\'(0) = b$ (forgetting the factor $2$ in $2b$), so $b = 6$, and then $3a + 12 - 4 = 5$ gives $a = -1$.',
-        'This forgets to multiply by the powers when differentiating, using $f\'(x) = ax^{2} + bx + c$ and $f\'\'(x) = 2ax + b$. Then $b = 6$ and $a + 6 - 4 = 5$ gives $a = 3$.',
-        null,
-        'This leaves $c$ out of $f\'(1)$, solving $3a + 2b = 5$ instead of $3a + 2b + c = 5$, which gives $a = -\\frac{1}{3}$.',
-      ],
-      keyIdea: 'Differentiate the general function first, then turn each given condition into an equation for the unknowns.',
-    },
-    check: {
-      optionValues: ['-1,6,-4', '3,6,-4', '1,3,-4', '-1/3,3,-4'],
-      compute: () => {
-        // f'(0) = c, f''(0) = 2b, f'(1) = 3a + 2b + c: search a small grid of rationals for the unique solution.
-        const sols: string[] = [];
-        for (let a3 = -30; a3 <= 30; a3++) {
-          const a = a3 / 3;
-          for (let b = -10; b <= 10; b++)
-            for (let c = -10; c <= 10; c++) {
-              const fp = (x: number) => 3 * a * x * x + 2 * b * x + c;
-              const fpp = (x: number) => 6 * a * x + 2 * b;
-              if (Math.abs(fp(0) + 4) < 1e-9 && Math.abs(fpp(0) - 6) < 1e-9 && Math.abs(fp(1) - 5) < 1e-9)
-                sols.push(`${a3 % 3 === 0 ? a3 / 3 : `${a3}/3`},${b},${c}`);
-            }
-        }
-        return sols.join(';');
-      },
-    },
-  },
-  {
-    id: 'differentiation-018',
-    subtopic: 'differentiation',
-    difficulty: 'challenge',
-    stem: 'Find the value of $\\frac{dy}{dx}$ for $y = \\sin^{2}(3x)$ at $x = \\frac{\\pi}{12}$.',
-    options: ['$3$', '$1$', '$-3$', '$3\\sqrt{2}$'],
+    difficulty: 'foundation',
+    stem: 'What is $\\frac{d}{dx}(7)$?',
+    options: ['$0$', '$7$', '$1$', '$7x$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Write $y = \\left(\\sin(3x)\\right)^{2}$. There are **three layers**: squaring, then $\\sin$, then $3x$. Apply the chain rule layer by layer:\n\n' +
-        '- Square: $2\\sin(3x)$\n' +
-        '- $\\sin$: times $\\cos(3x)$\n' +
-        '- $3x$: times $3$\n\n' +
-        '$$\\frac{dy}{dx} = 2\\sin(3x) \\cdot \\cos(3x) \\cdot 3 = 6\\sin(3x)\\cos(3x)$$\n\n' +
-        'At $x = \\frac{\\pi}{12}$: $3x = \\frac{\\pi}{4}$, and $\\sin\\left(\\frac{\\pi}{4}\\right) = \\cos\\left(\\frac{\\pi}{4}\\right) = \\frac{\\sqrt{2}}{2}$.\n\n' +
-        '$$\\frac{dy}{dx} = 6 \\times \\frac{\\sqrt{2}}{2} \\times \\frac{\\sqrt{2}}{2} = 6 \\times \\frac{2}{4} = 3$$',
+        'A constant never changes, so its graph is a flat line with gradient $0$. Therefore $\\frac{d}{dx}(7) = 0$.',
       whyWrong: [
         null,
-        'This handles the square and the $\\sin$ but forgets the innermost factor $3$ from $3x$: $2\\sin(3x)\\cos(3x) = 1$ at this point.',
-        'This uses $\\frac{d}{dx}\\sin = -\\cos$, which flips the sign. The derivative of $\\sin$ is $+\\cos$.',
-        'This brings down the $2$ but replaces $\\sin(3x)$ by $\\cos(3x)$ instead of keeping it and multiplying by $\\cos(3x)$: $2\\cos(3x) \\times 3 = 6 \\times \\frac{\\sqrt{2}}{2} = 3\\sqrt{2}$.',
+        'This keeps the constant unchanged. A derivative measures change, and a constant does not change.',
+        'This is the derivative of $x$, not of a constant.',
+        'This **integrates** $7$. Differentiating a constant gives $0$.',
       ],
-      keyIdea: 'For nested functions, apply the chain rule once per layer and multiply all the factors.',
+      keyIdea: 'The derivative of a constant is $0$.',
     },
     check: {
-      optionValues: [3, 1, -3, 3 * Math.SQRT2],
-      compute: () => D((x) => Math.sin(3 * x) ** 2, Math.PI / 12),
+      optionValues: [0, 7, 1, 14],
+      compute: () => D(() => 7, 2),
     },
   },
   {
-    id: 'differentiation-019',
+    id: 'differentiation-022',
     subtopic: 'differentiation',
-    difficulty: 'challenge',
-    stem: 'Given $f(x) = xe^{3x}$, find the value of $f\'\'(0)$.',
-    options: ['$9$', '$1$', '$6$', '$2$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: "What does $f'(a)$ tell you about the curve $y = f(x)$?",
+    options: ['The slope (gradient) of the tangent at $x = a$', 'The height of the curve at $x = a$', 'The area under the curve up to $x = a$', 'Where the curve crosses the $x$-axis'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        '**First derivative** (product rule with $u = x$, $v = e^{3x}$, $u\' = 1$, $v\' = 3e^{3x}$):\n\n' +
-        '$$f\'(x) = 1 \\cdot e^{3x} + x \\cdot 3e^{3x} = e^{3x} + 3xe^{3x}$$\n\n' +
-        '**Second derivative:** differentiate each term.\n\n' +
-        '- $e^{3x} \\to 3e^{3x}$\n' +
-        '- $3xe^{3x}$ is another product: $3e^{3x} + 3x \\cdot 3e^{3x} = 3e^{3x} + 9xe^{3x}$\n\n' +
-        '$$f\'\'(x) = 3e^{3x} + 3e^{3x} + 9xe^{3x} = 6e^{3x} + 9xe^{3x}$$\n\n' +
-        '**Substitute** $x = 0$ ($e^{0} = 1$): $f\'\'(0) = 6e^{0} + 9(0)e^{0} = 6$.',
+        "$f'(a)$ is the value of the derivative at $x = a$. It gives the **slope** of the curve there, which is the slope of the tangent at that point. \"Slope\" and \"gradient\" mean the same thing.",
       whyWrong: [
-        'This multiplies derivatives instead of using the product rule: it treats $f\'(x)$ as $1 \\times 3e^{3x}$, then $f\'\'(x) = 9e^{3x}$, which gives $9$.',
-        'This is $f\'(0) = e^{0} + 3(0)e^{0} = 1$, the **first** derivative at $0$.',
         null,
-        'This forgets the chain-rule factor $3$ every time $e^{3x}$ is differentiated, getting $f\'\'(x) = 2e^{3x} + xe^{3x}$ and so $2$.',
+        'The height of the curve is $f(a)$, not $f\'(a)$.',
+        'Area under a curve comes from **integrating**, not differentiating.',
+        'Crossings of the $x$-axis come from solving $f(x) = 0$. The derivative is about steepness.',
       ],
-      keyIdea: 'Second derivative of a product: apply the product rule twice, with the chain rule on $e^{kx}$ each time.',
-    },
-    check: {
-      optionValues: [9, 1, 6, 2],
-      compute: () => D2((x) => x * Math.exp(3 * x), 0),
+      keyIdea: "$f'(a)$ is the slope (gradient) of the curve at $x = a$.",
     },
   },
   {
-    id: 'differentiation-020',
+    id: 'differentiation-023',
     subtopic: 'differentiation',
-    difficulty: 'challenge',
-    stem: 'The **sigmoid** function $\\sigma(x) = \\frac{1}{1 + e^{-x}}$ is used in logistic regression and neural networks. What is $\\sigma\'(0)$?',
-    options: ['$\\frac{1}{2}$', '$\\frac{1}{4}$', '$-\\frac{1}{4}$', '$-1$'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'Which of these is $\\frac{d}{dx}\\left(x^{n}\\right)$?',
+    options: ['$nx^{n-1}$', '$x^{n-1}$', '$nx^{n}$', '$\\frac{x^{n+1}}{n+1}$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Write $\\sigma(x) = (1 + e^{-x})^{-1}$ and use the chain rule.\n\n' +
-        '- Outside: $(\\ldots)^{-1} \\to -(\\ldots)^{-2}$\n' +
-        '- Inside: $\\frac{d}{dx}(1 + e^{-x}) = -e^{-x}$\n\n' +
-        'Multiply:\n\n' +
-        '$$\\sigma\'(x) = -(1 + e^{-x})^{-2} \\times (-e^{-x}) = \\frac{e^{-x}}{(1 + e^{-x})^{2}}$$\n\n' +
-        'At $x = 0$, $e^{0} = 1$:\n\n' +
-        '$$\\sigma\'(0) = \\frac{1}{(1 + 1)^{2}} = \\frac{1}{4}$$\n\n' +
-        '(Useful fact: $\\sigma\'(x) = \\sigma(x)\\left(1 - \\sigma(x)\\right)$, and $\\sigma(0) = \\frac{1}{2}$, so $\\sigma\'(0) = \\frac{1}{2} \\times \\frac{1}{2} = \\frac{1}{4}$.)',
+        'The **power rule**: bring the power down in front, then reduce the power by $1$.\n\n' +
+        '$$\\frac{d}{dx}\\left(x^{n}\\right) = nx^{n-1}$$\n\n' +
+        'For example, $\\frac{d}{dx}\\left(x^{4}\\right) = 4x^{3}$.',
       whyWrong: [
-        'This is $\\sigma(0) = \\frac{1}{1 + 1} = \\frac{1}{2}$, the value of the function, not its derivative.',
         null,
-        'This forgets the inner chain-rule factor: the derivative of $e^{-x}$ is $-e^{-x}$, and the two minus signs should cancel to give a positive answer.',
-        'This differentiates only the denominator and puts it under the $1$, as if $\\left(\\frac{1}{g}\\right)\' = \\frac{1}{g\'}$: $\\frac{1}{-e^{0}} = -1$.',
+        'This reduces the power but forgets to multiply by the old power $n$.',
+        'This multiplies by the power but forgets to reduce the power by $1$.',
+        'This is the **integral** of $x^{n}$. Integrating raises the power; differentiating lowers it.',
       ],
-      keyIdea: 'Write a reciprocal as a power $-1$ and use the chain rule; for the sigmoid, $\\sigma\' = \\sigma(1 - \\sigma)$.',
+      keyIdea: 'Power rule: multiply by the power, then reduce the power by one.',
     },
     check: {
-      optionValues: [0.5, 0.25, -0.25, -1],
-      compute: () => D((x) => 1 / (1 + Math.exp(-x)), 0),
+      // the options at n = 4, x = 3
+      optionValues: [4 * 27, 27, 4 * 81, 243 / 5],
+      compute: () => D((x) => x ** 4, 3),
     },
   },
 ];

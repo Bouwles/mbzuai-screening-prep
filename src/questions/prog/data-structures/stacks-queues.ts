@@ -1,5 +1,8 @@
 import type { StaticQuestion } from '../../../types';
 
+/** Join source lines into one code string. */
+const L = (...lines: string[]) => lines.join('\n');
+
 // ---------------------------------------------------------------- helpers for the answer checks
 // (used only by check.compute, never shown to students)
 
@@ -40,19 +43,8 @@ function postfix(expr: string): number {
   return s.pop() as number;
 }
 
-/** Can `order` be produced by pushing 1..n in order and popping at any time? */
-function stackPermutationPossible(order: number[]): boolean {
-  const s: number[] = [];
-  let next = 1;
-  for (const want of order) {
-    while ((s.length === 0 || s[s.length - 1] !== want) && next <= order.length) s.push(next++);
-    if (s[s.length - 1] !== want) return false;
-    s.pop();
-  }
-  return true;
-}
-
 const strip = (o: string) => o.replace(/`/g, '');
+const show = (a: number[]) => `[${a.join(', ')}]`;
 
 /** Options of stacks-queues-013, shared with its check so the option values are computed, not typed in. */
 const Q13_OPTIONS = ['`A B C × + D -`', '`A B + C × D -`', '`A B + C D - ×`', '`- × + A B C D`'];
@@ -78,129 +70,58 @@ export const questions: StaticQuestion[] = [
     id: 'stacks-queues-001',
     subtopic: 'stacks-queues',
     difficulty: 'foundation',
-    stem: 'A web browser\'s **Back** button always takes you to the page you visited *most recently*, then the one before that, and so on. Which data structure is the natural way to store the history of visited pages?',
+    stem: 'Which data structure removes the most recently added item first?',
     options: ['A queue', 'A stack', 'A circular queue', 'A sorted list'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Each time you visit a page it is added to the history. Pressing **Back** must give you the page added **last**.\n\n' +
-        '- "Last in, first out" is exactly the rule of a **stack** (LIFO).\n' +
-        '- Visiting a page = **push** it on top; pressing Back = **pop** the top page.\n\n' +
-        'So the history is a **stack**.',
+        'Removing the most recently added item first is "last in, first out" (LIFO), the rule of a **stack**.\n\n' +
+        '- **Push** adds an item on top.\n' +
+        '- **Pop** removes the item on top, which is always the newest one still there.\n\n' +
+        'A queue does the opposite: it removes the oldest item first.',
       whyWrong: [
-        'A queue is first in, first out (FIFO): Back would take you to the *oldest* page you visited, not the most recent one.',
+        'A queue is first in, first out (FIFO): it removes the *oldest* item, not the most recent one.',
         null,
         'A circular queue is still a queue (FIFO), just stored in a fixed array that wraps around. It removes the oldest item, not the newest.',
-        'Sorting the pages (for example alphabetically) destroys the order in which they were visited, which is the one thing the Back button needs.',
+        'A sorted list keeps items in order of value, so the order they were added in is lost.',
       ],
       keyIdea: 'Whenever the most recently added item must come out first, use a stack (LIFO).',
-    },
-  },
-  {
-    id: 'stacks-queues-002',
-    subtopic: 'stacks-queues',
-    difficulty: 'foundation',
-    stem: 'Starting with an empty stack, these operations are carried out in order:\n\n`push(5)`, `push(8)`, `push(3)`, `pop()`, `push(6)`, `pop()`, `pop()`\n\nWhat value is returned by the **last** `pop()`?',
-    options: ['$8$', '$3$', '$6$', '$5$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Track the stack, writing it bottom to top (the top is on the right):\n\n' +
-        '| Operation | Stack (bottom to top) | Returned |\n' +
-        '|---|---|---|\n' +
-        '| `push(5)` | 5 | |\n' +
-        '| `push(8)` | 5, 8 | |\n' +
-        '| `push(3)` | 5, 8, 3 | |\n' +
-        '| `pop()` | 5, 8 | 3 |\n' +
-        '| `push(6)` | 5, 8, 6 | |\n' +
-        '| `pop()` | 5, 8 | 6 |\n' +
-        '| `pop()` | 5 | **8** |\n\n' +
-        'The last `pop()` returns $8$.',
-      whyWrong: [
-        null,
-        'This is queue thinking: if items left from the *front* (first in, first out), the pops would return 5, 8 and then 3. A stack removes from the top.',
-        'This forgets that 6 was already removed by the previous `pop()`. Each pop removes the item, it does not just look at it.',
-        'This is the value still left at the bottom of the stack at the end, not the value returned by the last pop.',
-      ],
-      keyIdea: 'A pop always removes the item that is currently on top, i.e. the most recently pushed item that is still there.',
-    },
-    check: {
-      optionValues: [8, 3, 6, 5],
-      compute: () => {
-        const { popped } = stackPops([5, 8, 3, 'pop', 6, 'pop', 'pop']);
-        return popped[popped.length - 1];
-      },
-    },
-  },
-  {
-    id: 'stacks-queues-003',
-    subtopic: 'stacks-queues',
-    difficulty: 'foundation',
-    stem: 'A queue at a help desk starts empty, and these operations are carried out in order:\n\n`enqueue(Amal)`, `enqueue(Bilal)`, `enqueue(Chen)`, `dequeue()`, `enqueue(Dana)`, `dequeue()`\n\nWho is now at the **front** of the queue?',
-    options: ['Dana', 'Bilal', 'Amal', 'Chen'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'In a queue, items join at the **rear** and leave from the **front** (first in, first out).\n\n' +
-        '| Operation | Queue (front to rear) | Removed |\n' +
-        '|---|---|---|\n' +
-        '| `enqueue(Amal)` | Amal | |\n' +
-        '| `enqueue(Bilal)` | Amal, Bilal | |\n' +
-        '| `enqueue(Chen)` | Amal, Bilal, Chen | |\n' +
-        '| `dequeue()` | Bilal, Chen | Amal |\n' +
-        '| `enqueue(Dana)` | Bilal, Chen, Dana | |\n' +
-        '| `dequeue()` | Chen, Dana | Bilal |\n\n' +
-        'The front of the queue is now **Chen**.',
-      whyWrong: [
-        'Dana is at the **rear** (she joined last). This mixes up the front and the rear of the queue.',
-        'This is stack thinking: removing the newest person each time (Chen, then Dana) leaves Amal, Bilal with Bilal on top. A queue removes the person who has waited longest.',
-        'This comes from removing people from the rear (the end where they join) and then reading the front. Dequeue removes from the front, so Amal is the first to go.',
-        null,
-      ],
-      keyIdea: 'A queue is FIFO: dequeue removes whoever has been waiting longest (the front).',
-    },
-    check: {
-      optionValues: ['Dana', 'Bilal', 'Amal', 'Chen'],
-      compute: () => {
-        const q: string[] = [];
-        const ops = ['Amal', 'Bilal', 'Chen', '-', 'Dana', '-'];
-        for (const op of ops) {
-          if (op === '-') q.shift();
-          else q.push(op);
-        }
-        return q[0];
-      },
     },
   },
   {
     id: 'stacks-queues-004',
     subtopic: 'stacks-queues',
     difficulty: 'foundation',
-    stem: 'A Python list is used as a stack. What does this code print?',
+    stem: 'A stack prints from bottom to top. What is printed?',
     code: {
-      lang: 'python',
-      source: 's = []\ns.append(1)\ns.append(2)\ns.append(3)\ns.pop()\ns.append(4)\nprint(s)',
+      lang: 'pseudocode',
+      source: L('S = []', 'push(S, 1)', 'push(S, 2)', 'push(S, 3)', 'pop(S)', 'push(S, 4)', 'print(S)'),
     },
     options: ['`[2, 3, 4]`', '`[1, 2, 3, 4]`', '`[1, 2, 4]`', '`[4, 2, 1]`'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'In Python, `append` adds to the **end** of the list (the top of the stack) and `pop()` with no argument removes the **last** item (the top).\n\n' +
-        '1. `s.append(1)`: `s = [1]`\n' +
-        '2. `s.append(2)`: `s = [1, 2]`\n' +
-        '3. `s.append(3)`: `s = [1, 2, 3]`\n' +
-        '4. `s.pop()`: removes 3, `s = [1, 2]`\n' +
-        '5. `s.append(4)`: `s = [1, 2, 4]`\n\n' +
+        '`push` adds on top and `pop` removes the top item.\n\n' +
+        '| Operation | `S` afterwards |\n' +
+        '|---|---|\n' +
+        '| `push(S, 1)` | `[1]` |\n' +
+        '| `push(S, 2)` | `[1, 2]` |\n' +
+        '| `push(S, 3)` | `[1, 2, 3]` |\n' +
+        '| `pop(S)` | `[1, 2]` |\n' +
+        '| `push(S, 4)` | `[1, 2, 4]` |\n\n' +
         'It prints `[1, 2, 4]`.',
       whyWrong: [
-        'This assumes `pop()` removes the **first** item (like a queue). With no argument, `pop()` removes the last item; `pop(0)` would remove the first.',
-        'This forgets that `s.pop()` actually removes the 3 from the list.',
+        'This assumes `pop` removes the **bottom** item (like a queue). It removes the top item, which is 3.',
+        'This forgets that `pop(S)` actually removes the 3.',
         null,
-        'This writes the stack with the top on the left. Python prints a list in its stored order, from index 0 to the end, so the bottom item 1 comes first.',
+        'This writes the stack with the top first. The stem says it prints from bottom to top, so the bottom item 1 comes first.',
       ],
-      keyIdea: 'A Python list works as a stack: `append` pushes onto the end and `pop()` removes from the end.',
+      keyIdea: 'Push and pop both work at the top of the stack; the bottom items stay where they are.',
     },
-    python: { stdout: '[1, 2, 4]\n' },
+    check: {
+      optionValues: ['[2, 3, 4]', '[1, 2, 3, 4]', '[1, 2, 4]', '[4, 2, 1]'],
+      compute: () => show(stackPops([1, 2, 3, 'pop', 4]).left),
+    },
   },
   {
     id: 'stacks-queues-005',
@@ -208,17 +129,17 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'In a **singly** linked list, what does each node store?',
     options: [
-      'A data value and a reference (pointer) to the previous node and to the next node',
-      'A data value and its index position in the list',
-      'A data value and a reference (pointer) to the next node',
-      'Only a reference (pointer) to the head of the list',
+      'A value and pointers to both neighbouring nodes',
+      'A value and its index in the list',
+      'A value and a pointer to the next node',
+      'Only a pointer to the head of the list',
     ],
     correctIndex: 2,
     markScheme: {
       solution:
         'A linked list is a chain of **nodes**. In a *singly* linked list each node holds two things:\n\n' +
         '1. the **data** (the value stored), and\n' +
-        '2. a **pointer** (reference) called `next` to the following node. The last node\'s `next` is `NULL` (`None` in Python).\n\n' +
+        '2. a **pointer** (reference) called `next` to the following node. The last node\'s `next` is `NULL`, meaning "no node".\n\n' +
         'The list itself only remembers the **head** (the first node). To reach any other node you follow the `next` pointers one by one.',
       whyWrong: [
         'Storing pointers to both the previous and the next node describes a **doubly** linked list, not a singly linked one.',
@@ -233,7 +154,7 @@ export const questions: StaticQuestion[] = [
     id: 'stacks-queues-006',
     subtopic: 'stacks-queues',
     difficulty: 'foundation',
-    stem: 'A singly linked list has 50 nodes and you only have a pointer to the head (node 1). Starting at the head, how many times must you follow a `next` pointer to reach node 20?',
+    stem: 'Starting at the head (node 1) of a 50-node singly linked list, how many `next` pointers must you follow to reach node 20?',
     options: ['$20$', '$1$', '$30$', '$19$'],
     correctIndex: 3,
     markScheme: {
@@ -265,13 +186,254 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+  {
+    id: 'stacks-queues-022',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'Which principle does a queue follow?',
+    options: ['First in first out', 'Last in first out', 'First in last out', 'Last in last out'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A queue adds items at the rear and removes them from the front, so the item that has waited longest leaves first: **first in first out (FIFO)**.\n\n' +
+        'Think of a line at a shop: the first person to join is the first to be served.',
+      whyWrong: [
+        null,
+        'That is the rule of a stack, which removes the newest item. A queue removes the oldest item.',
+        'First in last out is another way of saying last in first out, which is the rule of a stack.',
+        'In a queue the last arrival does leave last, so this describes the same behaviour in other words, but the standard name for it is first in first out (FIFO).',
+      ],
+      keyIdea: 'A queue is FIFO: first in, first out.',
+    },
+  },
+  {
+    id: 'stacks-queues-023',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'Which principle does a stack follow?',
+    options: ['Last in first out', 'First in last out', 'First in first out', 'Last in last out'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A stack adds and removes at the same end (the top), so the newest item leaves first: **last in first out (LIFO)**.\n\n' +
+        '"Last in first out" and "First in last out" describe the same behaviour: if the last item in is the first out, then the first item in must be the last out. If both appear as options, pick the standard name, LIFO.\n\n' +
+        'First in first out and last in last out both describe a queue.',
+      whyWrong: [
+        null,
+        'This describes the same behaviour as last in first out, but LIFO is the standard name, so choose it when both appear.',
+        'That is the rule of a queue, where the oldest item leaves first. A stack removes the newest item.',
+        'That describes a queue, where the newest item leaves last. In a stack the newest item leaves first.',
+      ],
+      keyIdea: 'A stack is LIFO. FILO means the same thing, but LIFO is the standard name.',
+    },
+  },
+  {
+    id: 'stacks-queues-024',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'Which item does `pop` remove from a stack?',
+    options: ['The item at the bottom', 'The item on top', 'The largest item', 'The item in the middle'],
+    correctIndex: 1,
+    markScheme: {
+      solution: '`pop` removes and returns the item on **top** of the stack, which is the most recently pushed item still there.',
+      whyWrong: [
+        'The bottom item is the oldest. It is the last to leave, because only the top can be reached.',
+        null,
+        'A stack ignores the size of its values. Only the order in which they were pushed matters.',
+        'A stack gives access to one end only, the top, so the middle cannot be reached directly.',
+      ],
+      keyIdea: '`pop` removes the top item of a stack.',
+    },
+  },
+  {
+    id: 'stacks-queues-025',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'Which item does `dequeue` remove from a queue?',
+    options: ['The item at the rear', 'The smallest item', 'The item at the front', 'The item in the middle'],
+    correctIndex: 2,
+    markScheme: {
+      solution: '`dequeue` removes and returns the item at the **front** of the queue, which is the item that has waited longest.',
+      whyWrong: [
+        'The rear is where new items join, so the rear item is the newest. It leaves last.',
+        'A queue ignores the size of its values. Only the order in which they joined matters.',
+        null,
+        'A queue only removes from the front, so an item in the middle has to wait its turn.',
+      ],
+      keyIdea: '`dequeue` removes the front item of a queue.',
+    },
+  },
+  {
+    id: 'stacks-queues-026',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'Where does `push` add a new item on a stack?',
+    options: ['At the bottom', 'In the middle', 'In sorted position', 'On top'],
+    correctIndex: 3,
+    markScheme: {
+      solution: '`push` puts the new item on **top** of the stack. It is then the first item a `pop` will remove.',
+      whyWrong: [
+        'Nothing can be added at the bottom without moving the whole stack. New items go on top.',
+        'A stack has one working end, the top, so nothing is inserted in the middle.',
+        'A stack keeps items in the order they arrived and does not sort them by value.',
+        null,
+      ],
+      keyIdea: '`push` adds to the top of a stack.',
+    },
+  },
+  {
+    id: 'stacks-queues-027',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'Where does `enqueue` add a new item in a queue?',
+    options: ['At the rear', 'At the front', 'In the middle', 'In sorted position'],
+    correctIndex: 0,
+    markScheme: {
+      solution: '`enqueue` adds the new item at the **rear** of the queue, like joining the back of a line. Items leave from the front.',
+      whyWrong: [
+        null,
+        'The front is where items leave. Joining there would let a new item go ahead of everyone already waiting.',
+        'A queue only adds at one end, the rear, so nothing is inserted in the middle.',
+        'A queue keeps items in the order they arrived and does not sort them by value.',
+      ],
+      keyIdea: '`enqueue` adds to the rear of a queue.',
+    },
+  },
+  {
+    id: 'stacks-queues-028',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'The values 1, 2, 3 are pushed onto an empty stack in that order, then all popped. In what order do they come out?',
+    options: ['1, 2, 3', '3, 2, 1', '2, 1, 3', '3, 1, 2'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'After the pushes the stack, bottom to top, is 1, 2, 3.\n\n' +
+        'Each pop takes the current top: first 3, then 2, then 1.\n\n' +
+        'So a stack gives items back in the reverse of the order they went in.',
+      whyWrong: [
+        'This is the order a **queue** would give. A stack gives the newest item back first.',
+        null,
+        'The first pop must return the top item, which is 3, the last value pushed.',
+        'After 3 is popped the new top is 2, not 1. The bottom item comes out last.',
+      ],
+      keyIdea: 'Pushing items and then popping them all reverses their order.',
+    },
+    check: {
+      optionValues: ['1, 2, 3', '3, 2, 1', '2, 1, 3', '3, 1, 2'],
+      compute: () => stackPops([1, 2, 3, 'pop', 'pop', 'pop']).popped.join(', '),
+    },
+  },
+  {
+    id: 'stacks-queues-029',
+    subtopic: 'stacks-queues',
+    difficulty: 'foundation',
+    stem: 'In a queue, insertion and deletion take place at:',
+    options: ['The same end', 'Opposite ends', 'The middle', 'Any position'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        '**Insertion** means adding an item (enqueue) and **deletion** means removing one (dequeue).\n\n' +
+        'A queue inserts at the rear and deletes at the front, so the two operations work at **opposite ends**. That is what makes it first in, first out.',
+      whyWrong: [
+        'Inserting and deleting at the same end describes a stack, which gives last in, first out.',
+        null,
+        'Nothing in a queue happens in the middle. Items join at the rear and leave from the front.',
+        'A queue restricts both operations to one end each. Access at any position describes an array.',
+      ],
+      keyIdea: 'Queue: insert at the rear, delete at the front. Stack: both at the top.',
+    },
+  },
 
   // ============================================================ EXAM
+  {
+    id: 'stacks-queues-002',
+    subtopic: 'stacks-queues',
+    difficulty: 'exam',
+    stem: 'What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L('S = []', 'push(S, 5)', 'push(S, 8)', 'push(S, 3)', 'pop(S)', 'push(S, 6)', 'pop(S)', 'print(pop(S))'),
+    },
+    options: ['8', '3', '6', '5'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Track the stack, writing it bottom to top (the top is on the right):\n\n' +
+        '| Operation | Stack (bottom to top) | Returned |\n' +
+        '|---|---|---|\n' +
+        '| `push(S, 5)` | 5 | |\n' +
+        '| `push(S, 8)` | 5, 8 | |\n' +
+        '| `push(S, 3)` | 5, 8, 3 | |\n' +
+        '| `pop(S)` | 5, 8 | 3 |\n' +
+        '| `push(S, 6)` | 5, 8, 6 | |\n' +
+        '| `pop(S)` | 5, 8 | 6 |\n' +
+        '| `print(pop(S))` | 5 | **8** |\n\n' +
+        'It prints 8.',
+      whyWrong: [
+        null,
+        'This is queue thinking: if items left from the *front* (first in, first out), the removals would return 5, 8 and then 3. A stack removes from the top.',
+        'This forgets that 6 was already removed by the previous `pop(S)`. Each pop removes the item, it does not just look at it.',
+        'This is the value still left at the bottom of the stack at the end, not the value returned by the last pop.',
+      ],
+      keyIdea: 'A pop always removes the item that is currently on top, i.e. the most recently pushed item that is still there.',
+    },
+    check: {
+      optionValues: [8, 3, 6, 5],
+      compute: () => {
+        const { popped } = stackPops([5, 8, 3, 'pop', 6, 'pop', 'pop']);
+        return popped[popped.length - 1];
+      },
+    },
+  },
+  {
+    id: 'stacks-queues-003',
+    subtopic: 'stacks-queues',
+    difficulty: 'exam',
+    stem: 'What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L('Q = []', 'enqueue(Q, 4)', 'enqueue(Q, 7)', 'enqueue(Q, 2)', 'dequeue(Q)', 'enqueue(Q, 9)', 'dequeue(Q)', 'print(dequeue(Q))'),
+    },
+    options: ['9', '7', '4', '2'],
+    correctIndex: 3,
+    markScheme: {
+      solution:
+        'In a queue, items join at the **rear** and leave from the **front** (first in, first out).\n\n' +
+        '| Operation | Queue (front to rear) | Removed |\n' +
+        '|---|---|---|\n' +
+        '| `enqueue(Q, 4)` | 4 | |\n' +
+        '| `enqueue(Q, 7)` | 4, 7 | |\n' +
+        '| `enqueue(Q, 2)` | 4, 7, 2 | |\n' +
+        '| `dequeue(Q)` | 7, 2 | 4 |\n' +
+        '| `enqueue(Q, 9)` | 7, 2, 9 | |\n' +
+        '| `dequeue(Q)` | 2, 9 | 7 |\n' +
+        '| `print(dequeue(Q))` | 9 | **2** |\n\n' +
+        'It prints 2.',
+      whyWrong: [
+        '9 is at the **rear** (it joined last). This mixes up the front and the rear of the queue.',
+        'This is stack thinking: removing the newest item each time gives 2, then 9, then 7. A queue removes the item that has waited longest.',
+        'This treats `dequeue(Q)` as only reading the front item, so 4 never leaves. Each dequeue removes the item.',
+        null,
+      ],
+      keyIdea: 'A queue is FIFO: dequeue removes whichever item has been waiting longest (the front).',
+    },
+    check: {
+      optionValues: [9, 7, 4, 2],
+      compute: () => {
+        const q: number[] = [4, 7, 2];
+        q.shift();
+        q.push(9);
+        q.shift();
+        return q.shift() as number;
+      },
+    },
+  },
   {
     id: 'stacks-queues-007',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'A program checks brackets with a stack: each opening bracket is pushed; each closing bracket must match the bracket popped from the top; at the end the stack must be empty. Which string passes the check (is **balanced**)?',
+    stem: 'A stack checks brackets: push each opener, each closer must match the popped top, and the stack must end empty. Which string is **balanced**?',
     options: ['`([)]`', '`(()`', '`{[()()]}`', '`())(`'],
     correctIndex: 2,
     markScheme: {
@@ -302,7 +464,7 @@ export const questions: StaticQuestion[] = [
     id: 'stacks-queues-008',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'Evaluate the postfix (Reverse Polish) expression below using a stack.\n\n`6 2 3 + * 4 -`',
+    stem: 'Evaluate the postfix (Reverse Polish) expression `6 2 3 + * 4 -` using a stack.',
     options: ['$-26$', '$20$', '$26$', '$30$'],
     correctIndex: 2,
     markScheme: {
@@ -335,69 +497,57 @@ export const questions: StaticQuestion[] = [
     id: 'stacks-queues-009',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'What does this code print?',
+    stem: 'Arrays are indexed from 1, and a queue prints from front to rear. What is printed?',
     code: {
-      lang: 'python',
-      source:
-        'from collections import deque\n\nq = deque()\nfor x in [3, 1, 4, 1, 5]:\n    q.append(x)\nq.popleft()\nq.popleft()\nq.append(9)\nprint(list(q))',
+      lang: 'pseudocode',
+      source: L(
+        'A = [3, 1, 4, 1, 5]',
+        'Q = []',
+        'for i = 1 to 5',
+        '   enqueue(Q, A[i])',
+        'end for',
+        'dequeue(Q)',
+        'dequeue(Q)',
+        'enqueue(Q, 9)',
+        'print(Q)',
+      ),
     },
     options: ['`[3, 1, 4, 9]`', '`[4, 1, 5, 9]`', '`[9, 4, 1, 5]`', '`[3, 1, 4, 1, 5, 9]`'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'A `deque` used like this is a **queue**: `append` adds at the rear (right), `popleft` removes from the front (left).\n\n' +
-        '1. After the loop: `[3, 1, 4, 1, 5]`\n' +
-        '2. `q.popleft()` removes 3: `[1, 4, 1, 5]`\n' +
-        '3. `q.popleft()` removes the first 1: `[4, 1, 5]`\n' +
-        '4. `q.append(9)`: `[4, 1, 5, 9]`\n\n' +
+        '`enqueue` adds at the rear and `dequeue` removes from the front.\n\n' +
+        '| Step | `Q` afterwards |\n' +
+        '|---|---|\n' +
+        '| the `for` loop | `[3, 1, 4, 1, 5]` |\n' +
+        '| first `dequeue(Q)` removes 3 | `[1, 4, 1, 5]` |\n' +
+        '| second `dequeue(Q)` removes the first 1 | `[4, 1, 5]` |\n' +
+        '| `enqueue(Q, 9)` | `[4, 1, 5, 9]` |\n\n' +
         'It prints `[4, 1, 5, 9]`.',
       whyWrong: [
-        'This removes from the right-hand end (like `pop()`, stack behaviour), taking off 5 and then 1. `popleft` removes from the left, the front of the queue.',
+        'This removes from the rear (stack behaviour), taking off 5 and then 1. `dequeue` removes from the front.',
         null,
-        'This thinks `append` adds to the front. `append` always adds on the right (the rear); `appendleft` would add on the left.',
-        'This treats `popleft()` as only *looking* at the front item (a peek). It actually removes the item and returns it.',
+        'This adds the 9 at the front. `enqueue` always adds at the rear.',
+        'This treats `dequeue` as only looking at the front item. It actually removes the item.',
       ],
-      keyIdea: 'With `collections.deque`, `append` plus `popleft` gives a FIFO queue: join on the right, leave from the left.',
+      keyIdea: 'In a queue, items join at the rear and leave from the front, so the earliest items go first.',
     },
-    python: { stdout: '[4, 1, 5, 9]\n' },
-  },
-  {
-    id: 'stacks-queues-010',
-    subtopic: 'stacks-queues',
-    difficulty: 'exam',
-    stem: 'What does this code print?',
-    code: {
-      lang: 'python',
-      source:
-        's = []\nfor ch in "PYTHON":\n    s.append(ch)\n\nout = ""\nfor i in range(3):\n    out += s.pop()\n\nprint(out + "".join(s))',
+    check: {
+      optionValues: ['[3, 1, 4, 9]', '[4, 1, 5, 9]', '[9, 4, 1, 5]', '[3, 1, 4, 1, 5, 9]'],
+      compute: () => {
+        const q = [3, 1, 4, 1, 5];
+        q.shift();
+        q.shift();
+        q.push(9);
+        return show(q);
+      },
     },
-    options: ['`NOHTYP`', '`PYTHON`', '`NNNPYTHON`', '`NOHPYT`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The first loop pushes the letters, so `s = [\'P\', \'Y\', \'T\', \'H\', \'O\', \'N\']` with `N` on top.\n\n' +
-        '| `i` | `s.pop()` returns | `out` | `s` afterwards |\n' +
-        '|---|---|---|---|\n' +
-        '| 0 | N | N | P Y T H O |\n' +
-        '| 1 | O | NO | P Y T H |\n' +
-        '| 2 | H | NOH | P Y T |\n\n' +
-        'Then `"".join(s)` joins what is left **in list order** (bottom to top): `PYT`.\n\n' +
-        'So it prints `NOH` + `PYT` = `NOHPYT`.',
-      whyWrong: [
-        'This reverses the whole word. Only three letters are popped (and reversed); the letters left in the list are joined in their normal order, bottom to top.',
-        'This takes letters from the front of the list (queue behaviour), giving `PYT` + `HON`. `pop()` takes from the end.',
-        'This treats `pop()` as only reading the top item without removing it, so `N` would be read three times. `pop()` removes the item.',
-        null,
-      ],
-      keyIdea: 'Popping a stack gives items in reverse order of pushing; what is still in the list keeps its original order.',
-    },
-    python: { stdout: 'NOHPYT\n' },
   },
   {
     id: 'stacks-queues-011',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'You have $n$ items stored (a) in a singly linked list with a head pointer and (b) in an array (such as a Python list). What is the time cost of inserting a new item at the **very front** in each case?',
+    stem: 'What is the time cost of inserting a new item at the **front** of an $n$-item singly linked list (with a head pointer), and of an $n$-item array?',
     options: [
       'Linked list: $O(n)$; array: $O(1)$',
       'Linked list: $O(1)$; array: $O(1)$',
@@ -408,7 +558,7 @@ export const questions: StaticQuestion[] = [
     markScheme: {
       solution:
         '**Linked list.** Make a new node, set its `next` to the current head, then make the head point to the new node. That is two pointer changes, whatever the length of the list: $O(1)$.\n\n' +
-        '**Array.** Array items sit in consecutive memory slots. To put a new item at index 0, every one of the $n$ existing items must move one place to the right first. That is about $n$ moves: $O(n)$.\n\n' +
+        '**Array.** Array items sit in consecutive memory slots. To put a new item in the first slot, every one of the $n$ existing items must move one place to the right first. That is about $n$ moves: $O(n)$.\n\n' +
         'Answer: linked list $O(1)$, array $O(n)$. (The opposite is true for *reading* the $k$-th item: an array does it in $O(1)$ by index, a linked list needs $O(n)$.)',
       whyWrong: [
         'This mixes up inserting with accessing by position. An array can *read* any index in $O(1)$, but inserting at the front forces every item to shift; the linked list only needs two pointer changes at the head.',
@@ -423,12 +573,12 @@ export const questions: StaticQuestion[] = [
     id: 'stacks-queues-012',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'A circular queue is stored in an array with indices 0 to 4 (capacity 5). It starts empty with `rear = 0`. Each **enqueue** stores the item at index `rear` and then sets `rear = (rear + 1) mod 5`. Each **dequeue** removes the item at the front (the front index also moves on by 1, wrapping the same way).\n\nOperations: enqueue 10, 20, 30, 40; dequeue twice; enqueue 50; enqueue 60.\n\nAt which index is **60** stored?',
+    stem: 'A circular queue has capacity 5, with indices 0 to 4 and `rear` starting at 0. After enqueue 10, 20, 30, 40, two dequeues, then enqueue 50 and 60, at which index is 60?',
     options: ['$5$', '$0$', '$3$', '$1$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Follow `rear` (where the next item goes):\n\n' +
+        'Each enqueue stores the item at index `rear`, then sets `rear` to $(\\text{rear} + 1) \\bmod 5$. Follow `rear`:\n\n' +
         '| Operation | Stored at | `rear` afterwards |\n' +
         '|---|---|---|\n' +
         '| enqueue 10 | 0 | 1 |\n' +
@@ -442,7 +592,7 @@ export const questions: StaticQuestion[] = [
       whyWrong: [
         'This forgets the "mod 5" wrap-around: $4 + 1 = 5$, but index 5 does not exist. The rear wraps back to index 0.',
         null,
-        'This assumes the remaining items shift to the start of the array after each dequeue (as in a Python list). A circular queue never moves items; only the front and rear indices move.',
+        'This assumes the remaining items shift to the start of the array after each dequeue. A circular queue never moves items; only the front and rear indices move.',
         'This gives the value of `rear` *after* storing 60 (the next free slot), not the index where 60 was stored.',
       ],
       keyIdea: 'In a circular queue the indices wrap with mod capacity, so slots freed at the start of the array are reused.',
@@ -509,18 +659,18 @@ export const questions: StaticQuestion[] = [
     id: 'stacks-queues-014',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'In a singly linked list, `P` points to a node and `X = P.next` is the node straight after it (`X` is not the last node). Which single pseudocode statement **deletes** `X` from the list?',
-    options: ['`P ← P.next.next`', '`X.next ← NULL`', '`P.next ← P.next.next`', '`P.next ← X`'],
+    stem: 'In a singly linked list, `X = P.next` is the node straight after `P`, and `X` is not the last node. Which statement **deletes** `X` from the list?',
+    options: ['`P = P.next.next`', '`X.next = NULL`', '`P.next = P.next.next`', '`P.next = X`'],
     correctIndex: 2,
     markScheme: {
       solution:
         'Before: `P → X → Y → ...` where `Y = X.next = P.next.next`.\n\n' +
         'To delete `X`, the node before it must "skip over" it, so `P` must point straight to `Y`:\n\n' +
-        '`P.next ← P.next.next`\n\n' +
+        '`P.next = P.next.next`\n\n' +
         'After: `P → Y → ...`. Nothing points to `X` any more, so it is no longer part of the list. Only one pointer changed, so deletion (once you have `P`) is $O(1)$.',
       whyWrong: [
         'This only moves the *variable* `P` to point at `Y`. No node\'s `next` pointer changes, so the list itself is unchanged and `X` is still in it.',
-        'This cuts the list after `X`: `X` stays linked from `P`, and every node after `X` is lost.',
+        '`NULL` means "no node", so this cuts the list after `X`: `X` stays linked from `P`, and every node after `X` is lost.',
         null,
         'This changes nothing: `P.next` already is `X`.',
       ],
@@ -528,43 +678,10 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'stacks-queues-015',
-    subtopic: 'stacks-queues',
-    difficulty: 'exam',
-    stem: 'What does this code print?',
-    code: {
-      lang: 'python',
-      source:
-        'class Node:\n    def __init__(self, value, nxt=None):\n        self.value = value\n        self.next = nxt\n\nhead = Node(5, Node(3, Node(8, Node(2, Node(2, Node(7))))))\n\nnode = head\ncount = 0\nwhile node.next is not None:\n    if node.value > node.next.value:\n        count += 1\n    node = node.next\nprint(count)',
-    },
-    options: ['`3`', '`2`', '`5`', '`4`'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The list is `5 → 3 → 8 → 2 → 2 → 7`. The loop compares each node with the next one and stops when `node` is the last node (its `next` is `None`).\n\n' +
-        '| `node.value` | `node.next.value` | `>`? | `count` |\n' +
-        '|---|---|---|---|\n' +
-        '| 5 | 3 | yes | 1 |\n' +
-        '| 3 | 8 | no | 1 |\n' +
-        '| 8 | 2 | yes | 2 |\n' +
-        '| 2 | 2 | no | 2 |\n' +
-        '| 2 | 7 | no | 2 |\n\n' +
-        'Then `node` is the 7 node, whose `next` is `None`, so the loop ends. It prints `2`.',
-      whyWrong: [
-        'This counts the pair 2, 2 as well, as if the test were `>=`. $2 > 2$ is false.',
-        null,
-        'This counts every comparison (every loop iteration), not only the ones where the value goes down.',
-        'This counts every change of value, up or down (5 to 3, 3 to 8, 8 to 2, 2 to 7). Only decreases are counted.',
-      ],
-      keyIdea: 'Traversing a linked list means following `next` pointers until `None`, looking at `node.value` and `node.next.value` on the way.',
-    },
-    python: { stdout: '2\n' },
-  },
-  {
     id: 'stacks-queues-016',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'A circular queue uses an array with indices 0 to 7 (capacity 8). Its front item is at index 6 and it currently holds 5 items in consecutive slots, wrapping from index 7 back to 0 when needed. At which index is the **rear** (last) item?',
+    stem: 'A circular queue of capacity 8 (indices 0 to 7) has its front item at index 6 and holds 5 items. At which index is the **rear** (last) item?',
     options: ['$10$', '$3$', '$2$', '$4$'],
     correctIndex: 2,
     markScheme: {
@@ -577,7 +694,7 @@ export const questions: StaticQuestion[] = [
         'This forgets to wrap round: index 10 does not exist in an array of capacity 8. Take the answer mod 8.',
         'This is the next **free** slot, $(6 + 5) \\bmod 8$. The last item is one before that, because the front item itself is the first of the 5.',
         null,
-        'This assumes the items start at index 0 (like a normal list), so the last of 5 items would be at index 4. In a circular queue the items start at the front index, here 6.',
+        'This assumes the items start at index 0, so the last of 5 items would be at index 4. In a circular queue the items start at the front index, here 6.',
       ],
       keyIdea: 'In a circular queue of capacity $N$, the rear item is at $(\\text{front} + \\text{size} - 1) \\bmod N$.',
     },
@@ -591,187 +708,202 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ============================================================ CHALLENGE
-  {
-    id: 'stacks-queues-017',
-    subtopic: 'stacks-queues',
-    difficulty: 'challenge',
-    stem: 'The numbers 1, 2, 3, 4 are pushed onto an empty stack **in that order**, but a `pop` (which prints the value removed) may be done at any moment between the pushes. Every number is eventually popped. Which printed sequence is **impossible**?',
-    options: ['`4 3 2 1`', '`1 2 3 4`', '`3 1 4 2`', '`2 1 4 3`'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Try to produce each sequence.\n\n' +
-        '- `4 3 2 1`: push 1, 2, 3, 4, then pop four times. Possible.\n' +
-        '- `1 2 3 4`: push 1, pop; push 2, pop; push 3, pop; push 4, pop. Possible.\n' +
-        '- `2 1 4 3`: push 1, push 2, pop (2), pop (1), push 3, push 4, pop (4), pop (3). Possible.\n' +
-        '- `3 1 4 2`: to print 3 first, push 1, 2, 3 and pop 3. Now the stack is 1, 2 with **2 on top**. The next print must be 2 (or a new number after pushing 4), never 1, because 1 is buried under 2. **Impossible.**\n\n' +
-        'Quick test: once a number is printed, any smaller numbers still on the stack must come out in *decreasing* order. In `3 1 4 2`, after 3 the remaining smaller numbers 1 and 2 come out as 1 then 2, which is increasing.',
-      whyWrong: [
-        'This is possible: push all four, then pop all four. Pushes do not have to be interleaved with pops.',
-        'This is possible: pop each number straight after pushing it. A stack can output items in their original order this way.',
-        null,
-        'This is possible: push 1 and 2, pop both (2 then 1), then push 3 and 4 and pop both (4 then 3).',
-      ],
-      keyIdea: 'A stack can only release the item on top, so an item cannot come out while a later-pushed item is still above it.',
-    },
-    check: {
-      optionValues: ['4 3 2 1', '1 2 3 4', '3 1 4 2', '2 1 4 3'],
-      compute: () => {
-        const bad = ['4 3 2 1', '1 2 3 4', '3 1 4 2', '2 1 4 3'].filter(
-          (o) => !stackPermutationPossible(o.split(' ').map(Number)),
-        );
-        return bad.length === 1 ? bad[0] : 'none or several';
-      },
-    },
-  },
-  {
-    id: 'stacks-queues-018',
-    subtopic: 'stacks-queues',
-    difficulty: 'challenge',
-    stem: 'What does this code print?',
-    code: {
-      lang: 'python',
-      source:
-        'def evaluate(tokens):\n    stack = []\n    for t in tokens:\n        if t in "+-*/":\n            b = stack.pop()\n            a = stack.pop()\n            if t == "+":\n                stack.append(a + b)\n            elif t == "-":\n                stack.append(a - b)\n            elif t == "*":\n                stack.append(a * b)\n            else:\n                stack.append(a / b)\n        else:\n            stack.append(int(t))\n    return stack.pop()\n\nprint(evaluate("4 6 2 - * 8 4 / +".split()))',
-    },
-    options: ['`18`', '`-15.5`', '`3.5`', '`18.0`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '`split()` gives the tokens `4`, `6`, `2`, `-`, `*`, `8`, `4`, `/`, `+`. Numbers are pushed; an operator pops `b` (top) then `a` and pushes `a op b`.\n\n' +
-        '| Token | Action | `stack` |\n' +
-        '|---|---|---|\n' +
-        '| `4` | push | [4] |\n' +
-        '| `6` | push | [4, 6] |\n' +
-        '| `2` | push | [4, 6, 2] |\n' +
-        '| `-` | b = 2, a = 6, push $6 - 2 = 4$ | [4, 4] |\n' +
-        '| `*` | b = 4, a = 4, push $4 \\times 4 = 16$ | [16] |\n' +
-        '| `8` | push | [16, 8] |\n' +
-        '| `4` | push | [16, 8, 4] |\n' +
-        '| `/` | b = 4, a = 8, push `8 / 4` = `2.0` | [16, 2.0] |\n' +
-        '| `+` | b = 2.0, a = 16, push `16 + 2.0` = `18.0` | [18.0] |\n\n' +
-        'In Python 3, `/` **always** gives a float, so `8 / 4` is `2.0`, and an int plus a float is a float. It prints `18.0`.',
-      whyWrong: [
-        'The arithmetic is right, but in Python 3 the `/` operator always returns a float (`8 / 4` is `2.0`), so the final sum is the float `18.0`.',
-        'This swaps the operands, computing `b op a` instead of `a op b`: $2 - 6 = -4$, $-4 \\times 4 = -16$, $4 / 8 = 0.5$, $0.5 + (-16) = -15.5$. The value popped first is the right-hand operand.',
-        'This takes the two **oldest** values (from the bottom, queue style) instead of the two on top of the stack. A stack always works on the most recent values.',
-        null,
-      ],
-      keyIdea: 'Postfix evaluation pops the right operand first, then the left; and in Python 3, `/` always produces a float.',
-    },
-    python: { stdout: '18.0\n' },
-  },
-  {
-    id: 'stacks-queues-019',
-    subtopic: 'stacks-queues',
-    difficulty: 'challenge',
-    stem: 'A queue is built from two stacks, `IN` and `OUT`.\n\n- **enqueue(x)**: push x onto `IN`.\n- **dequeue()**: if `OUT` is empty, pop every item from `IN` and push it onto `OUT` (one at a time); then pop and return the top of `OUT`.\n\nStarting with both stacks empty: enqueue 1, enqueue 2, enqueue 3, dequeue, enqueue 4, enqueue 5, dequeue, dequeue.\n\nWhat do the three dequeues return, in order?',
-    options: ['1, 4, 5', '3, 5, 4', '3, 2, 1', '1, 2, 3'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Stacks are written bottom to top.\n\n' +
-        '| Step | `IN` | `OUT` | Returned |\n' +
-        '|---|---|---|---|\n' +
-        '| enqueue 1, 2, 3 | 1, 2, 3 | empty | |\n' +
-        '| dequeue: `OUT` empty, so move 3, then 2, then 1 | empty | 3, 2, 1 | |\n' +
-        '| ...then pop `OUT` | empty | 3, 2 | **1** |\n' +
-        '| enqueue 4, 5 | 4, 5 | 3, 2 | |\n' +
-        '| dequeue: `OUT` not empty, pop it | 4, 5 | 3 | **2** |\n' +
-        '| dequeue: `OUT` not empty, pop it | 4, 5 | empty | **3** |\n\n' +
-        'Moving items from one stack to another **reverses** them, so the oldest item ends up on top of `OUT`. The dequeues return 1, 2, 3, exactly the first-in, first-out order of a real queue.',
-      whyWrong: [
-        'This moves `IN` onto `OUT` on every dequeue, even when `OUT` is not empty. That buries 2 and 3 under 5 and 4. The rule only transfers when `OUT` is empty.',
-        'This treats the structure as a single plain stack (always removing the newest item). The two-stack design exists precisely to give queue order.',
-        'This forgets that moving items from one stack to another reverses their order: `OUT` becomes 3, 2, 1 with **1** on top, not 3.',
-        null,
-      ],
-      keyIdea: 'Pouring one stack into another reverses the order, which turns LIFO into FIFO: two stacks can make a queue.',
-    },
-    check: {
-      optionValues: ['1, 4, 5', '3, 5, 4', '3, 2, 1', '1, 2, 3'],
-      compute: () => {
-        const IN: number[] = [];
-        const OUT: number[] = [];
-        const got: number[] = [];
-        const enq = (x: number) => IN.push(x);
-        const deq = () => {
-          if (OUT.length === 0) while (IN.length) OUT.push(IN.pop() as number);
-          got.push(OUT.pop() as number);
-        };
-        enq(1);
-        enq(2);
-        enq(3);
-        deq();
-        enq(4);
-        enq(5);
-        deq();
-        deq();
-        return got.join(', ');
-      },
-    },
-  },
-  {
-    id: 'stacks-queues-020',
-    subtopic: 'stacks-queues',
-    difficulty: 'challenge',
-    stem: 'What does this code print?',
-    code: {
-      lang: 'python',
-      source:
-        'class Node:\n    def __init__(self, value, nxt=None):\n        self.value = value\n        self.next = nxt\n\nhead = Node(1, Node(2, Node(3, Node(4))))\nprev = None\ncurr = head\nfor _ in range(2):\n    nxt = curr.next\n    curr.next = prev\n    prev = curr\n    curr = nxt\n\nout = []\nnode = prev\nwhile node is not None:\n    out.append(node.value)\n    node = node.next\nnode = curr\nwhile node is not None:\n    out.append(node.value)\n    node = node.next\nprint(out)',
-    },
-    options: ['`[2, 1, 3, 4]`', '`[4, 3, 2, 1]`', '`[2, 1]`', '`[1, 2, 3, 4]`'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Start: `1 → 2 → 3 → 4`, `prev = None`, `curr` = node 1. Each loop pass turns one node\'s arrow backwards.\n\n' +
-        '| Pass | `nxt` | `curr.next` set to | `prev` | `curr` |\n' +
-        '|---|---|---|---|---|\n' +
-        '| 1 | node 2 | `None` (node 1 now points to nothing) | node 1 | node 2 |\n' +
-        '| 2 | node 3 | node 1 (node 2 now points to node 1) | node 2 | node 3 |\n\n' +
-        'Now there are two separate chains:\n\n' +
-        '- from `prev`: `2 → 1 → None`\n' +
-        '- from `curr`: `3 → 4 → None` (nodes 3 and 4 were never touched)\n\n' +
-        'The first `while` loop collects 2, 1 and the second collects 3, 4. It prints `[2, 1, 3, 4]`.',
-      whyWrong: [
-        null,
-        'This is the result of a **full** reversal (4 passes). The loop only runs twice, so only the first two arrows are reversed.',
-        'This thinks nodes 3 and 4 are lost. They are still reachable through `curr` (saved in `nxt` before the arrow was changed), and the second loop prints them.',
-        'This assumes nothing changed, but the loop really does re-point `curr.next`, so nodes 1 and 2 are now linked backwards.',
-      ],
-      keyIdea: 'Reversing a linked list re-points one next pointer per step, keeping a saved reference (`nxt`) so the rest of the list is not lost.',
-    },
-    python: { stdout: '[2, 1, 3, 4]\n' },
-  },
   {
     id: 'stacks-queues-021',
     subtopic: 'stacks-queues',
     difficulty: 'exam',
-    stem: 'In a singly linked list, `P` points to an existing node and `N` is a new node. Which pair of pseudocode statements, carried out **in the order shown**, correctly inserts `N` straight after `P` without losing any nodes?',
+    stem: 'In a singly linked list, `N` is a new node. Which pair of statements, **in the order shown**, inserts `N` straight after node `P` without losing any nodes?',
     options: [
-      '`P.next ← N`, then `N.next ← P.next`',
-      '`N.next ← P.next`, then `P.next ← N`',
-      '`P.next ← N`, then `N.next ← NULL`',
-      '`N.next ← P`, then `P.next ← N`',
+      '`P.next = N`, then `N.next = P.next`',
+      '`N.next = P.next`, then `P.next = N`',
+      '`P.next = N`, then `N.next = NULL`',
+      '`N.next = P`, then `P.next = N`',
     ],
     correctIndex: 1,
     markScheme: {
       solution:
         'Before: `P → Q → ...` (where `Q = P.next`).\n\n' +
-        '1. `N.next ← P.next`: `N` now points to `Q`. Nothing is lost, because `P` still points to `Q` too.\n' +
-        '2. `P.next ← N`: `P` now points to `N`.\n\n' +
+        '1. `N.next = P.next`: `N` now points to `Q`. Nothing is lost, because `P` still points to `Q` too.\n' +
+        '2. `P.next = N`: `P` now points to `N`.\n\n' +
         'After: `P → N → Q → ...`. Two pointer changes, so insertion after a known node is $O(1)$.\n\n' +
         'The order matters: if `P.next` is overwritten first, the only link to `Q` (and everything after it) is gone.',
       whyWrong: [
-        'The order is wrong. After `P.next ← N`, the value of `P.next` is `N` itself, so `N.next ← P.next` makes `N` point to itself (a loop), and `Q` onwards is lost.',
+        'The order is wrong. After `P.next = N`, the value of `P.next` is `N` itself, so `N.next = P.next` makes `N` point to itself (a loop), and `Q` onwards is lost.',
         null,
-        'This links `P` to `N` but then ends the list at `N`, so every node that used to come after `P` is lost.',
+        '`NULL` means "no node", so this links `P` to `N` but then ends the list at `N`. Every node that used to come after `P` is lost.',
         'This makes `N` point back to `P`, creating a loop `P → N → P`, and the rest of the list after `P` is lost.',
       ],
       keyIdea: 'When inserting into a linked list, connect the new node to the rest of the list first, then point the previous node at it.',
+    },
+  },
+  {
+    id: 'stacks-queues-030',
+    subtopic: 'stacks-queues',
+    difficulty: 'exam',
+    stem: 'Arrays are indexed from 1, and so are strings. What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L(
+        'word = "STACK"',
+        'S = []',
+        'for i = 1 to length(word)',
+        '   push(S, word[i])',
+        'end for',
+        'out = ""',
+        'for i = 1 to 3',
+        '   out = out + pop(S)',
+        'end for',
+        'print(out)',
+      ),
+    },
+    options: ['`KCA`', '`STA`', '`ACK`', '`KKK`'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The first loop pushes S, T, A, C, K, so K is on top.\n\n' +
+        '| `i` | `pop(S)` | `out` |\n' +
+        '|---|---|---|\n' +
+        '| 1 | K | K |\n' +
+        '| 2 | C | KC |\n' +
+        '| 3 | A | KCA |\n\n' +
+        'It prints `KCA`.',
+      whyWrong: [
+        null,
+        'This takes letters from the front (queue behaviour). `pop` takes from the top, which is the end of the word.',
+        'This takes the right three letters but keeps them in their original order. Popping reverses the order.',
+        'This treats `pop` as only reading the top item, so K is read three times. `pop` removes the item.',
+      ],
+      keyIdea: 'Popping a stack gives items in the reverse of the order they were pushed.',
+    },
+    check: {
+      optionValues: ['KCA', 'STA', 'ACK', 'KKK'],
+      compute: () => {
+        const s = 'STACK'.split('');
+        let out = '';
+        for (let i = 1; i <= 3; i++) out += s.pop() as string;
+        return out;
+      },
+    },
+  },
+  {
+    id: 'stacks-queues-031',
+    subtopic: 'stacks-queues',
+    difficulty: 'exam',
+    stem: 'What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L('S = []', 'push(S, 2)', 'push(S, 5)', 'push(S, 9)', 't = 0', 'while (length(S) > 1)', '   t = t + pop(S)', 'end while', 'print(t)'),
+    },
+    options: ['14', '16', '7', 'Infinite loop'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The stack starts as 2, 5, 9 (bottom to top). The loop runs while more than one item is left.\n\n' +
+        '| `length(S)` at the test | `pop(S)` | `t` |\n' +
+        '|---|---|---|\n' +
+        '| 3 | 9 | 9 |\n' +
+        '| 2 | 5 | 14 |\n\n' +
+        'Now `length(S)` is 1, so $1 > 1$ is false and the loop stops. It prints 14.',
+      whyWrong: [
+        null,
+        'This adds all three values. The test is `length(S) > 1`, so the loop stops with the 2 still on the stack.',
+        'This adds 2 and 5, the two oldest values (queue thinking). `pop` takes the newest values first.',
+        'Each pass pops one item, so `length(S)` falls by 1 and the test eventually fails.',
+      ],
+      keyIdea: 'Trace the stack and the loop test together: each pop shrinks the stack, so the test can become false.',
+    },
+    check: {
+      optionValues: [14, 16, 7, 'Infinite loop'],
+      compute: () => {
+        const s = [2, 5, 9];
+        let t = 0;
+        let guard = 0;
+        while (s.length > 1) {
+          if (++guard > 1000) return 'Infinite loop';
+          t += s.pop() as number;
+        }
+        return t;
+      },
+    },
+  },
+  {
+    id: 'stacks-queues-032',
+    subtopic: 'stacks-queues',
+    difficulty: 'exam',
+    stem: 'What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L('S = []', 'push(S, 3)', 'push(S, 8)', 'while (length(S) > 0)', '   x = pop(S)', '   push(S, x)', 'end while', 'print(x)'),
+    },
+    options: ['8', '3', '2', 'Infinite loop'],
+    correctIndex: 3,
+    markScheme: {
+      solution:
+        'Trace the first passes, with the stack written bottom to top:\n\n' +
+        '| Pass | `x = pop(S)` | After `push(S, x)` | `length(S)` |\n' +
+        '|---|---|---|---|\n' +
+        '| 1 | 8 | 3, 8 | 2 |\n' +
+        '| 2 | 8 | 3, 8 | 2 |\n' +
+        '| 3 | 8 | 3, 8 | 2 |\n\n' +
+        'Each pass pops 8 and pushes it straight back, so `length(S)` stays 2 and the test `length(S) > 0` is always true. The loop never ends, so `print(x)` is never reached.',
+      whyWrong: [
+        '8 is what the first pop returns, but it goes straight back on the stack, so the loop carries on and the `print` is never reached.',
+        'This assumes the pops empty the stack, leaving 3 as the last value popped. Each popped value is pushed back, so the stack never shrinks.',
+        'This is `length(S)`, which never changes. The code prints `x`, and the `print` is never reached.',
+        null,
+      ],
+      keyIdea: 'A loop that waits for a stack to empty never ends if every pop is undone by a push.',
+    },
+    check: {
+      optionValues: [8, 3, 2, 'Infinite loop'],
+      compute: () => {
+        const s = [3, 8];
+        let x = 0;
+        let guard = 0;
+        while (s.length > 0) {
+          if (++guard > 1000) return 'Infinite loop';
+          x = s.pop() as number;
+          s.push(x);
+        }
+        return x;
+      },
+    },
+  },
+  {
+    id: 'stacks-queues-033',
+    subtopic: 'stacks-queues',
+    difficulty: 'exam',
+    stem: 'What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L('Q = []', 'enqueue(Q, 1)', 'enqueue(Q, 2)', 'enqueue(Q, 3)', 'for i = 1 to 2', '   x = dequeue(Q)', '   enqueue(Q, x)', 'end for', 'print(dequeue(Q))'),
+    },
+    options: ['3', '1', '2', 'Infinite loop'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Each pass moves the front item to the rear. The queue is written front to rear:\n\n' +
+        '| `i` | `x` | Queue afterwards |\n' +
+        '|---|---|---|\n' +
+        '| start | | 1, 2, 3 |\n' +
+        '| 1 | 1 | 2, 3, 1 |\n' +
+        '| 2 | 2 | 3, 1, 2 |\n\n' +
+        'The front item is now 3, so it prints 3.',
+      whyWrong: [
+        null,
+        'This assumes moving an item leaves the order unchanged. Each moved item goes to the **rear**, so the front changes.',
+        'This does only one pass. `for i = 1 to 2` includes 2, so the loop runs twice.',
+        'A `for` loop runs a fixed number of times, here 2, even though the queue never gets shorter.',
+      ],
+      keyIdea: 'Dequeuing an item and enqueuing it again rotates the queue by one place.',
+    },
+    check: {
+      optionValues: [3, 1, 2, 'Infinite loop'],
+      compute: () => {
+        const q = [1, 2, 3];
+        for (let i = 1; i <= 2; i++) q.push(q.shift() as number);
+        return q[0];
+      },
     },
   },
 ];

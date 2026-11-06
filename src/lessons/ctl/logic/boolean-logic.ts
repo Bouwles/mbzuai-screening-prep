@@ -3,7 +3,7 @@ import type { Lesson } from '../../../types';
 export const lesson: Lesson = {
   subtopic: 'boolean-logic',
   simple:
-    "Boolean logic works with only two values, 1 (true) and 0 (false). **AND** gives 1 only when both inputs are 1, **OR** gives 1 when at least one input is 1, and **NOT** flips 1 and 0. A **truth table** lists the output for every possible combination of inputs, like testing every setting of the switches in a light circuit. Python uses the same ideas with `and`, `or` and `not`.",
+    "Boolean logic works with only two values, 1 (true) and 0 (false). **AND** gives 1 only when both inputs are 1, **OR** gives 1 when at least one input is 1, and **NOT** flips 1 and 0. A **truth table** lists the output for every possible combination of inputs, like testing every setting of the switches in a light circuit. Code uses the same ideas with `and`, `or` and `not`.",
   methods: [
     {
       cue: "Asked which **gate** behaves in a certain way, or for a gate's outputs",
@@ -26,8 +26,8 @@ export const lesson: Lesson = {
       method: "If the table has a single 0, write NOT of that row and simplify with De Morgan (a single 1: describe that row). Otherwise test each option row by row.",
     },
     {
-      cue: "Python code with **`and` / `or` / `not`**, asked what it prints",
-      method: "`and` stops at the first falsy value and `or` at the first truthy one, returning that operand (not always `True` or `False`). Precedence is `not`, then `and`, then `or`, and skipped calls never run.",
+      cue: "Code with **`and` / `or` / `not`**, asked what it prints",
+      method: "Precedence is `not`, then `and`, then `or`. If the question says evaluation stops once the result is known, `and` stops at the first false value and `or` at the first true one, and skipped calls never run.",
     },
   ],
   know:
@@ -64,10 +64,10 @@ export const lesson: Lesson = {
     'In words: "not (rich and famous)" means "not rich, or not famous". Two NOTs cancel: $\\neg\\neg A = A$.\n\n' +
     '### Simplifying and equivalence\n\n' +
     'Two expressions are **logically equivalent** if they give the same output in every row of the truth table. You can prove it with a truth table, or simplify using the laws in the formula list. The most useful ones: $A \\lor \\neg A = 1$, $A \\land \\neg A = 0$, $A \\land 1 = A$, $A \\lor 0 = A$, factorising $(A \\land B) \\lor (A \\land C) = A \\land (B \\lor C)$, and absorption $A \\lor (A \\land B) = A$. To show two expressions are **not** equivalent you need only **one** row where they differ.\n\n' +
-    '### Boolean logic in Python\n\n' +
-    'Python writes the operators as words: `and`, `or`, `not`. `!=` on two bools acts as XOR (`^` also works on bools). Precedence is `not`, then `and`, then `or`, so `a or b and c` means `a or (b and c)`.\n\n' +
-    '**Short-circuiting:** Python evaluates left to right and stops as soon as the answer is known. `False and ...` is False whatever comes next, and `True or ...` is True, so the right-hand side is **never run**. That is why `x != 0 and 10 / x > 1` is safe even when `x` is 0.\n\n' +
-    '**Return values:** `and` and `or` return one of their operands, not necessarily `True`/`False`. 0, empty strings, empty lists and `None` are falsy; most other values are truthy. `a and b` gives `a` if `a` is falsy, otherwise `b`; `a or b` gives `a` if `a` is truthy, otherwise `b`. So `0 or 4` is `4` and `3 and 7` is `7`. Only `not` always returns a real bool.',
+    '### Boolean logic in code\n\n' +
+    'Pseudocode writes the operators as words: `and`, `or`, `not`. Precedence is `not`, then `and`, then `or`, so `a or b and c` means `a or (b and c)`.\n\n' +
+    '**Short-circuiting:** some questions say that evaluation goes left to right and stops as soon as the answer is known. false `and` anything is false, and true `or` anything is true, so the right-hand side is **never run**. That is why `x != 0 and 10 / x > 1` is safe even when `x` is 0.\n\n' +
+    '**Conditions in loops:** a `while` loop stops when its condition is false. By De Morgan, `while (x > 0 and y > 0)` stops when `x <= 0 or y <= 0`. A `while` loop with `or` keeps running while either part is true, so check whether it can ever stop: "Infinite loop" may be the answer.',
   formulas: [
     { label: 'NOT', tex: '\\neg 0 = 1, \\quad \\neg 1 = 0', note: 'NOT flips the value.' },
     { label: 'AND', tex: 'A \\land B = 1 \\iff A = 1 \\text{ and } B = 1' },
@@ -87,7 +87,7 @@ export const lesson: Lesson = {
     { label: 'Distributive laws', tex: 'A \\land (B \\lor C) = (A \\land B) \\lor (A \\land C), \\quad A \\lor (B \\land C) = (A \\lor B) \\land (A \\lor C)' },
     { label: 'Absorption laws', tex: 'A \\lor (A \\land B) = A, \\quad A \\land (A \\lor B) = A' },
     { label: 'Useful simplification', tex: 'A \\lor (\\neg A \\land B) = A \\lor B' },
-    { label: 'Python precedence', tex: '\\texttt{not} \\; > \\; \\texttt{and} \\; > \\; \\texttt{or}', note: '`a or b and c` means `a or (b and c)`.' },
+    { label: 'Precedence in code', tex: '\\texttt{not} \\; > \\; \\texttt{and} \\; > \\; \\texttt{or}', note: '`a or b and c` means `a or (b and c)`.' },
   ],
   examples: [
     {
@@ -125,16 +125,14 @@ export const lesson: Lesson = {
       answer: '$A \\land B$',
     },
     {
-      title: 'Python short-circuiting (exam level)',
-      problem:
-        'What does `print(0 and 1/0, 5 or 1/0, 2 and 3)` print?',
+      title: 'Short-circuiting in code (exam level)',
+      problem: 'Evaluation stops as soon as the result is known, and dividing by 0 is an error. With `x = 0`, what does `print(x == 0 or 10 / x > 1)` print?',
       steps: [
-        '`0 and 1/0`: 0 is falsy, so `and` stops and returns 0. The division by zero is **never evaluated**, so no error.',
-        '`5 or 1/0`: 5 is truthy, so `or` stops and returns 5. Again `1/0` is skipped.',
-        '`2 and 3`: 2 is truthy, so `and` moves on and returns the right operand, 3.',
-        '`print` separates the values with spaces.',
+        '`x == 0` is true.',
+        'true `or` anything is true, so the result is already known.',
+        '`10 / x` is **never evaluated**, so there is no error.',
       ],
-      answer: '`0 5 3`',
+      answer: '`true`',
     },
   ],
   traps: [
@@ -143,8 +141,8 @@ export const lesson: Lesson = {
     'Forgetting the inversion in NAND/NOR (or the final NOT gate in a circuit). Every output then comes out flipped, and the flipped answer is usually one of the options.',
     'Missing rows in a truth table. With 3 inputs there are 8 rows; list them in binary order 000 to 111 and do not forget the all-zero row.',
     'Negating a comparison wrongly in code: the opposite of `x > 3` is `x <= 3`, not `x < 3`.',
-    'Assuming Python `and`/`or` return `True`/`False` and that both sides always run. They return an operand, and the right side is skipped once the answer is known.',
+    'Assuming both sides always run when a question says evaluation stops once the result is known. The right side is then skipped as soon as the answer is known.',
   ],
   examTip:
-    'Most Boolean questions can be checked by **plugging in values**. For "which expression is equivalent", test a row or two (for example all inputs 1, then one input 0): any option that gives a different output from the original is out, and a single differing row is enough to eliminate it. For "how many rows are true", count the rows that give 0 if that is easier and subtract from $2^n$. The wrong options are usually the result of one specific slip (forgetting a NOT, reading XOR as OR, half-applying De Morgan), so if your answer is the exact opposite of an option in every row, check your NOTs. For Python questions, trace left to right, mark each value truthy or falsy, and stop evaluating `and` at the first falsy value and `or` at the first truthy value.',
+    'Most Boolean questions can be checked by **plugging in values**. For "which expression is equivalent", test a row or two (for example all inputs 1, then one input 0): any option that gives a different output from the original is out, and a single differing row is enough to eliminate it. For "how many rows are true", count the rows that give 0 if that is easier and subtract from $2^n$. The wrong options are usually the result of one specific slip (forgetting a NOT, reading XOR as OR, half-applying De Morgan), so if your answer is the exact opposite of an option in every row, check your NOTs. For code questions, apply `not`, then `and`, then `or`, and if the stem says evaluation stops once the result is known, stop `and` at the first false value and `or` at the first true value.',
 };

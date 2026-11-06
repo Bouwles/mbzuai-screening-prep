@@ -24,13 +24,13 @@ export const lesson: Lesson = {
     'A singly linked list can only be walked from the front, so searching it is always a linear search: $n$ comparisons in the worst case.\n\n' +
     '### Binary search\n\n' +
     'Binary search only works on a **sorted** list. This precondition is examined a lot. Keep two markers, low and high, around the part of the list that could still contain the target:\n\n' +
-    '1. Find the middle: mid = (low + high) DIV 2, which means divide and **round down**.\n' +
+    '1. Find the middle: `mid = div(low + high, 2)`, where `div` is integer division: divide and **round down**.\n' +
     '2. If the middle item is the target, stop.\n' +
     '3. If the middle item is too small, the target must be to the right: low = mid + 1.\n' +
     '4. If it is too big, the target must be to the left: high = mid - 1.\n' +
     '5. Repeat while low <= high. If low passes high, the target is not there.\n\n' +
     'Each comparison throws away about half of what is left, so a list of 1000 items needs at most 10 comparisons ($2^{10} = 1024$). The worst case is $\\lfloor \\log_2 n \\rfloor + 1$ comparisons, and with $k$ comparisons you can search at most $2^k - 1$ items. The best case is still 1 comparison (the first middle item is the target).\n\n' +
-    '**How to trace:** draw a table with columns low, high, mid, A[mid] and decision. Indexes start at 0, so a list of 9 items has high = 8 at the start.\n\n' +
+    '**How to trace:** draw a table with columns low, high, mid, A[mid] and decision. Arrays are indexed from 1, so an array of 9 items has low = 1 and high = 9 at the start.\n\n' +
     '### Bubble sort\n\n' +
     'One **pass**: go along the list comparing each pair of neighbours and swap them if the left one is bigger. The biggest item "bubbles" to the end in the first pass, so after $k$ passes the $k$ largest items are in their final places at the end. A list of $n$ items needs at most $n - 1$ passes. Because the last $k$ items are already in place after $k$ passes, the next pass can stop before them: the passes make $(n - 1) + (n - 2) + \\cdots + 1 = \\frac{n(n - 1)}{2}$ comparisons in total (for 5 items: $4 + 3 + 2 + 1 = 10$).\n\n' +
     'A common improvement stops as soon as a pass makes **no swaps**. On a list that is already sorted this needs just one pass of $n - 1$ comparisons (the best case). The total number of swaps equals the number of pairs that start in the wrong order.\n\n' +
@@ -52,7 +52,7 @@ export const lesson: Lesson = {
     '| Merge sort | about $n \\log_2 n$ | about $n \\log_2 n$ | yes |',
   formulas: [
     { label: 'Linear search comparisons', tex: '\\text{best} = 1, \\quad \\text{worst} = n, \\quad \\text{average} \\approx \\frac{n}{2}' },
-    { label: 'Binary search middle index', tex: '\\text{mid} = \\left\\lfloor \\frac{\\text{low} + \\text{high}}{2} \\right\\rfloor', note: 'Round down (DIV). Then use low = mid + 1 or high = mid - 1.' },
+    { label: 'Binary search middle index', tex: '\\text{mid} = \\left\\lfloor \\frac{\\text{low} + \\text{high}}{2} \\right\\rfloor', note: 'Round down (`div`). Then use low = mid + 1 or high = mid - 1.' },
     { label: 'Binary search worst case', tex: '\\lfloor \\log_2 n \\rfloor + 1 \\text{ comparisons}', note: 'For example, 100 items: $2^6 = 64 \\le 100 < 128$, so $6 + 1 = 7$.' },
     { label: 'Items searchable with k comparisons', tex: 'n_{\\max} = 2^k - 1' },
     { label: 'Comparisons in a full bubble or selection sort', tex: '(n - 1) + (n - 2) + \\cdots + 1 = \\frac{n(n - 1)}{2}' },
@@ -100,12 +100,12 @@ export const lesson: Lesson = {
     },
     {
       title: 'Binary search trace (exam level)',
-      problem: 'Binary search looks for 23 in `[2, 5, 8, 12, 16, 23, 38, 56, 72, 91]` (indexes 0 to 9). Which values are compared, and how many comparisons are made?',
+      problem: 'Binary search looks for 23 in `[2, 5, 8, 12, 16, 23, 38, 56, 72, 91]`, indexed from 1. Which values are compared, and how many comparisons are made?',
       steps: [
-        'Start: low = 0, high = 9.',
-        'mid = $(0 + 9) \\div 2 = 4.5$, round down to 4. A[4] = 16, and $16 < 23$, so low = 5.',
-        'mid = $(5 + 9) \\div 2 = 7$. A[7] = 56, and $56 > 23$, so high = 6.',
-        'mid = $(5 + 6) \\div 2 = 5.5$, round down to 5. A[5] = 23: found.',
+        'Start: low = 1, high = 10.',
+        'mid = $(1 + 10) \\div 2 = 5.5$, round down to 5. A[5] = 16, and $16 < 23$, so low = 6.',
+        'mid = $(6 + 10) \\div 2 = 8$. A[8] = 56, and $56 > 23$, so high = 7.',
+        'mid = $(6 + 7) \\div 2 = 6.5$, round down to 6. A[6] = 23: found.',
         'Values compared: 16, 56, 23. That is 3 comparisons, within the worst case of $\\lfloor \\log_2 10 \\rfloor + 1 = 4$.',
       ],
       answer: '16, 56, 23 (3 comparisons).',
@@ -113,7 +113,7 @@ export const lesson: Lesson = {
   ],
   traps: [
     'Using binary search on an **unsorted** list. It can miss the target; the list must be sorted first.',
-    'Rounding the middle index **up**. DIV means round down: $(5 + 8) \\div 2 = 6.5$ gives mid = 6, not 7.',
+    'Rounding the middle index **up**. `div` rounds down: $(5 + 8) \\div 2 = 6.5$ gives mid = 6, not 7.',
     'Forgetting the $+1$ in the binary search worst case: 100 items need 7 comparisons, not 6, because 6 comparisons only cover $2^6 - 1 = 63$ items.',
     'Mixing up the sorts: bubble sort fills the **end** with the largest items, selection sort fills the **front** with the smallest, and insertion sort sorts the first $k + 1$ items but leaves the rest untouched.',
     'Miscounting passes: in insertion sort the first pass inserts the **second** item; in selection sort a pass with no swap still counts as a pass.',

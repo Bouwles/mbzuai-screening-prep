@@ -57,10 +57,10 @@ export const lesson: Lesson = {
     '### Word problems\n\n' +
     'Give each unknown a letter, then turn each fact into one equation. Typical pairs: "how many items" and "total cost"; "sum" and "difference"; two different shopping baskets. ' +
     'Always ask yourself at the end: does my answer make sense (whole number of tickets, positive price)?\n\n' +
-    '### Clever substitutions (challenge level)\n\n' +
+    '### Clever substitutions\n\n' +
     'Some systems look scary but become linear with a new letter. For equations containing $\\frac{1}{x}$ and $\\frac{1}{y}$, let $u = \\frac{1}{x}$ and $v = \\frac{1}{y}$. ' +
     'For equations containing $2^x$ and $3^y$, let $a = 2^x$ and $b = 3^y$ (and remember $2^{x+1} = 2 \\times 2^x$). ' +
-    'The official sample question uses $\\sin\\alpha$, $\\cos\\beta$ and $\\tan\\gamma$ as the "letters". Solve the linear system, then **convert back** to the original unknowns.',
+    'The "letters" can even be $\\sin\\alpha$, $\\cos\\beta$ and $\\tan\\gamma$. Solve the linear system, then **convert back** to the original unknowns.',
   formulas: [
     { label: 'General 2 by 2 linear system', tex: 'ax + by = c, \\qquad dx + ey = f' },
     { label: 'Elimination rule', tex: '\\text{same sign} \\Rightarrow \\text{subtract}, \\qquad \\text{different signs} \\Rightarrow \\text{add}', note: 'Make one unknown have the same size of coefficient in both equations first.' },
@@ -140,7 +140,7 @@ export const lesson: Lesson = {
   ],
   examTip:
     'In a 4-option question you rarely need to solve from scratch. **Plug each option into every equation**: the right one works in all of them, and the wrong ones usually satisfy only some (they were built from a slip). ' +
-    'This is the fastest method for 3 by 3 systems and "sample question 3" style systems in $\\sin$, $\\cos$ and $\\tan$. ' +
+    'This is the fastest method for 3 by 3 systems and for systems in $\\sin$, $\\cos$ and $\\tan$. ' +
     'If the question asks for $x + y$, try adding or subtracting the equations first: it often gives the answer in one line. ' +
     'For "no solution / infinitely many" questions, check the ratio of the $x$ and $y$ coefficients ($ae - bd = 0$), then the constants. ' +
     'For word problems, eliminate options that are not whole numbers or not positive when they count people or tickets. ' +

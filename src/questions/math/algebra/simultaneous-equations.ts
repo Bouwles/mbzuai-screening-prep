@@ -45,38 +45,6 @@ export const questions: StaticQuestion[] = [
     check: { optionValues: [7, 3, 14, 6], compute: () => solve2(1, 1, 10, 1, -1, 4).x.value() },
   },
   {
-    id: 'simultaneous-equations-002',
-    subtopic: 'simultaneous-equations',
-    difficulty: 'foundation',
-    stem: 'Use substitution to solve $y = 2x + 1$ and $3x + y = 16$. Give your answer as $(x, y)$.',
-    options: ['$(7, 3)$', '$(3, 7)$', '$(3, 6)$', '$\\left(\\frac{17}{5}, \\frac{39}{5}\\right)$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'The first equation already tells us what $y$ is, so substitute $y = 2x + 1$ into the second equation:\n\n' +
-        '$$3x + (2x + 1) = 16$$\n\n' +
-        '$$5x + 1 = 16$$\n\n' +
-        '$$5x = 15$$\n\n' +
-        '$$x = 3$$\n\n' +
-        'Now find $y$ from $y = 2x + 1$: $y = 2(3) + 1 = 7$.\n\n' +
-        'Check in the second equation: $3(3) + 7 = 16$. So the solution is $(3, 7)$.',
-      whyWrong: [
-        'This has $x$ and $y$ the wrong way round. Check it: $y = 2(7) + 1 = 15$, not $3$.',
-        null,
-        'This forgets the $+1$ when finding $y$: $y = 2(3) + 1 = 7$, not $2(3) = 6$.',
-        'This moves the $+1$ across without changing its sign, giving $5x = 16 + 1 = 17$. It should be $5x = 16 - 1 = 15$.',
-      ],
-      keyIdea: 'If one equation gives $y$ in terms of $x$, substitute that whole expression (in brackets) into the other equation.',
-    },
-    check: {
-      optionValues: ['7,3', '3,7', '3,6', '17/5,39/5'],
-      compute: () => {
-        const x = new Frac(16 - 1, 3 + 2);
-        return `${x},${x.mul(2).add(1)}`;
-      },
-    },
-  },
-  {
     id: 'simultaneous-equations-003',
     subtopic: 'simultaneous-equations',
     difficulty: 'foundation',
@@ -132,9 +100,143 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'simultaneous-equations-005',
+    id: 'simultaneous-equations-019',
     subtopic: 'simultaneous-equations',
     difficulty: 'foundation',
+    stem: 'Two straight lines have different slopes. How many solutions does the pair of equations have?',
+    options: ['Exactly one', 'None', 'Exactly two', 'Infinitely many'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Each linear equation is a straight line, and a solution is a point on both lines.\n\n' +
+        'Lines with different slopes are not parallel, so they cross at exactly one point.',
+      whyWrong: [
+        null,
+        'No solution needs parallel lines, and parallel lines have **equal** slopes.',
+        'Two different straight lines can never meet at exactly two points.',
+        'Infinitely many solutions needs both equations to describe the same line, which would have equal slopes.',
+      ],
+      keyIdea: 'Different slopes mean the lines cross once, so there is exactly one solution.',
+    },
+  },
+  {
+    id: 'simultaneous-equations-020',
+    subtopic: 'simultaneous-equations',
+    difficulty: 'foundation',
+    stem: 'On a graph, what does the solution of a pair of linear simultaneous equations represent?',
+    options: ['The point where the lines cross', 'Where each line meets the $y$-axis', 'The slope of each line', 'Where each line meets the $x$-axis'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A solution is a pair $(x, y)$ that makes **both** equations true, so it lies on both lines.\n\n' +
+        'The only point on both lines is the point where they cross.',
+      whyWrong: [
+        null,
+        'A $y$-intercept lies on its own line, but usually not on the other line, so it does not satisfy both equations.',
+        'A slope measures how steep a line is. A solution is a pair of values $(x, y)$.',
+        'An $x$-intercept lies on its own line, but usually not on the other line, so it does not satisfy both equations.',
+      ],
+      keyIdea: 'The solution of two linear equations is the point where their lines cross.',
+    },
+  },
+  {
+    id: 'simultaneous-equations-021',
+    subtopic: 'simultaneous-equations',
+    difficulty: 'foundation',
+    stem: 'A system of linear equations that has no solution is called:',
+    options: ['Inconsistent', 'Consistent', 'Dependent', 'Homogeneous'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'An **inconsistent** system has no solution: its equations contradict each other, as parallel lines do.\n\n' +
+        'For example, $x + y = 1$ and $x + y = 2$ cannot both be true.',
+      whyWrong: [
+        null,
+        'A consistent system has at least one solution.',
+        'A dependent system has one equation that follows from the others, so it has infinitely many solutions in the two-line case.',
+        'A homogeneous system has every constant equal to 0, so it always has the solution where all the unknowns are 0.',
+      ],
+      keyIdea: 'Inconsistent means no solution; consistent means at least one solution.',
+    },
+  },
+  {
+    id: 'simultaneous-equations-022',
+    subtopic: 'simultaneous-equations',
+    difficulty: 'foundation',
+    stem: 'To eliminate $y$ from $2x + 3y = 7$ and $5x - 3y = 1$, you should:',
+    options: ['add the equations', 'subtract the equations', 'multiply the equations', 'divide one equation by the other'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The $y$ terms are $+3y$ and $-3y$: the same size with opposite signs.\n\n' +
+        'Adding the equations gives $7x = 8$, and $y$ has gone.',
+      whyWrong: [
+        null,
+        'Subtracting gives $-3x + 6y = 6$, so the $y$ terms double instead of cancelling. Subtract only when the signs are the same.',
+        'Multiplying the equations creates terms such as $xy$ and $y^2$, which makes the system harder.',
+        'Dividing one equation by the other gives a fraction with both unknowns in it, so $y$ does not disappear.',
+      ],
+      keyIdea: 'Opposite signs: add. Same signs: subtract.',
+    },
+  },
+  {
+    id: 'simultaneous-equations-023',
+    subtopic: 'simultaneous-equations',
+    difficulty: 'foundation',
+    stem: 'If two linear equations describe the same line, how many solutions does the system have?',
+    options: ['Infinitely many', 'Exactly one', 'Exactly two', 'None'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Every point on the line satisfies both equations, and a line has infinitely many points.\n\n' +
+        'For example, $x + y = 2$ and $2x + 2y = 4$ describe the same line.',
+      whyWrong: [
+        null,
+        'Exactly one solution is the case of two lines with different slopes, which cross once.',
+        'Two straight lines can never share exactly two points: if they share two, they are the same line.',
+        'No solution is the case of parallel lines with different intercepts, which never meet.',
+      ],
+      keyIdea: 'The same line means infinitely many solutions; parallel lines mean none; different slopes mean one.',
+    },
+  },
+
+  // ------------------------------------------------------------------ exam
+  {
+    id: 'simultaneous-equations-002',
+    subtopic: 'simultaneous-equations',
+    difficulty: 'exam',
+    stem: 'Use substitution to solve $y = 2x + 1$ and $3x + y = 16$. Give your answer as $(x, y)$.',
+    options: ['$(7, 3)$', '$(3, 7)$', '$(3, 6)$', '$\\left(\\frac{17}{5}, \\frac{39}{5}\\right)$'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'The first equation already tells us what $y$ is, so substitute $y = 2x + 1$ into the second equation:\n\n' +
+        '$$3x + (2x + 1) = 16$$\n\n' +
+        '$$5x + 1 = 16$$\n\n' +
+        '$$5x = 15$$\n\n' +
+        '$$x = 3$$\n\n' +
+        'Now find $y$ from $y = 2x + 1$: $y = 2(3) + 1 = 7$.\n\n' +
+        'Check in the second equation: $3(3) + 7 = 16$. So the solution is $(3, 7)$.',
+      whyWrong: [
+        'This has $x$ and $y$ the wrong way round. Check it: $y = 2(7) + 1 = 15$, not $3$.',
+        null,
+        'This forgets the $+1$ when finding $y$: $y = 2(3) + 1 = 7$, not $2(3) = 6$.',
+        'This moves the $+1$ across without changing its sign, giving $5x = 16 + 1 = 17$. It should be $5x = 16 - 1 = 15$.',
+      ],
+      keyIdea: 'If one equation gives $y$ in terms of $x$, substitute that whole expression (in brackets) into the other equation.',
+    },
+    check: {
+      optionValues: ['7,3', '3,7', '3,6', '17/5,39/5'],
+      compute: () => {
+        const x = new Frac(16 - 1, 3 + 2);
+        return `${x},${x.mul(2).add(1)}`;
+      },
+    },
+  },
+  {
+    id: 'simultaneous-equations-005',
+    subtopic: 'simultaneous-equations',
+    difficulty: 'exam',
     stem: 'Solve $3x + 2y = 12$ and $5x - 2y = 4$. What is the value of $y$?',
     options: ['$2$', '$-3$', '$3$', '$6$'],
     correctIndex: 2,
@@ -157,8 +259,6 @@ export const questions: StaticQuestion[] = [
     },
     check: { optionValues: [2, -3, 3, 6], compute: () => solve2(3, 2, 12, 5, -2, 4).y.value() },
   },
-
-  // ------------------------------------------------------------------ exam
   {
     id: 'simultaneous-equations-006',
     subtopic: 'simultaneous-equations',
@@ -413,121 +513,10 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'simultaneous-equations-014',
-    subtopic: 'simultaneous-equations',
-    difficulty: 'challenge',
-    stem: 'Solve $\\frac{2}{x} + \\frac{3}{y} = 2$ and $\\frac{4}{x} - \\frac{9}{y} = -1$. Give your answer as $(x, y)$.',
-    options: ['$\\left(\\frac{1}{2}, \\frac{1}{3}\\right)$', '$(3, 2)$', '$\\left(10, \\frac{5}{3}\\right)$', '$(2, 3)$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'These are not linear in $x$ and $y$, but they **are** linear in $u = \\frac{1}{x}$ and $v = \\frac{1}{y}$:\n\n' +
-        '$$2u + 3v = 2$$\n\n' +
-        '$$4u - 9v = -1$$\n\n' +
-        'Multiply the first by 3 (every term): $6u + 9v = 6$. Add to the second:\n\n' +
-        '$$10u = 5 \\quad\\Rightarrow\\quad u = \\frac{1}{2}$$\n\n' +
-        'Substitute: $2 \\times \\frac{1}{2} + 3v = 2$, so $3v = 1$ and $v = \\frac{1}{3}$.\n\n' +
-        'Undo the substitution: $x = \\frac{1}{u} = 2$ and $y = \\frac{1}{v} = 3$.\n\n' +
-        'Check: $\\frac{2}{2} + \\frac{3}{3} = 2$ and $\\frac{4}{2} - \\frac{9}{3} = 2 - 3 = -1$. So $(x, y) = (2, 3)$.',
-      whyWrong: [
-        'These are $u$ and $v$. You must undo the substitution: $x = \\frac{1}{u}$ and $y = \\frac{1}{v}$.',
-        'The numbers are swapped. Check: $\\frac{2}{3} + \\frac{3}{2} = \\frac{13}{6}$, not $2$.',
-        'This multiplies only the left side by 3, writing $6u + 9v = 2$. Then $10u = 1$, $u = \\frac{1}{10}$, $x = 10$, and $y$ comes out as $\\frac{5}{3}$. Every term must be multiplied, including the constant.',
-        null,
-      ],
-      keyIdea: 'A clever substitution (here $u = \\frac{1}{x}$, $v = \\frac{1}{y}$) can turn a non-linear system into an ordinary linear one; remember to convert back at the end.',
-    },
-    check: {
-      optionValues: ['1/2,1/3', '3,2', '10,5/3', '2,3'],
-      compute: () => {
-        const { x: u, y: v } = solve2(2, 3, 2, 4, -9, -1);
-        return `${new Frac(u.d, u.n)},${new Frac(v.d, v.n)}`;
-      },
-    },
-  },
-  {
-    id: 'simultaneous-equations-015',
-    subtopic: 'simultaneous-equations',
-    difficulty: 'challenge',
-    stem: 'Solve the simultaneous equations $2^x + 3^y = 17$ and $2^{x+1} - 3^y = 7$. Give your answer as $(x, y)$.',
-    options: ['$(8, 9)$', '$(3, 2)$', '$(4, 3)$', '$(2, 3)$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'First rewrite $2^{x+1} = 2 \\times 2^x$. Now let $a = 2^x$ and $b = 3^y$:\n\n' +
-        '$$a + b = 17$$\n\n' +
-        '$$2a - b = 7$$\n\n' +
-        'Add the equations: $3a = 24$, so $a = 8$. Then $b = 17 - 8 = 9$.\n\n' +
-        'Convert back:\n\n' +
-        '- $2^x = 8 = 2^3$, so $x = 3$\n' +
-        '- $3^y = 9 = 3^2$, so $y = 2$\n\n' +
-        'Check: $2^3 + 3^2 = 8 + 9 = 17$ and $2^4 - 3^2 = 16 - 9 = 7$. So $(x, y) = (3, 2)$.',
-      whyWrong: [
-        'These are the values of $a = 2^x$ and $b = 3^y$. You still need to solve $2^x = 8$ and $3^y = 9$.',
-        null,
-        'This treats $2^x = 8$ as $2x = 8$ and $3^y = 9$ as $3y = 9$, i.e. multiplication instead of powers. In fact $2^4 = 16$, not $8$.',
-        'The exponents are swapped. Check: $2^2 + 3^3 = 4 + 27 = 31$, not $17$.',
-      ],
-      keyIdea: 'Substitute $a = 2^x$, $b = 3^y$ (using $2^{x+1} = 2 \\times 2^x$) to get a linear system, then convert back with powers.',
-    },
-    check: {
-      optionValues: ['8,9', '3,2', '4,3', '2,3'],
-      compute: () => {
-        const { x: a, y: b } = solve2(1, 1, 17, 2, -1, 7);
-        let x = 0;
-        while (2 ** x < a.value()) x++;
-        let y = 0;
-        while (3 ** y < b.value()) y++;
-        return 2 ** x === a.value() && 3 ** y === b.value() ? `${x},${y}` : 'no integer solution';
-      },
-    },
-  },
-  {
-    id: 'simultaneous-equations-016',
-    subtopic: 'simultaneous-equations',
-    difficulty: 'challenge',
-    stem: 'Solve the system below. What is the value of $y$?\n\n$$x + y + z = 4$$\n\n$$2x + y - z = 0$$\n\n$$x - 2y + 2z = 10$$',
-    options: ['$1$', '$-\\frac{1}{2}$', '$-1$', '$-\\frac{11}{5}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Eliminate $z$ from two different pairs.\n\n' +
-        '- First + second: the $z$ terms cancel and the right-hand sides add to $4$, so $3x + 2y = 4$. Call this (A).\n' +
-        '- Third minus twice the first: $(x - 2y + 2z) - (2x + 2y + 2z) = 10 - 8$, so $-x - 4y = 2$. Call this (B).\n\n' +
-        'From (B): $x = -2 - 4y$. Substitute into (A):\n\n' +
-        '$$3(-2 - 4y) + 2y = 4$$\n\n' +
-        '$$-6 - 12y + 2y = 4$$\n\n' +
-        '$$-10y = 10 \\quad\\Rightarrow\\quad y = -1$$\n\n' +
-        'Then $x = -2 - 4(-1) = 2$ and $z = 4 - 2 - (-1) = 3$.\n\n' +
-        'Check the third equation: $2 - 2(-1) + 2(3) = 2 + 2 + 6 = 10$. So $y = -1$.',
-      whyWrong: [
-        'Sign slip in the last division: $-10y = 10$ gives $y = -1$, not $+1$.',
-        'This doubles the $y$ and $z$ terms of the first equation but forgets to double $x$, writing $x + 2y + 2z = 8$. Subtracting then gives $-4y = 2$. When you multiply an equation, multiply **every** term.',
-        null,
-        'This forgets to double the right-hand side when forming "third minus twice the first", using $10 - 4 = 6$ instead of $10 - 8 = 2$. That gives $-x - 4y = 6$ and leads to $y = -\\frac{11}{5}$.',
-      ],
-      keyIdea: 'To solve three equations in three unknowns, eliminate one variable from two different pairs, solve the resulting 2 by 2 system, then back-substitute.',
-    },
-    check: {
-      optionValues: [1, -0.5, -1, -2.2],
-      compute: () =>
-        solve3(
-          [
-            [1, 1, 1],
-            [2, 1, -1],
-            [1, -2, 2],
-          ],
-          [4, 0, 10],
-        )[1].value(),
-    },
-  },
   {
     id: 'simultaneous-equations-017',
     subtopic: 'simultaneous-equations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'The line $y = 2x + k$ meets the curve $y = x^2 + 4x + 6$ at **exactly one** point. Find $k$.',
     options: ['$5$', '$2$', '$-5$', '$3$'],
     correctIndex: 0,
@@ -562,7 +551,7 @@ export const questions: StaticQuestion[] = [
     id: 'simultaneous-equations-018',
     subtopic: 'simultaneous-equations',
     difficulty: 'exam',
-    stem: 'There are three boxes, A, B and C. Boxes A and B together weigh 13 kg, boxes B and C together weigh 17 kg, and boxes A and C together weigh 16 kg. How much does box B weigh?',
+    stem: 'Boxes A and B together weigh 13 kg, B and C weigh 17 kg, and A and C weigh 16 kg. How much does box B weigh?',
     options: ['$23$ kg', '$30$ kg', '$7$ kg', '$6$ kg'],
     correctIndex: 2,
     markScheme: {

@@ -171,6 +171,130 @@ export const questions: StaticQuestion[] = [
       compute: () => Math.log(3) / Math.log(9),
     },
   },
+  {
+    id: 'logs-exponentials-021',
+    subtopic: 'logs-exponentials',
+    difficulty: 'foundation',
+    stem: 'Which statement means the same as $\\log_b x = y$?',
+    options: ['$b^{y} = x$', '$x^{y} = b$', '$y^{b} = x$', '$b^{x} = y$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A logarithm is a power: $\\log_b x$ is the power of $b$ that gives $x$.\n\n' +
+        'So $\\log_b x = y$ means $b^{y} = x$. For example, $\\log_2 8 = 3$ means $2^{3} = 8$.',
+      whyWrong: [
+        null,
+        'This uses $x$ as the base. The base of the logarithm is $b$, so the power must be on $b$.',
+        'This uses $y$ as the base and $b$ as the power. $y$ is the power, and $b$ is the base.',
+        'This swaps $x$ and $y$. The log $y$ is the power, and $x$ is the result.',
+      ],
+      keyIdea: '$\\log_b x = y$ means exactly the same as $b^{y} = x$.',
+    },
+  },
+  {
+    id: 'logs-exponentials-022',
+    subtopic: 'logs-exponentials',
+    difficulty: 'foundation',
+    stem: 'For any valid base $b$, what is the value of $\\log_b 1$?',
+    options: ['$0$', '$1$', '$b$', 'Undefined'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$\\log_b 1$ asks: **$b$ to what power gives 1?** Any non-zero number to the power 0 is 1, so $\\log_b 1 = 0$.\n\n' +
+        'A valid base is a positive number other than 1.',
+      whyWrong: [
+        null,
+        '$1$ is the value of $\\log_b b$, the power that turns $b$ into itself.',
+        'This takes the base as the answer. The log is the missing power, and $b^{b}$ is not 1.',
+        'A logarithm does not exist for 0 or negative numbers, but 1 is positive.',
+      ],
+      keyIdea: '$\\log_b 1 = 0$, because $b^{0} = 1$.',
+    },
+    check: {
+      // each option evaluated at b = 7
+      optionValues: [0, 1, 7, null],
+      compute: () => Math.log(1) / Math.log(7),
+    },
+  },
+  {
+    id: 'logs-exponentials-023',
+    subtopic: 'logs-exponentials',
+    difficulty: 'foundation',
+    stem: 'What is the value of $\\ln e$?',
+    options: ['$1$', '$0$', '$e$', '$\\frac{1}{e}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$\\ln$ is the **natural logarithm**, the logarithm to base $e$, where $e \\approx 2.718$.\n\n' +
+        '$\\ln e$ asks: **$e$ to what power gives $e$?** The power is 1.',
+      whyWrong: [
+        null,
+        '$0$ is the value of $\\ln 1$, because $e^{0} = 1$.',
+        'This treats $\\ln$ as if it did nothing. The log is the power, not the number you started with.',
+        '$\\frac{1}{e}$ is $e^{-1}$, a power of $e$. The question asks for a logarithm.',
+      ],
+      keyIdea: '$\\ln$ means the logarithm to base $e$, so $\\ln e = 1$.',
+    },
+    check: {
+      optionValues: [1, 0, Math.E, 1 / Math.E],
+      compute: () => Math.log(Math.E),
+    },
+  },
+  {
+    id: 'logs-exponentials-024',
+    subtopic: 'logs-exponentials',
+    difficulty: 'foundation',
+    stem: 'For positive $a$ and $b$, which expression is equal to $\\log(ab)$?',
+    options: ['$\\log a + \\log b$', '$(\\log a)(\\log b)$', '$\\log a - \\log b$', '$a\\log b$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'This is the **product law**: the log of a product is the sum of the logs, $\\log(ab) = \\log a + \\log b$.\n\n' +
+        'It works because multiplying powers of the same base adds the indices.',
+      whyWrong: [
+        null,
+        'This multiplies the logs. A product inside the log becomes a **sum** of logs.',
+        'A difference of logs is the log of a quotient: $\\log a - \\log b = \\log \\frac{a}{b}$.',
+        'This confuses it with the power law, $\\log(b^{a}) = a\\log b$, which is for a power and not a product.',
+      ],
+      keyIdea: 'Product law: $\\log(ab) = \\log a + \\log b$.',
+    },
+    check: {
+      // each option evaluated at a = 2, b = 5 with base 10
+      optionValues: [
+        Math.log10(2) + Math.log10(5),
+        Math.log10(2) * Math.log10(5),
+        Math.log10(2) - Math.log10(5),
+        2 * Math.log10(5),
+      ],
+      compute: () => Math.log10(2 * 5),
+    },
+  },
+  {
+    id: 'logs-exponentials-025',
+    subtopic: 'logs-exponentials',
+    difficulty: 'foundation',
+    stem: 'For $x > 0$, which expression is equal to $\\log(x^{n})$?',
+    options: ['$n\\log x$', '$(\\log x)^{n}$', '$\\log x + n$', '$\\log(nx)$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'This is the **power law**: the index comes down in front as a multiplier, $\\log(x^{n}) = n\\log x$.\n\n' +
+        'For example, with base 10, $\\log(100^{3}) = 3\\log 100 = 3 \\times 2 = 6$.',
+      whyWrong: [
+        null,
+        'This raises the whole log to the power $n$. The index comes down as a multiplier instead.',
+        'This adds the index. The power law multiplies by it.',
+        'This moves the index down inside the log, which changes it to a multiplier of $x$. It has to come outside the log.',
+      ],
+      keyIdea: 'Power law: $\\log(x^{n}) = n\\log x$.',
+    },
+    check: {
+      // each option evaluated at x = 100, n = 3 with base 10
+      optionValues: [3 * 2, 2 ** 3, 2 + 3, Math.log10(300)],
+      compute: () => Math.log10(100 ** 3),
+    },
+  },
   // ------------------------------------------------------------------ exam
   {
     id: 'logs-exponentials-006',
@@ -292,7 +416,7 @@ export const questions: StaticQuestion[] = [
     id: 'logs-exponentials-010',
     subtopic: 'logs-exponentials',
     difficulty: 'exam',
-    stem: 'The amount of a drug in a patient\'s blood is modelled by $C = 200e^{-0.25t}$ mg, where $t$ is the time in hours after the dose. How long does it take for the amount to fall to 50 mg? Give your answer in hours to 1 decimal place.',
+    stem: 'Given $C = 200e^{-0.25t}$, find $t$ when $C = 50$, to 1 decimal place.',
     options: ['$2.4$', '$5.5$', '$3.0$', '$0.3$'],
     correctIndex: 1,
     markScheme: {
@@ -301,12 +425,12 @@ export const questions: StaticQuestion[] = [
         'Divide by 200: $e^{-0.25t} = \\frac{50}{200} = 0.25$.\n\n' +
         'Take $\\ln$ of both sides: $-0.25t = \\ln 0.25 = -1.3863\\ldots$\n\n' +
         'Divide by $-0.25$: $t = \\frac{1.3863}{0.25} = 5.545\\ldots$\n\n' +
-        'So $t = 5.5$ hours (1 d.p.).\n\n' +
-        'Sense check: 50 mg is a quarter of 200 mg, which is two half-lives. One half-life is $\\frac{\\ln 2}{0.25} \\approx 2.77$ h, and two of them make about 5.5 h.',
+        'So $t = 5.5$ (1 d.p.).\n\n' +
+        'Sense check: 50 is a quarter of 200, which is two half-lives. One half-life is $\\frac{\\ln 2}{0.25} \\approx 2.77$, and two of them make about 5.5.',
       whyWrong: [
         'This uses $\\log_{10}$ instead of $\\ln$: $\\frac{\\log 4}{0.25} = 2.4$. Only $\\ln$ undoes $e$.',
         null,
-        'This treats the decay as linear, losing 25% of the original 200 mg (50 mg) every hour: $200 - 50t = 50$ gives $t = 3$. An exponential model loses a proportion of what is **left**, not a fixed amount.',
+        'This treats the decay as linear, losing 25% of the original 200 (which is 50) for each unit of $t$: $200 - 50t = 50$ gives $t = 3$. An exponential model loses a proportion of what is **left**, not a fixed amount.',
         'This multiplies by 0.25 at the end instead of dividing: $1.386 \\times 0.25 = 0.3$.',
       ],
       keyIdea: 'Isolate the exponential first, then take $\\ln$ of both sides to bring the power down.',
@@ -320,7 +444,7 @@ export const questions: StaticQuestion[] = [
     id: 'logs-exponentials-011',
     subtopic: 'logs-exponentials',
     difficulty: 'exam',
-    stem: 'A colony of bacteria is modelled by $P = P_0e^{kt}$, where $t$ is in hours. At $t = 0$ there are 500 bacteria and at $t = 6$ there are 2000. Find $k$, correct to 3 significant figures.',
+    stem: 'Given $P = P_0e^{kt}$ with $P = 500$ at $t = 0$ and $P = 2000$ at $t = 6$, find $k$ to 3 significant figures.',
     options: ['$0.100$', '$1.39$', '$0.667$', '$0.231$'],
     correctIndex: 3,
     markScheme: {
@@ -452,158 +576,6 @@ export const questions: StaticQuestion[] = [
         return [2 * p + q, p + 2 * q, p * q * q, p + q * q];
       })(),
       compute: () => Math.log(18) / Math.log(5),
-    },
-  },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'logs-exponentials-016',
-    subtopic: 'logs-exponentials',
-    difficulty: 'challenge',
-    stem: 'Solve $e^{2x} - 5e^{x} + 6 = 0$.',
-    options: ['$x = 2$ or $x = 3$', 'There are no real solutions', '$x = \\ln 2$ or $x = \\ln 3$', '$x = \\log_{10} 2$ or $x = \\log_{10} 3$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Notice that $e^{2x} = (e^x)^2$. Substitute $u = e^x$:\n\n' +
-        '$u^2 - 5u + 6 = 0$\n\n' +
-        'Factorise: $(u - 2)(u - 3) = 0$, so $u = 2$ or $u = 3$.\n\n' +
-        'Go back to $x$: $e^x = 2$ gives $x = \\ln 2$; $e^x = 3$ gives $x = \\ln 3$.\n\n' +
-        'Both are valid because 2 and 3 are positive ($e^x$ is always positive). So $x = \\ln 2$ or $x = \\ln 3$ (about 0.693 and 1.10).',
-      whyWrong: [
-        'This finds $u = 2$ or $u = 3$ but forgets that $u = e^x$, not $x$. You still need to take $\\ln$.',
-        'This factorises as $(u + 2)(u + 3)$, giving $e^x = -2$ or $-3$, which are impossible. The correct factors are $(u - 2)(u - 3)$ because the middle term is $-5u$.',
-        null,
-        'This undoes $e^x$ with base-10 logs. The inverse of $e^x$ is $\\ln x$.',
-      ],
-      keyIdea: 'An equation in $e^{2x}$ and $e^x$ is a hidden quadratic: substitute $u = e^x$, solve, then take $\\ln$.',
-    },
-    check: {
-      optionValues: ['2.0000,3.0000', 'none', '0.6931,1.0986', '0.3010,0.4771'],
-      compute: () => {
-        const rs = scanRoots((x) => Math.exp(2 * x) - 5 * Math.exp(x) + 6, -5, 5, 1000);
-        return rs.length ? rs.map((r) => r.toFixed(4)).join(',') : 'none';
-      },
-    },
-  },
-  {
-    id: 'logs-exponentials-017',
-    subtopic: 'logs-exponentials',
-    difficulty: 'challenge',
-    stem: 'Find $x$ and $y$ such that\n\n$$\\log_2 x + \\log_3 y = 5$$\n\n$$2\\log_2 x - \\log_3 y = 4$$',
-    options: ['$x = 3,\\ y = 2$', '$x = 9,\\ y = 8$', '$x = 8,\\ y = 9$', '$x = 6,\\ y = 6$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Treat the logs as the unknowns. Let $a = \\log_2 x$ and $b = \\log_3 y$:\n\n' +
-        '$a + b = 5$ and $2a - b = 4$.\n\n' +
-        'Add the two equations: $3a = 9$, so $a = 3$. Then $b = 5 - 3 = 2$.\n\n' +
-        'Undo the logs: $\\log_2 x = 3$ gives $x = 2^3 = 8$; $\\log_3 y = 2$ gives $y = 3^2 = 9$.\n\n' +
-        'Check: $\\log_2 8 + \\log_3 9 = 3 + 2 = 5$ and $2(3) - 2 = 4$. Correct.',
-      whyWrong: [
-        'These are the values of $\\log_2 x$ and $\\log_3 y$. You still have to undo the logs: $x = 2^3$, $y = 3^2$.',
-        'This raises the log value to the base instead of the base to the log value: $x = 3^2$ and $y = 2^3$. From $\\log_2 x = 3$, $x = 2^3$.',
-        null,
-        'This multiplies the base by the log value ($2 \\times 3$ and $3 \\times 2$). Undoing a log means raising the base to a power.',
-      ],
-      keyIdea: 'Substitute $a = \\log_2 x$, $b = \\log_3 y$ to get a linear system, solve it, then undo each log.',
-    },
-    check: {
-      optionValues: ['3,2', '9,8', '8,9', '6,6'],
-      compute: () => {
-        // Cramer's rule for a + b = 5, 2a - b = 4
-        const [a1, b1, c1, a2, b2, c2] = [1, 1, 5, 2, -1, 4];
-        const d = a1 * b2 - b1 * a2;
-        const a = (c1 * b2 - b1 * c2) / d;
-        const b = (a1 * c2 - c1 * a2) / d;
-        return `${Math.round(2 ** a)},${Math.round(3 ** b)}`;
-      },
-    },
-  },
-  {
-    id: 'logs-exponentials-018',
-    subtopic: 'logs-exponentials',
-    difficulty: 'challenge',
-    stem: 'Solve $(\\log_2 x)^2 - 3\\log_2 x + 2 = 0$.',
-    options: ['$x = 4$ only', '$x = 1$ or $x = 2$', '$x = \\frac{1}{4}$ or $x = \\frac{1}{2}$', '$x = 2$ or $x = 4$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Let $u = \\log_2 x$. The equation becomes $u^2 - 3u + 2 = 0$.\n\n' +
-        'Factorise: $(u - 1)(u - 2) = 0$, so $u = 1$ or $u = 2$.\n\n' +
-        'Undo the log: $\\log_2 x = 1$ gives $x = 2$; $\\log_2 x = 2$ gives $x = 2^2 = 4$.\n\n' +
-        'Both are positive, so both are valid. Check $x = 2$: $1 - 3 + 2 = 0$. Check $x = 4$: $4 - 6 + 2 = 0$.',
-      whyWrong: [
-        'This treats $(\\log_2 x)^2$ as $\\log_2(x^2) = 2\\log_2 x$, which turns the equation into $-\\log_2 x + 2 = 0$. Squaring the log is not the same as squaring $x$.',
-        'These are the values of $u = \\log_2 x$. You still have to undo the log: $x = 2^u$.',
-        'This factorises as $(u + 1)(u + 2)$, getting $u = -1$ or $-2$. With a middle term of $-3u$ the factors are $(u - 1)(u - 2)$.',
-        null,
-      ],
-      keyIdea: 'A quadratic in $\\log_2 x$: substitute $u = \\log_2 x$, solve for $u$, then use $x = 2^u$.',
-    },
-    check: {
-      optionValues: ['4', '1,2', '0.25,0.5', '2,4'],
-      compute: () => {
-        const f = (x: number) => Math.log2(x) ** 2 - 3 * Math.log2(x) + 2;
-        return scanRoots(f, 0.01, 100, 9999).map(r6).join(',');
-      },
-    },
-  },
-  {
-    id: 'logs-exponentials-019',
-    subtopic: 'logs-exponentials',
-    difficulty: 'challenge',
-    stem: 'Investment A is worth $A = 1000e^{0.05t}$ dirhams and investment B is worth $B = 1500e^{0.02t}$ dirhams, where $t$ is the time in years. After how many years are the two investments worth the same? Give your answer to 1 decimal place.',
-    options: ['$5.8$', '$8.1$', '$13.5$', '$207.2$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Set them equal: $1000e^{0.05t} = 1500e^{0.02t}$.\n\n' +
-        'Divide both sides by $1000e^{0.02t}$: $\\frac{e^{0.05t}}{e^{0.02t}} = 1.5$, and $\\frac{e^{0.05t}}{e^{0.02t}} = e^{0.05t - 0.02t} = e^{0.03t}$.\n\n' +
-        'So $e^{0.03t} = 1.5$.\n\n' +
-        'Take $\\ln$: $0.03t = \\ln 1.5 = 0.405465\\ldots$\n\n' +
-        'Divide: $t = \\frac{0.405465}{0.03} = 13.515\\ldots$, so $t = 13.5$ years (1 d.p.).',
-      whyWrong: [
-        'This adds the rates instead of subtracting: $e^{0.07t} = 1.5$. Dividing powers of $e$ subtracts the exponents.',
-        'This ignores the growth of B, solving $1000e^{0.05t} = 1500$.',
-        null,
-        'This subtracts the starting values ($1500 - 1000 = 500$) instead of dividing them, solving $e^{0.03t} = 500$.',
-      ],
-      keyIdea: 'Collect the exponentials on one side using $\\frac{e^a}{e^b} = e^{a - b}$, then take $\\ln$.',
-    },
-    check: {
-      optionValues: [5.8, 8.1, 13.5, 207.2],
-      compute: () => dp1(bisect((t) => 1000 * Math.exp(0.05 * t) - 1500 * Math.exp(0.02 * t), 0, 100)),
-    },
-  },
-  {
-    id: 'logs-exponentials-020',
-    subtopic: 'logs-exponentials',
-    difficulty: 'challenge',
-    stem: 'Find the exact value of the product\n\n$$\\log_2 3 \\times \\log_3 4 \\times \\log_4 5 \\times \\cdots \\times \\log_{31} 32$$',
-    options: ['$5$', '$1$', '$16$', '$30$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Change every log to natural logs using $\\log_a b = \\frac{\\ln b}{\\ln a}$:\n\n' +
-        '$$\\frac{\\ln 3}{\\ln 2} \\times \\frac{\\ln 4}{\\ln 3} \\times \\frac{\\ln 5}{\\ln 4} \\times \\cdots \\times \\frac{\\ln 32}{\\ln 31}$$\n\n' +
-        'Each numerator cancels with the next denominator (the product "telescopes"). Only the first denominator and the last numerator survive:\n\n' +
-        '$$\\frac{\\ln 32}{\\ln 2} = \\log_2 32$$\n\n' +
-        'Since $2^5 = 32$, the product equals 5.',
-      whyWrong: [
-        null,
-        'This assumes everything cancels. The first denominator $\\ln 2$ and the last numerator $\\ln 32$ are left over.',
-        'This divides the last number by the first ($\\frac{32}{2}$) instead of taking $\\log_2 32$.',
-        'This counts the factors (there are 30 of them) as if each one equalled 1 and they were added. The factors are multiplied, and they are not equal to 1.',
-      ],
-      keyIdea: 'Converting to a common base turns a chain of logs into a telescoping product: $\\log_a b \\times \\log_b c = \\log_a c$.',
-    },
-    check: {
-      optionValues: [5, 1, 16, 30],
-      compute: () => {
-        let p = 1;
-        for (let k = 2; k <= 31; k++) p *= Math.log(k + 1) / Math.log(k);
-        return p;
-      },
     },
   },
 ];

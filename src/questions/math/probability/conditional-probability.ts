@@ -101,7 +101,7 @@ export const questions: StaticQuestion[] = [
     id: 'conditional-probability-003',
     subtopic: 'conditional-probability',
     difficulty: 'foundation',
-    stem: 'A bag contains 3 red and 5 green counters. A counter is taken at random, its colour is noted and it is **put back**. A second counter is then taken. What is the probability that **both** counters are green?',
+    stem: 'A bag has 3 red and 5 green counters. A counter is taken at random and **put back**, then a second is taken. What is the probability that **both** are green?',
     options: ['$\\frac{5}{14}$', '$\\frac{25}{64}$', '$\\frac{5}{8}$', '$\\frac{39}{64}$'],
     correctIndex: 1,
     markScheme: {
@@ -150,7 +150,7 @@ export const questions: StaticQuestion[] = [
     id: 'conditional-probability-005',
     subtopic: 'conditional-probability',
     difficulty: 'foundation',
-    stem: 'The probability that it rains on a given day is $0.3$. If it rains, the probability that Omar is late for school is $0.4$. If it does not rain, the probability that he is late is $0.1$. What is the probability that it rains **and** Omar is late?',
+    stem: 'It rains on a given day with probability $0.3$. If it rains, Omar is late with probability $0.4$; if not, he is late with probability $0.1$. What is the probability that it rains **and** Omar is late?',
     options: ['$0.4$', '$0.12$', '$0.7$', '$0.19$'],
     correctIndex: 1,
     markScheme: {
@@ -175,7 +175,7 @@ export const questions: StaticQuestion[] = [
     id: 'conditional-probability-006',
     subtopic: 'conditional-probability',
     difficulty: 'exam',
-    stem: 'A factory has two machines. Machine A makes 60% of the items and 5% of its items are faulty. Machine B makes the other 40% and 10% of its items are faulty. An item is chosen at random. What is the probability that it is faulty?',
+    stem: 'Machine A makes 60% of a factory\'s items, and 5% of them are faulty. Machine B makes the other 40%, and 10% of them are faulty. What is the probability that a randomly chosen item is faulty?',
     options: ['$0.075$', '$0.15$', '$0.03$', '$0.07$'],
     correctIndex: 3,
     markScheme: {
@@ -426,45 +426,11 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'conditional-probability-014',
-    subtopic: 'conditional-probability',
-    difficulty: 'challenge',
-    stem: 'In a school, 40% of students travel by bus and the rest walk. Half of the bus students were late at least once this term. Overall, 38% of all students were late at least once. What is the probability that a student who **walks** was late at least once?',
-    options: ['$0.18$', '$0.3$', '$0.2$', '$0.5$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Let $p = P(\\text{late} \\mid \\text{walk})$. The walkers are $1 - 0.4 = 0.6$ of the students.\n\n' +
-        'Law of total probability:\n\n' +
-        '$$P(\\text{late}) = P(\\text{bus})P(\\text{late} \\mid \\text{bus}) + P(\\text{walk})P(\\text{late} \\mid \\text{walk})$$\n\n' +
-        '$$0.38 = 0.4 \\times 0.5 + 0.6p = 0.2 + 0.6p$$\n\n' +
-        '$$0.6p = 0.18 \\quad\\Rightarrow\\quad p = \\frac{0.18}{0.6} = 0.3$$',
-      whyWrong: [
-        'This is $0.38 - 0.2 = P(\\text{walk} \\cap \\text{late})$. It forgets the last step of dividing by $P(\\text{walk}) = 0.6$.',
-        null,
-        'This is $0.4 \\times 0.5 = P(\\text{bus} \\cap \\text{late})$, the bus branch of the tree, not the walkers.',
-        'This is $1 - 0.5$, as if "late given walk" were the complement of "late given bus". They are separate groups; the walk branch has its own probability, found from the overall 38%.',
-      ],
-      keyIdea: 'If the total probability is given, set up $P(L) = \\sum P(\\text{branch})P(L \\mid \\text{branch})$ and solve for the missing conditional probability.',
-    },
-    check: {
-      optionValues: [0.18, 0.3, 0.2, 0.5],
-      compute: () => {
-        const pBus = F(4, 10);
-        const pLateBus = F(1, 2);
-        const pLate = F(38, 100);
-        return pLate.sub(pBus.mul(pLateBus)).div(F(1).sub(pBus)).value();
-      },
-    },
-  },
   {
     id: 'conditional-probability-015',
     subtopic: 'conditional-probability',
     difficulty: 'exam',
-    stem: 'Three machines make all the parts in a workshop. Machine A makes 50% of the parts, B makes 30% and C makes 20%. The percentages of faulty parts are 2% for A, 3% for B and 5% for C. A part is chosen at random and found to be **faulty**. What is the probability that it was made by machine C?',
+    stem: 'Machine A makes 50% of a workshop\'s parts, B makes 30% and C makes 20%. The fault rates are 2% for A, 3% for B and 5% for C. A randomly chosen part is **faulty**. What is the probability that C made it?',
     options: ['$\\frac{1}{2}$', '$\\frac{1}{100}$', '$\\frac{10}{29}$', '$\\frac{1}{20}$'],
     correctIndex: 2,
     markScheme: {
@@ -496,110 +462,71 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'conditional-probability-016',
+    id: 'conditional-probability-019',
     subtopic: 'conditional-probability',
-    difficulty: 'challenge',
-    stem: 'A condition affects 10% of a group of patients. A test is positive for 90% of patients with the condition and for 20% of patients without it. A patient takes the test **twice**, and the two results are independent given whether or not the patient has the condition. **Both** results are positive. What is the probability that the patient has the condition?',
-    options: ['$\\frac{9}{13}$', '$\\frac{1}{3}$', '$\\frac{81}{100}$', '$\\frac{1}{9}$'],
+    difficulty: 'foundation',
+    stem: 'What does $P(A \\mid B)$ mean?',
+    options: ['The probability of $A$, given that $B$ has happened', 'The probability of $B$, given that $A$ has happened', 'The probability that $A$ and $B$ both happen', 'The probability of $A$ divided by the probability of $B$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Let $D$ = has the condition and $T$ = both results positive.\n\n' +
-        '- $P(D \\cap T) = 0.1 \\times 0.9 \\times 0.9 = 0.081$\n' +
-        '- $P(D\' \\cap T) = 0.9 \\times 0.2 \\times 0.2 = 0.036$\n\n' +
-        'Total: $P(T) = 0.081 + 0.036 = 0.117$.\n\n' +
-        '$$P(D \\mid T) = \\frac{0.081}{0.117} = \\frac{81}{117} = \\frac{9}{13}$$\n\n' +
-        'Another way: after one positive, $P(D \\mid +) = \\frac{0.09}{0.09 + 0.18} = \\frac{1}{3}$. Use $\\frac{1}{3}$ as the new prior for the second test: $\\frac{\\frac{1}{3} \\times 0.9}{\\frac{1}{3} \\times 0.9 + \\frac{2}{3} \\times 0.2} = \\frac{0.3}{0.3 + \\frac{2}{15}} = \\frac{9}{13}$.',
+        'The vertical bar means "given". In $P(A \\mid B)$ we already know that $B$ has happened, and we ask how likely $A$ is among those cases.',
       whyWrong: [
         null,
-        'This is $P(D \\mid +)$ after only **one** positive test. A second positive result is more evidence, so the probability must rise above $\\frac{1}{3}$.',
-        'This is $0.9 \\times 0.9 = P(T \\mid D)$, the chance an ill patient gets two positives. It reverses the condition and ignores that only 10% have the condition.',
-        'This squares the one-test answer, $\\left(\\frac{1}{3}\\right)^2$. Evidence is combined by updating with Bayes again, not by multiplying the posterior by itself (that would make more evidence lower the probability).',
+        'This is $P(B \\mid A)$, the reverse conditional. The event after the bar is the one already known.',
+        'This is $P(A \\cap B)$. The conditional probability restricts attention to the cases where $B$ happened.',
+        'The bar means "given", not division. The formula divides the overlap $P(A \\cap B)$ by the probability of $B$.',
       ],
-      keyIdea: 'Independent pieces of evidence multiply along each branch; then apply Bayes once (or update the prior step by step).',
+      keyIdea: 'Read the bar as "given": the event after it is already known to have happened.',
+    },
+  },
+  {
+    id: 'conditional-probability-020',
+    subtopic: 'conditional-probability',
+    difficulty: 'foundation',
+    stem: 'Which formula gives $P(A \\mid B)$, when $P(B) > 0$?',
+    options: ['$\\frac{P(A \\cap B)}{P(B)}$', '$\\frac{P(A \\cap B)}{P(A)}$', '$P(A) \\times P(B)$', '$\\frac{P(A)}{P(B)}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Given that $B$ has happened, the possible cases shrink to $B$. Among those, the ones where $A$ also happens are $A \\cap B$. So\n\n' +
+        '$$P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$$',
+      whyWrong: [
+        null,
+        'This is $P(B \\mid A)$: it divides by the wrong event. Divide by the event after the bar.',
+        'This equals $P(A \\cap B)$ only for independent events, and it is not a conditional probability.',
+        'The top must be the overlap $P(A \\cap B)$, not the whole probability of $A$.',
+      ],
+      keyIdea: 'Conditional probability: the overlap divided by the probability of the given event.',
     },
     check: {
-      optionValues: [9 / 13, 1 / 3, 81 / 100, 1 / 9],
+      // 100 equally likely outcomes: 30 in A, 40 in B, 12 in both
+      optionValues: [12 / 40, 12 / 30, (30 / 100) * (40 / 100), 30 / 40],
       compute: () => {
-        const prior = F(1, 10);
-        const sens = F(9, 10);
-        const fpr = F(2, 10);
-        const ill = prior.mul(sens).mul(sens);
-        const well = F(1).sub(prior).mul(fpr).mul(fpr);
-        return ill.div(ill.add(well)).value();
+        const inA = (x: number) => x < 30;
+        const inB = (x: number) => x >= 18 && x < 58;
+        const all = Array.from({ length: 100 }, (_, i) => i);
+        return all.filter((x) => inA(x) && inB(x)).length / all.filter(inB).length;
       },
     },
   },
   {
-    id: 'conditional-probability-017',
+    id: 'conditional-probability-021',
     subtopic: 'conditional-probability',
-    difficulty: 'challenge',
-    stem: 'A family has two children. Each child is equally likely to be a boy or a girl, independently. You are told that **at least one** of the children is a girl. What is the probability that **both** children are girls?',
-    options: ['$\\frac{1}{2}$', '$\\frac{1}{4}$', '$\\frac{1}{3}$', '$\\frac{2}{3}$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Events $A$ and $B$ are independent. Which expression equals $P(A \\cap B)$?',
+    options: ['$P(A) \\times P(B)$', '$P(A) + P(B)$', '$0$', '$\\frac{P(A)}{P(B)}$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'List the equally likely outcomes (older child first): BB, BG, GB, GG - each has probability $\\frac{1}{4}$.\n\n' +
-        '"At least one girl" removes BB, leaving **3** equally likely outcomes: BG, GB, GG.\n\n' +
-        'Only GG has both girls:\n\n' +
-        '$$P(GG \\mid \\text{at least one G}) = \\frac{P(GG)}{P(\\text{at least one G})} = \\frac{\\frac{1}{4}}{\\frac{3}{4}} = \\frac{1}{3}$$',
+        'Independence means that $P(A \\mid B) = P(A)$. Since $P(A \\cap B) = P(A \\mid B) \\times P(B)$ in general, for independent events\n\n' +
+        '$$P(A \\cap B) = P(A) \\times P(B)$$',
       whyWrong: [
-        'This answers "the other child is a girl" as if we knew **which** child is the girl. We only know at least one is, so BG and GB both remain possible, as well as GG.',
-        'This is $P(GG)$ with no information, $\\frac{1}{2} \\times \\frac{1}{2}$. The condition removes BB, so you divide by $\\frac{3}{4}$.',
         null,
-        'This is the probability of **exactly one** girl given at least one ($\\frac{2}{3}$): the right sample space but the wrong event.',
+        'Adding is for "or" with mutually exclusive events. "And" with independent events multiplies.',
+        'This is true for **mutually exclusive** events, which is a different idea.',
+        'Dividing gives no standard probability. For independent events the probabilities multiply.',
       ],
-      keyIdea: 'Write out the full sample space, cross out what the condition rules out, and count what is left.',
+      keyIdea: 'For independent events, multiply: $P(A \\cap B) = P(A)P(B)$.',
     },
-    check: {
-      optionValues: [1 / 2, 1 / 4, 1 / 3, 2 / 3],
-      compute: () => {
-        const outcomes = ['BB', 'BG', 'GB', 'GG'];
-        const atLeastOne = outcomes.filter((o) => o.includes('G'));
-        const both = atLeastOne.filter((o) => o === 'GG');
-        return F(both.length, atLeastOne.length).value();
-      },
-    },
-  },
-  {
-    id: 'conditional-probability-018',
-    subtopic: 'conditional-probability',
-    difficulty: 'challenge',
-    stem: 'A bag contains 5 red and 3 blue balls. Three balls are taken out one at a time **without replacement**. Given that the **first** ball is red, what is the probability that the **third** ball is red?',
-    options: ['$\\frac{5}{14}$', '$\\frac{5}{8}$', '$\\frac{1}{2}$', '$\\frac{4}{7}$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Once the first ball is known to be red, the bag holds 4 red and 3 blue (7 balls). The second ball is unknown, so split on it:\n\n' +
-        '- Second red, third red: $\\frac{4}{7} \\times \\frac{3}{6} = \\frac{12}{42}$\n' +
-        '- Second blue, third red: $\\frac{3}{7} \\times \\frac{4}{6} = \\frac{12}{42}$\n\n' +
-        'Add: $\\frac{12}{42} + \\frac{12}{42} = \\frac{24}{42} = \\frac{4}{7}$.\n\n' +
-        'Shortcut: with the second ball unseen, the third ball is equally likely to be any of the 7 remaining balls, 4 of which are red, so the answer is $\\frac{4}{7}$.',
-      whyWrong: [
-        'This is $\\frac{5}{8} \\times \\frac{4}{7} = P(\\text{1st red} \\cap \\text{3rd red})$. The first ball being red is **given**, so you should not multiply by $\\frac{5}{8}$ again.',
-        'This ignores the given information: $\\frac{5}{8}$ is the chance the third ball is red when nothing is known about the first ball.',
-        'This is $\\frac{3}{6}$, which assumes the second ball was also red. The second ball is unknown, so both possibilities for it must be included.',
-        null,
-      ],
-      keyIdea: 'Given information changes the bag; any unseen draws in between are handled by adding the branches (or by symmetry).',
-    },
-    check: {
-      optionValues: [5 / 14, 5 / 8, 1 / 2, 4 / 7],
-      compute: () => {
-        // brute force over all ordered triples of distinct balls (0-4 red, 5-7 blue)
-        const isRed = (i: number) => i < 5;
-        let firstRed = 0;
-        let firstAndThirdRed = 0;
-        for (let a = 0; a < 8; a++)
-          for (let b = 0; b < 8; b++)
-            for (let c = 0; c < 8; c++) {
-              if (a === b || b === c || a === c) continue;
-              if (!isRed(a)) continue;
-              firstRed++;
-              if (isRed(c)) firstAndThirdRed++;
-            }
-        return F(firstAndThirdRed, firstRed).value();
-      },
-    },
-  },
-];
+  },];

@@ -19,17 +19,6 @@ function uniqueOr<T>(vals: T[]): T | 'ambiguous' | 'none' {
 const before = <T>(o: T[], x: T, y: T) => o.indexOf(x) < o.indexOf(y);
 /** Positions i and j are neighbours in a row. */
 const adjRow = (i: number, j: number) => Math.abs(i - j) === 1;
-/** Positions i and j are neighbours on a circle of n seats. */
-const adjCircle = (i: number, j: number, n: number) => (i - j + n) % n === 1 || (j - i + n) % n === 1;
-/** Number of rotation-distinct circular seatings among the given list of seatings. */
-function circularDistinct(seatings: string[][]): number {
-  const keys = new Set<string>();
-  for (const s of seatings) {
-    const k = s.indexOf(s.slice().sort()[0]);
-    keys.add([...s.slice(k), ...s.slice(0, k)].join(','));
-  }
-  return keys.size;
-}
 
 export const questions: StaticQuestion[] = [
   // ================================================================ foundation
@@ -115,55 +104,28 @@ export const questions: StaticQuestion[] = [
     id: 'ordering-puzzles-003',
     subtopic: 'ordering-puzzles',
     difficulty: 'foundation',
-    stem: 'Five runners take part in a race and there are no ties. In how many different orders can they finish?',
-    options: ['$15$', '$60$', '$3125$', '$120$'],
+    stem: 'Four runners take part in a race and there are no ties. In how many different orders can they finish?',
+    options: ['$10$', '$12$', '$256$', '$24$'],
     correctIndex: 3,
     markScheme: {
       solution:
         'Fill the places one at a time:\n\n' +
-        '- 1st place: any of the 5 runners, so 5 choices.\n' +
-        '- 2nd place: one runner is used, so 4 choices.\n' +
-        '- 3rd place: 3 choices. 4th place: 2 choices. 5th place: 1 choice.\n\n' +
+        '- 1st place: any of the 4 runners, so 4 choices.\n' +
+        '- 2nd place: one runner is used, so 3 choices.\n' +
+        '- 3rd place: 2 choices. 4th place: 1 choice.\n\n' +
         'Multiply the choices (the counting principle):\n\n' +
-        '$$5 \\times 4 \\times 3 \\times 2 \\times 1 = 5! = 120$$',
+        '$$4 \\times 3 \\times 2 \\times 1 = 4! = 24$$',
       whyWrong: [
-        'This is $5 + 4 + 3 + 2 + 1$: the choices were **added**. Each choice for 1st place can be combined with every choice for 2nd place, so you must **multiply**.',
-        'This is $5 \\times 4 \\times 3$, the number of ways to fill only the first **three** places (gold, silver, bronze). The question asks for the complete finishing order of all five runners, so keep multiplying down to 1.',
-        'This is $5^5$: it allows the same runner to fill more than one place. Once a runner has finished they cannot finish again, so the choices go down by one each time.',
+        'This is $4 + 3 + 2 + 1$: the choices were **added**. Each choice for 1st place can be combined with every choice for 2nd place, so you must **multiply**.',
+        'This is $4 \\times 3$, the number of ways to fill only the first **two** places. The question asks for the complete finishing order, so keep multiplying down to 1.',
+        'This is $4^4$: it allows the same runner to fill more than one place. Once a runner has finished they cannot finish again, so the choices go down by one each time.',
         null,
       ],
       keyIdea: 'The number of ways to arrange $n$ different things in a line is $n! = n \\times (n - 1) \\times \\dots \\times 1$.',
     },
     check: {
-      optionValues: [15, 60, 3125, 120],
-      compute: () => perms(['A', 'B', 'C', 'D', 'E']).length,
-    },
-  },
-  {
-    id: 'ordering-puzzles-004',
-    subtopic: 'ordering-puzzles',
-    difficulty: 'foundation',
-    stem:
-      'Five friends sit around a **round** table with five equally spaced seats. Two seatings count as the same if one is just a rotation of the other (everyone has the same left and right neighbours). How many different seatings are there?',
-    options: ['$24$', '$120$', '$12$', '$4$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'In a row there would be $5! = 120$ orders. Around a round table, rotating everyone one seat gives the **same** seating, and each seating appears in 5 rotations.\n\n' +
-        'Quick method: fix one friend in a seat to remove the rotations, then arrange the other 4 around them:\n\n' +
-        '$$(5 - 1)! = 4! = 4 \\times 3 \\times 2 \\times 1 = 24$$\n\n' +
-        'Check: $\\frac{120}{5} = 24$.',
-      whyWrong: [
-        null,
-        'This is $5! = 120$, the number for a straight **row**. Around a round table each seating has been counted 5 times, once for each rotation.',
-        'This is $\\frac{4!}{2}$: it also treats a seating and its mirror image as the same. The question only says rotations are the same, and a mirror image swaps everyone\'s left and right neighbours.',
-        'This is $5 - 1 = 4$: it uses the right idea of fixing one person but forgets the factorial. The other 4 people can be arranged in $4!$ ways, not 4.',
-      ],
-      keyIdea: 'For $n$ people around a round table (rotations the same), fix one person and arrange the rest: $(n - 1)!$ ways.',
-    },
-    check: {
-      optionValues: [24, 120, 12, 4],
-      compute: () => circularDistinct(perms(['A', 'B', 'C', 'D', 'E'])),
+      optionValues: [10, 12, 256, 24],
+      compute: () => perms(['A', 'B', 'C', 'D']).length,
     },
   },
   {
@@ -209,39 +171,32 @@ export const questions: StaticQuestion[] = [
     id: 'ordering-puzzles-006',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    stem:
-      'Arif, Bea, Chloe, Dev and Eman sit in a row of five seats, numbered 1 to 5 from left to right.\n\n' +
-      '- Chloe sits in the middle seat.\n' +
-      '- Arif sits immediately to the left of Chloe.\n' +
-      '- Eman sits at one end of the row.\n' +
-      '- Bea does not sit next to Chloe.\n\n' +
-      'In which seat does Dev sit?',
-    options: ['Seat 2', 'Seat 4', 'Cannot be determined', 'Seat 5'],
-    correctIndex: 1,
+    stem: 'Arif, Bea, Chloe and Dev fill seats 1 to 4, left to right.\n\n- Chloe is in seat 3.\n- Arif is immediately left of Chloe.\n- Bea is not next to Chloe.\n\nWhere does Dev sit?',
+    options: ['Seat 1', 'Seat 2', 'Seat 4', 'Cannot be determined'],
+    correctIndex: 2,
     markScheme: {
       solution:
         'Place the fixed people first.\n\n' +
-        '1. The middle of 5 seats is seat 3, so Chloe is in seat 3.\n' +
+        '1. Chloe is in seat 3.\n' +
         '2. Immediately to the left of seat 3 is seat 2, so Arif is in seat 2.\n' +
-        '3. Seats left: 1, 4, 5. Bea is not next to Chloe, so Bea cannot be in seat 4. Bea is in seat 1 or seat 5.\n' +
-        '4. Eman is at an end: seat 1 or seat 5.\n' +
-        '5. Bea and Eman therefore take seats 1 and 5 between them (in some order), which leaves only seat 4 for Dev.\n\n' +
-        '| Seat | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- |\n| Person | Bea or Eman | Arif | Chloe | Dev | Eman or Bea |\n\n' +
-        'Bea and Eman could swap, but Dev is in **Seat 4** either way.',
+        '3. Seats left: 1 and 4. Seat 4 is next to Chloe, so Bea cannot be there. Bea is in seat 1.\n' +
+        '4. Dev takes the last seat.\n\n' +
+        '| Seat | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Person | Bea | Arif | Chloe | Dev |\n\n' +
+        'Dev is in **Seat 4**.',
       whyWrong: [
-        'This comes from putting Arif to the **right** of Chloe (seat 4). With seats numbered left to right, "immediately to the left of seat 3" is seat 2, which is Arif\'s seat.',
+        'This reads "not next to" as "next to". Bea would then take seat 4 and leave seat 1 for Dev.',
+        'This puts Arif to the **right** of Chloe, in seat 4, which leaves seat 2 for Dev. With seats numbered left to right, "immediately left of seat 3" is seat 2.',
         null,
-        'It is true that Bea and Eman can swap ends, but both ends are then full, so Dev\'s seat is fixed. Always check whether the person you are asked about is pinned down even if others are not.',
-        'This comes from ignoring the clue about Bea. Without it Dev could be at an end, but Bea must avoid seat 4, so Bea and Eman fill both ends.',
+        'Every clue is needed, but together they fix all four seats, so there is only one arrangement.',
       ],
-      keyIdea: 'Place the people with fixed seats first, then use "not next to" and "at an end" clues to narrow down the remaining seats.',
+      keyIdea: 'Place the people with fixed seats first, then use "not next to" clues to narrow down the remaining seats.',
     },
     check: {
-      optionValues: [2, 4, 'ambiguous', 5],
+      optionValues: [1, 2, 4, 'ambiguous'],
       compute: () => {
-        const sols = perms(['Arif', 'Bea', 'Chloe', 'Dev', 'Eman']).filter((o) => {
+        const sols = perms(['Arif', 'Bea', 'Chloe', 'Dev']).filter((o) => {
           const s = (x: string) => o.indexOf(x);
-          return s('Chloe') === 2 && s('Arif') === s('Chloe') - 1 && (s('Eman') === 0 || s('Eman') === 4) && !adjRow(s('Bea'), s('Chloe'));
+          return s('Chloe') === 2 && s('Arif') === s('Chloe') - 1 && !adjRow(s('Bea'), s('Chloe'));
         });
         return uniqueOr(sols.map((o) => o.indexOf('Dev') + 1));
       },
@@ -298,105 +253,55 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'ordering-puzzles-008',
-    subtopic: 'ordering-puzzles',
-    difficulty: 'exam',
-    stem:
-      'Amir, Bilal, Chen, Dana, Elif and Femi sit around a round table at six equally spaced seats.\n\n' +
-      '- Bilal sits directly opposite Amir.\n' +
-      '- Chen sits immediately clockwise of Amir.\n' +
-      '- Dana does not sit next to Amir.\n' +
-      '- Elif sits immediately clockwise of Dana.\n\n' +
-      'Who sits immediately clockwise of Femi?',
-    options: ['Chen', 'Elif', 'Bilal', 'Dana'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Number the seats 0 to 5 going clockwise and put Amir in seat 0 (in a circle you can always fix one person).\n\n' +
-        '1. Directly opposite seat 0 in a circle of 6 is $0 + 3 =$ seat 3: Bilal.\n' +
-        '2. Immediately clockwise of Amir is seat 1: Chen.\n' +
-        '3. Free seats: 2, 4, 5. Amir\'s neighbours are seats 1 and 5, so Dana is in seat 2 or seat 4.\n' +
-        '4. If Dana were in seat 2, Elif would need seat 3, but Bilal is there. So Dana is in seat 4 and Elif is in seat 5.\n' +
-        '5. Femi takes the last seat, seat 2.\n\n' +
-        '| Seat | 0 | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- | --- |\n| Person | Amir | Chen | Femi | Bilal | Dana | Elif |\n\n' +
-        'Immediately clockwise of Femi (seat 2) is seat 3: **Bilal**.',
-      whyWrong: [
-        'Chen is immediately **anticlockwise** of Femi. This comes from going the wrong way round the table.',
-        'This comes from mixing up Dana and Femi in the last clue (reading it as "Elif sits immediately clockwise of Femi"), which puts Femi in seat 4 and Elif in seat 5. The clue is about Dana: Dana in seat 2 would force Elif into seat 3, which is Bilal\'s, so Dana is in seat 4 and Femi is in seat 2.',
-        null,
-        'Dana is **two** seats clockwise of Femi, not one. "Immediately clockwise" means the very next seat.',
-      ],
-      keyIdea: 'In a circle, fix one person, number the seats in the clockwise direction, and test each "either/or" case until only one survives.',
-    },
-    check: {
-      optionValues: ['Chen', 'Elif', 'Bilal', 'Dana'],
-      compute: () => {
-        const n = 6;
-        // o[k] is the person in seat k; seat numbers increase clockwise
-        const sols = perms(['Amir', 'Bilal', 'Chen', 'Dana', 'Elif', 'Femi']).filter((o) => {
-          const s = (x: string) => o.indexOf(x);
-          return (
-            s('Bilal') === (s('Amir') + 3) % n &&
-            s('Chen') === (s('Amir') + 1) % n &&
-            !adjCircle(s('Dana'), s('Amir'), n) &&
-            s('Elif') === (s('Dana') + 1) % n
-          );
-        });
-        return uniqueOr(sols.map((o) => o[(o.indexOf('Femi') + 1) % n]));
-      },
-    },
-  },
-  {
     id: 'ordering-puzzles-009',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    stem: 'Five people, including Xavier and Yusuf, sit in a row of five chairs. In how many ways can they sit if Xavier and Yusuf **must sit next to each other**?',
-    options: ['$24$', '$48$', '$120$', '$72$'],
+    stem: 'Four people, including Xavier and Yusuf, sit in a row of four chairs. In how many ways can they sit if Xavier and Yusuf **must sit next to each other**?',
+    options: ['$6$', '$12$', '$24$', '$3$'],
     correctIndex: 1,
     markScheme: {
       solution:
         'Use the **block method**.\n\n' +
-        '1. Glue Xavier and Yusuf together into one block. Now there are 4 "units" to arrange: the block and the other 3 people.\n' +
-        '2. Arrange 4 units in a row: $4! = 24$ ways.\n' +
+        '1. Glue Xavier and Yusuf together into one block. Now there are 3 "units" to arrange: the block and the other 2 people.\n' +
+        '2. Arrange 3 units in a row: $3! = 6$ ways.\n' +
         '3. Inside the block they can sit as Xavier-Yusuf or Yusuf-Xavier: 2 ways.\n' +
-        '4. Multiply: $2 \\times 4! = 2 \\times 24 = 48$.',
+        '4. Multiply: $2 \\times 3! = 2 \\times 6 = 12$.',
       whyWrong: [
-        'This is $4!$: it arranges the block but forgets that Xavier and Yusuf can swap places inside it, which doubles the count.',
+        'This is $3!$: it arranges the block but forgets that Xavier and Yusuf can swap places inside it, which doubles the count.',
         null,
-        'This is $5!$, every possible seating. It ignores the condition that the two must be together.',
-        'This is $120 - 48$, the number of seatings where they are **not** next to each other. It answers the opposite question.',
+        'This is $4!$, every possible seating. It ignores the condition that the two must be together.',
+        'This counts only the 3 pairs of neighbouring chairs. It forgets that the pair can swap and that the other two people can swap.',
       ],
       keyIdea: '"Must be together": treat them as one block, arrange the units, then multiply by the number of orders inside the block.',
     },
     check: {
-      optionValues: [24, 48, 120, 72],
-      compute: () => perms(['X', 'Y', 'P', 'Q', 'R']).filter((o) => adjRow(o.indexOf('X'), o.indexOf('Y'))).length,
+      optionValues: [6, 12, 24, 3],
+      compute: () => perms(['X', 'Y', 'P', 'Q']).filter((o) => adjRow(o.indexOf('X'), o.indexOf('Y'))).length,
     },
   },
   {
     id: 'ordering-puzzles-010',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    stem:
-      'Five runners, including Hamad and Isaac, finish a race with no ties. In how many of the possible finishing orders does Hamad finish **before** Isaac (not necessarily immediately before)?',
-    options: ['$60$', '$120$', '$24$', '$48$'],
+    stem: 'Four runners, including Hamad and Isaac, finish a race with no ties. In how many finishing orders does Hamad finish **before** Isaac (not necessarily immediately before)?',
+    options: ['$12$', '$24$', '$6$', '$2$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'There are $5! = 120$ finishing orders altogether.\n\n' +
+        'There are $4! = 24$ finishing orders altogether.\n\n' +
         'Pair each order with the order you get by **swapping** Hamad and Isaac (everyone else stays put). In exactly one of each pair Hamad is ahead. So exactly half of all orders have Hamad before Isaac:\n\n' +
-        '$$\\frac{5!}{2} = \\frac{120}{2} = 60$$',
+        '$$\\frac{4!}{2} = \\frac{24}{2} = 12$$',
       whyWrong: [
         null,
-        'This is $5!$, all orders. It ignores the condition; in half of these orders Isaac beats Hamad.',
-        'This is $4!$, the number of orders where Hamad finishes **immediately** before Isaac (glued together in that order). "Before" allows other runners in between.',
-        'This is $2 \\times 4!$, the number of orders where the two finish **next to each other** in either order. That is a different condition.',
+        'This is $4!$, all orders. It ignores the condition; in half of these orders Isaac beats Hamad.',
+        'This is $3!$, the number of orders where Hamad finishes **immediately** before Isaac (glued together in that order). "Before" allows other runners in between.',
+        'This fixes Hamad first and Isaac second, which is only one of the ways for Hamad to beat Isaac.',
       ],
       keyIdea: 'By symmetry, "A before B" holds in exactly half of all orders: $\\frac{n!}{2}$.',
     },
     check: {
-      optionValues: [60, 120, 24, 48],
-      compute: () => perms(['H', 'I', 'P', 'Q', 'R']).filter((o) => before(o, 'H', 'I')).length,
+      optionValues: [12, 24, 6, 2],
+      compute: () => perms(['H', 'I', 'P', 'Q']).filter((o) => before(o, 'H', 'I')).length,
     },
   },
   {
@@ -447,14 +352,8 @@ export const questions: StaticQuestion[] = [
     id: 'ordering-puzzles-012',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    stem:
-      'Five friends compare heights.\n\n' +
-      '- Ahmed is 20 cm taller than Bassam.\n' +
-      '- Carla is 10 cm shorter than Ahmed.\n' +
-      '- Dina is 5 cm taller than Bassam.\n' +
-      '- Elena is 15 cm shorter than Carla.\n\n' +
-      'Who is the **second shortest**?',
-    options: ['Elena', 'Bassam', 'Dina', 'Carla'],
+    stem: 'Four friends compare heights.\n\n- Ahmed is 20 cm taller than Bassam.\n- Carla is 10 cm shorter than Ahmed.\n- Dina is 5 cm taller than Bassam.\n\nWho is the **second shortest**?',
+    options: ['Bassam', 'Dina', 'Carla', 'Ahmed'],
     correctIndex: 1,
     markScheme: {
       solution:
@@ -462,26 +361,24 @@ export const questions: StaticQuestion[] = [
         '- Ahmed: $0 + 20 = 20$\n' +
         '- Carla: $20 - 10 = 10$\n' +
         '- Dina: $0 + 5 = 5$\n' +
-        '- Elena: $10 - 15 = -5$\n' +
         '- Bassam: $0$\n\n' +
-        'From shortest to tallest: Elena $(-5)$, Bassam $(0)$, Dina $(5)$, Carla $(10)$, Ahmed $(20)$.\n\n' +
-        'The second shortest is **Bassam**.',
+        'From shortest to tallest: Bassam $(0)$, Dina $(5)$, Carla $(10)$, Ahmed $(20)$.\n\n' +
+        'The second shortest is **Dina**.',
       whyWrong: [
-        'Elena is the **shortest**, not the second shortest.',
+        'Bassam is the **shortest**. You get Bassam in second place by measuring Carla from Bassam instead of from Ahmed, which makes her $-10$.',
         null,
-        'This comes from reading "Elena is 15 cm shorter than Carla" as "taller". Then Elena would be $25$ and Dina would be second shortest. Elena is $10 - 15 = -5$.',
-        'This comes from measuring Carla from Bassam instead of from Ahmed ($-10$ instead of $10$). Carla is 10 cm shorter than **Ahmed**: $20 - 10 = 10$.',
+        'Carla is the second **tallest**. This counts from the wrong end of the order.',
+        'Ahmed is the tallest, at the opposite end of the order from the one asked about.',
       ],
       keyIdea: 'When clues give amounts ("20 cm taller"), choose one person as zero and give everyone a number; then just sort the numbers.',
     },
     check: {
-      optionValues: ['Elena', 'Bassam', 'Dina', 'Carla'],
+      optionValues: ['Bassam', 'Dina', 'Carla', 'Ahmed'],
       compute: () => {
         const h: Record<string, number> = { Bassam: 0 };
         h.Ahmed = h.Bassam + 20;
         h.Carla = h.Ahmed - 10;
         h.Dina = h.Bassam + 5;
-        h.Elena = h.Carla - 15;
         return Object.keys(h).sort((a, b) => h[a] - h[b])[1];
       },
     },
@@ -495,7 +392,7 @@ export const questions: StaticQuestion[] = [
       '- Wafa is taller than Xin.\n' +
       '- Yara is taller than Xin.\n' +
       '- Zaid is shorter than Yara.\n\n' +
-      'Which **one** extra clue would make the complete order of heights certain?',
+      'Which extra clue would make the order certain?',
     options: ['Wafa is taller than Yara.', 'Xin is taller than Zaid.', 'Zaid is taller than Wafa.', 'Yara is taller than Wafa.'],
     correctIndex: 2,
     markScheme: {
@@ -534,49 +431,33 @@ export const questions: StaticQuestion[] = [
     id: 'ordering-puzzles-014',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    stem:
-      'Farah, Gus, Hiro, Isla and Jon sit in a row of five seats, numbered 1 to 5 from left to right.\n\n' +
-      '1. Hiro sits next to both Farah and Jon.\n' +
-      '2. Gus sits somewhere to the right of Isla.\n' +
-      '3. Jon does not sit in an end seat.\n' +
-      '4. Farah sits somewhere to the right of Jon.\n' +
-      '5. Gus sits in an end seat.\n\n' +
-      'Who sits in seat 4?',
-    options: ['Hiro', 'Jon', 'Farah', 'Isla'],
-    correctIndex: 2,
+    stem: 'Four people fill seats 1 to 4, left to right.\n\n- Hiro is next to Farah and Jon.\n- Farah is right of Jon.\n- Jon is not at an end.\n\nWho is in seat 3?',
+    options: ['Farah', 'Hiro', 'Jon', 'Gus'],
+    correctIndex: 1,
     markScheme: {
       solution:
-        'Clue 1 means Hiro is in the middle of a block of three: Farah, Hiro, Jon in some order with Hiro in the centre. Clue 4 says Farah is to the right of Jon, so the block reads **Jon, Hiro, Farah** from left to right.\n\n' +
-        'The block can start in seat 1, 2 or 3:\n\n' +
-        '- Start in seat 1: Jon is in seat 1, an end seat. Breaks clue 3.\n' +
-        '- Start in seat 2: Jon 2, Hiro 3, Farah 4. Isla and Gus fill seats 1 and 5; Gus is right of Isla, so Isla 1, Gus 5. Gus is at an end. All clues hold.\n' +
-        '- Start in seat 3: Jon 3, Hiro 4, Farah 5. Isla 1, Gus 2. Gus is not at an end: breaks clue 5.\n\n' +
-        '| Seat | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- |\n| Person | Isla | Jon | Hiro | Farah | Gus |\n\n' +
-        'Seat 4: **Farah**.',
+        'The first clue means Hiro is in the middle of a block of three: Farah, Hiro, Jon in some order with Hiro in the centre. Farah is to the right of Jon, so the block reads **Jon, Hiro, Farah** from left to right.\n\n' +
+        'The block can start in seat 1 or seat 2:\n\n' +
+        '- Start in seat 1: Jon is in seat 1, an end seat. This breaks the last clue.\n' +
+        '- Start in seat 2: Jon 2, Hiro 3, Farah 4, and Gus takes seat 1. All clues hold.\n\n' +
+        '| Seat | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Person | Gus | Jon | Hiro | Farah |\n\n' +
+        'Seat 3: **Hiro**.',
       whyWrong: [
-        'Hiro is in seat 4 in the arrangement Isla, Gus, Jon, Hiro, Farah, which fits clues 1 to 4 but has Gus in seat 2, not at an end. This answer ignores clue 5.',
-        'This comes from reading clue 4 backwards (Farah to the left of Jon), which gives the block Farah, Hiro, Jon and allows Isla, Farah, Hiro, Jon, Gus with Jon in seat 4.',
+        'This ignores the last clue: Jon, Hiro, Farah, Gus fits the first two clues and puts Farah in seat 3, but it has Jon in an end seat.',
         null,
-        'This comes from ignoring clue 3: then Jon, Hiro, Farah, Isla, Gus also fits, with Jon at the end and Isla in seat 4.',
+        'This reads the second clue backwards (Farah left of Jon), which gives Farah, Hiro, Jon, Gus with Jon in seat 3.',
+        'Gus has to sit outside the block of three, so he can only be in seat 1 or seat 4.',
       ],
       keyIdea: 'Combine clues into a fixed block first, then slide the block along the row and reject positions that break a clue.',
     },
     check: {
-      optionValues: ['Hiro', 'Jon', 'Farah', 'Isla'],
+      optionValues: ['Farah', 'Hiro', 'Jon', 'Gus'],
       compute: () => {
-        const sols = perms(['Farah', 'Gus', 'Hiro', 'Isla', 'Jon']).filter((o) => {
+        const sols = perms(['Farah', 'Gus', 'Hiro', 'Jon']).filter((o) => {
           const s = (x: string) => o.indexOf(x);
-          return (
-            adjRow(s('Hiro'), s('Farah')) &&
-            adjRow(s('Hiro'), s('Jon')) &&
-            s('Gus') > s('Isla') &&
-            s('Jon') !== 0 &&
-            s('Jon') !== 4 &&
-            s('Farah') > s('Jon') &&
-            (s('Gus') === 0 || s('Gus') === 4)
-          );
+          return adjRow(s('Hiro'), s('Farah')) && adjRow(s('Hiro'), s('Jon')) && s('Farah') > s('Jon') && s('Jon') !== 0 && s('Jon') !== 3;
         });
-        return uniqueOr(sols.map((o) => o[3]));
+        return uniqueOr(sols.map((o) => o[2]));
       },
     },
   },
@@ -584,272 +465,234 @@ export const questions: StaticQuestion[] = [
     id: 'ordering-puzzles-015',
     subtopic: 'ordering-puzzles',
     difficulty: 'exam',
-    stem: 'This Python program counts arrangements of the letters A, B, C, D that satisfy two conditions. What does it print?',
-    code: {
-      lang: 'python',
-      source:
-        "from itertools import permutations\n\ncount = 0\nfor p in permutations('ABCD'):\n    if p.index('A') < p.index('B') and p[0] != 'C':\n        count += 1\nprint(count)",
-    },
-    options: ['`12`', '`9`', '`18`', '`3`'],
+    stem: 'How many orderings of the letters A, B, C, D have A somewhere before B and do not start with C?',
+    options: ['$12$', '$9$', '$18$', '$3$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        '`permutations(\'ABCD\')` produces all $4! = 24$ orderings, each as a tuple such as `(\'B\', \'A\', \'D\', \'C\')`. An ordering is counted when **both** conditions hold:\n\n' +
-        '- `p.index(\'A\') < p.index(\'B\')`: A comes somewhere before B.\n' +
-        '- `p[0] != \'C\'`: the first letter is not C.\n\n' +
+        'There are $4! = 24$ orderings in total.\n\n' +
         'Step 1: orderings with A before B. By symmetry this is half of 24, so $12$.\n\n' +
-        'Step 2: remove those that start with C. If C is first, the remaining letters A, B, D fill 3 places in $3! = 6$ ways, and A is before B in half of them: $3$.\n\n' +
-        'Step 3: $12 - 3 = 9$.\n\n' +
-        'The program prints `9`.',
+        'Step 2: remove those that start with C. If C is first, the letters A, B, D fill 3 places in $3! = 6$ ways, and A is before B in half of them: $3$.\n\n' +
+        'Step 3: $12 - 3 = 9$.',
       whyWrong: [
-        'This is $\\frac{24}{2}$: it uses only the first condition and forgets the `and p[0] != \'C\'` part.',
+        'This is $\\frac{24}{2}$: it uses only the first condition and forgets that the first letter cannot be C.',
         null,
         'This is $24 - 6$: it uses only the second condition (first letter is not C) and forgets that A must come before B.',
-        'This is the number of orderings that start with C and have A before B, which are exactly the ones the program **excludes**.',
+        'This is the number of orderings that start with C and have A before B, which are exactly the ones to **exclude**.',
       ],
-      keyIdea: 'Counting with two conditions joined by `and`: count those meeting the first condition, then subtract those that meet it but break the second.',
+      keyIdea: 'Counting with two conditions: count those meeting the first condition, then subtract those that meet it but break the second.',
     },
-    python: { stdout: '9' },
     check: {
       optionValues: [12, 9, 18, 3],
       compute: () => perms(['A', 'B', 'C', 'D']).filter((p) => before(p, 'A', 'B') && p[0] !== 'C').length,
     },
   },
-
-  // ================================================================ challenge
   {
-    id: 'ordering-puzzles-016',
+    id: 'ordering-puzzles-022',
     subtopic: 'ordering-puzzles',
-    difficulty: 'challenge',
-    stem:
-      'Leila, Musa, Nour, Omar, Priya and Quinn sit around a round table at six equally spaced seats.\n\n' +
-      '- Musa sits directly opposite Leila.\n' +
-      '- Priya sits immediately clockwise of Musa.\n' +
-      '- Quinn sits next to Leila.\n' +
-      '- Nour does not sit next to Leila.\n' +
-      '- Omar sits next to Priya.\n\n' +
-      'Who sits directly opposite Quinn?',
-    options: ['Nour', 'Musa', 'Omar', 'Priya'],
+    difficulty: 'foundation',
+    stem: 'In how many different orders can $3$ people stand in a line?',
+    options: ['$3$', '$6$', '$9$', '$27$'],
+    correctIndex: 1,
+    markScheme: {
+      solution: 'There are 3 choices for the first place, 2 for the second and 1 for the third:\n\n$$3 \\times 2 \\times 1 = 3! = 6$$',
+      whyWrong: [
+        'This counts the people, not the orders. Each person can stand in several different places.',
+        null,
+        'This is $3 \\times 3$: it multiplies people by places, which is not a counting rule.',
+        'This is $3^3$: it lets the same person stand in more than one place.',
+      ],
+      keyIdea: '$n$ different things can be put in a line in $n!$ ways.',
+    },
+    check: { optionValues: [3, 6, 9, 27], compute: () => perms(['A', 'B', 'C']).length },
+  },
+  {
+    id: 'ordering-puzzles-023',
+    subtopic: 'ordering-puzzles',
+    difficulty: 'foundation',
+    stem: '"Ann sits immediately to the left of Bo" means:',
+    options: ["Ann is in the seat next to Bo, on Bo's left", 'Ann is somewhere to the left of Bo', 'Ann is next to Bo, on either side', 'Ann is in the leftmost seat'],
+    correctIndex: 0,
+    markScheme: {
+      solution: '"Immediately" means the very next seat, and "left of" fixes the side. So Ann is in the seat next to Bo, on Bo\'s left, and nobody sits between them.',
+      whyWrong: [
+        null,
+        'This is "somewhere to the left of", which allows people in between. "Immediately" does not.',
+        'This is "next to", which does not say which side. "To the left of" fixes the side.',
+        'Ann could be anywhere in the row as long as Bo is in the very next seat on her right.',
+      ],
+      keyIdea: '"Immediately left of" means the very next seat on that side; "left of" alone allows a gap.',
+    },
+  },
+  {
+    id: 'ordering-puzzles-024',
+    subtopic: 'ordering-puzzles',
+    difficulty: 'foundation',
+    stem: 'If Ann is taller than Bo and Bo is taller than Cy, which must be true?',
+    options: ['Ann is taller than Cy', 'Cy is taller than Ann', 'Bo is the tallest', 'Ann and Cy are the same height'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Write the clues in one chain, with ">" for "is taller than": Ann > Bo > Cy. Reading along the chain, **Ann is taller than Cy**.',
+      whyWrong: [
+        null,
+        'This reverses the chain. Cy is at the bottom, below both of the others.',
+        'Bo is in the middle: Ann is taller than Bo.',
+        'Ann is above Bo and Cy is below Bo, so they cannot be the same height.',
+      ],
+      keyIdea: 'Comparisons chain together: if A > B and B > C, then A > C.',
+    },
+    check: {
+      optionValues: ['a>c', 'c>a', 'b top', 'same'],
+      compute: () => {
+        const sols = perms(['A', 'B', 'C']).filter((o) => before(o, 'A', 'B') && before(o, 'B', 'C'));
+        const st: [string, (o: string[]) => boolean][] = [
+          ['a>c', (o) => before(o, 'A', 'C')],
+          ['c>a', (o) => before(o, 'C', 'A')],
+          ['b top', (o) => o[0] === 'B'],
+        ];
+        return st.filter(([, f]) => sols.every(f)).map(([k]) => k).join('+');
+      },
+    },
+  },
+  {
+    id: 'ordering-puzzles-025',
+    subtopic: 'ordering-puzzles',
+    difficulty: 'foundation',
+    stem: 'Among four people of different heights, the second shortest is also the:',
+    options: ['third tallest', 'second tallest', 'tallest', 'fourth tallest'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'With $n$ people, position $k$ from the bottom is position $n + 1 - k$ from the top. Here that is $4 + 1 - 2 = 3$, so the second shortest is the **third tallest**.',
+      whyWrong: [
+        null,
+        'This keeps the number 2 when changing ends. The second tallest is a different person from the second shortest.',
+        'The tallest is at the opposite end, and is the fourth shortest.',
+        'The fourth tallest is the shortest, not the second shortest.',
+      ],
+      keyIdea: 'Position $k$ from one end of $n$ people is position $n + 1 - k$ from the other end.',
+    },
+    check: { optionValues: [3, 2, 1, 4], compute: () => 4 + 1 - 2 },
+  },
+  {
+    id: 'ordering-puzzles-026',
+    subtopic: 'ordering-puzzles',
+    difficulty: 'exam',
+    stem: 'Four runners finish with no ties.\n\n- Ann finished second.\n- Bo finished after Ann.\n- Cy finished before Di.\n\nWho finished first?',
+    options: ['Bo', 'Cy', 'Di', 'Cannot be determined'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'Exactly one runner finished ahead of Ann.\n\n' +
+        '- It is not Bo, who finished after Ann.\n' +
+        '- It is not Di, because then Cy would have to be even further ahead, and only one place is free.\n\n' +
+        'So **Cy** finished first. Bo and Di take the last two places in either order, but that does not change the winner.',
+      whyWrong: [
+        'This reads "Bo finished after Ann" as "before". Bo is behind Ann, so Bo cannot be first.',
+        null,
+        'This reads "Cy finished before Di" backwards. Di has Cy ahead of them, so Di cannot be first.',
+        'The last two places can swap, but the question asks about first place, which is fixed.',
+      ],
+      keyIdea: 'An order can be only partly fixed: check whether the position you are asked about is the same in every arrangement.',
+    },
+    check: {
+      optionValues: ['Bo', 'Cy', 'Di', 'ambiguous'],
+      compute: () => {
+        const sols = perms(['Ann', 'Bo', 'Cy', 'Di']).filter((o) => o[1] === 'Ann' && before(o, 'Ann', 'Bo') && before(o, 'Cy', 'Di'));
+        return uniqueOr(sols.map((o) => o[0]));
+      },
+    },
+  },
+  {
+    id: 'ordering-puzzles-027',
+    subtopic: 'ordering-puzzles',
+    difficulty: 'exam',
+    stem: 'Pam scored more than Quo, and Rae scored more than Sid. Which order, from highest to lowest, is **impossible**?',
+    options: ['Pam, Quo, Rae, Sid', 'Rae, Pam, Sid, Quo', 'Pam, Rae, Sid, Quo', 'Quo, Sid, Pam, Rae'],
     correctIndex: 3,
     markScheme: {
       solution:
-        'Number the seats 0 to 5 clockwise and fix Leila in seat 0.\n\n' +
-        '1. Opposite seat 0 (3 seats round, half of 6) is seat 3: Musa.\n' +
-        '2. Immediately clockwise of seat 3 is seat 4: Priya.\n' +
-        '3. Free seats: 1, 2, 5. Leila\'s neighbours are seats 1 and 5.\n' +
-        '4. Nour is not next to Leila, so Nour cannot be in 1 or 5: Nour is in seat 2.\n' +
-        '5. Omar is next to Priya (seat 4), whose neighbours are seats 3 and 5. Seat 3 is Musa\'s, so Omar is in seat 5.\n' +
-        '6. Quinn takes seat 1, which is next to Leila, as required.\n\n' +
-        '| Seat | 0 | 1 | 2 | 3 | 4 | 5 |\n| --- | --- | --- | --- | --- | --- | --- |\n| Person | Leila | Quinn | Nour | Musa | Priya | Omar |\n\n' +
-        'Opposite seat 1 is seat $1 + 3 = 4$: **Priya**.',
+        'Test each order against both clues: Pam must be above Quo, and Rae must be above Sid.\n\n' +
+        '| Order | Pam above Quo? | Rae above Sid? |\n| --- | --- | --- |\n' +
+        '| Pam, Quo, Rae, Sid | yes | yes |\n' +
+        '| Rae, Pam, Sid, Quo | yes | yes |\n' +
+        '| Pam, Rae, Sid, Quo | yes | yes |\n' +
+        '| Quo, Sid, Pam, Rae | **no** | **no** |\n\n' +
+        'Only **Quo, Sid, Pam, Rae** breaks the clues.',
       whyWrong: [
-        'This comes from swapping Quinn and Omar (Quinn in seat 5, opposite seat 2). That ignores the clue that Omar sits next to Priya, which forces Omar into seat 5.',
-        'Musa is only **two** seats clockwise of Quinn. In a circle of 6, directly opposite means 3 seats away.',
-        'Omar is only **two** seats anticlockwise of Quinn (seat 1 to seat 0 to seat 5). Directly opposite means 3 seats away in either direction.',
+        'This order fits both clues. The two pairs do not have to mix: nothing links them to each other.',
+        'This order fits both clues. Pam and Quo may have other people between them, because "more than" does not mean "next to".',
+        'This order fits both clues. Pam is above Quo and Rae is above Sid, even with the pairs overlapping.',
         null,
       ],
-      keyIdea: 'In a circle of $n$ equally spaced seats, the seat directly opposite seat $k$ is $\\frac{n}{2}$ seats away, in either direction.',
+      keyIdea: 'To rule out an order, one broken clue is enough; to allow an order, every clue must hold.',
     },
     check: {
-      optionValues: ['Nour', 'Musa', 'Omar', 'Priya'],
+      optionValues: ['Pam,Quo,Rae,Sid', 'Rae,Pam,Sid,Quo', 'Pam,Rae,Sid,Quo', 'Quo,Sid,Pam,Rae'],
       compute: () => {
-        const n = 6;
-        const sols = perms(['Leila', 'Musa', 'Nour', 'Omar', 'Priya', 'Quinn']).filter((o) => {
-          const s = (x: string) => o.indexOf(x);
-          return (
-            s('Musa') === (s('Leila') + n / 2) % n &&
-            s('Priya') === (s('Musa') + 1) % n &&
-            adjCircle(s('Quinn'), s('Leila'), n) &&
-            !adjCircle(s('Nour'), s('Leila'), n) &&
-            adjCircle(s('Omar'), s('Priya'), n)
-          );
-        });
-        return uniqueOr(sols.map((o) => o[(o.indexOf('Quinn') + n / 2) % n]));
+        const opts = ['Pam,Quo,Rae,Sid', 'Rae,Pam,Sid,Quo', 'Pam,Rae,Sid,Quo', 'Quo,Sid,Pam,Rae'];
+        return opts.filter((t) => {
+          const o = t.split(',');
+          return !(before(o, 'Pam', 'Quo') && before(o, 'Rae', 'Sid'));
+        }).join('+');
       },
     },
   },
   {
-    id: 'ordering-puzzles-017',
+    id: 'ordering-puzzles-028',
     subtopic: 'ordering-puzzles',
-    difficulty: 'challenge',
-    stem:
-      'Six people, including Rania and Sami, sit around a round table with six equally spaced seats. Seatings that are rotations of each other count as the same. In how many seatings are Rania and Sami **not** next to each other?',
-    options: ['$48$', '$72$', '$120$', '$96$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '**Step 1: all seatings.** Around a round table, $n$ people can sit in $(n - 1)!$ ways: $(6 - 1)! = 5! = 120$.\n\n' +
-        '**Step 2: seatings where they ARE together.** Glue Rania and Sami into one block. Now there are 5 units around the table: $(5 - 1)! = 4! = 24$ ways. The block can be Rania-Sami or Sami-Rania: $\\times 2$. Together: $2 \\times 24 = 48$.\n\n' +
-        '**Step 3: subtract.** Not together $=$ all $-$ together $= 120 - 48 = 72$.\n\n' +
-        'Check another way: fix Rania in a seat. Sami can take any of the other 5 seats, but 2 of them are next to Rania, so 3 seats are allowed. The other 4 people fill the rest in $4! = 24$ ways: $3 \\times 24 = 72$.',
-      whyWrong: [
-        'This is $2 \\times 4!$, the number of seatings where they **are** together. You still need to subtract it from the total.',
-        null,
-        'This is $5!$, every circular seating. It ignores the condition.',
-        'This is $120 - 24$: it forgot that the glued block can be in either order (Rania-Sami or Sami-Rania), so it subtracted only half of the "together" seatings.',
-      ],
-      keyIdea: '"Not together" $=$ total $-$ "together"; around a table use $(n - 1)!$ for the total and $2 \\times (n - 2)!$ for "together".',
-    },
-    check: {
-      optionValues: [48, 72, 120, 96],
-      compute: () => {
-        const seatings = perms(['R', 'S', 'A', 'B', 'C', 'D']).filter((o) => !adjCircle(o.indexOf('R'), o.indexOf('S'), 6));
-        return circularDistinct(seatings);
-      },
-    },
-  },
-  {
-    id: 'ordering-puzzles-018',
-    subtopic: 'ordering-puzzles',
-    difficulty: 'challenge',
-    stem:
-      'Aisha, Ben, Carlos and Divya each have a different favourite programming language (Python, Java, C, Rust) and have each been coding for a different whole number of years (1, 2, 3 or 4).\n\n' +
-      '1. The Python fan has been coding for 3 years longer than Ben.\n' +
-      '2. Divya has been coding for 4 years.\n' +
-      '3. Carlos likes C and has been coding for longer than Aisha.\n' +
-      '4. The Rust fan has been coding for 1 year.\n\n' +
-      'For how many years has the **Java** fan been coding?',
-    options: ['$3$', '$2$', '$1$', '$4$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Start with the most restrictive clue. Clue 1 says the Python fan has (Ben\'s years) $+ 3$, and the years only go up to 4.\n\n' +
-        '1. So Ben has 1 year and the Python fan has 4 years.\n' +
-        '2. Clue 2: Divya has 4 years, so Divya is the Python fan.\n' +
-        '3. Clue 4: the Rust fan has 1 year, and Ben has 1 year, so Ben likes Rust.\n' +
-        '4. Clue 3: Carlos likes C. The only language left is Java, so Aisha likes Java.\n' +
-        '5. Years left for Aisha and Carlos: 2 and 3. Carlos has coded longer than Aisha, so Carlos has 3 and Aisha has 2.\n\n' +
-        '| Person | Language | Years |\n| --- | --- | --- |\n| Aisha | Java | 2 |\n| Ben | Rust | 1 |\n| Carlos | C | 3 |\n| Divya | Python | 4 |\n\n' +
-        'The Java fan (Aisha) has been coding for **2** years.',
-      whyWrong: [
-        'This comes from reading clue 3 backwards and giving Aisha more years than Carlos. Carlos has coded **longer**, so Carlos gets 3 and Aisha gets 2.',
-        null,
-        'This is Ben\'s number of years, and Ben is the **Rust** fan. Make sure you answer for the person the question asks about (the Java fan).',
-        'This comes from reading clue 1 as "the Python fan has coded for 3 years". That makes Ben the Python fan and leaves Java to Divya with 4 years, but clue 1 says 3 years **longer than Ben**.',
-      ],
-      keyIdea: 'Start from the most restrictive clue (here "3 years longer" when the maximum is 4), then let each deduction unlock the next.',
-    },
-    check: {
-      optionValues: [3, 2, 1, 4],
-      compute: () => {
-        const people = ['Aisha', 'Ben', 'Carlos', 'Divya'];
-        const answers: number[] = [];
-        for (const lang of perms(['Python', 'Java', 'C', 'Rust'])) {
-          for (const yrs of perms([1, 2, 3, 4])) {
-            const y = (p: string) => yrs[people.indexOf(p)];
-            const fan = (l: string) => people[lang.indexOf(l)];
-            const ok =
-              y(fan('Python')) === y('Ben') + 3 &&
-              y('Divya') === 4 &&
-              fan('C') === 'Carlos' &&
-              y('Carlos') > y('Aisha') &&
-              y(fan('Rust')) === 1;
-            if (ok) answers.push(y(fan('Java')));
-          }
-        }
-        return uniqueOr(answers);
-      },
-    },
-  },
-  {
-    id: 'ordering-puzzles-019',
-    subtopic: 'ordering-puzzles',
-    difficulty: 'challenge',
-    stem:
-      'Six runners, P, Q, R, S, T and U, finish a race with no ties.\n\n' +
-      '1. S finished last.\n' +
-      '2. R finished immediately after U.\n' +
-      '3. Exactly two runners finished between P and Q.\n' +
-      '4. T finished before P.\n' +
-      '5. Q finished before U.\n\n' +
-      'Who finished **second**?',
-    options: ['T', 'P', 'Q', 'U'],
+    difficulty: 'exam',
+    stem: 'Four people fill seats 1 to 4, left to right.\n\n- Amy is in an end seat.\n- Exactly one person sits between Amy and Ben.\n- Cal is in seat 4.\n\nWho is in seat 2?',
+    options: ['Ben', 'Cal', 'Dot', 'Amy'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Clue 1: S is 6th, so P, Q, R, T, U fill places 1 to 5.\n\n' +
-        'Clue 3: exactly two runners between P and Q means their places differ by 3. Within places 1 to 5 the pairs are $\\{1, 4\\}$ and $\\{2, 5\\}$.\n\n' +
-        'Try each case (U and R must be consecutive, U first):\n\n' +
-        '- P 1st: T cannot finish before P. Rejected.\n' +
-        '- P 4th, Q 1st: free places 2, 3, 5. U, R must be 2, 3, leaving T 5th, after P. Breaks clue 4.\n' +
-        '- P 2nd, Q 5th: free places 1, 3, 4. U 3rd, R 4th, T 1st. But Q (5th) is after U (3rd). Breaks clue 5.\n' +
-        '- P 5th, Q 2nd: free places 1, 3, 4. U 3rd, R 4th, T 1st. T is before P and Q is before U. All clues hold.\n\n' +
-        '| Place | 1st | 2nd | 3rd | 4th | 5th | 6th |\n| --- | --- | --- | --- | --- | --- | --- |\n| Runner | T | Q | U | R | P | S |\n\n' +
-        'Second place: **Q**.',
+        '1. Cal is in seat 4, so the end seat left for Amy is seat 1.\n' +
+        '2. Exactly one person between Amy and Ben means their seat numbers differ by 2, so Ben is in seat 3.\n' +
+        '3. Dot takes the last seat, seat 2.\n\n' +
+        '| Seat | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Person | Amy | Dot | Ben | Cal |',
       whyWrong: [
-        'This comes from reading "exactly two runners between P and Q" as only **one** runner between them (places differing by 2), which gives Q, T, P, U, R, S.',
-        'P is second in T, P, U, R, Q, S, which fits clues 1 to 4 but has Q after U. This answer forgets to apply clue 5.',
+        'This reads "exactly one person between" as "next to". One person between means the seat numbers differ by 2.',
+        'Cal is fixed in seat 4 by the last clue.',
         null,
-        'This comes from ignoring clue 4: then Q, U, R, P, T, S also fits the other clues, with U second. But T must finish before P.',
+        'Seat 2 is not an end seat, and Amy must be in an end seat.',
       ],
-      keyIdea: '"Exactly $k$ between X and Y" means their positions differ by $k + 1$: list the possible position pairs and test each case.',
+      keyIdea: 'Exactly $k$ people between two people means their seat numbers differ by $k + 1$.',
     },
     check: {
-      optionValues: ['T', 'P', 'Q', 'U'],
+      optionValues: ['Ben', 'Cal', 'Dot', 'Amy'],
       compute: () => {
-        const sols = perms(['P', 'Q', 'R', 'S', 'T', 'U']).filter((o) => {
+        const sols = perms(['Amy', 'Ben', 'Cal', 'Dot']).filter((o) => {
           const s = (x: string) => o.indexOf(x);
-          return s('S') === 5 && s('R') === s('U') + 1 && Math.abs(s('P') - s('Q')) === 3 && s('T') < s('P') && s('Q') < s('U');
+          return (s('Amy') === 0 || s('Amy') === 3) && Math.abs(s('Amy') - s('Ben')) === 2 && s('Cal') === 3;
         });
         return uniqueOr(sols.map((o) => o[1]));
       },
     },
   },
   {
-    id: 'ordering-puzzles-020',
+    id: 'ordering-puzzles-029',
     subtopic: 'ordering-puzzles',
-    difficulty: 'challenge',
-    stem:
-      'Four boys and three girls (all different people) stand in a row of seven. In how many ways can they stand if **no two boys stand next to each other and no two girls stand next to each other**?',
-    options: ['$288$', '$5040$', '$144$', '$30$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'No two of the same kind can be neighbours, so boys and girls must **alternate**.\n\n' +
-        '1. With 4 boys and 3 girls in 7 places, the only alternating pattern is B G B G B G B. (Starting with a girl, G B G B G B G, would need 4 girls.)\n' +
-        '2. Arrange the 4 boys in the 4 B places: $4! = 24$ ways.\n' +
-        '3. Arrange the 3 girls in the 3 G places: $3! = 6$ ways.\n' +
-        '4. Multiply: $1 \\times 24 \\times 6 = 144$.',
-      whyWrong: [
-        'This is $2 \\times 4! \\times 3!$: it doubles for "start with a boy or start with a girl". That doubling is right when the groups are the same size, but with 4 boys and 3 girls a row starting with a girl is impossible.',
-        'This is $7!$, every possible line-up, ignoring the condition.',
-        null,
-        'This is $4! + 3!$: the two arrangements were **added**. Every boy order combines with every girl order, so multiply.',
-      ],
-      keyIdea: 'For alternating arrangements, first find which patterns are possible, then multiply the arrangements within each group.',
-    },
-    check: {
-      optionValues: [288, 5040, 144, 30],
-      compute: () =>
-        perms(['B1', 'B2', 'B3', 'B4', 'G1', 'G2', 'G3']).filter((o) => o.every((x, i) => i === 0 || x[0] !== o[i - 1][0])).length,
-    },
-  },
-  {
-    id: 'ordering-puzzles-021',
-    subtopic: 'ordering-puzzles',
-    difficulty: 'challenge',
-    stem:
-      'Five people, Adel, Basma, Chris, Dua and Eli, sit in a row of five seats. Chris must sit in one of the two **end** seats, and Adel and Basma must **not** sit next to each other. How many seatings are possible?',
-    options: ['$24$', '$48$', '$72$', '$36$'],
+    difficulty: 'exam',
+    stem: 'Four people stand in a line. In how many orders is Ann **not** first?',
+    options: ['$18$', '$6$', '$24$', '$12$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        '**Step 1: Chris at an end.** Chris has 2 choices (left end or right end). The other 4 people fill the other 4 seats in $4! = 24$ ways. Total: $2 \\times 24 = 48$.\n\n' +
-        '**Step 2: of these, count where Adel and Basma ARE next to each other.** With Chris at an end, the other 4 seats form an unbroken row of 4. Glue Adel and Basma into a block: the block and Dua and Eli are 3 units, arranged in $3! = 6$ ways, times 2 for the order inside the block: $12$ per end. For both ends: $2 \\times 12 = 24$.\n\n' +
-        '**Step 3: subtract.** $48 - 24 = 24$.\n\n' +
-        'Check: with Chris on the left, seats 2 to 5 hold the others. The non-adjacent seat pairs for Adel and Basma are $\\{2, 4\\}$, $\\{2, 5\\}$ and $\\{3, 5\\}$: 3 pairs, times 2 orders, times $2!$ for Dua and Eli $= 12$. Double for Chris on the right: $24$.',
+        'Count everything, then subtract what is not allowed.\n\n' +
+        '- All orders: $4! = 24$.\n' +
+        '- Ann first: the other 3 people fill the remaining places in $3! = 6$ ways.\n\n' +
+        'Ann not first: $24 - 6 = 18$.',
       whyWrong: [
         null,
-        'This is $2 \\times 4!$, the seatings with Chris at an end. It forgets the condition that Adel and Basma must not be next to each other.',
-        'This is $5! - 2 \\times 4!$, the seatings where Adel and Basma are apart, but it forgets that Chris must be at an end.',
-        'This is $48 - 12$: when subtracting the "together" cases it counted only one end for Chris (or only one order of the Adel-Basma block).',
+        'This is the number of orders where Ann **is** first. It still has to be subtracted from the total.',
+        'This is $4!$, every order. It ignores the condition.',
+        'This assumes Ann is first in half of all orders. She is first in only 1 of every 4, since there are 4 places.',
       ],
-      keyIdea: 'Apply the "fixed position" condition first, then subtract the unwanted "together" cases counted under the same condition.',
+      keyIdea: '"Not" conditions are often easiest as the total minus the cases you do not want.',
     },
     check: {
-      optionValues: [24, 48, 72, 36],
-      compute: () =>
-        perms(['A', 'B', 'C', 'D', 'E']).filter((o) => (o.indexOf('C') === 0 || o.indexOf('C') === 4) && !adjRow(o.indexOf('A'), o.indexOf('B'))).length,
+      optionValues: [18, 6, 24, 12],
+      compute: () => perms(['Ann', 'B', 'C', 'D']).filter((o) => o[0] !== 'Ann').length,
     },
   },
 ];

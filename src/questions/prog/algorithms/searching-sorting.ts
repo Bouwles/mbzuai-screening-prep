@@ -1,5 +1,8 @@
 import type { StaticQuestion } from '../../../types';
 
+/** Join source lines into one code string. */
+const L = (...lines: string[]) => lines.join('\n');
+
 // ---------------------------------------------------------------- small simulators used ONLY by the answer checks
 const key = (a: number[]) => a.join(',');
 
@@ -37,16 +40,16 @@ function insertionPasses(src: number[], k: number): number[] {
   return a;
 }
 
-/** Values compared with the target in a standard (round-down) binary search. */
+/** Values compared with the target in a binary search over positions 1..n, rounding the middle down. */
 function binaryProbes(a: number[], target: number): number[] {
-  let lo = 0;
-  let hi = a.length - 1;
+  let lo = 1;
+  let hi = a.length;
   const seen: number[] = [];
   while (lo <= hi) {
     const mid = Math.floor((lo + hi) / 2);
-    seen.push(a[mid]);
-    if (a[mid] === target) break;
-    if (a[mid] < target) lo = mid + 1;
+    seen.push(a[mid - 1]);
+    if (a[mid - 1] === target) break;
+    if (a[mid - 1] < target) lo = mid + 1;
     else hi = mid - 1;
   }
   return seen;
@@ -73,39 +76,25 @@ function mergeComparisons(x: number[], y: number[]): number {
   return c;
 }
 
-/** Merge sort that counts every comparison made while merging. */
-function mergeSortCount(a: number[]): { sorted: number[]; comps: number } {
-  if (a.length <= 1) return { sorted: a.slice(), comps: 0 };
-  const h = Math.floor(a.length / 2);
-  const L = mergeSortCount(a.slice(0, h));
-  const R = mergeSortCount(a.slice(h));
-  const out: number[] = [];
-  let i = 0;
-  let j = 0;
-  let c = 0;
-  while (i < L.sorted.length && j < R.sorted.length) {
-    c++;
-    if (L.sorted[i] <= R.sorted[j]) out.push(L.sorted[i++]);
-    else out.push(R.sorted[j++]);
-  }
-  out.push(...L.sorted.slice(i), ...R.sorted.slice(j));
-  return { sorted: out, comps: L.comps + R.comps + c };
-}
-
-const BSEARCH_PSEUDO =
-  'low ← 0\n' +
-  'high ← n - 1\n' +
-  'WHILE low <= high DO\n' +
-  '    mid ← (low + high) DIV 2\n' +
-  '    IF A[mid] = target THEN\n' +
-  '        RETURN mid\n' +
-  '    ELSE IF A[mid] < target THEN\n' +
-  '        low ← mid + 1\n' +
-  '    ELSE\n' +
-  '        ______________\n' +
-  '    ENDIF\n' +
-  'ENDWHILE\n' +
-  'RETURN -1';
+const BSEARCH_PSEUDO = L(
+  'function search(A, n, target)',
+  '   low = 1',
+  '   high = n',
+  '   while (low <= high)',
+  '      mid = div(low + high, 2) // div is integer division',
+  '      if A[mid] == target',
+  '         return mid',
+  '      else',
+  '         if A[mid] < target',
+  '            low = mid + 1',
+  '         else',
+  '            // missing line',
+  '         end if',
+  '      end if',
+  '   end while',
+  '   return 0',
+  'end function',
+);
 
 export const questions: StaticQuestion[] = [
   // ======================================================== FOUNDATION
@@ -113,24 +102,19 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-001',
     subtopic: 'searching-sorting',
     difficulty: 'foundation',
-    stem: 'Binary search finds an item by checking the **middle** element of the list and then throwing away the half that cannot contain the target. What must be true about the list for binary search to work correctly?',
-    options: [
-      'The list must have no duplicate values',
-      'The length of the list must be a power of 2',
-      'The list must be sorted (in order)',
-      'The list must contain only numbers',
-    ],
+    stem: 'A precondition for binary search on a list is that the list:',
+    options: ['Has no duplicate values', 'Has a power of 2 as its length', 'Is sorted', 'Contains only numbers'],
     correctIndex: 2,
     markScheme: {
       solution:
         'After comparing the target with the middle element, binary search decides which half to keep:\n\n' +
         '- if the target is **smaller** than the middle element, it keeps only the left half;\n' +
         '- if the target is **bigger**, it keeps only the right half.\n\n' +
-        'This decision is only safe if every item on the left is smaller than (or equal to) the middle and every item on the right is bigger, in other words if the list is **sorted**. On an unsorted list the target could be sitting in the half that was thrown away, so the search could wrongly report "not found".\n\n' +
-        'So the precondition for binary search is: **the list must be sorted**.',
+        'This decision is only safe if every item on the left is no bigger than the middle and every item on the right is no smaller, in other words if the list is **sorted**. On an unsorted list the target could be sitting in the half that was thrown away, so the search could wrongly report "not found".\n\n' +
+        'A **precondition** is something that must be true before an algorithm starts. For binary search it is: **the list must be sorted**.',
       whyWrong: [
         'Duplicates do not break binary search: it still finds one of the equal items. The real requirement is that the list is in order.',
-        'Any length works, because the middle index is found with whole-number division (round down). A length that is a power of 2 just makes the halving come out exactly.',
+        'Any length works, because the middle index is found with whole-number division (round down). The two sides just differ by at most one item.',
         null,
         'Binary search works on anything that can be put in order and compared, such as words in alphabetical order. Being numbers is not the requirement; being sorted is.',
       ],
@@ -141,7 +125,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-002',
     subtopic: 'searching-sorting',
     difficulty: 'foundation',
-    stem: 'A linear search checks the items of an unsorted list one at a time, starting with the first item. The list has 40 items and the target is **not** in the list. How many comparisons does the search make before it reports "not found"?',
+    stem: 'A linear search runs on an unsorted list of 40 items, and the target is **not** in the list. How many comparisons does it make?',
     options: ['20', '40', '6', '39'],
     correctIndex: 1,
     markScheme: {
@@ -176,7 +160,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-003',
     subtopic: 'searching-sorting',
     difficulty: 'foundation',
-    stem: 'Which sorting algorithm works by splitting the list into two halves, sorting each half (using the same method again), and then **merging** the two sorted halves into one sorted list?',
+    stem: 'Which sorting algorithm splits a list into two halves, sorts each half, and then **merges** them?',
     options: ['Insertion sort', 'Bubble sort', 'Selection sort', 'Merge sort'],
     correctIndex: 3,
     markScheme: {
@@ -200,7 +184,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-004',
     subtopic: 'searching-sorting',
     difficulty: 'foundation',
-    stem: 'The list `[6, 2, 9, 1, 5]` is being sorted into ascending order with **bubble sort**. In one pass, each pair of neighbouring items is compared from left to right, and the two are swapped if the left one is bigger. What is the list after the **first pass**?',
+    stem: 'One left-to-right pass of **bubble sort**, swapping neighbours when the left is bigger, is applied to `[6, 2, 9, 1, 5]`. What is the list afterwards?',
     options: ['`[1, 2, 5, 6, 9]`', '`[1, 2, 9, 6, 5]`', '`[2, 6, 1, 5, 9]`', '`[2, 6, 9, 1, 5]`'],
     correctIndex: 2,
     markScheme: {
@@ -233,10 +217,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'foundation',
     stem: 'A sorting algorithm is described as **stable**. What does this mean?',
     options: [
-      'It always takes the same amount of time, whatever the input',
-      'Items with equal sort keys stay in the same order relative to each other as in the original list',
-      'It never crashes, even on an empty list',
-      'It sorts the list without needing any extra memory',
+      'Its running time never depends on the input',
+      'Items with equal keys keep their relative order',
+      'It never fails on an empty list',
+      'It needs no extra memory',
     ],
     correctIndex: 1,
     markScheme: {
@@ -255,13 +239,103 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'A stable sort keeps items with equal keys in their original relative order.',
     },
   },
+  {
+    id: 'searching-sorting-021',
+    subtopic: 'searching-sorting',
+    difficulty: 'foundation',
+    stem: 'Which search algorithm needs the data to be sorted first?',
+    options: ['Linear search', 'Binary search', 'Both linear and binary search', 'Neither of them'],
+    correctIndex: 1,
+    markScheme: {
+      solution: '**Binary search** throws away half of the data at each step, which is only safe when the data is sorted. Linear search checks every item in turn, so it works on any list.',
+      whyWrong: [
+        'Linear search checks items one at a time, so it works whatever order they are in.',
+        null,
+        'Only binary search relies on order. Linear search works on unsorted data too.',
+        'Binary search does need sorted data, because it uses the order to decide which half to keep.',
+      ],
+      keyIdea: 'Binary search requires sorted data; linear search does not.',
+    },
+  },
+  {
+    id: 'searching-sorting-022',
+    subtopic: 'searching-sorting',
+    difficulty: 'foundation',
+    stem: 'What is the best-case number of comparisons for a linear search on $n$ items?',
+    options: ['$1$', '$n$', '$\\frac{n}{2}$', '$\\log_2 n$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'The best case is when the target is the **first** item checked, so the search stops after $1$ comparison.',
+      whyWrong: [
+        null,
+        'This is the **worst** case, when the target is last or missing.',
+        'This is about the **average** number of comparisons when the target is present.',
+        'This is about the worst case for **binary** search, which is a different algorithm.',
+      ],
+      keyIdea: 'Linear search: best case 1 comparison, worst case $n$.',
+    },
+  },
+  {
+    id: 'searching-sorting-023',
+    subtopic: 'searching-sorting',
+    difficulty: 'foundation',
+    stem: 'Which sort repeatedly finds the smallest remaining item and swaps it into the next position?',
+    options: ['Selection sort', 'Bubble sort', 'Insertion sort', 'Merge sort'],
+    correctIndex: 0,
+    markScheme: {
+      solution: '**Selection sort** selects the smallest item in the unsorted part and swaps it with the first unsorted item, so the sorted part grows from the front.',
+      whyWrong: [
+        null,
+        'Bubble sort only swaps neighbouring items and carries the largest item to the end.',
+        'Insertion sort takes the next item in order and slides it into the sorted part. It does not search for the smallest.',
+        'Merge sort splits the list and merges sorted parts. It does not search for the smallest.',
+      ],
+      keyIdea: 'Selection sort: select the smallest remaining item, swap it to the front.',
+    },
+  },
+  {
+    id: 'searching-sorting-024',
+    subtopic: 'searching-sorting',
+    difficulty: 'foundation',
+    stem: 'Which sort repeatedly swaps neighbouring items that are in the wrong order?',
+    options: ['Merge sort', 'Selection sort', 'Bubble sort', 'Insertion sort'],
+    correctIndex: 2,
+    markScheme: {
+      solution: '**Bubble sort** compares neighbouring items and swaps them when they are out of order, so the largest remaining item "bubbles" to the end of each pass.',
+      whyWrong: [
+        'Merge sort splits the list and merges sorted parts, so it does not swap neighbours.',
+        'Selection sort swaps the smallest remaining item into place, often across a long distance.',
+        null,
+        'Insertion sort slides one item left into the sorted part until it fits, rather than making passes of neighbour swaps over the whole list.',
+      ],
+      keyIdea: 'Bubble sort works only by swapping neighbours that are out of order.',
+    },
+  },
+  {
+    id: 'searching-sorting-025',
+    subtopic: 'searching-sorting',
+    difficulty: 'foundation',
+    stem: 'What is the largest number of passes bubble sort needs for a list of $n$ items?',
+    options: ['$n$', '$\\frac{n}{2}$', '$n - 1$', '$n^2$'],
+    correctIndex: 2,
+    markScheme: {
+      solution: 'Each pass puts one more item in its final place at the end. After $n - 1$ passes, $n - 1$ items are in place, so the one left over must be in place too. A version that repeats until a pass makes no swaps runs one extra checking pass, but that pass is not needed to sort.',
+      whyWrong: [
+        'This counts one pass too many. Once $n - 1$ items are placed, the last item has nowhere else to go.',
+        'Half the passes is not enough in the worst case. A reversed list needs every one of the $n - 1$ passes.',
+        null,
+        'This is roughly the total number of **comparisons**, not the number of passes.',
+      ],
+      keyIdea: 'Bubble sort needs at most $n - 1$ passes, because each pass fixes one more item at the end.',
+    },
+  },
 
   // ======================================================== EXAM
   {
     id: 'searching-sorting-006',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'A sorted list contains 100 items. In the **worst case**, how many comparisons does binary search need to find a target or decide it is not there? (Each check of a middle element counts as one comparison.)',
+    stem: 'In the **worst case**, how many middle-element comparisons does binary search make on a sorted list of 100 items?',
     options: ['50', '100', '6', '7'],
     correctIndex: 3,
     markScheme: {
@@ -295,27 +369,25 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-007',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem:
-      'Binary search is used to look for **35** in the sorted list `[3, 8, 12, 17, 21, 26, 30, 35, 41]` (indexes 0 to 8). It starts with low = 0 and high = 8 and uses mid = (low + high) DIV 2, rounding down. If the middle value is too small it sets low = mid + 1; if it is too big it sets high = mid - 1.\n\n' +
-      'Which values are compared with 35, in order?',
+    stem: 'Binary search looks for **35** in the sorted array `[3, 8, 12, 17, 21, 26, 30, 35, 41]`, indexed from 1, using `mid = div(low + high, 2)`. Which values are compared with 35, in order?',
     options: ['21, 35', '3, 8, 12, 17, 21, 26, 30, 35', '21, 30, 35', '21, 8, 3'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Trace the search step by step:\n\n' +
+        '`div` is integer division, so it rounds down. When the middle value is too small, set `low = mid + 1`; when it is too big, set `high = mid - 1`.\n\n' +
         '| Step | low | high | mid | value at mid | Decision |\n' +
         '| --- | --- | --- | --- | --- | --- |\n' +
-        '| 1 | 0 | 8 | $(0 + 8) \\div 2 = 4$ | 21 | $21 < 35$, so low = 5 |\n' +
-        '| 2 | 5 | 8 | $13 \\div 2 = 6.5$, round down to 6 | 30 | $30 < 35$, so low = 7 |\n' +
-        '| 3 | 7 | 8 | $15 \\div 2 = 7.5$, round down to 7 | 35 | found |\n\n' +
+        '| 1 | 1 | 9 | $10 \\div 2 = 5$ | 21 | $21 < 35$, so low = 6 |\n' +
+        '| 2 | 6 | 9 | $15 \\div 2 = 7.5$, round down to 7 | 30 | $30 < 35$, so low = 8 |\n' +
+        '| 3 | 8 | 9 | $17 \\div 2 = 8.5$, round down to 8 | 35 | found |\n\n' +
         'The values compared are 21, 30, 35.',
       whyWrong: [
-        'This rounds the middle index **up** in step 2 (6.5 becomes 7, giving 35 straight away). The question says DIV 2 rounds down, so the middle index is 6.',
+        'This rounds the middle index **up** in step 2 (7.5 becomes 8, giving 35 straight away). `div` rounds down, so the middle index is 7.',
         'This is a linear search from the start of the list. Binary search jumps to the middle each time.',
         null,
         'This moves the wrong way: after 21 is too small it searches the left half instead of the right half, so it never reaches 35.',
       ],
-      keyIdea: 'In a binary search trace, keep a table of low, high and mid, and always round mid down when the method says DIV.',
+      keyIdea: 'In a binary search trace, keep a table of low, high and mid, and always round mid down when the method uses `div`.',
     },
     check: {
       optionValues: ['21, 35', '3, 8, 12, 17, 21, 26, 30, 35', '21, 30, 35', '21, 8, 3'],
@@ -326,7 +398,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-008',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'The list `[7, 3, 9, 2, 6, 4]` is sorted into ascending order with **bubble sort**. In each pass, neighbouring items are compared from left to right and swapped if the left one is bigger. What is the list after **two** complete passes?',
+    stem: 'Two left-to-right passes of **bubble sort**, swapping neighbours when the left is bigger, are applied to `[7, 3, 9, 2, 6, 4]`. What is the list afterwards?',
     options: ['`[3, 7, 2, 6, 4, 9]`', '`[2, 3, 9, 7, 6, 4]`', '`[3, 7, 9, 2, 6, 4]`', '`[3, 2, 6, 4, 7, 9]`'],
     correctIndex: 3,
     markScheme: {
@@ -362,7 +434,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-009',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'The list `[29, 10, 14, 37, 13, 5]` is sorted into ascending order with **selection sort**. In each pass, the smallest item in the unsorted part is found and **swapped** with the first item of the unsorted part (a pass still counts even if no swap is needed). What is the list after **three** passes?',
+    stem: 'Three passes of **selection sort**, each swapping the smallest unsorted item into the first unsorted position, are applied to `[29, 10, 14, 37, 13, 5]`. What is the list afterwards?',
     options: [
       '`[5, 10, 13, 14, 37, 29]`',
       '`[5, 10, 13, 37, 14, 29]`',
@@ -372,7 +444,7 @@ export const questions: StaticQuestion[] = [
     correctIndex: 1,
     markScheme: {
       solution:
-        'Each pass looks only at the unsorted part, finds its smallest item and swaps it into the first unsorted position. Write a row for every pass, even when no swap is needed.\n\n' +
+        'Each pass looks only at the unsorted part, finds its smallest item and swaps it into the first unsorted position. A pass still counts when no swap is needed.\n\n' +
         '| Pass | Unsorted part | Smallest | Action | List afterwards |\n' +
         '| --- | --- | --- | --- | --- |\n' +
         '| 1 | `[29, 10, 14, 37, 13, 5]` | 5 | swap 5 with 29 | `[5, 10, 14, 37, 13, 29]` |\n' +
@@ -396,7 +468,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-010',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'The list `[8, 4, 6, 2, 9, 1]` is sorted into ascending order with **insertion sort**. In each pass, the next unsorted item is inserted into its correct place in the sorted part at the front (the first pass inserts the second item, 4). What is the list after **three** passes?',
+    stem: 'Three passes of **insertion sort**, where the first pass inserts the second item, are applied to `[8, 4, 6, 2, 9, 1]`. What is the list afterwards?',
     options: ['`[2, 4, 6, 8, 9, 1]`', '`[1, 2, 4, 6, 9, 8]`', '`[4, 6, 8, 2, 9, 1]`', '`[2, 4, 1, 6, 8, 9]`'],
     correctIndex: 0,
     markScheme: {
@@ -425,49 +497,62 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-011',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'What does this Python code print? (The two printed lines are shown separated by a space.)',
+    stem: 'This linear search counts its comparisons in `c`. Arrays are indexed from 1. What is printed?',
     code: {
-      lang: 'python',
-      source:
-        'def linear_search(items, target):\n' +
-        '    count = 0\n' +
-        '    for i in range(len(items)):\n' +
-        '        count += 1\n' +
-        '        if items[i] == target:\n' +
-        '            return i, count\n' +
-        '    return -1, count\n' +
-        '\n' +
-        'data = [4, 9, 2, 7, 9, 5]\n' +
-        'print(linear_search(data, 9))\n' +
-        'print(linear_search(data, 3))',
+      lang: 'pseudocode',
+      source: L(
+        'A = [4, 9, 2, 7, 9, 5]',
+        'p = 0',
+        'c = 0',
+        'for i = 1 to length(A)',
+        '   c = c + 1',
+        '   if A[i] == 9',
+        '      p = i',
+        '      break',
+        '   end if',
+        'end for',
+        'print(p, c)',
+      ),
     },
-    options: ['`(4, 5) (-1, 6)`', '`(2, 2) (-1, 6)`', '`(1, 2) (-1, 6)`', '`(1, 2) (-1, 5)`'],
+    options: ['`5 5`', '`1 2`', '`2 2`', '`2 6`'],
     correctIndex: 2,
     markScheme: {
       solution:
-        '**First call, target 9:**\n\n' +
-        '| i | items[i] | count | equal to 9? |\n' +
+        '| `i` | `A[i]` | `c` | `A[i] == 9`? |\n' +
         '| --- | --- | --- | --- |\n' +
-        '| 0 | 4 | 1 | no |\n' +
-        '| 1 | 9 | 2 | yes, return `(1, 2)` |\n\n' +
-        'The function returns as soon as it finds the **first** 9, at index 1, after 2 comparisons. The second 9 at index 4 is never reached.\n\n' +
-        '**Second call, target 3:** 3 is not in the list, so the loop runs for all 6 items (count goes 1, 2, ..., 6), then `return -1, count` gives `(-1, 6)`.\n\n' +
-        'Printing a tuple shows it in brackets, so the output is `(1, 2)` then `(-1, 6)`.',
+        '| 1 | 4 | 1 | no |\n' +
+        '| 2 | 9 | 2 | yes: `p = 2`, then `break` |\n\n' +
+        '`break` ends the loop at the **first** 9, so the second 9 at index 5 is never reached. It prints `2 2`.',
       whyWrong: [
-        'This finds the **last** 9 (index 4). The `return` inside the loop ends the function at the first match.',
-        'This uses a position counted from 1. Python indexes start at 0, so the first 9 is at index 1.',
+        'This finds the **last** 9 (index 5). The `break` ends the loop at the first match.',
+        'This counts positions from 0. In this array the first item is `A[1]`, so the first 9 is at index 2.',
         null,
-        'This miscounts the unsuccessful search: `count` is increased once for each of the 6 items before the loop finishes.',
+        'This keeps counting to the end of the array. The `break` stops the loop, so `c` stops at 2.',
       ],
       keyIdea: 'Linear search stops at the first match; when the target is missing it compares with all $n$ items.',
     },
-    python: { stdout: '(1, 2)\n(-1, 6)\n' },
+    check: {
+      optionValues: ['5 5', '1 2', '2 2', '2 6'],
+      compute: () => {
+        const a = [4, 9, 2, 7, 9, 5];
+        let p = 0;
+        let c = 0;
+        for (let i = 1; i <= a.length; i++) {
+          c++;
+          if (a[i - 1] === 9) {
+            p = i;
+            break;
+          }
+        }
+        return `${p} ${c}`;
+      },
+    },
   },
   {
     id: 'searching-sorting-012',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'In merge sort, two sorted lists are merged by repeatedly comparing the front items of each list and moving the smaller one to the output. When one list becomes empty, the rest of the other list is copied across with no more comparisons. How many comparisons are made when merging `[2, 5, 9]` and `[3, 4, 10, 12]`?',
+    stem: 'When merging `[2, 5, 9]` and `[3, 4, 10, 12]`, each comparison moves the smaller front item to the output, and leftovers are copied without comparing. How many comparisons are made?',
     options: ['7', '5', '12', '6'],
     correctIndex: 1,
     markScheme: {
@@ -499,7 +584,7 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-013',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'The table shows five students in their original order. The list is sorted by **score, lowest first**, using a **stable** sorting algorithm. In what order are the students listed afterwards?',
+    stem: 'The table lists five students in their original order. What order results from a **stable** sort by score, lowest first?',
     table: {
       headers: ['Name', 'Score'],
       rows: [
@@ -556,33 +641,37 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-014',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'This version of bubble sort stops as soon as a pass makes no swaps. It is run on a list of 12 items that is **already sorted**. How many comparisons does it make in total?',
+    stem: 'This bubble sort stops after a pass with no swaps. Arrays are indexed from 1. How many comparisons does it make on an **already sorted** array of 12 items?',
     code: {
       lang: 'pseudocode',
-      source:
-        'REPEAT\n' +
-        '    swapped ← FALSE\n' +
-        '    FOR i ← 0 TO n - 2\n' +
-        '        IF A[i] > A[i + 1] THEN\n' +
-        '            swap A[i] and A[i + 1]\n' +
-        '            swapped ← TRUE\n' +
-        '        ENDIF\n' +
-        '    ENDFOR\n' +
-        'UNTIL swapped = FALSE',
+      source: L(
+        'swapped = true',
+        'while (swapped)',
+        '   swapped = false',
+        '   for i = 1 to n - 1',
+        '      if A[i] > A[i + 1]',
+        '         t = A[i]',
+        '         A[i] = A[i + 1]',
+        '         A[i + 1] = t',
+        '         swapped = true',
+        '      end if',
+        '   end for',
+        'end while',
+      ),
     },
     options: ['66', '22', '11', '12'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'With $n = 12$, the FOR loop runs for $i = 0, 1, \\ldots, 10$, which is $n - 1 = 11$ comparisons per pass (12 items have 11 neighbouring pairs).\n\n' +
-        '**Pass 1:** every pair is already in order, so no swaps happen and `swapped` stays FALSE.\n\n' +
-        'The UNTIL condition `swapped = FALSE` is now true, so the loop stops after this single pass.\n\n' +
+        'With $n = 12$, the `for` loop runs for $i = 1, 2, \\ldots, 11$, which is $n - 1 = 11$ comparisons per pass (12 items have 11 neighbouring pairs).\n\n' +
+        '**Pass 1:** every pair is already in order, so no swaps happen and `swapped` stays false.\n\n' +
+        'The `while` test now fails, so the loop stops after this single pass.\n\n' +
         'Total: $11$ comparisons. This is the **best case** of bubble sort with an early-exit flag.',
       whyWrong: [
-        'This is $\\frac{12 \\times 11}{2} = 66$, the number of comparisons for a full bubble sort that never stops early. The swapped flag stops it after one pass.',
+        'This is $\\frac{12 \\times 11}{2} = 66$, the number of comparisons for a full bubble sort that never stops early. The `swapped` flag stops it after one pass.',
         'This assumes a second pass is needed to "confirm" the list is sorted. The first pass already makes no swaps, so the loop ends after it.',
         null,
-        'This counts one comparison per item. A list of 12 items has only 11 neighbouring pairs (the FOR loop goes from 0 to $n - 2$).',
+        'This counts one comparison per item. A list of 12 items has only 11 neighbouring pairs (the `for` loop goes from 1 to $n - 1$).',
       ],
       keyIdea: 'Bubble sort with a swapped flag needs only one pass, $n - 1$ comparisons, on an already sorted list (its best case).',
     },
@@ -610,33 +699,31 @@ export const questions: StaticQuestion[] = [
     id: 'searching-sorting-015',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'This pseudocode is meant to perform a binary search on a sorted array `A` of `n` items. Which line should fill the blank so that the search always works correctly?',
+    stem: 'This binary search on a sorted array `A` is missing one line. Arrays are indexed from 1. Which line belongs at the comment so that the search always works?',
     code: { lang: 'pseudocode', source: BSEARCH_PSEUDO },
-    options: ['`high ← mid - 1`', '`high ← mid + 1`', '`low ← mid - 1`', '`high ← mid`'],
+    options: ['`high = mid - 1`', '`high = mid + 1`', '`low = mid - 1`', '`high = mid`'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'The blank runs when `A[mid] > target`, so the target (if present) must be to the **left** of `mid`.\n\n' +
+        'The missing line runs when `A[mid] > target`, so the target (if present) must be to the **left** of `mid`.\n\n' +
         '- `mid` itself has just been checked and is not the target, so it can be excluded.\n' +
-        '- The new search range should be `low` to `mid - 1`, so we set `high ← mid - 1`.\n\n' +
-        'Check a small case, `A = [1, 2, 3]`, target 1: mid = 1, `A[1] = 2 > 1`, so high = 0; then mid = 0, `A[0] = 1`, found. And if the target were 0 (missing): after that, high becomes $-1$, low = 0 > high, the loop ends and returns $-1$.\n\n' +
-        'Correct line: `high ← mid - 1`.',
+        '- The new search range should be `low` to `mid - 1`, so we set `high = mid - 1`.\n\n' +
+        'Check a small case, `A = [1, 2, 3]`, target 1: mid = 2, `A[2] = 2 > 1`, so high = 1; then mid = 1, `A[1] = 1`, found. If the target were 0 (missing), high would then become 0, low = 1 > high, the loop ends and it returns 0.\n\n' +
+        'Correct line: `high = mid - 1`.',
       whyWrong: [
         null,
-        'This moves `high` to the **right**, making the range bigger. When low = high = mid it keeps choosing the same mid forever (an infinite loop).',
+        'This keeps `mid` and the item after it in the range, even though the target must be to the left of `mid`. With `[1, 2, 3]` and target 1: mid = 2, so high = 3 and the same mid is chosen forever (an infinite loop).',
         'This changes the wrong pointer. The target is on the left, so `high` must move; changing `low` can even repeat the same mid forever (try `[1, 2, 3]` with target 1).',
         'This keeps `mid` in the range even though it has already been checked. When low = high = mid and the target is missing, nothing changes and the loop never ends.',
       ],
       keyIdea: 'In binary search, after checking mid, exclude it: use `low = mid + 1` or `high = mid - 1`, otherwise the loop may never end.',
     },
   },
-
-  // ======================================================== CHALLENGE
   {
     id: 'searching-sorting-016',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
-    stem: 'Bubble sort (compare neighbours left to right, swap if the left one is bigger, repeat passes until sorted) is used to sort `[6, 3, 8, 1, 5]` into ascending order. How many **swaps** does it make in total?',
+    stem: 'Bubble sort, swapping neighbours when the left is bigger, sorts `[6, 3, 8, 1, 5]` into ascending order. How many **swaps** does it make in total?',
     options: ['10', '6', '4', '2'],
     correctIndex: 1,
     markScheme: {
@@ -676,123 +763,6 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'searching-sorting-017',
-    subtopic: 'searching-sorting',
-    difficulty: 'challenge',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source:
-        'def bsearch(a, target):\n' +
-        '    lo, hi = 0, len(a) - 1\n' +
-        '    steps = 0\n' +
-        '    while lo <= hi:\n' +
-        '        mid = (lo + hi) // 2\n' +
-        '        steps += 1\n' +
-        '        if a[mid] == target:\n' +
-        '            return steps\n' +
-        '        elif a[mid] < target:\n' +
-        '            lo = mid + 1\n' +
-        '        else:\n' +
-        '            hi = mid - 1\n' +
-        '    return -steps\n' +
-        '\n' +
-        'nums = list(range(2, 42, 2))   # 2, 4, 6, ..., 40\n' +
-        'print(bsearch(nums, 34), bsearch(nums, 7))',
-    },
-    options: ['`17 -20`', '`5 5`', '`-4 -4`', '`5 -5`'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '`nums` has 20 items, index $i$ holds $2(i + 1)$, so `hi` starts at 19.\n\n' +
-        '**Search for 34** (it is at index 16):\n\n' +
-        '| steps | lo | hi | mid | a[mid] | action |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| 1 | 0 | 19 | 9 | 20 | $20 < 34$, lo = 10 |\n' +
-        '| 2 | 10 | 19 | 14 | 30 | $30 < 34$, lo = 15 |\n' +
-        '| 3 | 15 | 19 | 17 | 36 | $36 > 34$, hi = 16 |\n' +
-        '| 4 | 15 | 16 | 15 | 32 | $32 < 34$, lo = 16 |\n' +
-        '| 5 | 16 | 16 | 16 | 34 | found, return 5 |\n\n' +
-        '**Search for 7** (not in the list, which only has even numbers):\n\n' +
-        '| steps | lo | hi | mid | a[mid] | action |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| 1 | 0 | 19 | 9 | 20 | $20 > 7$, hi = 8 |\n' +
-        '| 2 | 0 | 8 | 4 | 10 | $10 > 7$, hi = 3 |\n' +
-        '| 3 | 0 | 3 | 1 | 4 | $4 < 7$, lo = 2 |\n' +
-        '| 4 | 2 | 3 | 2 | 6 | $6 < 7$, lo = 3 |\n' +
-        '| 5 | 3 | 3 | 3 | 8 | $8 > 7$, hi = 2 |\n\n' +
-        'Now lo = 3 > hi = 2, the loop ends and the function returns `-steps` = $-5$.\n\n' +
-        'Output: `5 -5`.',
-      whyWrong: [
-        'These are *linear* search counts (34 is the 17th item; a missing item needs all 20 comparisons). This code is a binary search.',
-        'This forgets that an unsuccessful search returns `-steps`, so the second number is negative.',
-        'This stops the loop as soon as lo equals hi (as if the condition were `lo < hi`), so the last item is never checked. The condition is `lo <= hi`.',
-        null,
-      ],
-      keyIdea: 'Trace binary search with a lo / hi / mid table, and remember the loop still runs when lo equals hi.',
-    },
-    python: { stdout: '5 -5\n' },
-  },
-  {
-    id: 'searching-sorting-018',
-    subtopic: 'searching-sorting',
-    difficulty: 'challenge',
-    stem: 'Merge sort is applied to `[38, 27, 43, 3, 9, 82, 10, 15]`. The list is split into halves (4 and 4, then 2 and 2, then single items) and merged back up using the standard merge, which stops comparing when one list is empty. How many comparisons are made in **total**?',
-    options: ['17', '24', '28', '7'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '**Level 1: merge single items into pairs** (1 comparison each):\n\n' +
-        '- 38 and 27 give `[27, 38]`; 43 and 3 give `[3, 43]`; 9 and 82 give `[9, 82]`; 10 and 15 give `[10, 15]`.\n' +
-        '- Comparisons: $4 \\times 1 = 4$.\n\n' +
-        '**Level 2: merge pairs into fours.**\n\n' +
-        '- `[27, 38]` with `[3, 43]`: 27 v 3 (take 3), 27 v 43 (take 27), 38 v 43 (take 38), then copy 43. That is 3 comparisons, giving `[3, 27, 38, 43]`.\n' +
-        '- `[9, 82]` with `[10, 15]`: 9 v 10 (take 9), 82 v 10 (take 10), 82 v 15 (take 15), then copy 82. That is 3 comparisons, giving `[9, 10, 15, 82]`.\n\n' +
-        '**Level 3: final merge** of `[3, 27, 38, 43]` with `[9, 10, 15, 82]`:\n\n' +
-        '- 3 v 9, 27 v 9, 27 v 10, 27 v 15, 27 v 82, 38 v 82, 43 v 82: 7 comparisons, then copy 82.\n\n' +
-        'Total: $4 + 6 + 7 = 17$ comparisons. (For this list every merge happens to be a worst case, $n - 1$ comparisons for $n$ items.)',
-      whyWrong: [
-        null,
-        'This is $8 \\times 3 = 24$: it counts every item moved at every level as a comparison. Items copied after a list empties need no comparison.',
-        'This is $\\frac{8 \\times 7}{2} = 28$, the number of comparisons for a full bubble sort of 8 items, not merge sort.',
-        'This counts only the final merge. The lower levels (pairs and fours) also need comparisons.',
-      ],
-      keyIdea: 'Count merge sort comparisons level by level; each merge of $n$ items makes at most $n - 1$ comparisons.',
-    },
-    check: {
-      optionValues: [17, 24, 28, 7],
-      compute: () => mergeSortCount([38, 27, 43, 3, 9, 82, 10, 15]).comps,
-    },
-  },
-  {
-    id: 'searching-sorting-019',
-    subtopic: 'searching-sorting',
-    difficulty: 'challenge',
-    stem: 'For a list of $n$ items (where $n$ is large), which statement is TRUE?',
-    options: [
-      'Binary search needs about $\\log_2 n$ comparisons even in its best case',
-      'Selection sort makes fewer comparisons on an already sorted list than on a reversed list',
-      'Insertion sort makes only $n - 1$ comparisons on a list that is already sorted',
-      'The worst case for linear search is when the target is the first item in the list',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Check each statement:\n\n' +
-        '- **Binary search best case:** if the target is the very first middle element, it is found in **1** comparison. So "about $\\log_2 n$ even in the best case" is false ($\\log_2 n$ is the worst case).\n' +
-        '- **Selection sort:** every pass scans the whole unsorted part to find the minimum, whatever the order. It always makes $\\frac{n(n - 1)}{2}$ comparisons, so a sorted list does not help. False.\n' +
-        '- **Insertion sort on a sorted list:** each new item is compared with its left neighbour once; that neighbour is smaller, so the item stays put. That is 1 comparison for each of the items 2 to $n$: $n - 1$ comparisons. **True** (this is its best case).\n' +
-        '- **Linear search:** if the target is the first item, it is found in 1 comparison. That is the **best** case, not the worst. False.',
-      whyWrong: [
-        'The best case of binary search is 1 comparison (the target is the first middle element checked). About $\\log_2 n$ comparisons is the worst case.',
-        'Selection sort always scans the entire unsorted part on every pass, so it makes the same $\\frac{n(n - 1)}{2}$ comparisons on any list.',
-        null,
-        'Finding the target at the first position takes 1 comparison, which is the best case. The worst case is the target being last or missing.',
-      ],
-      keyIdea: 'Insertion sort and early-exit bubble sort are fast on sorted lists, but selection sort always does the same work.',
-    },
-  },
-  {
     id: 'searching-sorting-020',
     subtopic: 'searching-sorting',
     difficulty: 'exam',
@@ -823,6 +793,177 @@ export const questions: StaticQuestion[] = [
         let n = 1;
         while (maxProbes(n + 1) <= 6) n++;
         return n;
+      },
+    },
+  },
+  {
+    id: 'searching-sorting-026',
+    subtopic: 'searching-sorting',
+    difficulty: 'exam',
+    stem: 'This loop searches `A` for 8. Arrays are indexed from 1. What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L('A = [5, 2, 8, 6]', 'i = 1', 'while (i <= length(A) and A[i] != 8)', '   i = i + 1', 'end while', 'print(i)'),
+    },
+    options: ['2', '3', '4', 'Infinite loop'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        '| `i` | `A[i]` | `A[i] != 8`? |\n' +
+        '| --- | --- | --- |\n' +
+        '| 1 | 5 | yes, so `i` becomes 2 |\n' +
+        '| 2 | 2 | yes, so `i` becomes 3 |\n' +
+        '| 3 | 8 | no, so the loop stops |\n\n' +
+        'It prints 3, the position of 8 in an array indexed from 1.',
+      whyWrong: [
+        'This counts positions from 0. Here the first item is `A[1]`, so 8 is at index 3.',
+        null,
+        'This is the length of the array. The loop stops as soon as it reaches the 8, before the last item.',
+        '`i` goes up by 1 on each pass, and the test fails as soon as `A[i]` is 8.',
+      ],
+      keyIdea: 'A linear search stops at the first match, and the loop counter then holds the position of the match.',
+    },
+    check: {
+      optionValues: [2, 3, 4, 'Infinite loop'],
+      compute: () => {
+        const a = [5, 2, 8, 6];
+        let i = 1;
+        let guard = 0;
+        while (i <= a.length && a[i - 1] !== 8) {
+          if (++guard > 1000) return 'Infinite loop';
+          i++;
+        }
+        return i;
+      },
+    },
+  },
+  {
+    id: 'searching-sorting-027',
+    subtopic: 'searching-sorting',
+    difficulty: 'exam',
+    stem: 'This faulty binary search uses `low = mid` instead of `low = mid + 1`. Arrays are indexed from 1. What is printed?',
+    code: {
+      lang: 'pseudocode',
+      source: L(
+        'A = [2, 4, 6, 8]',
+        'low = 1',
+        'high = 4',
+        'while (low < high)',
+        '   mid = div(low + high, 2) // div is integer division',
+        '   if A[mid] < 8',
+        '      low = mid',
+        '   else',
+        '      high = mid',
+        '   end if',
+        'end while',
+        'print(low)',
+      ),
+    },
+    options: ['4', '3', '2', 'Infinite loop'],
+    correctIndex: 3,
+    markScheme: {
+      solution:
+        '| `low` | `high` | `mid` | `A[mid]` | Update |\n' +
+        '| --- | --- | --- | --- | --- |\n' +
+        '| 1 | 4 | 2 | 4 | `low = 2` |\n' +
+        '| 2 | 4 | 3 | 6 | `low = 3` |\n' +
+        '| 3 | 4 | 3 | 6 | `low = 3` |\n\n' +
+        'From the third row on nothing changes: `mid` stays 3, `low` stays 3 and $3 < 4$ stays true. The loop never ends.',
+      whyWrong: [
+        'This is the position of 8, which a correct search would find. Here `div(3 + 4, 2)` rounds down to 3, so `mid` never reaches 4.',
+        'This is where `low` gets stuck, but the loop is still running, so `print(low)` is never reached.',
+        'This stops after the first update. $2 < 4$ is still true, so the loop continues.',
+        null,
+      ],
+      keyIdea: 'If an update can leave `low` and `high` unchanged, a binary search can loop forever, which is why `mid` must be excluded.',
+    },
+    check: {
+      optionValues: [4, 3, 2, 'Infinite loop'],
+      compute: () => {
+        const a = [2, 4, 6, 8];
+        let low = 1;
+        let high = 4;
+        let guard = 0;
+        while (low < high) {
+          if (++guard > 1000) return 'Infinite loop';
+          const mid = Math.floor((low + high) / 2);
+          if (a[mid - 1] < 8) low = mid;
+          else high = mid;
+        }
+        return low;
+      },
+    },
+  },
+  {
+    id: 'searching-sorting-028',
+    subtopic: 'searching-sorting',
+    difficulty: 'exam',
+    stem: 'What is printed? Arrays are indexed from 1.',
+    code: {
+      lang: 'pseudocode',
+      source: L(
+        'A = [4, 1, 3, 2]',
+        'for i = 1 to 3',
+        '   if A[i] > A[i + 1]',
+        '      t = A[i]',
+        '      A[i] = A[i + 1]',
+        '      A[i + 1] = t',
+        '   end if',
+        'end for',
+        'print(A)',
+      ),
+    },
+    options: ['`[1, 3, 2, 4]`', '`[1, 2, 3, 4]`', '`[1, 4, 3, 2]`', '`[4, 3, 2, 1]`'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'This is one pass of bubble sort. `t` holds a value while two items swap.\n\n' +
+        '| `i` | Compare | Swap? | `A` afterwards |\n' +
+        '| --- | --- | --- | --- |\n' +
+        '| 1 | 4 and 1 | yes | `[1, 4, 3, 2]` |\n' +
+        '| 2 | 4 and 3 | yes | `[1, 3, 4, 2]` |\n' +
+        '| 3 | 4 and 2 | yes | `[1, 3, 2, 4]` |\n\n' +
+        'It prints `[1, 3, 2, 4]`. The largest value has moved to the end, but the array is not yet fully sorted.',
+      whyWrong: [
+        null,
+        'This is the fully sorted array. The code makes only one pass, so 3 and 2 are still out of order.',
+        'This stops after the first swap. The loop continues up to `i = 3`.',
+        'This sorts into descending order. The test `A[i] > A[i + 1]` moves larger values to the right.',
+      ],
+      keyIdea: 'A swap needs a temporary variable, and one bubble pass only guarantees the largest item reaches the end.',
+    },
+    check: {
+      optionValues: ['[1, 3, 2, 4]', '[1, 2, 3, 4]', '[1, 4, 3, 2]', '[4, 3, 2, 1]'],
+      compute: () => `[${bubblePasses([4, 1, 3, 2], 1).join(', ')}]`,
+    },
+  },
+  {
+    id: 'searching-sorting-029',
+    subtopic: 'searching-sorting',
+    difficulty: 'exam',
+    stem: 'Selection sort scans the whole unsorted part on every pass. How many comparisons does it make in total on a list of 6 items?',
+    options: ['15', '5', '36', '30'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Finding the smallest of $k$ unsorted items takes $k - 1$ comparisons.\n\n' +
+        'With 6 items the passes make $5 + 4 + 3 + 2 + 1$ comparisons, which is $\\frac{6 \\times 5}{2} = 15$.\n\n' +
+        'The count is the same for every list, even one that is already sorted.',
+      whyWrong: [
+        null,
+        'This is the number of passes, $n - 1 = 5$. Each pass makes several comparisons.',
+        'This is $6^2$, assuming every pass scans all 6 items. The unsorted part gets shorter each time.',
+        'This is $6 \\times 5$, forgetting to divide by 2 in $\\frac{n(n - 1)}{2}$.',
+      ],
+      keyIdea: 'Selection sort always makes $\\frac{n(n - 1)}{2}$ comparisons.',
+    },
+    check: {
+      optionValues: [15, 5, 36, 30],
+      compute: () => {
+        const n = 6;
+        let c = 0;
+        for (let p = 0; p < n - 1; p++) for (let i = p + 1; i < n; i++) c++;
+        return c;
       },
     },
   },

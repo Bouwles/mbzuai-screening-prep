@@ -7,10 +7,10 @@ export const lesson: Lesson = {
   methods: [
     { cue: 'A step count like $T(n) = 3n^2 + 5n + 7$, or "which grows fastest?"', method: 'Keep only the fastest-growing term and drop its constant: $O(n^2)$. Ladder: $\\log n < \\sqrt{n} < n < n \\log n < n^2 < n^3 < 2^n$.' },
     { cue: 'Code with loops: "what is the Big-O?"', method: 'Loops one after another **add**; a loop inside a loop **multiplies**. A loop that halves or doubles its counter runs about $\\log_2 n$ times.' },
-    { cue: '"How many times does this line run?" for a given $n$', method: 'Count the exact passes of each loop (check where `range` or `for i = a to b` starts and stops). A triangular loop gives $1 + 2 + \\dots + n = \\frac{n(n + 1)}{2}$.' },
+    { cue: '"How many times does this line run?" for a given $n$', method: 'Count the exact passes of each loop (check where `for i = a to b` starts and stops; both ends are included). A triangular loop gives $1 + 2 + \\dots + n = \\frac{n(n + 1)}{2}$.' },
     { cue: 'It takes $t$ seconds for $n$ items; how long for $kn$ items?', method: 'For $O(n^p)$ multiply the time by $k^p$ (e.g. $O(n^2)$, triple $n$: $\\times 9$). For $O(\\log n)$ the time grows only a little.' },
     { cue: 'Binary search worst case for $n$ items', method: '$\\lfloor \\log_2 n \\rfloor + 1$ comparisons: about 20 for a million items.' },
-    { cue: 'Cost of a Python operation, or which structure to use', method: 'List: index, `append`, `len` are $O(1)$; `x in list`, `insert(0, x)`, `pop(0)` are $O(n)$. Set/dict lookup is $O(1)$ on average. Use a dict to look up a value by key and a `deque` for a queue.' },
+    { cue: 'Cost of an array operation, or which structure to use', method: 'Array: reading an index, adding at the end and reading the length are $O(1)$; searching for a value and inserting or removing at the front are $O(n)$. A hash table finds a key in $O(1)$ on average, so use one to look up a value by its key.' },
     { cue: 'When is algorithm A (e.g. $20n + 500$) faster than B (e.g. $n^2$)?', method: 'Solve the inequality (here $n^2 - 20n - 500 > 0$), then check the whole numbers either side of the root.' },
   ],
   know:
@@ -25,7 +25,7 @@ export const lesson: Lesson = {
     '$$1 < \\log n < \\sqrt{n} < n < n\\log n < n^2 < n^3 < 2^n < n!$$\n\n' +
     '| Big-O | Name | If $n$ doubles, the work... | Typical example |\n' +
     '| --- | --- | --- | --- |\n' +
-    '| $O(1)$ | constant | stays the same | `a[i]`, `len(a)`, dict lookup |\n' +
+    '| $O(1)$ | constant | stays the same | `A[i]`, `length(A)`, hash table lookup |\n' +
     '| $O(\\log n)$ | logarithmic | goes up by one step | binary search, a loop that halves |\n' +
     '| $O(n)$ | linear | doubles | linear search, one loop over the list |\n' +
     '| $O(n\\log n)$ | "n log n" | slightly more than doubles | merge sort |\n' +
@@ -38,38 +38,37 @@ export const lesson: Lesson = {
     '- **Loops one after another add:** $O(n) + O(n) = O(2n) = O(n)$.\n' +
     '- **Nested loops multiply:** an $n$-loop inside an $n$-loop gives $n \\times n = O(n^2)$.\n' +
     '- **Triangular loops** (inner loop runs $1, 2, \\dots, n$ times) add up to $\\frac{n(n+1)}{2}$, which is still $O(n^2)$.\n' +
-    '- **Loops that halve or double** (`n = n // 2`, `i = i * 2`) run about $\\log_2 n$ times: $O(\\log n)$.\n' +
+    '- **Loops that halve or double** (`n = div(n,2)`, `i = i * 2`) run about $\\log_2 n$ times: $O(\\log n)$.\n' +
     '- A halving loop **inside** an $n$-loop: $O(n\\log n)$.\n\n' +
     'Always look at what actually controls each loop. A loop that doubles `i` while an inner loop runs `i` times does $1 + 2 + 4 + \\dots$ work, which totals less than $2n$, so it is $O(n)$, not $O(n\\log n)$.\n\n' +
     '### Exact counts versus Big-O\n\n' +
-    'Some questions ask "how many times does this line run?" for a specific $n$. Then you need the exact count, not the Big-O. Be careful with loop boundaries: Python `range(a, b)` gives $b - a$ values, while pseudocode `for i = 1 to n` includes both ends ($n$ values). For a halving loop, trace the values: $1000 \\to 500 \\to 250 \\to \\dots \\to 1$ (9 halvings, because integer division rounds down).\n\n' +
+    'Some questions ask "how many times does this line run?" for a specific $n$. Then you need the exact count, not the Big-O. Be careful with loop boundaries: `for i = a to b` includes both ends, so it gives $b - a + 1$ values. For a halving loop, trace the values: $1000 \\to 500 \\to 250 \\to \\dots \\to 1$ (9 halvings, because integer division rounds down).\n\n' +
     '### Predicting running times\n\n' +
     'If an algorithm is $O(n^p)$ and $n$ is multiplied by $k$, the time is multiplied by about $k^p$. An $O(n^2)$ sort that takes 4 seconds for 1000 items takes about $4 \\times 3^2 = 36$ seconds for 3000 items. For $O(2^n)$, each extra 1 in $n$ **doubles** the time. For $O(\\log n)$, squaring $n$ only doubles the time.\n\n' +
-    '### Python lists, dicts and sets\n\n' +
-    '| Operation | List | Dict / set |\n' +
+    '### Arrays and hash tables\n\n' +
+    '| Operation | Array | Hash table |\n' +
     '| --- | --- | --- |\n' +
-    '| access by index `a[i]` | $O(1)$ | (not by position) |\n' +
-    '| look up by key `d[k]` | (no keys) | $O(1)$ average |\n' +
-    '| `x in ...` | $O(n)$ (linear scan) | $O(1)$ average (hashing) |\n' +
-    '| add an item: `a.append(x)` / `s.add(x)`, `d[k] = v` | $O(1)$ (at the end) | $O(1)$ average |\n' +
-    '| remove an item by value: `a.remove(x)` / `s.remove(x)`, `del d[k]` | $O(n)$ (search, then shift) | $O(1)$ average |\n' +
-    '| `insert(0, x)`, `pop(0)` | $O(n)$ (everything shifts) | not applicable |\n' +
-    '| `pop()` from the end | $O(1)$ | not applicable |\n' +
-    '| `len(...)` | $O(1)$ | $O(1)$ |\n\n' +
-    'Dicts and sets use **hashing**: Python turns the key into a number that points straight to where it is stored, so it never scans.\n\n' +
+    '| read by index `A[i]` | $O(1)$ | (not by position) |\n' +
+    '| look up a value by its key | (no keys) | $O(1)$ average |\n' +
+    '| check whether a value is present | $O(n)$ (linear scan) | $O(1)$ average (hashing) |\n' +
+    '| add an item | $O(1)$ (at the end) | $O(1)$ average |\n' +
+    '| remove an item by value | $O(n)$ (search, then shift) | $O(1)$ average |\n' +
+    '| insert or remove at the front | $O(n)$ (everything shifts) | not applicable |\n' +
+    '| remove from the end | $O(1)$ | not applicable |\n' +
+    '| read the length | $O(1)$ | $O(1)$ |\n\n' +
+    'A **hash table** (also called a key-value map, dictionary or set) uses **hashing**: the key is turned into a number that points straight to where it is stored, so it never scans.\n\n' +
     '### Searches and sorts\n\n' +
     '- Linear search: $O(n)$ worst case. Works on any list.\n' +
     '- Binary search: $O(\\log n)$ worst case, at most $\\lfloor \\log_2 n \\rfloor + 1$ inspections. Needs a **sorted** list.\n' +
     '- Bubble, insertion and selection sort: $O(n^2)$ worst case. On an already sorted list insertion sort is $O(n)$, and so is bubble sort if it stops early after a pass with no swaps; selection sort is $O(n^2)$ even then.\n' +
     '- Merge sort: $O(n\\log n)$ in every case.\n' +
-    '- Quicksort: $O(n\\log n)$ on average, but $O(n^2)$ in the worst case (when the pivot is always the smallest or largest item).\n' +
-    '- Python\'s built-in `sorted()` and `list.sort()`: $O(n\\log n)$.\n\n' +
+    '- Quicksort: $O(n\\log n)$ on average, but $O(n^2)$ in the worst case (when the pivot is always the smallest or largest item).\n\n' +
     '### Choosing a data structure\n\n' +
-    '- Need "is this already there?" checks many times: use a **set**.\n' +
-    '- Need to look up a value from a key (code to price, name to score): use a **dict**.\n' +
-    '- Need items in order with access by position: use a **list**.\n' +
-    '- First in, first out (a queue): use `collections.deque` with `append` and `popleft`, both $O(1)$.\n' +
-    '- Last in, first out (a stack): a list with `append` and `pop()`.',
+    '- Need "is this already there?" checks many times: use a **hash table** of the values (a set).\n' +
+    '- Need to look up a value from a key (code to price, name to score): use a **hash table** of key-value pairs.\n' +
+    '- Need items in order with access by position: use an **array**.\n' +
+    '- First in, first out: use a **queue**, where `enqueue` and `dequeue` are both $O(1)$.\n' +
+    '- Last in, first out: use a **stack**, where `push` and `pop` are both $O(1)$.',
   formulas: [
     { label: 'Big-O rule', tex: 'T(n) = 3n^2 + 5n + 7 \\;\\Rightarrow\\; O(n^2)', note: 'Keep the fastest-growing term, drop its coefficient.' },
     { label: 'Growth ladder', tex: '1 < \\log n < \\sqrt{n} < n < n\\log n < n^2 < n^3 < 2^n < n!', note: 'From slowest-growing to fastest-growing, for large n.' },
@@ -81,7 +80,7 @@ export const lesson: Lesson = {
     { label: 'Doubling sum', tex: '1 + 2 + 4 + \\dots + 2^k = 2^{k+1} - 1 < 2 \\times 2^k', note: 'Why a doubling outer loop with an inner loop of length $i$ is only $O(n)$.' },
     { label: 'Time scaling', tex: 'O(n^p): \\; n \\to kn \\;\\Rightarrow\\; \\text{time} \\times k^p', note: 'For $O(2^n)$, each increase of 1 in $n$ doubles the time.' },
     { label: 'Common complexities', tex: '\\text{linear search } O(n), \\; \\text{binary search } O(\\log n), \\; \\text{merge sort } O(n\\log n), \\; \\text{bubble sort } O(n^2)' },
-    { label: 'Python operations', tex: '\\texttt{x in list}: O(n), \\quad \\texttt{x in set}: O(1), \\quad \\texttt{d[k]}: O(1), \\quad \\texttt{list.insert(0, x)}: O(n)', note: 'Dict and set costs are averages (hashing).' },
+    { label: 'Common operations', tex: '\\text{search an array}: O(n), \\quad \\text{hash table lookup}: O(1), \\quad \\text{insert at the front of an array}: O(n)', note: 'Hash table costs are averages.' },
   ],
   examples: [
     {
@@ -97,7 +96,7 @@ export const lesson: Lesson = {
     },
     {
       title: 'Counting a halving loop',
-      problem: 'How many times does the body of `while n > 1: n = n // 2` run when `n` starts at 100? What is the complexity?',
+      problem: 'How many times does the body of this loop run when `n` starts at 100? What is the complexity?\n\n```pseudocode\nwhile (n > 1)\n   n = div(n,2) // div is integer division\nend while\n```',
       steps: [
         'Trace the values of `n`: $100 \\to 50 \\to 25 \\to 12 \\to 6 \\to 3 \\to 1$.',
         'Count the arrows: 6 passes. Then `n > 1` is false ($1 > 1$ is false), so the loop stops.',
@@ -133,9 +132,9 @@ export const lesson: Lesson = {
     '**Multiplying sequential loops.** Two loops one after the other are $n + n = 2n$, which is $O(n)$. Only a loop **inside** another loop multiplies.',
     '**Choosing the term with the biggest coefficient or the biggest constant.** In $500n + n^2 + 9000$ the dominant term is $n^2$; coefficients and constants never change the Big-O.',
     '**Trusting small values of $n$.** At $n = 8$, $n^3 = 512$ is bigger than $2^n = 256$, and $\\sqrt{8} < \\log_2 8$. Big-O is about very large $n$, where $2^n$ beats every polynomial and $\\sqrt{n}$ beats $\\log n$.',
-    '**Assuming `x in` is always fast.** `x in my_list` scans the list ($O(n)$); `x in my_set` and dict key lookups are $O(1)$ on average.',
-    '**Off-by-one counts.** `range(1, n)` runs $n - 1$ times, pseudocode `for i = 1 to n` runs $n$ times, and `while n > 1` stops one pass earlier than `while n > 0`.',
-    '**Forgetting that binary search needs sorted data**, or using `list.pop(0)` for a queue: it is $O(n)$ per removal, so use `collections.deque` and `popleft()`.',
+    '**Assuming every "is it there?" check is fast.** Searching an unsorted array scans it ($O(n)$); a hash table lookup is $O(1)$ on average.',
+    '**Off-by-one counts.** `for i = 2 to n` runs $n - 1$ times, `for i = 1 to n` runs $n$ times, and `while (n > 1)` stops one pass earlier than `while (n > 0)`.',
+    '**Forgetting that binary search needs sorted data**, or removing from the front of an array in a loop: each removal shifts every item, so it is $O(n)$ per removal. A queue avoids this.',
   ],
   examTip:
     'Complexity questions usually offer four Big-O options such as $O(1)$, $O(\\log n)$, $O(n)$, $O(n^2)$, so work out the *shape* first: count the loop levels, and ask whether each loop goes up by 1 (that is $n$ passes) or halves/doubles ($\\log n$ passes). Check whether loops are nested (multiply) or one after another (add). For "how many times does this run" questions, trace small values or use $\\frac{n(n+1)}{2}$ and powers of 2 ($2^{10} = 1024$, $2^{20} \\approx$ one million); wrong options are usually $n^2$ (inner loop assumed full length), the outer-loop count alone, or an off-by-one. For timing questions, compute $k = \\frac{\\text{new } n}{\\text{old } n}$ on your calculator and multiply the time by $k^p$; if an option equals old time $\\times k$, it is the "linear" trap. For data-structure choices, ask what the task does most often (look up by key, membership test, add/remove at the front) and pick the structure where that operation is $O(1)$.',

@@ -12,8 +12,8 @@ export const lesson: Lesson = {
     { cue: '**Stationary point**, local maximum or minimum', method: "Solve $f'(x) = 0$, then put $x$ into $f$ to get $y$. Classify with $f''$: negative means a maximum, positive means a minimum." },
     { cue: 'Where is $f$ **increasing** or **decreasing**?', method: "Find where $f'(x) = 0$, then test the sign of $f'$ in each interval between those points: $f' < 0$ means decreasing." },
     { cue: '**Maximum value on an interval** $a \\le x \\le b$', method: 'Compare $f$ at the stationary points inside the interval and at both endpoints.' },
-    { cue: '**Optimisation** word problem (fencing, a box, a shortest distance)', method: 'Use the constraint to write the quantity in one variable, differentiate, set to $0$, check it is a max or min, and answer what was asked (the area, not $x$). For a distance, minimise its square.' },
-    { cue: '"**How fast** is ... changing?"', method: 'Chain rule: $\\frac{dA}{dt} = \\frac{dA}{ds} \\times \\frac{ds}{dt}$. For linked quantities (a sliding ladder), differentiate the equation linking them with respect to $t$, then substitute.' },
+    { cue: '**Optimisation** word problem (such as fencing)', method: 'Use the constraint to write the quantity in one variable, differentiate, set to $0$, check it is a max or min, and answer what was asked (the area, not $x$).' },
+    { cue: '**Rate of change** or velocity at a given time', method: 'Differentiate with respect to time, then substitute the time.' },
   ],
   know:
     '### The one big idea\n\n' +
@@ -49,7 +49,7 @@ export const lesson: Lesson = {
     '4. Check it is a max or min (second derivative) and that it makes physical sense (lengths must be positive).\n' +
     '5. Answer the question actually asked: often the area or volume, not the $x$-value.\n\n' +
     '### Rates of change\n\n' +
-    'A derivative is a **rate of change**. If $h$ is height in metres and $t$ is time in seconds, then $\\frac{dh}{dt}$ is velocity in m/s, and differentiating again gives acceleration. When two quantities are linked (such as the side and area of a square), use the **chain rule**: $\\frac{dA}{dt} = \\frac{dA}{ds} \\times \\frac{ds}{dt}$. For shapes like a sliding ladder, write the equation linking the variables (Pythagoras), differentiate both sides with respect to $t$, then substitute the values at that moment.\n\n' +
+    'A derivative is a **rate of change**. If $h$ is height in metres and $t$ is time in seconds, then $\\frac{dh}{dt}$ is velocity in m/s, and differentiating again gives acceleration.\n\n' +
     '### Why this matters in AI\n\n' +
     'Training a machine learning model means **minimising a loss function**. The idea is exactly this topic: the minimum is where the gradient is zero, and gradient descent walks downhill by following the sign of the derivative.',
   formulas: [
@@ -62,7 +62,6 @@ export const lesson: Lesson = {
     { label: 'Second derivative test', tex: 'f\'\'(a) < 0 \\Rightarrow \\text{max}, \\qquad f\'\'(a) > 0 \\Rightarrow \\text{min}', note: 'If $f\'\'(a) = 0$ the test is inconclusive.' },
     { label: 'Point of inflection (candidate)', tex: 'f\'\'(x) = 0', note: 'Where the curve changes from bending one way to the other.' },
     { label: 'Velocity and acceleration', tex: 'v = \\frac{ds}{dt}, \\qquad a = \\frac{dv}{dt} = \\frac{d^{2}s}{dt^{2}}' },
-    { label: 'Connected rates of change (chain rule)', tex: '\\frac{dy}{dt} = \\frac{dy}{dx} \\times \\frac{dx}{dt}' },
   ],
   examples: [
     {
@@ -102,16 +101,6 @@ export const lesson: Lesson = {
       ],
       answer: '$50$ (when $x = 10$ and $y = 5$)',
     },
-    {
-      title: 'Connected rates of change',
-      problem: 'The radius of a circle increases at $3$ cm/s. How fast is the area increasing when the radius is $4$ cm? Give your answer in terms of $\\pi$.',
-      steps: [
-        'Area: $A = \\pi r^{2}$, so $\\frac{dA}{dr} = 2\\pi r$.',
-        'Chain rule: $\\frac{dA}{dt} = \\frac{dA}{dr} \\times \\frac{dr}{dt} = 2\\pi r \\times 3 = 6\\pi r$.',
-        'At $r = 4$: $\\frac{dA}{dt} = 6\\pi \\times 4 = 24\\pi$.',
-      ],
-      answer: '$24\\pi \\text{ cm}^{2}/\\text{s}$ (about $75.4 \\text{ cm}^{2}/\\text{s}$)',
-    },
   ],
   traps: [
     'Using the $y$-coordinate of the point as the $y$-intercept of the tangent. The intercept $c$ is only equal to $y_1$ when $x_1 = 0$; otherwise use $y - y_1 = m(x - x_1)$.',
@@ -119,13 +108,13 @@ export const lesson: Lesson = {
     'Finding the $y$-value of a stationary point by substituting into $f\'(x)$ or $f\'\'(x)$ instead of the original $f(x)$. Substituting into $f\'(x)$ always gives $0$, which is a big warning sign.',
     'Mixing up the second derivative test: negative means **maximum**, positive means **minimum**. Think of $y = -x^{2}$ (a hill) whose second derivative is $-2$.',
     'On a closed interval, forgetting to check the endpoints, or counting a stationary point that lies outside the interval.',
-    'In optimisation questions, giving the $x$-value when the question asks for the area, volume or cost (or forgetting the square root when you minimised a squared distance).',
+    'In optimisation questions, giving the $x$-value when the question asks for the area, volume or cost.',
   ],
   examTip:
     'Expect options that are the results of the traps above, so every wrong option is "nearly right". Fast checks:\n\n' +
     '- **Tangent or normal equation:** plug the $x$-value of the point into each option. The correct line must give the same $y$ as the curve. That alone usually removes two options. Then check the gradient (the number in front of $x$) against $f\'(a)$, and its sign.\n' +
     '- **Stationary points:** substitute the option\'s $x$ into $f\'(x)$; it must give $0$. Then check the $y$-value with the original function.\n' +
     '- **Max or min:** use the sign of $f\'\'(x)$, or sketch: a positive cubic goes up, down, up, so its first stationary point (smaller $x$) is the maximum.\n' +
-    '- **Optimisation:** the answer must make physical sense (positive lengths, and the box must exist). If an option needs more material than you have, it is wrong. On a calculator you can test nearby values: the true maximum is bigger than the value just either side.\n' +
-    '- **Rates of change:** check the units (area rate is $\\text{cm}^{2}/\\text{s}$) and the sign (decreasing quantities have negative rates).',
+    '- **Optimisation:** the answer must make physical sense (positive lengths). If an option needs more material than you have, it is wrong. On a calculator you can test nearby values: the true maximum is bigger than the value just either side.\n' +
+    '- **Rates of change:** check the units (velocity is m/s) and the sign (decreasing quantities have negative rates).',
 };

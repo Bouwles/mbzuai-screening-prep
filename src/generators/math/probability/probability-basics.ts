@@ -33,7 +33,7 @@ const VENN_CONTEXTS = [
   { a: 'plays football', b: 'plays basketball', bBase: 'play basketball', who: 'student' },
   { a: 'owns a laptop', b: 'owns a tablet', bBase: 'own a tablet', who: 'student' },
   { a: 'studies Physics', b: 'studies Chemistry', bBase: 'study Chemistry', who: 'student' },
-  { a: 'reads the news online', b: 'watches the news on TV', bBase: 'watch the news on TV', who: 'adult' },
+  { a: 'reads news online', b: 'watches TV news', bBase: 'watch TV news', who: 'adult' },
   { a: 'drinks coffee', b: 'drinks tea', bBase: 'drink tea', who: 'office worker' },
 ] as const;
 
@@ -182,7 +182,7 @@ export const generators: Generator[] = [
             { f: H(a + b - 2 * c), why: 'This is the probability of **exactly one** of the events; it also includes the "$B$ only" region.' },
           ];
         } else {
-          question = `does **exactly one** of these two things (one of them, but not both)`;
+          question = `does **exactly one** of these two things`;
           finalStep =
             `Find the two "only" regions:\n\n` +
             `- $A$ only: ${m(`${dec(H(a))} - ${dec(H(c))} = ${dec(H(a - c))}`)}\n` +
@@ -200,7 +200,7 @@ export const generators: Generator[] = [
         const ansText = m(dec(answer));
         return {
           stem:
-            `For a randomly chosen ${ctx.who}, let $A$ be the event "${ctx.a}" and $B$ the event "${ctx.b}". ` +
+            `For a random ${ctx.who}, $A$ is "${ctx.a}" and $B$ is "${ctx.b}", with ` +
             `${m(`P(A) = ${dec(H(a))}`)}, ${m(`P(B) = ${dec(H(b))}`)} and ${m(`P(A \\cap B) = ${dec(H(c))}`)}. ` +
             `What is the probability that the ${ctx.who} ${question}?`,
           answer: ansText,

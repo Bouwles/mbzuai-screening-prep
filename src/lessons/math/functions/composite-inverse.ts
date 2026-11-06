@@ -13,7 +13,6 @@ export const lesson: Lesson = {
     { cue: '$f(f^{-1}(6))$, or a point / graph of the inverse', method: '$f$ and $f^{-1}$ cancel, so $f(f^{-1}(6)) = 6$. $(a, b)$ on $f$ means $(b, a)$ on $f^{-1}$: a reflection in $y = x$.' },
     { cue: '**Domain** of $f^{-1}$ / inverse of a quadratic on a restricted domain', method: 'Domain of $f^{-1}$ = range of $f$. For a quadratic, complete the square first and use the original domain to choose the sign of the square root.' },
     { cue: 'Given $g$ and $f \\circ g$ (or $g \\circ f$), find $f$', method: 'Rewrite the composite in terms of the inner expression, e.g. $2x^2 + 5 = 2(x^2 + 1) + 3$, so $f(x) = 2x + 3$.' },
-    { cue: '**Self-inverse**, or applying $f$ many times', method: 'Self-inverse means $f(f(x)) = x$; $\\frac{ax + b}{cx + d}$ is self-inverse when $d = -a$. For repeated application, compute a few terms, find the cycle, use the remainder.' },
   ],
   know:
     '### Functions as machines\n\n' +
@@ -52,9 +51,7 @@ export const lesson: Lesson = {
     'Doing a function and then its inverse (in either order) brings you back where you started: $f(f^{-1}(x)) = x$ and $f^{-1}(f(x)) = x$. So $f(f^{-1}(6)) = 6$ without any working.\n\n' +
     'For a composite, undo the **outer** function first: $(f \\circ g)^{-1} = g^{-1} \\circ f^{-1}$.\n\n' +
     '### Graphs: reflection in $y = x$\n\n' +
-    'Swapping inputs and outputs swaps the coordinates of every point: $(a, b)$ on $y = f(x)$ becomes $(b, a)$ on $y = f^{-1}(x)$. Geometrically this is a **reflection in the line** $y = x$. If the two graphs meet, an increasing function meets its inverse on that line, so you can find the meeting point by solving $f(x) = x$.\n\n' +
-    '### Self-inverse functions\n\n' +
-    'A function is **self-inverse** if $f^{-1} = f$, which is the same as $f(f(x)) = x$. Its graph is symmetric about $y = x$. Common examples: $f(x) = -x$, $f(x) = c - x$, $f(x) = \\frac{k}{x}$ (for any $k \\ne 0$), and $f(x) = \\frac{ax + b}{cx - a}$ with $c \\ne 0$ (the **constant** on the bottom is minus the $x$-coefficient on top), as long as it is not a constant function.',
+    'Swapping inputs and outputs swaps the coordinates of every point: $(a, b)$ on $y = f(x)$ becomes $(b, a)$ on $y = f^{-1}(x)$. Geometrically this is a **reflection in the line** $y = x$. If the two graphs meet, an increasing function meets its inverse on that line, so you can find the meeting point by solving $f(x) = x$.',
   formulas: [
     { label: 'Composite function', tex: '(f \\circ g)(x) = f(g(x))', note: 'Apply $g$ first (inside), then $f$. Usually $f(g(x)) \\ne g(f(x))$.' },
     { label: 'Definition of the inverse', tex: 'f(a) = b \\iff f^{-1}(b) = a', note: 'To find $f^{-1}(k)$, solve $f(x) = k$.' },
@@ -63,9 +60,8 @@ export const lesson: Lesson = {
     { label: 'Domain and range swap', tex: '\\text{domain of } f^{-1} = \\text{range of } f, \\qquad \\text{range of } f^{-1} = \\text{domain of } f' },
     { label: 'Inverse of a composite', tex: '(f \\circ g)^{-1} = g^{-1} \\circ f^{-1}', note: 'Undo the outer function first (socks and shoes).' },
     { label: 'Graph of the inverse', tex: '(a, b) \\text{ on } y = f(x) \\iff (b, a) \\text{ on } y = f^{-1}(x)', note: 'A reflection in the line $y = x$.' },
-    { label: 'Self-inverse', tex: 'f^{-1} = f \\iff f(f(x)) = x' },
     { label: 'Inverse of a linear function', tex: 'f(x) = ax + b \\;\\Rightarrow\\; f^{-1}(x) = \\frac{x - b}{a}' },
-    { label: 'Inverse of a rational function', tex: 'f(x) = \\frac{ax + b}{cx + d} \\;\\Rightarrow\\; f^{-1}(x) = \\frac{dx - b}{a - cx}', note: 'When $c \\ne 0$, it is self-inverse exactly when $d = -a$.' },
+    { label: 'Inverse of a rational function', tex: 'f(x) = \\frac{ax + b}{cx + d} \\;\\Rightarrow\\; f^{-1}(x) = \\frac{dx - b}{a - cx}' },
   ],
   examples: [
     {
@@ -93,16 +89,16 @@ export const lesson: Lesson = {
     },
     {
       title: 'Inverse of a fraction function',
-      problem: 'Find the inverse of $f(x) = \\frac{x+4}{2x-1}$, $x \\ne \\frac{1}{2}$.',
+      problem: 'Find the inverse of $f(x) = \\frac{x+4}{2x-3}$, $x \\ne \\frac{3}{2}$.',
       steps: [
-        'Write $y = \\frac{x+4}{2x-1}$ and swap: $x = \\frac{y+4}{2y-1}$.',
-        'Multiply both sides by $(2y - 1)$: $2xy - x = y + 4$.',
-        'Collect the $y$ terms on the left: $2xy - y = x + 4$.',
-        'Factorise out $y$: $y(2x - 1) = x + 4$.',
-        'Divide: $y = \\frac{x+4}{2x-1}$.',
-        'This is the same as $f(x)$, so $f$ is self-inverse (the constant on the bottom, $-1$, is minus the $x$-coefficient on top, $1$).',
+        'Write $y = \\frac{x+4}{2x-3}$ and swap: $x = \\frac{y+4}{2y-3}$.',
+        'Multiply both sides by $(2y - 3)$: $2xy - 3x = y + 4$.',
+        'Collect the $y$ terms on the left: $2xy - y = 3x + 4$.',
+        'Factorise out $y$: $y(2x - 1) = 3x + 4$.',
+        'Divide: $y = \\frac{3x+4}{2x-1}$.',
+        'Check: $f(1) = \\frac{5}{-1} = -5$, and $f^{-1}(-5) = \\frac{-15+4}{-10-1} = \\frac{-11}{-11} = 1$.',
       ],
-      answer: '$f^{-1}(x) = \\frac{x+4}{2x-1}$, $x \\ne \\frac{1}{2}$: the function is self-inverse.',
+      answer: '$f^{-1}(x) = \\frac{3x+4}{2x-1}$, $x \\ne \\frac{1}{2}$.',
     },
     {
       title: 'Inverse of a quadratic with a restricted domain',

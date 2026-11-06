@@ -11,7 +11,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-001',
     subtopic: 'valid-conclusions',
     difficulty: 'foundation',
-    stem: 'An advert for Gamma phones shows the bar chart below of average battery life. What is the **main** reason the chart is misleading?',
+    stem: 'The bar chart compares the average battery life of three phone brands. What is the **main** reason it is misleading?',
     chart: {
       kind: 'bar',
       title: 'Average battery life',
@@ -23,10 +23,10 @@ export const questions: StaticQuestion[] = [
       yMax: 11,
     },
     options: [
-      'The bars should have been drawn as a line graph',
-      'The vertical axis starts at 10 hours instead of 0, so small differences look huge',
-      'The bars are arranged from shortest to tallest',
-      'Battery life should have been shown in minutes instead of hours',
+      'It should be a line graph',
+      'The vertical axis starts at 10, not 0',
+      'The bars are in height order',
+      'Battery life should be in minutes',
     ],
     correctIndex: 1,
     markScheme: {
@@ -48,12 +48,12 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-002',
     subtopic: 'valid-conclusions',
     difficulty: 'foundation',
-    stem: 'Monthly data collected over three years in a coastal city show a strong positive correlation between ice-cream sales and the number of people rescued from drowning. Which conclusion is **valid**?',
+    stem: 'Monthly data show a strong positive correlation between ice-cream sales and drownings in a coastal city. Which conclusion is **valid**?',
     options: [
-      'Eating ice cream causes people to drown',
-      'Banning ice-cream sales would reduce the number of drownings',
-      'Ice-cream sales and drownings tend to rise together, probably because both go up in hot weather',
-      'Because the correlation is strong, every month with higher ice-cream sales also had more drownings',
+      'Eating ice cream causes drowning',
+      'Banning ice cream would reduce drownings',
+      'The two rise together, probably because of hot weather',
+      'Every month with higher sales had more drownings',
     ],
     correctIndex: 2,
     markScheme: {
@@ -74,12 +74,12 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-003',
     subtopic: 'valid-conclusions',
     difficulty: 'foundation',
-    stem: 'A news website puts a poll on its home page: "Do you use the internet every day?" Out of 12,000 visitors who answered, 98% said yes. The website reports that "98% of adults in the country use the internet every day". Why is this conclusion **not** valid?',
+    stem: 'A website poll finds that 98% of its 12,000 respondents use the internet daily, and reports this for all adults. Why is this conclusion **not** valid?',
     options: [
-      'A sample of 12,000 people is too small to say anything about a country',
-      'A percentage as high as 98% cannot be accurate',
-      'Polls can never be used to draw conclusions about a whole population',
-      'Only people already visiting a website could answer, so the sample is biased towards internet users',
+      '12,000 people is too small a sample',
+      'A figure as high as 98% cannot be accurate',
+      'Polls can never support conclusions about a population',
+      'The sample is biased towards internet users',
     ],
     correctIndex: 3,
     markScheme: {
@@ -100,7 +100,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-004',
     subtopic: 'valid-conclusions',
     difficulty: 'foundation',
-    stem: 'The number of electric cars in a city **doubled** from 2020 to 2024. An infographic shows one car picture for each year. The 2024 picture is drawn twice as **tall** and twice as **wide** as the 2020 picture. How many times larger is the **area** of the 2024 picture than the 2020 picture?',
+    stem: 'An infographic picture is redrawn twice as **tall** and twice as **wide**. How many times larger is its **area**?',
     options: ['$2$', '$3$', '$4$', '$8$'],
     correctIndex: 2,
     markScheme: {
@@ -109,9 +109,9 @@ export const questions: StaticQuestion[] = [
         '- Width is multiplied by $2$.\n' +
         '- Height is multiplied by $2$.\n\n' +
         'So the area is multiplied by $2 \\times 2 = 4$.\n\n' +
-        'The data only doubled, but the eye judges the size of a picture by its area, so the infographic makes the increase look **4 times** as big. This is a common way pictograms distort data: the picture should have been scaled so its *area* doubled, or simply shown as two identical cars.',
+        'If the data only doubled, the picture still looks **4 times** as big, because the eye judges size by area. This is a common way pictograms distort data: the picture should be scaled so its *area* doubles, or simply shown twice.',
       whyWrong: [
-        'This is the true increase in the **data**, or the scale factor of just one dimension. Scaling both the width and the height by 2 multiplies the area by $2 \\times 2$.',
+        'This is the scale factor of just one dimension. Scaling both the width and the height by 2 multiplies the area by $2 \\times 2$.',
         'This adds the increases instead of multiplying the scale factors: "100% taller plus 100% wider = 200% bigger". Area scale factors multiply.',
         null,
         'This is $2^3$, which would be the change in **volume** of a 3D object scaled by 2 in every direction. A flat picture only has width and height.',
@@ -131,12 +131,12 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-005',
     subtopic: 'valid-conclusions',
     difficulty: 'foundation',
-    stem: 'On a food delivery app, Restaurant A has an average rating of 5.0 stars from 2 reviews. Restaurant B has an average rating of 4.6 stars from 850 reviews. Which statement is best supported by this information?',
+    stem: 'Restaurant A has an average rating of 5.0 stars from 2 reviews. Restaurant B has 4.6 stars from 850 reviews. Which statement is best supported?',
     options: [
-      "Restaurant B's rating is more reliable, because it is based on far more reviews; A's rating could change a lot after a few more reviews",
-      'Restaurant A is definitely better, because 5.0 is higher than 4.6',
-      'Both ratings are equally reliable, because both are averages of the reviews',
-      'Restaurant B must be worse, because more reviews means more chances for complaints',
+      'B\'s rating is more reliable, because it has far more reviews',
+      'A is definitely better, because 5.0 is higher than 4.6',
+      'Both ratings are equally reliable',
+      'B must be worse, because more reviews bring more complaints',
     ],
     correctIndex: 0,
     markScheme: {
@@ -160,7 +160,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-006',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'The chart compares the monthly downloads (in thousands) of two apps. On the chart, App Y\'s bar looks **3 times** as tall as App X\'s bar. By what percentage are App Y\'s downloads **actually** higher than App X\'s?',
+    stem: 'On the chart, App Y\'s bar looks **3 times** as tall as App X\'s. By what percentage are App Y\'s downloads **actually** higher than App X\'s?',
     chart: {
       kind: 'bar',
       title: 'Monthly downloads',
@@ -194,7 +194,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-007',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'The line chart shows the number of monthly users of an app last year. An advert says "Users up 25% in just three months!", using the September and December figures. Using the **whole** chart, what was the percentage change in monthly users from **January to December**? (Give answers to 1 decimal place where needed.)',
+    stem: 'An advert says "Users up 25% in just three months!", using September and December. From the whole chart, what was the percentage change in monthly users from **January to December**?',
     chart: {
       kind: 'line',
       title: 'Monthly users',
@@ -236,7 +236,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-008',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'A teacher records how many hours 10 students slept the night before a test and their test scores. The scatter graph is shown below. Which conclusion is **valid**?',
+    stem: 'The scatter graph shows hours of sleep and test score for 10 students. Which conclusion is **valid**?',
     chart: {
       kind: 'scatter',
       title: 'Sleep and test score',
@@ -256,17 +256,17 @@ export const questions: StaticQuestion[] = [
       ],
     },
     options: [
-      'Sleeping more causes students to get higher scores',
-      'In this group, students who slept more tended to get higher scores',
-      'Every student who slept more than another student also scored higher',
-      'There is no relationship, because the points do not lie exactly on a straight line',
+      'Sleeping more causes higher scores',
+      'Students who slept more tended to score higher',
+      'Every student who slept more scored higher',
+      'There is no relationship',
     ],
     correctIndex: 1,
     markScheme: {
       solution:
         'Step 1: Describe the pattern. As hours of sleep increase, scores generally increase, so there is a **positive correlation**.\n\n' +
         'Step 2: Check for exceptions. One student slept 7 hours and scored 70, while another slept 8 hours and scored only 66. So the pattern is a **tendency**, not a rule for every student.\n\n' +
-        'Step 3: Think about causation. This is an **observational** study: the teacher did not control how long anyone slept. Other factors (for example, students who revised earlier may also go to bed earlier) could explain the link.\n\n' +
+        'Step 3: Think about causation. This is an **observational** study: nobody controlled how long anyone slept. Other factors (for example, students who revised earlier may also go to bed earlier) could explain the link.\n\n' +
         'So the valid statement is that students who slept more **tended** to score higher.',
       whyWrong: [
         'This claims **causation**. The data are observational, so a confounding variable (such as how organised a student is) could explain both more sleep and higher scores.',
@@ -281,12 +281,12 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-009',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'A researcher wants to estimate the average number of hours per week that adults in a city spend exercising. She interviews 400 people as they leave a gym at 7 am. Which statement best describes the problem with her method?',
+    stem: 'To estimate how much adults in a city exercise, a researcher interviews 400 people leaving a gym at 7 am. What is the main problem with her method?',
     options: [
-      'The sample is fine because 400 people is a large number',
-      'The sample over-represents people who exercise a lot, so her estimate is likely to be too high',
-      'The sample over-represents people who exercise a lot, so her estimate is likely to be too low',
-      'The only problem is the time; interviewing people leaving the gym at 6 pm instead would fix it',
+      'None: 400 people is a large sample',
+      'It over-represents active people, so the estimate is too high',
+      'It over-represents active people, so the estimate is too low',
+      'Only the time: interviewing at 6 pm would fix it',
     ],
     correctIndex: 1,
     markScheme: {
@@ -307,7 +307,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-010',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'A headline says "Crime soars in Town A: up 50%!". The table shows the number of reported crimes in two towns. Which conclusion is supported by the table?',
+    stem: 'The table shows reported crimes in two towns. A headline says "Crime soars in Town A: up 50%!". Which conclusion is supported?',
     table: {
       headers: ['Town', 'Last year', 'This year', 'Percentage change'],
       rows: [
@@ -316,10 +316,10 @@ export const questions: StaticQuestion[] = [
       ],
     },
     options: [
-      'Town A had the larger increase in the number of crimes, because 50% is more than 10%',
+      'Town A had the larger increase in the number of crimes',
       'Town A now has more crimes than Town B',
-      'Crime rose by 60% across the two towns combined',
-      'Town B had the larger increase in the number of crimes: 40 more, compared with 10 more in Town A',
+      'Crime rose by 60% across the two towns',
+      'Town B had the larger increase in the number of crimes',
     ],
     correctIndex: 3,
     markScheme: {
@@ -343,7 +343,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-011',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'The table shows how many patients survived a type of operation at two hospitals, split by how ill the patients were. Which statement is correct?',
+    stem: 'The table shows survivors of an operation at two hospitals, by severity of illness. Which statement is correct?',
     table: {
       caption: 'Survived / patients treated',
       headers: ['Hospital', 'Mild cases', 'Severe cases', 'All patients'],
@@ -353,10 +353,10 @@ export const questions: StaticQuestion[] = [
       ],
     },
     options: [
-      'Hospital B has the higher survival rate for both mild and severe cases',
-      'Hospital A has the higher survival rate for both mild and severe cases, but Hospital B has the higher overall survival rate',
-      'Hospital A has the higher overall survival rate, because it is better for both types of case',
-      'The table must contain an error: if Hospital A is better for both types of case, it must also be better overall',
+      'Hospital B is better for both mild and severe cases',
+      'Hospital A is better for both, but B is better overall',
+      'Hospital A is better overall and for both',
+      'The table must contain an error',
     ],
     correctIndex: 1,
     markScheme: {
@@ -381,7 +381,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-012',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'In Class X, 18 out of 20 students passed a test (90%). In Class Y, 30 out of 60 students passed (50%). What is the pass rate for the two classes **combined**?',
+    stem: '18 of 20 students passed in Class X (90%) and 30 of 60 passed in Class Y (50%). What is the **combined** pass rate?',
     options: ['70%', '48%', '60%', '40%'],
     correctIndex: 2,
     markScheme: {
@@ -405,7 +405,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-013',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'The line chart shows the number of members (in thousands) of a sports club. The values plotted are 10, 30, 50, 52, 54 and 56 thousand. On the chart, the years are **equally spaced** along the horizontal axis. Which conclusion is correct?',
+    stem: 'The chart shows club membership, with the plotted years drawn **equally spaced**. Which conclusion is correct?',
     chart: {
       kind: 'line',
       title: 'Club membership',
@@ -416,10 +416,10 @@ export const questions: StaticQuestion[] = [
       yMin: 0,
     },
     options: [
-      'Membership grew by a steady 2 thousand per year throughout; it only looks slower after 2020 because the time gaps between the plotted years are not equal (10 years, then 1 year)',
-      'Growth slowed from 20 thousand per year before 2020 to 2 thousand per year after 2020',
-      'Growth stopped after 2020, because the line is almost flat',
-      'Growth slowed, because the increase from 2020 to 2023 (6 thousand) is less than the increase from 2000 to 2010 (20 thousand)',
+      'Steady growth of 2 thousand per year throughout',
+      'Growth slowed from 20 thousand per year to 2 thousand',
+      'Growth stopped after 2020',
+      'Growth slowed: only 6 thousand from 2020 to 2023',
     ],
     correctIndex: 0,
     markScheme: {
@@ -439,12 +439,11 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ---------------------------------------------------------------- challenge
   {
     id: 'valid-conclusions-014',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'A university has two departments. Overall, 64% of male applicants and 41% of female applicants were accepted. A newspaper concludes that the university is biased against women. Using the table, which statement is best supported by the data?',
+    stem: 'Overall, 64% of male and 41% of female applicants to a university were accepted. A newspaper claims bias against women. Using the table, which statement is best supported?',
     table: {
       caption: 'Accepted / applied',
       headers: ['Department', 'Men', 'Women'],
@@ -455,10 +454,10 @@ export const questions: StaticQuestion[] = [
       ],
     },
     options: [
-      'The data prove the university is biased against women, because 41% is much lower than 64%',
-      'Men had a higher acceptance rate than women in both departments',
-      "Women's true overall acceptance rate is 57.5%, the average of their two department rates, so women did better overall",
-      'Women had a higher acceptance rate in each department; their overall rate is lower because most women applied to Department Y, which accepts few applicants',
+      'The data prove bias against women',
+      'Men had the higher rate in both departments',
+      'Women\'s true overall rate is 57.5%',
+      'Women had the higher rate in each department',
     ],
     correctIndex: 3,
     markScheme: {
@@ -485,7 +484,7 @@ export const questions: StaticQuestion[] = [
     id: 'valid-conclusions-015',
     subtopic: 'valid-conclusions',
     difficulty: 'exam',
-    stem: 'Two drugs, P and Q, were each given to 200 patients. The table shows how many patients recovered, by age group. Drug P has the higher recovery rate in **both** age groups. What are the **overall** recovery rates of the two drugs?',
+    stem: 'Two drugs were each given to 200 patients. The table shows recoveries by age group. Drug P has the higher rate in **both** groups. What are the **overall** recovery rates?',
     table: {
       caption: 'Recovered / treated',
       headers: ['Drug', 'Under 50', '50 and over'],
@@ -531,122 +530,66 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+
+  // ---------------------------------------------------------------- recall
   {
-    id: 'valid-conclusions-016',
+    id: 'valid-conclusions-019',
     subtopic: 'valid-conclusions',
-    difficulty: 'challenge',
-    stem: 'The bar chart shows a company\'s annual profit. Its vertical axis starts at 40. The **lie factor** of a graph is defined as\n\n$$\\text{lie factor} = \\frac{\\text{percentage change shown by the graphic}}{\\text{percentage change in the data}}$$\n\nwhere the graphic\'s change is measured using the **visible** heights of the bars (above the bottom of the axis). What is the lie factor of this chart?',
-    chart: {
-      kind: 'bar',
-      title: 'Annual profit',
-      xLabel: 'Year',
-      yLabel: 'Profit (AED millions)',
-      categories: ['2022', '2023'],
-      series: [{ name: 'Profit (AED millions)', values: [50, 70] }],
-      yMin: 40,
-      yMax: 75,
-    },
-    options: ['$3$', '$1.4$', '$0.2$', '$5$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'A third variable that influences both of two correlated variables is called a:',
+    options: ['Confounding variable', 'Dependent variable', 'Outlier', 'Residual'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Step 1: Change in the **data**. Profit went from 50 to 70:\n\n' +
-        '$$\\frac{70 - 50}{50} \\times 100 = 40\\%$$\n\n' +
-        'Step 2: Change in the **graphic**. The axis starts at 40, so the visible bar heights are $50 - 40 = 10$ and $70 - 40 = 30$:\n\n' +
-        '$$\\frac{30 - 10}{10} \\times 100 = 200\\%$$\n\n' +
-        'Step 3: Lie factor:\n\n' +
-        '$$\\frac{200\\%}{40\\%} = 5$$\n\n' +
-        'So the chart exaggerates the change 5 times over. An honest chart has a lie factor close to 1.',
+        'A **confounding variable** (or confounder) affects both variables, which can make them move together even if neither causes the other.\n\n' +
+        'For example, hot weather raises both ice-cream sales and swimming accidents.',
       whyWrong: [
-        'This is the ratio of the visible bar heights, $\\frac{30}{10} = 3$. The lie factor compares percentage **changes**: $200\\%$ in the picture against $40\\%$ in the data.',
-        'This is the ratio of the real values, $\\frac{70}{50} = 1.4$, which describes the data only and ignores what the graphic shows.',
-        'This divides the wrong way round: $\\frac{40\\%}{200\\%} = 0.2$. The change shown by the graphic goes on top.',
         null,
+        'A dependent variable is the outcome being measured in an experiment. It does not describe a hidden third factor.',
+        'An outlier is a single data value far from the others, not a variable that influences two others.',
+        'A residual is the gap between an actual value and a predicted value on a fitted line.',
       ],
-      keyIdea: 'A truncated axis inflates visual changes: compare the percentage change in the bar heights with the percentage change in the real values.',
-    },
-    check: {
-      optionValues: [3, 1.4, 0.2, 5],
-      compute: () => {
-        const axisStart = 40;
-        const [a, b] = [50, 70];
-        const graphic = pct(a - axisStart, b - axisStart);
-        const data = pct(a, b);
-        return graphic / data;
-      },
+      keyIdea: 'A confounding variable is a hidden third factor that can make two variables appear linked.',
     },
   },
   {
-    id: 'valid-conclusions-017',
+    id: 'valid-conclusions-020',
     subtopic: 'valid-conclusions',
-    difficulty: 'challenge',
-    stem: 'A music app compares two groups of songs. Songs from the 1970s in its "All-Time Classics" playlist have an average user rating of 4.6 stars. **All** songs released in the last 12 months have an average rating of 3.4 stars. The app concludes that "music was better in the 1970s". What is the biggest flaw in this conclusion?',
-    options: [
-      'There is no flaw: the 1970s songs have a clearly higher average rating',
-      'The difference is less than 2 stars, so it must be due to chance',
-      'Only the best-loved 1970s songs have survived into the Classics playlist, while the recent group contains every new song, good and bad',
-      'The conclusion would be valid if the app had collected more ratings for each group',
-    ],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'A sample that does not fairly represent its population is described as:',
+    options: ['Biased', 'Random', 'Large', 'Paired'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Compare **how each group was chosen**.\n\n' +
-        '- 1970s group: only songs that people still love decades later (they were good enough to make an "All-Time Classics" list). The thousands of forgotten 1970s songs are missing.\n' +
-        '- Recent group: **every** song from the last year, including all the weak ones that will soon be forgotten.\n\n' +
-        'The groups are not like-for-like. Filtering out the failures and keeping only the "survivors" is called **survivorship bias**. It would make the 1970s look better even if music quality had not changed at all.\n\n' +
-        'A fair comparison would use all songs from each period, or the best songs from each period.',
+        'The **population** is the whole group you want to learn about; the **sample** is the part you actually measure.\n\n' +
+        'A sample that over-represents or under-represents some part of the population is **biased**, and it gives misleading results however big it is.',
       whyWrong: [
-        'A higher average only supports the claim if the two groups were chosen in the same way. Here one group was filtered to the best songs and the other was not.',
-        'Nothing in the data suggests the gap is due to chance, and $4.6 - 3.4 = 1.2$ stars is a large gap on a 5-star scale. The real problem is how the songs in each group were selected.',
         null,
-        'More ratings would not remove the bias: the 1970s group would still contain only the best songs. Collecting more data from a biased selection gives the same biased answer.',
+        'A random sample gives every member a chance of selection, which is how bias is usually avoided.',
+        'Size is a separate issue. A large sample can still be biased, and a large biased sample is still misleading.',
+        'Paired describes data collected in matched pairs. It says nothing about whether the sample is representative.',
       ],
-      keyIdea: 'Survivorship bias: comparing only the "survivors" of one group with everything from another group makes the first group look better than it really is.',
+      keyIdea: 'A biased sample does not represent its population, and a bigger sample does not fix that.',
     },
   },
   {
-    id: 'valid-conclusions-018',
+    id: 'valid-conclusions-021',
     subtopic: 'valid-conclusions',
-    difficulty: 'challenge',
-    stem: 'For 9 countries, the scatter graph shows chocolate eaten per person per year ($x$, in kg) and the number of Nobel Prize winners per 10 million people ($y$). The regression line is $\\hat{y} = 2.5x - 4$. Which statement is **valid**?',
-    chart: {
-      kind: 'scatter',
-      title: 'Chocolate and Nobel Prizes',
-      xLabel: 'Chocolate per person per year (kg)',
-      yLabel: 'Nobel winners per 10 million',
-      points: [
-        { x: 2, y: 1 },
-        { x: 3, y: 4 },
-        { x: 4, y: 5 },
-        { x: 5, y: 9 },
-        { x: 6, y: 11 },
-        { x: 7, y: 13 },
-        { x: 8, y: 17 },
-        { x: 9, y: 18 },
-        { x: 10, y: 21 },
-      ],
-      line: { slope: 2.5, intercept: -4 },
-    },
-    options: [
-      'If a country increases its chocolate consumption by 2 kg per person, it will gain 5 more Nobel winners per 10 million people',
-      'Countries that eat 2 kg more chocolate per person are predicted to have 2.5 more Nobel winners per 10 million people',
-      'Countries that eat 2 kg more chocolate per person are predicted to have 5 more Nobel winners per 10 million people, but this does not show that chocolate causes Nobel Prizes',
-      'Countries that eat 2 kg more chocolate per person are predicted to have 1 more Nobel winner per 10 million people',
-    ],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Two variables have a strong positive correlation. What can be concluded?',
+    options: ['They tend to increase together', 'One causes the other', 'They always have equal values', 'Neither can ever decrease'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Step 1: Use the **gradient**. In $\\hat{y} = 2.5x - 4$ the gradient is $2.5$: each extra 1 kg of chocolate goes with $2.5$ more winners per 10 million (on average).\n\n' +
-        'Step 2: For 2 extra kg: $2.5 \\times 2 = 5$ more winners per 10 million.\n\n' +
-        'Check with the equation: $x = 6$ gives $\\hat{y} = 11$, and $x = 8$ gives $\\hat{y} = 16$; the difference is $16 - 11 = 5$.\n\n' +
-        'Step 3: Interpret carefully. This is observational data about countries. A confounding variable such as **national wealth** could explain both: richer countries can afford more chocolate *and* spend more on universities and research. So the line can **predict**, but it cannot show that eating chocolate **causes** prizes.',
+        'A **positive correlation** means that as one variable increases, the other **tends** to increase too.\n\n' +
+        'It describes a pattern in the data. It does not show cause and effect, and it allows exceptions.',
       whyWrong: [
-        'The number 5 is right, but the claim is **causal** ("will gain"). Observational data cannot show that changing chocolate consumption would change the number of winners; wealth is a likely confounder.',
-        'The gradient $2.5$ is the change for **1 kg**, not for 2 kg. For 2 kg the predicted change is $2.5 \\times 2 = 5$.',
         null,
-        'This substitutes $x = 2$ into the whole equation ($2.5 \\times 2 - 4 = 1$), which gives the predicted value for a country eating 2 kg, not the **change** for 2 extra kg. The intercept cancels out when you compare two countries.',
+        'Correlation does not imply causation. A third variable could be driving both.',
+        'Correlation is about how two variables move together, not about their sizes. Their values can be very different.',
+        'Both variables can rise and fall. Positive correlation only means that they tend to move in the same direction.',
       ],
-      keyIdea: 'The gradient of a regression line gives the predicted change in $y$ per unit of $x$, but a correlation in observational data never proves causation.',
+      keyIdea: 'Correlation describes a tendency to move together; it does not show cause and effect.',
     },
   },
 ];

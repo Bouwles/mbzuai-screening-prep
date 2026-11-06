@@ -381,159 +381,120 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+  // ------------------------------------------------------------------ recall and short calculations
   {
-    id: 'limits-014',
+    id: 'limits-019',
     subtopic: 'limits',
-    difficulty: 'challenge',
-    stem: 'Find $\\lim_{x \\to \\infty} \\dfrac{\\sqrt{4x^2 + 1}}{3x - 2}$.',
-    options: ['$\\frac{4}{3}$', '$0$', '$\\frac{2}{3}$', '$\\infty$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'The denominator behaves like $3x$ for large $x$, so divide top and bottom by $x$. For $x > 0$, $x = \\sqrt{x^2}$, so dividing the square root by $x$ means dividing **inside** it by $x^2$:\n\n' +
-        '$$\\frac{\\sqrt{4x^2 + 1}}{x} = \\sqrt{\\frac{4x^2 + 1}{x^2}} = \\sqrt{4 + \\frac{1}{x^2}}$$\n\n' +
-        'So\n\n' +
-        '$$\\frac{\\sqrt{4x^2 + 1}}{3x - 2} = \\frac{\\sqrt{4 + \\frac{1}{x^2}}}{3 - \\frac{2}{x}}$$\n\n' +
-        'As $x \\to \\infty$, $\\frac{1}{x^2} \\to 0$ and $\\frac{2}{x} \\to 0$, giving $\\frac{\\sqrt{4}}{3} = \\frac{2}{3}$.\n\n' +
-        'Intuition: for huge $x$, $\\sqrt{4x^2 + 1} \\approx \\sqrt{4x^2} = 2x$, so the fraction is about $\\frac{2x}{3x} = \\frac{2}{3}$.',
-      whyWrong: [
-        '$\\frac{4}{3}$ forgets the square root: the leading behaviour of $\\sqrt{4x^2 + 1}$ is $\\sqrt{4x^2} = 2x$, not $4x$.',
-        '$0$ comes from thinking a square root grows more slowly than any linear term, so the bottom "wins". But $\\sqrt{4x^2 + 1}$ grows like $2x$, the same rate as $3x - 2$.',
-        null,
-        '$\\infty$ comes from seeing $x^2$ on top and $x$ on the bottom and concluding the top has the higher degree. The square root halves the power: $\\sqrt{4x^2 + 1}$ behaves like $2x$, degree 1.',
-      ],
-      keyIdea: 'For large positive $x$, $\\sqrt{x^2} = x$, so compare the leading terms after taking the root: $\\sqrt{4x^2 + 1}$ behaves like $2x$.',
-    },
-    check: {
-      optionValues: [4 / 3, 0, 2 / 3, null],
-      compute: () => ((x: number) => Math.sqrt(4 * x * x + 1) / (3 * x - 2))(1e8),
-    },
-  },
-  {
-    id: 'limits-015',
-    subtopic: 'limits',
-    difficulty: 'challenge',
-    stem:
-      'The constants $a$ and $b$ are such that\n\n' +
-      '$$\\lim_{x \\to 2} \\frac{x^2 + ax + b}{x - 2} = 7$$\n\n' +
-      'Find $(a, b)$.',
-    options: ['$(5, -14)$', '$(3, -10)$', '$(7, 10)$', '$(3, 10)$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'As $x \\to 2$ the denominator tends to 0. For the limit to be a finite number (7), the numerator must also tend to 0, otherwise the fraction would blow up. So\n\n' +
-        '$$2^2 + 2a + b = 0 \\quad \\Rightarrow \\quad b = -4 - 2a$$\n\n' +
-        'So $x = 2$ is a root of the numerator and $(x - 2)$ is a factor: $x^2 + ax + b = (x - 2)(x + c)$ for some number $c$.\n\n' +
-        'Cancelling $(x - 2)$ leaves $x + c$, whose limit as $x \\to 2$ is $2 + c$. Set $2 + c = 7$, so $c = 5$.\n\n' +
-        'Expand: $(x - 2)(x + 5) = x^2 + 3x - 10$, so $a = 3$ and $b = -10$.\n\n' +
-        'Check: $\\frac{x^2 + 3x - 10}{x - 2} = \\frac{(x - 2)(x + 5)}{x - 2} = x + 5 \\to 7$. Also $b = -4 - 2(3) = -10$ agrees.',
-      whyWrong: [
-        '$(5, -14)$ comes from setting $c = 7$ directly, i.e. using $(x - 2)(x + 7) = x^2 + 5x - 14$. After cancelling, the limit is $2 + c$, not $c$, so $c$ must be 5.',
-        null,
-        '$(7, 10)$ comes from using the factor $(x + 2)$ instead of $(x - 2)$: $(x + 2)(x + 5) = x^2 + 7x + 10$. That numerator is not 0 at $x = 2$, so the limit would not even be finite.',
-        '$(3, 10)$ has the right $a$ but a sign error in $b$: from $4 + 2(3) + b = 0$ we get $b = -10$, not $10$. With $b = 10$ the numerator is 20 at $x = 2$ and the fraction blows up.',
-      ],
-      keyIdea: 'If the bottom tends to 0 but the limit is finite, the top must also tend to 0, so $(x - 2)$ is a factor of the top.',
-    },
-    check: {
-      optionValues: ['5,-14', '3,-10', '7,10', '3,10'],
-      compute: () => {
-        const found: string[] = [];
-        for (let a = -20; a <= 20; a++)
-          for (let b = -20; b <= 20; b++) {
-            if (4 + 2 * a + b !== 0) continue;
-            const L = near((x) => (x * x + a * x + b) / (x - 2), 2);
-            if (Math.abs(L - 7) < 1e-6) found.push(`${a},${b}`);
-          }
-        return found.join(';');
-      },
-    },
-  },
-  {
-    id: 'limits-016',
-    subtopic: 'limits',
-    difficulty: 'challenge',
-    stem: 'With $x$ in radians, find $\\lim_{x \\to 0} \\dfrac{1 - \\cos x}{x^2}$.',
-    options: ['$0$', '$1$', '$2$', '$\\frac{1}{2}$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Substituting gives $\\frac{1 - 1}{0} = \\frac{0}{0}$. Multiply top and bottom by $1 + \\cos x$ to use $1 - \\cos^2 x = \\sin^2 x$:\n\n' +
-        '$$\\frac{1 - \\cos x}{x^2} \\cdot \\frac{1 + \\cos x}{1 + \\cos x} = \\frac{1 - \\cos^2 x}{x^2(1 + \\cos x)} = \\frac{\\sin^2 x}{x^2} \\cdot \\frac{1}{1 + \\cos x}$$\n\n' +
-        'Now take each part separately as $x \\to 0$:\n\n' +
-        '- $\\frac{\\sin^2 x}{x^2} = \\left(\\frac{\\sin x}{x}\\right)^2 \\to 1^2 = 1$\n' +
-        '- $\\frac{1}{1 + \\cos x} \\to \\frac{1}{1 + 1} = \\frac{1}{2}$\n\n' +
-        'So the limit is $1 \\times \\frac{1}{2} = \\frac{1}{2}$.\n\n' +
-        'Calculator check (radians): $x = 0.01$ gives $\\frac{1 - \\cos 0.01}{0.0001} \\approx 0.499996$.',
-      whyWrong: [
-        '$0$ comes from mixing this up with $\\lim_{x \\to 0} \\frac{1 - \\cos x}{x} = 0$, or from looking only at the numerator. Dividing by $x^2$ instead of $x$ changes the answer.',
-        '$1$ treats the expression as if it were the standard limit $\\frac{\\sin x}{x} \\to 1$. After rewriting, a factor $\\frac{1}{1 + \\cos x} \\to \\frac{1}{2}$ remains.',
-        '$2$ comes from multiplying by $1 + \\cos x \\to 2$ instead of dividing by it: the factor $(1 + \\cos x)$ ends up in the **denominator**.',
-        null,
-      ],
-      keyIdea: 'Multiply by the conjugate $1 + \\cos x$ to turn $1 - \\cos x$ into $\\sin^2 x$, then use $\\frac{\\sin x}{x} \\to 1$.',
-    },
-    check: {
-      optionValues: [0, 1, 2, 0.5],
-      compute: () => ((x: number) => (1 - Math.cos(x)) / (x * x))(1e-3),
-    },
-  },
-  {
-    id: 'limits-017',
-    subtopic: 'limits',
-    difficulty: 'challenge',
-    stem: 'Find $\\lim_{x \\to \\infty} \\left(\\sqrt{x^2 + 6x} - x\\right)$.',
-    options: ['$3$', '$0$', '$6$', '$\\infty$'],
+    difficulty: 'foundation',
+    stem: 'What is $\\lim_{x \\to \\infty} \\frac{1}{x}$?',
+    options: ['$0$', '$1$', '$\\infty$', 'The limit does not exist'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Both $\\sqrt{x^2 + 6x}$ and $x$ grow without bound, so this is an "$\\infty - \\infty$" form: you cannot just say the answer is 0. Multiply by the conjugate over itself:\n\n' +
-        '$$\\left(\\sqrt{x^2 + 6x} - x\\right) \\cdot \\frac{\\sqrt{x^2 + 6x} + x}{\\sqrt{x^2 + 6x} + x} = \\frac{(x^2 + 6x) - x^2}{\\sqrt{x^2 + 6x} + x} = \\frac{6x}{\\sqrt{x^2 + 6x} + x}$$\n\n' +
-        'Divide top and bottom by $x$ (for $x > 0$, dividing the root by $x$ means dividing inside it by $x^2$):\n\n' +
-        '$$\\frac{6}{\\sqrt{1 + \\frac{6}{x}} + 1}$$\n\n' +
-        'As $x \\to \\infty$, $\\frac{6}{x} \\to 0$, giving $\\frac{6}{\\sqrt{1} + 1} = \\frac{6}{2} = 3$.\n\n' +
-        'Calculator check: $x = 1000$ gives $\\sqrt{1006000} - 1000 \\approx 2.996$.',
+        'As $x$ grows without bound, $\\frac{1}{x}$ gets smaller and smaller: $\\frac{1}{10} = 0.1$, $\\frac{1}{1000} = 0.001$, and so on.\n\n' +
+        'The values settle towards $0$, so the limit is $0$.',
       whyWrong: [
         null,
-        '$0$ comes from saying "$\\infty - \\infty = 0$". Both parts grow, but $\\sqrt{x^2 + 6x}$ stays about 3 ahead of $x$, so the difference settles at 3.',
-        '$6$ comes from rationalising correctly to $\\frac{6x}{\\sqrt{x^2 + 6x} + x}$ but then treating the denominator as $x$ instead of about $2x$ (it is $\\sqrt{x^2 + 6x} + x \\approx x + x$).',
-        '$\\infty$ comes from thinking the square-root part "wins" because it contains $x^2$. But $\\sqrt{x^2 + 6x}$ grows only like $x$, and the gap between it and $x$ stays finite.',
+        'This looks only at the top of the fraction. The bottom keeps growing, so the fraction shrinks well below $1$.',
+        'This looks only at the bottom, which grows without bound. The fraction itself shrinks towards $0$.',
+        'The values settle towards one number, so the limit exists, even though $\\frac{1}{x}$ never actually equals $0$.',
       ],
-      keyIdea: 'For an $\\infty - \\infty$ form with a square root, multiply by the conjugate to turn it into a fraction.',
+      keyIdea: 'A fixed number divided by something growing without bound tends to $0$.',
     },
     check: {
-      optionValues: [3, 0, 6, null],
-      compute: () => ((x: number) => Math.sqrt(x * x + 6 * x) - x)(1e7),
+      optionValues: [0, 1, null, null],
+      compute: () => 1 / 1e9,
     },
   },
   {
-    id: 'limits-018',
+    id: 'limits-020',
     subtopic: 'limits',
-    difficulty: 'challenge',
-    stem: "Let $f(x) = \\dfrac{1}{x}$. Using first principles, $f'(2) = \\lim_{h \\to 0} \\dfrac{f(2 + h) - f(2)}{h}$. What is the value of this limit?",
-    options: ['$\\frac{1}{4}$', '$-\\frac{1}{2}$', '$-\\frac{1}{4}$', '$0$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Substituting into a limit gives $\\frac{0}{0}$. What does this tell you?',
+    options: ['The form is indeterminate, so simplify first', 'The limit is $0$', 'The limit is $1$', 'The limit does not exist'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Write out the difference quotient:\n\n' +
-        '$$\\frac{f(2 + h) - f(2)}{h} = \\frac{\\frac{1}{2 + h} - \\frac{1}{2}}{h}$$\n\n' +
-        '**Step 1.** Combine the two fractions on top over the common denominator $2(2 + h)$:\n\n' +
-        '$$\\frac{1}{2 + h} - \\frac{1}{2} = \\frac{2 - (2 + h)}{2(2 + h)} = \\frac{-h}{2(2 + h)}$$\n\n' +
-        '**Step 2.** Divide by $h$ (allowed, since $h \\ne 0$ while approaching):\n\n' +
-        '$$\\frac{-h}{2(2 + h)} \\div h = \\frac{-1}{2(2 + h)}$$\n\n' +
-        '**Step 3.** Let $h \\to 0$: $\\frac{-1}{2(2)} = -\\frac{1}{4}$.\n\n' +
-        "So $f'(2) = -\\frac{1}{4}$. Check with the power rule: $f(x) = x^{-1}$ gives $f'(x) = -x^{-2} = -\\frac{1}{x^2}$, which is $-\\frac{1}{4}$ at $x = 2$.",
+        '$\\frac{0}{0}$ is called an **indeterminate** form: it does not give a value at all. It means more work is needed, usually factorising and cancelling, and then substituting again.\n\n' +
+        'For example, $\\frac{x^2 - 9}{x - 3}$ gives $\\frac{0}{0}$ at $x = 3$, but its limit there is $6$.',
       whyWrong: [
-        '$\\frac{1}{4}$ loses the minus sign when simplifying $2 - (2 + h)$, which is $-h$, not $h$. The function $\\frac{1}{x}$ is decreasing for $x > 0$, so its gradient must be negative.',
-        '$-\\frac{1}{2}$ comes from forgetting the $(2 + h)$ in the common denominator, using $\\frac{-h}{2}$ instead of $\\frac{-h}{2(2 + h)}$; it is $-\\frac{1}{x}$ at $x = 2$ instead of $-\\frac{1}{x^2}$.',
         null,
-        '$0$ comes from substituting $h = 0$ straight away: the top becomes $\\frac{1}{2} - \\frac{1}{2} = 0$, but the bottom is also 0, so the quotient must be simplified first.',
+        'This looks only at the top. The bottom is also $0$, so the fraction is not simply $0$.',
+        'This uses $\\frac{a}{a} = 1$, which only works when $a$ is not $0$.',
+        'A limit of this form often does exist. Giving up here misses that the expression can be simplified.',
       ],
-      keyIdea: 'In first-principles questions, combine fractions, cancel the factor $h$, and only then let $h \\to 0$.',
+      keyIdea: 'A $\\frac{0}{0}$ result means "simplify, then substitute again"; it is not an answer.',
+    },
+  },
+  {
+    id: 'limits-021',
+    subtopic: 'limits',
+    difficulty: 'foundation',
+    stem: 'When does the two-sided limit $\\lim_{x \\to a} f(x)$ exist?',
+    options: ['When both one-sided limits exist and are equal', 'When $f(a) = 0$', 'When $f(a)$ is defined', 'When at least one one-sided limit exists'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The two-sided limit looks at values of $f(x)$ on **both** sides of $x = a$. It exists exactly when the left-hand limit and the right-hand limit both exist and are equal.\n\n' +
+        'What happens exactly at $x = a$ does not matter.',
+      whyWrong: [
+        null,
+        'The value of the function at $a$ does not decide the limit, and the limit need not be $0$.',
+        'A limit depends on values **near** $a$, not at $a$. For example, $\\frac{x^2 - 9}{x - 3}$ is not defined at $x = 3$, yet its limit there is $6$.',
+        'One side is not enough. For $\\frac{|x|}{x}$ at $0$ the one-sided limits are $-1$ and $1$, so there is no two-sided limit.',
+      ],
+      keyIdea: 'A two-sided limit exists only if the left-hand and right-hand limits agree.',
+    },
+  },
+  {
+    id: 'limits-022',
+    subtopic: 'limits',
+    difficulty: 'exam',
+    stem: 'Find $\\lim_{x \\to 2} \\dfrac{x^2 - 5x + 6}{x - 2}$.',
+    options: ['$-1$', '$5$', '$0$', '$-3$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Substituting $x = 2$ gives top $= 4 - 10 + 6 = 0$ and bottom $= 0$, so this is $\\frac{0}{0}$ and we simplify first.\n\n' +
+        '1. Factorise the top: $x^2 - 5x + 6 = (x - 2)(x - 3)$.\n' +
+        '2. Cancel the common factor: $\\frac{(x - 2)(x - 3)}{x - 2} = x - 3$ for $x \\ne 2$.\n' +
+        '3. Substitute again: $2 - 3 = -1$.',
+      whyWrong: [
+        null,
+        'This factorises with a sign slip, as $(x - 2)(x + 3)$, and gets $2 + 3$. But $(x - 2)(x + 3)$ expands to $x^2 + x - 6$.',
+        'This looks only at the top, which is $0$ at $x = 2$. The bottom is also $0$, so simplify first.',
+        'This cancels correctly to $x - 3$ but then keeps only the $-3$. You still have to substitute $x = 2$.',
+      ],
+      keyIdea: 'If $x = a$ gives $\\frac{0}{0}$, factorise, cancel $(x - a)$ and substitute again.',
     },
     check: {
-      optionValues: [0.25, -0.5, -0.25, 0],
-      compute: () => near((h) => (1 / (2 + h) - 1 / 2) / h, 0),
+      optionValues: [-1, 5, 0, -3],
+      compute: () => near((x) => (x * x - 5 * x + 6) / (x - 2), 2),
+    },
+  },
+  {
+    id: 'limits-023',
+    subtopic: 'limits',
+    difficulty: 'exam',
+    stem: 'Find $\\lim_{x \\to \\infty} \\dfrac{5x - 3x^2}{6x^2 + 1}$.',
+    options: ['$-\\frac{1}{2}$', '$\\frac{5}{6}$', '$\\frac{1}{2}$', '$-2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Top and bottom both have degree $2$, so the limit is the ratio of the leading coefficients (the numbers in front of the highest powers).\n\n' +
+        'The leading coefficient on top is $-3$ and on the bottom it is $6$, so the limit is $\\frac{-3}{6} = -\\frac{1}{2}$.\n\n' +
+        'Check by dividing every term by $x^2$: $\\frac{\\frac{5}{x} - 3}{6 + \\frac{1}{x^2}} \\to \\frac{-3}{6}$.',
+      whyWrong: [
+        null,
+        'This uses the first number written on top, $5$. The leading coefficient belongs to the highest power, which is $-3x^2$.',
+        'This drops the minus sign on $-3x^2$.',
+        'This divides the coefficients the wrong way round, $\\frac{6}{-3}$. It is top over bottom.',
+      ],
+      keyIdea: 'With equal degrees, the limit at infinity is the ratio of the coefficients of the highest powers, whichever term is written first.',
+    },
+    check: {
+      optionValues: [-1 / 2, 5 / 6, 1 / 2, -2],
+      compute: () => ((x: number) => (5 * x - 3 * x * x) / (6 * x * x + 1))(1e8),
     },
   },
 ];

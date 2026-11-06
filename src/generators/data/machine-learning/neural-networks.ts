@@ -33,7 +33,7 @@ type Act = 'relu' | 'sigmoid' | 'tanh';
 const ACT_INFO: Record<Act, { name: string; formula: string; dp: boolean }> = {
   relu: { name: 'ReLU', formula: '$\\text{ReLU}(z) = \\max(0, z)$', dp: false },
   sigmoid: { name: 'sigmoid', formula: '$\\sigma(z) = \\frac{1}{1 + e^{-z}}$', dp: true },
-  tanh: { name: 'tanh', formula: '$\\tanh(z)$ (use the tanh button on your calculator)', dp: true },
+  tanh: { name: 'tanh', formula: '$\\tanh(z)$', dp: true },
 };
 const HALVES = [-2, -1.5, -1, -0.5, 0.5, 1, 1.5, 2];
 
@@ -95,8 +95,8 @@ function genSingleNeuron(rng: Rng) {
     const xs = x.map((xi, i) => `$x_{${i + 1}} = ${num(xi)}$`).join(', ');
     const ws = w.map((wi, i) => `$w_{${i + 1}} = ${num(wi)}$`).join(', ');
     const zDef = w.map((_, i) => `w_{${i + 1}}x_{${i + 1}}`).join(' + ') + ' + b';
-    const dpNote = ACT_INFO[act].dp ? ' Give your answer to 3 decimal places.' : '';
-    const stem = `A neuron has inputs ${xs}, weights ${ws} and bias $b = ${num(b)}$. It uses the ${nameA} activation function, ${ACT_INFO[act].formula}. What is the output of the neuron?${dpNote}`;
+    const dpNote = ACT_INFO[act].dp ? ', to 3 decimal places' : '';
+    const stem = `A neuron with ${nameA} activation, ${ACT_INFO[act].formula}, has inputs ${xs}, weights ${ws} and bias $b = ${num(b)}$. What is its output${dpNote}?`;
     const solution =
       `**Step 1: weighted sum.** Multiply each input by its weight, add the products, then add the bias.\n\n` +
       prods.map((p, i) => `- $w_{${i + 1}}x_{${i + 1}} = ${num(w[i])} \\times ${paren(x[i])} = ${num(p)}$`).join('\n') +
@@ -162,7 +162,7 @@ function genForwardPass(rng: Rng) {
       `$$y = ${sumTex(v, h, c)} = ${num(y)}$$\n\n` +
       `Answer: ${t(y)}`;
     return {
-      stem: `A small network has inputs $x_1 = ${num(x[0])}$ and $x_2 = ${num(x[1])}$, two hidden neurons $h_1$ and $h_2$ with ReLU activation, and one output neuron $y$ with **no** activation. The weights and biases are in the table. What is the output $y$?`,
+      stem: `A network has inputs $x_1 = ${num(x[0])}$ and $x_2 = ${num(x[1])}$, hidden ReLU neurons $h_1$ and $h_2$, and an output $y$ with **no** activation. Using the weights and biases in the table, what is $y$?`,
       table: {
         caption: 'Weights and biases',
         headers: ['Neuron', 'Weight on 1st input', 'Weight on 2nd input', 'Bias', 'Activation'],
@@ -182,13 +182,6 @@ function genForwardPass(rng: Rng) {
 }
 
 // ---------------------------------------------------------------- counting parameters
-const PARAM_CTX = [
-  (n: number) => `A fully connected neural network takes $${n}$ input features.`,
-  (n: number) => `A fully connected network reads $${n}$ sensor measurements as its inputs.`,
-];
-/** Only used when there are enough inputs to be a (tiny) image. */
-const IMAGE_CTX = (n: number) => `A small image classifier flattens each image into $${n}$ pixel values, which are the inputs of a fully connected network.`;
-
 function genParamCount(rng: Rng) {
   for (let attempt = 0; ; attempt++) {
     const nIn = rng.pick([3, 4, 5, 6, 8, 10, 12, 16, 20, 25, 64]);
@@ -217,8 +210,7 @@ function genParamCount(rng: Rng) {
     }
     const hiddenDesc =
       hidden.length === 1 ? `one hidden layer of $${hidden[0]}$ neurons` : `two hidden layers with $${hidden[0]}$ and $${hidden[1]}$ neurons`;
-    const ctx = nIn >= 16 ? rng.pick([...PARAM_CTX, IMAGE_CTX]) : rng.pick(PARAM_CTX);
-    const stem = `${ctx(nIn)} It has ${hiddenDesc} and an output layer of $${nOut}$ neuron${nOut === 1 ? '' : 's'}. Every hidden and output neuron has its own bias. How many trainable parameters (weights plus biases) does the network have?`;
+    const stem = `A fully connected network has $${nIn}$ inputs, ${hiddenDesc} and $${nOut}$ output neuron${nOut === 1 ? '' : 's'}, with a bias on every hidden and output neuron. How many trainable parameters (weights plus biases) does it have?`;
     const solution =
       'For each pair of neighbouring layers: weights $= n_{\\text{in}} \\times n_{\\text{out}}$ and biases $= n_{\\text{out}}$ (one per receiving neuron).\n\n' +
       '| Connection | Weights | Biases |\n| --- | --- | --- |\n' +
@@ -242,7 +234,7 @@ export const generators: Generator[] = [
   {
     id: 'gen-neural-networks-single-neuron',
     subtopic: 'neural-networks',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     title: 'Output of a single neuron (ReLU, sigmoid or tanh)',
     generate: genSingleNeuron,
   },

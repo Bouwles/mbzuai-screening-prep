@@ -12,7 +12,7 @@ export const lesson: Lesson = {
     { cue: 'Largest possible **domain** with a $\\sqrt{\\;}$ or $\\ln$', method: 'Solve inside $\\ge 0$ for a root, inside $> 0$ for a log or a root in a denominator; reverse the sign if you divide by a negative. With several parts, take the overlap.' },
     { cue: '**Range** of a quadratic', method: 'Find the vertex $x = \\frac{-b}{2a}$ and its $y$-value; the range is $\\ge$ that value if $a > 0$, $\\le$ it if $a < 0$. On a restricted domain also check both endpoints.' },
     { cue: '**Range** of $a^x + k$ or of $\\frac{ax + b}{cx + d}$', method: 'Exponential: $a^x + k > k$ (asymptote never reached). Rational: rearrange $y = f(x)$ for $x$; the missing value is $\\frac{a}{c}$.' },
-    { cue: '**Piecewise** function or an `if`/`elif` chain', method: 'Check which condition the input satisfies first (watch $<$ versus $\\le$ at the boundary), then use only that formula.' },
+    { cue: '**Piecewise** function', method: 'Check which condition the input satisfies first (watch $<$ versus $\\le$ at the boundary), then use only that formula.' },
     { cue: 'Is it **one-to-one**? / smallest $k$ to make it one-to-one', method: 'Horizontal line test: find two inputs with the same output to rule a function out. For a quadratic, restrict to one side of the vertex: $x \\ge \\frac{-b}{2a}$.' },
   ],
   know:
@@ -48,8 +48,7 @@ export const lesson: Lesson = {
     'If the domain is **restricted** (for example $0 \\le x \\le 5$), check the vertex (if it is inside the interval) **and** both endpoints; the smallest and largest of these give the range.\n\n' +
     'For $\\frac{ax + b}{cx + d}$, the value $\\frac{a}{c}$ (the horizontal asymptote) is missing from the range.\n\n' +
     '### Piecewise functions\n\n' +
-    'A piecewise function uses different formulas on different parts of the domain. To evaluate one, **first** check which condition the input satisfies, **then** use that formula. Watch the boundary: with "$x < 3$" and "$x \\ge 3$", the input 3 belongs to the second piece. ' +
-    'In code, a piecewise function is just an `if` / `elif` / `else` chain.\n\n' +
+    'A piecewise function uses different formulas on different parts of the domain. To evaluate one, **first** check which condition the input satisfies, **then** use that formula. Watch the boundary: with "$x < 3$" and "$x \\ge 3$", the input 3 belongs to the second piece.\n\n' +
     '### One-to-one functions\n\n' +
     'A function is **one-to-one** if different inputs always give different outputs. Graph test: every horizontal line crosses the graph **at most once**. ' +
     '$x^3$ and $2x + 1$ are one-to-one; $x^2$ is not, because $f(-2) = f(2) = 4$. ' +

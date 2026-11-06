@@ -25,16 +25,6 @@ function gridMax(f: Fn, lo: number, hi: number, scale = 1000): number {
   for (let i = Math.round(lo * scale); i <= Math.round(hi * scale); i++) best = Math.max(best, f(i / scale));
   return best;
 }
-/** Minimum of a unimodal function on [lo, hi] by ternary search. */
-function ternaryMin(f: Fn, lo: number, hi: number): number {
-  for (let i = 0; i < 300; i++) {
-    const a = lo + (hi - lo) / 3;
-    const b = hi - (hi - lo) / 3;
-    if (f(a) < f(b)) hi = b;
-    else lo = a;
-  }
-  return f((lo + hi) / 2);
-}
 /**
  * Where f is decreasing, found numerically: locate the sign changes of the numerical
  * derivative on [-20, 20], then test the sign of f' in each gap. Returns e.g. "x<2" or "1<x<2".
@@ -88,7 +78,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'derivative-applications-002',
     subtopic: 'derivative-applications',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     stem: 'The curve $y = x^{2} - 6x + 5$ has one stationary point. What are its coordinates?',
     options: ['$(3, -4)$', '$(-3, 32)$', '$(3, 4)$', '$(1, 0)$'],
     correctIndex: 0,
@@ -143,7 +133,7 @@ export const questions: StaticQuestion[] = [
     id: 'derivative-applications-004',
     subtopic: 'derivative-applications',
     difficulty: 'foundation',
-    stem: 'A ball is thrown upwards. Its height after $t$ seconds is $h = 20t - 5t^{2}$ metres. What is its velocity (the rate of change of height) at $t = 1$ second?',
+    stem: 'The height of a ball after $t$ seconds is $h = 20t - 5t^{2}$ metres. Find its velocity (the rate of change of height) at $t = 1$.',
     options: ['$15$ m/s', '$30$ m/s', '$-10$ m/s', '$10$ m/s'],
     correctIndex: 3,
     markScheme: {
@@ -307,7 +297,7 @@ export const questions: StaticQuestion[] = [
     id: 'derivative-applications-010',
     subtopic: 'derivative-applications',
     difficulty: 'exam',
-    stem: 'A farmer has $60$ m of fencing to make a rectangular pen against a long straight wall. The wall forms one side, so fencing is needed for only **three** sides. What is the largest possible area of the pen?',
+    stem: 'A rectangular pen against a straight wall uses $60$ m of fencing for its other **three** sides. What is the largest possible area of the pen?',
     options: ['$225 \\text{ m}^{2}$', '$450 \\text{ m}^{2}$', '$400 \\text{ m}^{2}$', '$900 \\text{ m}^{2}$'],
     correctIndex: 1,
     markScheme: {
@@ -327,33 +317,6 @@ export const questions: StaticQuestion[] = [
       keyIdea: 'Optimisation: write the quantity in terms of one variable using the constraint, differentiate, set to zero, and check it is a maximum.',
     },
     check: { optionValues: [225, 450, 400, 900], compute: () => gridMax((x) => x * (60 - 2 * x), 0, 30) },
-  },
-  {
-    id: 'derivative-applications-011',
-    subtopic: 'derivative-applications',
-    difficulty: 'exam',
-    stem: 'The side of a square is increasing at $2$ cm per second. How fast is the **area** of the square increasing at the moment when the side is $5$ cm?',
-    options: ['$10 \\text{ cm}^{2}/\\text{s}$', '$25 \\text{ cm}^{2}/\\text{s}$', '$4 \\text{ cm}^{2}/\\text{s}$', '$20 \\text{ cm}^{2}/\\text{s}$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Let the side be $s$, so the area is $A = s^{2}$. We know $\\frac{ds}{dt} = 2$ and want $\\frac{dA}{dt}$ when $s = 5$.\n\n' +
-        '1. Differentiate with respect to $s$: $\\frac{dA}{ds} = 2s$.\n' +
-        '2. Chain rule: $\\frac{dA}{dt} = \\frac{dA}{ds} \\times \\frac{ds}{dt} = 2s \\times 2 = 4s$.\n' +
-        '3. At $s = 5$: $\\frac{dA}{dt} = 4 \\times 5 = 20$.\n\n' +
-        'The area is increasing at $20 \\text{ cm}^{2}/\\text{s}$.',
-      whyWrong: [
-        '$10 = 2s$ is $\\frac{dA}{ds}$, how fast the area changes per cm of side. You still need to multiply by $\\frac{ds}{dt} = 2$ (chain rule).',
-        '$25 \\text{ cm}^{2}$ is the **area** at that moment, not its rate of change.',
-        'This squares the rate, $2^{2} = 4$, as if the rate of change of $s^{2}$ were $\\left(\\frac{ds}{dt}\\right)^{2}$. The chain rule gives $\\frac{dA}{dt} = 2s \\frac{ds}{dt}$.',
-        null,
-      ],
-      keyIdea: 'Connected rates of change: $\\frac{dA}{dt} = \\frac{dA}{ds} \\times \\frac{ds}{dt}$.',
-    },
-    check: {
-      optionValues: [10, 25, 4, 20],
-      compute: () => nd((t) => (5 + 2 * t) ** 2, 0), // side = 5 + 2t, area = side squared
-    },
   },
   {
     id: 'derivative-applications-012',
@@ -413,32 +376,6 @@ export const questions: StaticQuestion[] = [
       compute: () => bisect((x) => nd((t) => t ** 2 - 5 * t + 2, x) - 3, -10, 10),
     },
   },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'derivative-applications-014',
-    subtopic: 'derivative-applications',
-    difficulty: 'challenge',
-    stem: 'A square sheet of card has side $12$ cm. Equal squares of side $x$ cm are cut from each corner and the sides are folded up to make an open box. What is the maximum possible volume of the box, in $\\text{cm}^{3}$?',
-    options: ['$256$', '$128$', '$64$', '$2$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'After cutting, the base is a square of side $12 - 2x$ (a piece of length $x$ is removed at **both** ends of each edge) and the height is $x$.\n\n' +
-        '1. Volume: $V = x(12 - 2x)^{2} = x(144 - 48x + 4x^{2}) = 4x^{3} - 48x^{2} + 144x$.\n' +
-        '2. Differentiate: $\\frac{dV}{dx} = 12x^{2} - 96x + 144 = 12(x^{2} - 8x + 12) = 12(x - 2)(x - 6)$.\n' +
-        '3. Stationary points: $x = 2$ or $x = 6$. But $x = 6$ makes the base side $12 - 12 = 0$ (no box), so we need $0 < x < 6$.\n' +
-        '4. Check $x = 2$: $\\frac{d^{2}V}{dx^{2}} = 24x - 96 = 48 - 96 = -48 < 0$, so it is a maximum.\n' +
-        '5. Volume: $V = 2 \\times (12 - 4)^{2} = 2 \\times 64 = 128 \\text{ cm}^{3}$.',
-      whyWrong: [
-        'This takes the base side as $12 - x$, forgetting that a square is cut from **both** ends of each edge. Then $V = x(12 - x)^{2}$ peaks at $x = 4$ with $V = 256$.',
-        null,
-        'This swaps the dimensions, using $V = x^{2}(12 - 2x)$ (base side $x$, height $12 - 2x$). The height is the cut size $x$ and the base side is $12 - 2x$.',
-        '$2$ is the best cut size $x$ (in cm), not the volume. Substitute it back: $V = 2(12 - 4)^{2} = 128$.',
-      ],
-      keyIdea: 'Build the volume formula from the diagram first (base side $12 - 2x$, height $x$), then differentiate and reject stationary points that make no physical sense.',
-    },
-    check: { optionValues: [256, 128, 64, 2], compute: () => gridMax((x) => x * (12 - 2 * x) ** 2, 0, 6) },
-  },
   {
     id: 'derivative-applications-015',
     subtopic: 'derivative-applications',
@@ -475,93 +412,140 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+  // ------------------------------------------------------------------ recall and short calculations
   {
-    id: 'derivative-applications-016',
+    id: 'derivative-applications-019',
     subtopic: 'derivative-applications',
-    difficulty: 'challenge',
-    stem: 'What is the shortest distance from the point $(0, 2)$ to the curve $y = x^{2}$?',
-    options: ['$2$', '$\\frac{7}{4}$', '$\\frac{\\sqrt{7}}{2}$', '$\\frac{\\sqrt{6}}{2}$'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'What is true of $f\'(x)$ at a stationary point of $f$?',
+    options: ['$f\'(x) = 0$', '$f(x) = 0$', '$f\'\'(x) = 0$', '$f\'(x) = 1$'],
+    correctIndex: 0,
     markScheme: {
-      solution:
-        'Take a general point $(x, x^{2})$ on the curve. It is easier to minimise the **squared** distance $D = d^{2}$: it has its minimum at the same point and there is no square root to differentiate.\n\n' +
-        '1. $D = x^{2} + (x^{2} - 2)^{2} = x^{2} + x^{4} - 4x^{2} + 4 = x^{4} - 3x^{2} + 4$.\n' +
-        '2. $\\frac{dD}{dx} = 4x^{3} - 6x = 2x(2x^{2} - 3)$, which is zero at $x = 0$ or $x^{2} = \\frac{3}{2}$.\n' +
-        '3. Nature: $\\frac{d^{2}D}{dx^{2}} = 12x^{2} - 6$. At $x = 0$ this is $-6 < 0$, a local **maximum** of the distance. At $x^{2} = \\frac{3}{2}$ it is $18 - 6 = 12 > 0$, a minimum.\n' +
-        '4. Minimum: $D = \\left(\\frac{3}{2}\\right)^{2} - 3 \\times \\frac{3}{2} + 4 = \\frac{9}{4} - \\frac{18}{4} + \\frac{16}{4} = \\frac{7}{4}$.\n' +
-        '5. Distance: $d = \\sqrt{\\frac{7}{4}} = \\frac{\\sqrt{7}}{2} \\approx 1.32$.',
+      solution: 'A **stationary point** is where the curve is momentarily flat, so its gradient is zero: $f\'(x) = 0$.',
       whyWrong: [
-        '$2$ is the distance to $(0, 0)$, from the stationary point $x = 0$. But $\\frac{d^{2}D}{dx^{2}} = -6 < 0$ there, so it is a local **maximum** of the distance, not the minimum.',
-        '$\\frac{7}{4}$ is the minimum of the **squared** distance $d^{2}$. You must take the square root at the end.',
         null,
-        '$\\frac{\\sqrt{6}}{2} = \\sqrt{\\frac{3}{2}}$ is the $x$-coordinate of the closest point, not the distance.',
+        'This is where the curve meets the $x$-axis. A stationary point can be at any height.',
+        'The second derivative helps classify a stationary point. It need not be $0$ there; at a maximum it is usually negative.',
+        'A gradient of $1$ means the curve is rising. A flat point has gradient $0$.',
       ],
-      keyIdea: 'To minimise a distance, minimise its square instead, and use the second derivative to reject stationary points that are maxima.',
-    },
-    check: {
-      optionValues: [2, 7 / 4, Math.sqrt(7) / 2, Math.sqrt(6) / 2],
-      compute: () => ternaryMin((x) => Math.sqrt(x ** 2 + (x ** 2 - 2) ** 2), 0, 3),
+      keyIdea: "A stationary point is where $f'(x) = 0$.",
     },
   },
   {
-    id: 'derivative-applications-017',
+    id: 'derivative-applications-020',
     subtopic: 'derivative-applications',
-    difficulty: 'challenge',
-    stem: 'A $10$ m ladder leans against a vertical wall. The bottom of the ladder slides away from the wall at $1$ m/s. How fast is the top of the ladder sliding **down** the wall at the moment when the bottom is $6$ m from the wall?',
-    options: ['$\\frac{3}{4}$ m/s', '$\\frac{4}{3}$ m/s', '$1$ m/s', '$\\frac{3}{5}$ m/s'],
+    difficulty: 'foundation',
+    stem: 'If $f\'(x) > 0$ for every $x$ in an interval, what can you say about $f$ on that interval?',
+    options: ['$f$ is increasing', '$f$ is decreasing', '$f$ is positive', '$f$ has a maximum'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'A positive derivative means a positive gradient, so the graph goes uphill as $x$ increases: $f$ is **increasing**.',
+      whyWrong: [
+        null,
+        'Decreasing needs $f\'(x) < 0$, a negative gradient.',
+        'This confuses the gradient with the height. A curve can be below the $x$-axis and still be rising.',
+        '$f$ need not have a maximum: $f(x) = x$ on $0 < x < 1$ has $f\'(x) > 0$ and no largest value. A turning point would need the gradient to reach $0$, but here it stays positive.',
+      ],
+      keyIdea: "$f'(x) > 0$ means increasing; $f'(x) < 0$ means decreasing.",
+    },
+  },
+  {
+    id: 'derivative-applications-021',
+    subtopic: 'derivative-applications',
+    difficulty: 'foundation',
+    stem: 'What is the **normal** to a curve at a point?',
+    options: ['The line through the point perpendicular to the tangent', 'The line through the point parallel to the tangent', 'The tangent itself', 'The horizontal line through the point'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'The **normal** passes through the same point as the tangent and is at right angles to it. If the tangent has gradient $m$, the normal has gradient $-\\frac{1}{m}$.',
+      whyWrong: [
+        null,
+        'A line through the point and parallel to the tangent is just the tangent again. The normal is perpendicular to it.',
+        'The tangent touches the curve with the same gradient as the curve. The normal is a different line, perpendicular to it.',
+        'A horizontal line is the tangent at a stationary point, not the normal in general.',
+      ],
+      keyIdea: 'The normal is perpendicular to the tangent at the same point.',
+    },
+  },
+  {
+    id: 'derivative-applications-022',
+    subtopic: 'derivative-applications',
+    difficulty: 'exam',
+    stem: 'Find the $x$-coordinates of the stationary points of $y = x^{3} - 12x$.',
+    options: ['$x = 2$ and $x = -2$', '$x = 2$ only', '$x = 4$ and $x = -4$', '$x = 0$ and $x = 12$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Let $x$ be the distance of the bottom from the wall and $y$ the height of the top. By Pythagoras, $x^{2} + y^{2} = 100$.\n\n' +
-        '1. When $x = 6$: $y = \\sqrt{100 - 36} = \\sqrt{64} = 8$.\n' +
-        '2. Differentiate both sides with respect to time $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0$.\n' +
-        '3. Substitute $x = 6$, $y = 8$, $\\frac{dx}{dt} = 1$: $2(6)(1) + 2(8)\\frac{dy}{dt} = 0$, so $12 + 16\\frac{dy}{dt} = 0$.\n' +
-        '4. Solve: $\\frac{dy}{dt} = -\\frac{12}{16} = -\\frac{3}{4}$.\n\n' +
-        'The minus sign means $y$ is decreasing, so the top slides down at $\\frac{3}{4}$ m/s.',
+        '1. Differentiate: $\\frac{dy}{dx} = 3x^{2} - 12$.\n' +
+        '2. Set to zero: $3x^{2} = 12$, so $x^{2} = 4$.\n' +
+        '3. Take both square roots: $x = 2$ or $x = -2$.',
       whyWrong: [
         null,
-        'This flips the ratio, using $\\frac{y}{x} = \\frac{8}{6}$ instead of $\\frac{x}{y} = \\frac{6}{8}$. From $x\\frac{dx}{dt} + y\\frac{dy}{dt} = 0$, the speed down the wall is $\\frac{x}{y} \\times \\frac{dx}{dt}$.',
-        'This assumes the top moves at the same speed as the bottom. The ladder length is fixed, but the two ends move at different rates that depend on the position.',
-        'This divides by the ladder length $10$ instead of the height $y = 8$, giving $\\frac{6}{10}$. Differentiating $x^{2} + y^{2} = 100$ gives $\\frac{dy}{dt} = -\\frac{x}{y} \\times \\frac{dx}{dt}$.',
+        'This forgets the negative square root. $x^{2} = 4$ has two solutions.',
+        'This stops at $x^{2} = 4$ and treats the $4$ as the value of $x$. You still have to take the square root.',
+        'This works from $y = 0$ rather than $\\frac{dy}{dx} = 0$, and it also forgets the square root. Stationary points come from the derivative.',
       ],
-      keyIdea: 'Connected rates: write an equation linking the quantities, differentiate both sides with respect to time, then substitute the values at that instant.',
+      keyIdea: 'Set the derivative to zero, and keep both square roots.',
     },
     check: {
-      optionValues: [3 / 4, 4 / 3, 1, 3 / 5],
-      compute: () => -nd((t) => Math.sqrt(100 - (6 + t) ** 2), 0), // bottom at 6 + t, top at sqrt(100 - x^2)
+      optionValues: ['-2,2', '2', '-4,4', '0,12'],
+      compute: () => {
+        const f: Fn = (x) => x ** 3 - 12 * x;
+        const xs: number[] = [];
+        for (let x = -20; x <= 20; x++) if (Math.abs(nd(f, x)) < 1e-6) xs.push(x);
+        return xs.join(',');
+      },
     },
   },
   {
-    id: 'derivative-applications-018',
+    id: 'derivative-applications-023',
     subtopic: 'derivative-applications',
-    difficulty: 'challenge',
-    stem: 'The tangent to the curve $y = \\frac{1}{x}$ at the point where $x = 2$ meets the $x$-axis and the $y$-axis. What is the area of the triangle formed by this tangent and the two axes?',
-    options: ['$4$', '$\\frac{9}{4}$', '$\\frac{1}{2}$', '$2$'],
-    correctIndex: 3,
+    difficulty: 'exam',
+    stem: 'Find the slope of the tangent to the curve $y = \\frac{4}{x}$ at $x = 2$.',
+    options: ['$-1$', '$1$', '$2$', '$-2$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        '1. Point: at $x = 2$, $y = \\frac{1}{2}$, so the point is $\\left(2, \\frac{1}{2}\\right)$.\n' +
-        '2. Gradient: $y = x^{-1}$, so $\\frac{dy}{dx} = -x^{-2} = -\\frac{1}{x^{2}}$. At $x = 2$: $m = -\\frac{1}{4}$.\n' +
-        '3. Tangent: $y - \\frac{1}{2} = -\\frac{1}{4}(x - 2)$, so $y = -\\frac{1}{4}x + \\frac{1}{2} + \\frac{1}{2} = -\\frac{1}{4}x + 1$.\n' +
-        '4. Intercepts: when $x = 0$, $y = 1$; when $y = 0$, $\\frac{1}{4}x = 1$, so $x = 4$.\n' +
-        '5. Area $= \\frac{1}{2} \\times \\text{base} \\times \\text{height} = \\frac{1}{2} \\times 4 \\times 1 = 2$.',
+        '"Slope" means the same as "gradient".\n\n' +
+        '1. Rewrite as a power: $y = 4x^{-1}$.\n' +
+        '2. Differentiate: $\\frac{dy}{dx} = -4x^{-2} = -\\frac{4}{x^{2}}$.\n' +
+        '3. Substitute $x = 2$: $-\\frac{4}{4} = -1$.',
       whyWrong: [
-        'This forgets the $\\frac{1}{2}$ in the triangle area formula: $4 \\times 1 = 4$.',
-        'This differentiates $x^{-1}$ as $-x^{-1}$ (not lowering the power), giving gradient $-\\frac{1}{2}$. The tangent becomes $y = -\\frac{1}{2}x + \\frac{3}{2}$ with intercepts $3$ and $\\frac{3}{2}$, so the area is $\\frac{9}{4}$.',
-        'This loses the constant when expanding the bracket. Since $-\\frac{1}{4}(x - 2) = -\\frac{1}{4}x + \\frac{1}{2}$, the tangent is $y = -\\frac{1}{4}x + 1$, not $y = -\\frac{1}{4}x + \\frac{1}{2}$. The wrong line has intercepts $2$ and $\\frac{1}{2}$, giving area $\\frac{1}{2}$.',
         null,
+        'This loses the minus sign that comes from the power $-1$.',
+        'This is the height of the curve at $x = 2$, not its slope.',
+        'This uses $-\\frac{4}{x}$, forgetting that the power drops from $-1$ to $-2$.',
       ],
-      keyIdea: 'Find the tangent with $y - y_1 = m(x - x_1)$, then its intercepts come from setting $x = 0$ and $y = 0$.',
+      keyIdea: 'Rewrite fractions as negative powers before differentiating, then substitute.',
     },
     check: {
-      optionValues: [4, 9 / 4, 1 / 2, 2],
-      compute: () => {
-        const f: Fn = (x) => 1 / x;
-        const mGrad = nd(f, 2);
-        const c = f(2) - mGrad * 2; // y-intercept
-        const xInt = -c / mGrad;
-        return 0.5 * xInt * c;
-      },
+      optionValues: [-1, 1, 2, -2],
+      compute: () => nd((x) => 4 / x, 2),
+    },
+  },
+  {
+    id: 'derivative-applications-024',
+    subtopic: 'derivative-applications',
+    difficulty: 'exam',
+    stem: 'Find the minimum value of $f(x) = x^{2} - 4x + 7$.',
+    options: ['$3$', '$2$', '$7$', '$19$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        "1. Differentiate: $f'(x) = 2x - 4$.\n" +
+        '2. Set to zero: $x = 2$. Since $f\'\'(x) = 2 > 0$, this is a minimum.\n' +
+        '3. Substitute into the **original** function: $f(2) = 4 - 8 + 7 = 3$.',
+      whyWrong: [
+        null,
+        'This is the $x$-value where the minimum occurs. The question asks for the value of $f$ there.',
+        'This is $f(0)$, the $y$-intercept. The minimum is at the stationary point, $x = 2$.',
+        'This solves $2x - 4 = 0$ with a sign slip and uses $x = -2$: $f(-2) = 4 + 8 + 7 = 19$.',
+      ],
+      keyIdea: 'Find $x$ from the derivative, then put it into the original function for the minimum value.',
+    },
+    check: {
+      optionValues: [3, 2, 7, 19],
+      compute: () => -gridMax((x) => -(x ** 2 - 4 * x + 7), -10, 10),
     },
   },
 ];

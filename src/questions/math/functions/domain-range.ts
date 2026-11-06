@@ -418,70 +418,35 @@ export const questions: StaticQuestion[] = [
     id: 'domain-range-014',
     subtopic: 'domain-range',
     difficulty: 'exam',
-    stem: 'This Python function is a piecewise function. What does the program print?',
-    code: {
-      lang: 'python',
-      source:
-        'def f(x):\n    if x < 0:\n        return -x\n    elif x < 10:\n        return 2 * x\n    else:\n        return x - 3\n\nprint(f(-4), f(5), f(10))',
-    },
-    options: ['`4 10 20`', '`4 10 7`', '`-4 10 7`', '`-8 10 7`'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Python checks the conditions **top to bottom** and uses the first one that is `True`.\n\n' +
-        '| call | `x < 0`? | `x < 10`? | returns |\n' +
-        '|---|---|---|---|\n' +
-        '| `f(-4)` | True | (not checked) | `-(-4)` = 4 |\n' +
-        '| `f(5)` | False | True | `2 * 5` = 10 |\n' +
-        '| `f(10)` | False | False | `10 - 3` = 7 |\n\n' +
-        '`print` with three arguments separates them with spaces, so the output is `4 10 7`.',
-      whyWrong: [
-        'This treats 10 as satisfying `x < 10`. But $10 < 10$ is False (strict inequality), so the `else` branch runs and returns $10 - 3 = 7$.',
-        null,
-        'This reads `-x` as "the number stays negative". `-x` means negate $x$: $-(-4) = 4$.',
-        'This skips the first test and applies `2 * x` to $-4$. Since $-4 < 0$ is True, the first branch returns before the `elif` is ever checked.',
-      ],
-      keyIdea: 'A piecewise function in code is an if/elif/else chain: the first true condition decides the formula, and boundaries depend on `<` versus `<=`.',
-    },
-    python: { stdout: '4 10 7\n' },
-  },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'domain-range-015',
-    subtopic: 'domain-range',
-    difficulty: 'challenge',
-    stem: 'What is the largest possible domain of $f(x) = \\sqrt{\\frac{x - 1}{x + 3}}$?',
-    options: ['$x < -3$ or $x \\ge 1$', '$x \\ge 1$', '$x \\le -3$ or $x \\ge 1$', '$-3 < x \\le 1$'],
+    stem:
+      'A function is defined by\n\n' +
+      '$$f(x) = \\begin{cases} -x & \\text{if } x < 0 \\\\ 2x & \\text{if } 0 \\le x < 10 \\\\ x - 3 & \\text{if } x \\ge 10 \\end{cases}$$\n\n' +
+      'Find $f(-4) + f(5) + f(10)$.',
+    options: ['$21$', '$34$', '$13$', '$9$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Two conditions: the fraction inside the root must be $\\ge 0$, and its denominator must not be 0.\n\n' +
-        '1. Critical values: numerator zero at $x = 1$, denominator zero at $x = -3$.\n' +
-        '2. Sign table:\n\n' +
-        '| region | $x - 1$ | $x + 3$ | fraction |\n' +
-        '|---|---|---|---|\n' +
-        '| $x < -3$ (try $-4$) | $-$ | $-$ | $+$ |\n' +
-        '| $-3 < x < 1$ (try 0) | $-$ | $+$ | $-$ |\n' +
-        '| $x > 1$ (try 2) | $+$ | $+$ | $+$ |\n\n' +
-        '3. The fraction is positive for $x < -3$ and for $x > 1$.\n' +
-        '4. At $x = 1$ the fraction is $0$ and $\\sqrt{0} = 0$: include it. At $x = -3$ we divide by zero: exclude it.\n\n' +
-        'Domain: $x < -3$ or $x \\ge 1$.',
+        'For each input, first find which condition it satisfies, then use only that rule.\n\n' +
+        '| input | condition | value |\n' +
+        '|---|---|---|\n' +
+        '| $-4$ | $x < 0$ | $-(-4) = 4$ |\n' +
+        '| $5$ | $0 \\le x < 10$ | $2 \\times 5 = 10$ |\n' +
+        '| $10$ | $x \\ge 10$ | $10 - 3 = 7$ |\n\n' +
+        'Adding up: $4 + 10 + 7 = 21$.',
       whyWrong: [
         null,
-        'This only looks at the numerator ($x - 1 \\ge 0$). A negative divided by a negative is positive, so values like $x = -4$ also work: $\\sqrt{\\frac{-5}{-1}} = \\sqrt{5}$.',
-        'This includes $x = -3$, where the denominator is 0 and the fraction is not defined.',
-        'This picks the region where the fraction is **negative** (try $x = 0$: $\\sqrt{-\\frac{1}{3}}$ is not real).',
+        'This uses $2x$ at $x = 10$, giving $4 + 10 + 20$. But $10 < 10$ is false, so $x = 10$ belongs to the last rule.',
+        'This reads $-x$ as "the number stays negative", giving $-4 + 10 + 7$. In fact $-(-4) = 4$.',
+        'This applies $2x$ to $-4$, giving $-8 + 10 + 7$. Since $-4 < 0$, the first rule applies.',
       ],
-      keyIdea: 'For $\\sqrt{\\frac{p}{q}}$ use a sign table: you need $\\frac{p}{q} \\ge 0$ with $q \\ne 0$, and a negative over a negative is positive.',
+      keyIdea: 'In a piecewise function, the condition an input satisfies decides the rule; boundaries depend on $<$ versus $\\le$.',
     },
     check: {
-      optionValues: [
-        setSig((x) => x < -3 || x >= 1),
-        setSig((x) => x >= 1),
-        setSig((x) => x <= -3 || x >= 1),
-        setSig((x) => -3 < x && x <= 1),
-      ],
-      compute: () => domSig((x) => Math.sqrt((x - 1) / (x + 3))),
+      optionValues: [21, 34, 13, 9],
+      compute: () => {
+        const f = (x: number) => (x < 0 ? -x : x < 10 ? 2 * x : x - 3);
+        return f(-4) + f(5) + f(10);
+      },
     },
   },
   {
@@ -590,40 +555,98 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'domain-range-019',
+    id: 'domain-range-020',
     subtopic: 'domain-range',
-    difficulty: 'challenge',
-    stem: 'A quadratic function $f(x) = ax^2 + bx + c$ satisfies $f(0) = 3$, $f(1) = 2$ and $f(-1) = 8$. Find $f(2)$.',
-    options: ['$5$', '$-5$', '$2$', '$17$'],
+    difficulty: 'foundation',
+    stem: 'What does the **range** of a function describe?',
+    options: ['The set of all possible outputs', 'The set of all allowed inputs', 'The largest output minus the smallest output', 'The slope of its graph'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Each piece of information is an equation in $a$, $b$, $c$.\n\n' +
-        '1. $f(0) = c = 3$.\n' +
-        '2. $f(1) = a + b + c = 2$, so $a + b = -1$.\n' +
-        '3. $f(-1) = a - b + c = 8$, so $a - b = 5$.\n' +
-        '4. Add the last two equations: $2a = 4$, so $a = 2$. Then $b = -1 - 2 = -3$.\n' +
-        '5. So $f(x) = 2x^2 - 3x + 3$. Check: $f(-1) = 2 + 3 + 3 = 8$. Correct.\n' +
-        '6. $f(2) = 2(4) - 3(2) + 3 = 8 - 6 + 3 = 5$.',
+        'The **domain** is the set of inputs a function accepts. The **range** is the set of outputs it can actually produce.\n\n' +
+        'For example, $f(x) = x^2$ with domain all real numbers has range $f(x) \\ge 0$.',
       whyWrong: [
         null,
-        'This swaps $a$ and $b$ ($a = -3$, $b = 2$), giving $-12 + 4 + 3$. Adding the equations eliminates $b$ and gives $2a = 4$.',
-        'This forgets the constant $c = 3$ at the end: $8 - 6 = 2$.',
-        'This uses $b = 3$ instead of $-3$ (sign slip when subtracting), giving $8 + 6 + 3$. Check: then $f(1)$ would be $8$, not $2$.',
+        'This describes the **domain**. Domain means inputs; range means outputs.',
+        'This is the meaning of "range" in statistics, a single number. The range of a function is a whole set of values.',
+        'Slope says how steeply a graph rises. It does not say which output values occur.',
       ],
-      keyIdea: 'Each fact "$f(p) = q$" is an equation: substitute, solve the simultaneous equations, then evaluate.',
-    },
-    check: {
-      optionValues: [5, -5, 2, 17],
-      compute: () => {
-        const f0 = 3;
-        const f1 = 2;
-        const fm1 = 8;
-        const c = f0;
-        const a = (f1 + fm1) / 2 - c;
-        const b = (f1 - fm1) / 2;
-        return a * 4 + b * 2 + c;
-      },
+      keyIdea: 'Domain = allowed inputs; range = possible outputs.',
     },
   },
-];
+  {
+    id: 'domain-range-021',
+    subtopic: 'domain-range',
+    difficulty: 'foundation',
+    stem: 'The real function $f(x) = \\ln x$ is defined exactly when:',
+    options: ['$x > 0$', '$x \\ge 0$', '$x \\ne 0$', 'All real $x$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A logarithm can only take a **strictly positive** input.\n\n' +
+        '$\\ln x$ asks "what power of $e$ gives $x$?". Every power of $e$ is positive, so $x$ must be greater than $0$. The value $x = 0$ is not allowed either.',
+      whyWrong: [
+        null,
+        'This includes $x = 0$, but no power of $e$ equals $0$, so $\\ln 0$ is not defined. The $\\ge$ rule belongs to square roots.',
+        'This allows negative inputs, but no power of $e$ is negative, so $\\ln(-2)$ is not a real number. The $\\ne$ rule belongs to denominators.',
+        'This forgets the restriction altogether. The graph of $y = \\ln x$ exists only to the right of the $y$-axis.',
+      ],
+      keyIdea: 'For $\\ln(\\text{stuff})$, solve $\\text{stuff} > 0$ (strictly).',
+    },
+    check: {
+      optionValues: [setSig((x) => x > 0), setSig((x) => x >= 0), setSig((x) => x !== 0), setSig(() => true)],
+      compute: () => domSig((x) => Math.log(x)),
+    },
+  },
+  {
+    id: 'domain-range-022',
+    subtopic: 'domain-range',
+    difficulty: 'foundation',
+    stem: 'A curve is the graph of a function of $x$ only if every vertical line meets it:',
+    options: ['At most once', 'At least once', 'Exactly twice', 'Never'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A function gives **exactly one output** for each input.\n\n' +
+        'A vertical line picks out one input $x$. If it met the curve twice, that input would have two outputs, which a function does not allow. If it misses the curve, that $x$ is simply outside the domain.\n\n' +
+        'So every vertical line must meet the curve at most once. This is the **vertical line test**.',
+      whyWrong: [
+        null,
+        'This would force every real $x$ into the domain. A function may leave values out: $y = \\frac{1}{x}$ has no point at $x = 0$.',
+        'Two meeting points on one vertical line mean one input with two outputs, which is exactly what a function cannot have.',
+        'If no vertical line met the curve, the curve would have no points at all.',
+      ],
+      keyIdea: 'Vertical line test: a curve is a function of $x$ when no vertical line meets it more than once.',
+    },
+  },
+  {
+    id: 'domain-range-023',
+    subtopic: 'domain-range',
+    difficulty: 'exam',
+    stem: 'Let $f : \\mathbb{R} \\to \\mathbb{R}$ be the mapping $f(x) = 4 - x^2$. What is the image of $f$?',
+    options: ['$f(x) \\le 4$', '$f(x) \\ge 4$', '$f(x) \\le 2$', 'All real numbers'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **image** of a function is another name for its range, the set of all outputs. The notation $f : \\mathbb{R} \\to \\mathbb{R}$ says that $f$ takes real inputs and gives real outputs.\n\n' +
+        '1. $x^2 \\ge 0$ for every real $x$, so $-x^2 \\le 0$.\n' +
+        '2. Add $4$: $4 - x^2 \\le 4$.\n' +
+        '3. The value $4$ is reached, since $f(0) = 4$, and the outputs go down without limit as $x$ grows.\n\n' +
+        'So the image is $f(x) \\le 4$.',
+      whyWrong: [
+        null,
+        'This flips the inequality. Subtracting $x^2$ can only lower the value below $4$: for example $f(3) = -5$.',
+        'This mixes up an input with an output. $x = 2$ is the input where $f(x) = 0$; the largest output is $f(0) = 4$.',
+        'The $\\mathbb{R}$ after the arrow only says that outputs are real numbers. Not every real number is reached: nothing above $4$ is an output.',
+      ],
+      keyIdea: 'The image (range) of $c - x^2$ is everything up to and including $c$, because $x^2$ is never negative.',
+    },
+    check: {
+      optionValues: ['at most 4', 'at least 4', 'at most 2', 'all'],
+      compute: () => {
+        const ys = GRID.map((x) => 4 - x * x);
+        const top = Math.max(...ys);
+        return top === 4 && Math.min(...ys) < 4 ? 'at most 4' : 'other';
+      },
+    },
+  },];

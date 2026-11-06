@@ -1,6 +1,6 @@
 import type { StaticQuestion } from '../../../types';
 import { gcd } from '../../../lib/frac';
-import { median, round, sumOf } from '../../../lib/mathx';
+import { median, sumOf } from '../../../lib/mathx';
 
 export const questions: StaticQuestion[] = [
   // ---------------------------------------------------------------- foundation
@@ -8,7 +8,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-001',
     subtopic: 'data-calculations',
     difficulty: 'foundation',
-    stem: 'The bar chart shows the number of visitors (in thousands) to a website on five days. What is the percentage increase in visitors from **Monday** to **Wednesday**?',
+    stem: 'The bar chart shows website visitors (in thousands) on five days. What is the percentage increase in visitors from **Monday** to **Wednesday**?',
     chart: {
       kind: 'bar',
       title: 'Website visitors',
@@ -46,7 +46,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-002',
     subtopic: 'data-calculations',
     difficulty: 'foundation',
-    stem: 'The pie chart shows how a group of students travel to school (the numbers are counts of students). What percentage of the students **walk**? (Percentages are given to 1 decimal place where needed.)',
+    stem: 'The pie chart shows how many students use each way of travelling to school. What percentage of the students **walk**?',
     chart: {
       kind: 'pie',
       title: 'How students travel to school',
@@ -83,8 +83,8 @@ export const questions: StaticQuestion[] = [
   {
     id: 'data-calculations-003',
     subtopic: 'data-calculations',
-    difficulty: 'foundation',
-    stem: 'The table shows the number of goals a football team scored in each of its 20 matches. What is the mean number of goals per match?',
+    difficulty: 'exam',
+    stem: 'The table shows the goals a team scored in each of its 20 matches. What is the mean number of goals per match?',
     table: {
       headers: ['Goals scored', 'Number of matches'],
       rows: [
@@ -123,7 +123,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-004',
     subtopic: 'data-calculations',
     difficulty: 'foundation',
-    stem: 'The table shows the members of a school AI club. What is the ratio of boys to girls **in the whole club**, in its simplest form?',
+    stem: 'The table shows the members of a club. What is the ratio of boys to girls **in the whole club**, in its simplest form?',
     table: {
       headers: ['Year group', 'Boys', 'Girls'],
       rows: [
@@ -160,7 +160,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-005',
     subtopic: 'data-calculations',
     difficulty: 'foundation',
-    stem: 'A delivery van travelled 150 km and used 12 litres of fuel. What was its fuel economy in **kilometres per litre**?',
+    stem: 'A van travelled 150 km on 12 litres of fuel. What was its fuel economy in **kilometres per litre**?',
     options: ['$12.5$ km per litre', '$0.08$ km per litre', '$8$ km per litre', '$1800$ km per litre'],
     correctIndex: 0,
     markScheme: {
@@ -184,7 +184,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-006',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'The line graph shows the number of subscribers to an app over six months. By what percentage did the number of subscribers fall from its **highest** month to June? (Percentages are given to 1 decimal place where needed.)',
+    stem: 'The line graph shows an app\'s subscribers over six months. By what percentage did the number fall from its **highest** month to June? (Options to 1 decimal place where needed.)',
     chart: {
       kind: 'line',
       title: 'App subscribers',
@@ -223,7 +223,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-007',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'After a $20\\%$ price increase, the monthly cost of a cloud server plan is AED 72. What was the monthly cost **before** the increase?',
+    stem: 'After a $20\\%$ price increase, a monthly cost is AED 72. What was the cost **before** the increase?',
     options: ['AED 57.60', 'AED 52', 'AED 60', 'AED 86.40'],
     correctIndex: 2,
     markScheme: {
@@ -232,7 +232,7 @@ export const questions: StaticQuestion[] = [
         '$$1.2 \\times \\text{original} = 72$$\n\n' +
         'Divide both sides by the multiplier:\n\n' +
         '$$\\text{original} = \\frac{72}{1.2} = 60$$\n\n' +
-        'Check: $60 \\times 1.2 = 72$. The original cost was AED 60.',
+        'Check: $60 \\times 1.2 = 72$. The cost before the increase was AED 60.',
       whyWrong: [
         'This is $72 \\times 0.8$: it takes $20\\%$ off the **new** price. But the $20\\%$ was calculated on the original price, so you must divide by 1.2.',
         'This subtracts 20 as if $20\\%$ meant AED 20.',
@@ -247,7 +247,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-008',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'The number of daily active users of an app **increased by** $50\\%$ during 2024 and then **decreased by** $30\\%$ during 2025. What is the overall percentage change over the two years?',
+    stem: 'A number **increases by** $50\\%$ and then **decreases by** $30\\%$. What is the overall percentage change?',
     options: ['$20\\%$ increase', '$10\\%$ increase', '$5\\%$ decrease', '$5\\%$ increase'],
     correctIndex: 3,
     markScheme: {
@@ -255,7 +255,7 @@ export const questions: StaticQuestion[] = [
         'Use multipliers: an increase of $50\\%$ is $\\times 1.5$; a decrease of $30\\%$ is $\\times 0.7$.\n\n' +
         '$$1.5 \\times 0.7 = 1.05$$\n\n' +
         'A multiplier of 1.05 means $5\\%$ more than at the start.\n\n' +
-        'Check with 1000 users: $1000 \\to 1500$ (up $50\\%$) $\\to 1500 \\times 0.7 = 1050$ (down $30\\%$). From 1000 to 1050 is an increase of 50, which is $5\\%$ of 1000.',
+        'Check with a starting value of 1000: $1000 \\to 1500$ (up $50\\%$) $\\to 1500 \\times 0.7 = 1050$ (down $30\\%$). From 1000 to 1050 is an increase of 50, which is $5\\%$ of 1000.',
       whyWrong: [
         'This adds $+50\\%$ and $-30\\%$. Percentages applied one after another do not add, because the $30\\%$ is taken from the larger number (1500), not the original.',
         'This averages the two changes, $\\frac{50 - 30}{2}$. Successive changes must be combined by multiplying the multipliers.',
@@ -277,7 +277,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-009',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'A course grade is a weighted average of three components, shown in the table. What is the student\'s final grade? (Options are given to 1 decimal place where needed.)',
+    stem: 'A course grade is a weighted average of the three components in the table. What is the student\'s final grade? (Options to 1 decimal place where needed.)',
     table: {
       headers: ['Component', 'Weight', 'Score (out of 100)'],
       rows: [
@@ -317,7 +317,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-010',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'Two schools sat the same test. The table shows the number of students and the pass rate at each school. What percentage of **all** the students passed?',
+    stem: 'The table shows the number of students and the pass rate at two schools. What percentage of **all** the students passed?',
     table: {
       headers: ['School', 'Students', 'Pass rate'],
       rows: [
@@ -433,14 +433,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-013',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'In a survey, the share of students who use an AI chatbot for homework rose from $30\\%$ in 2024 to $36\\%$ in 2025. What is the **percentage increase** in this share (the relative change, not the change in percentage points)? (Percentages are given to 1 decimal place where needed.)',
-    table: {
-      headers: ['Year', 'Share using an AI chatbot'],
-      rows: [
-        ['2024', '30%'],
-        ['2025', '36%'],
-      ],
-    },
+    stem: 'A share rose from $30\\%$ to $36\\%$. What is the **percentage increase** in the share (the relative change, not the change in percentage points)?',
     options: ['$6\\%$', '$20\\%$', '$16.7\\%$', '$120\\%$'],
     correctIndex: 1,
     markScheme: {
@@ -462,7 +455,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-014',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'The table shows the population of four towns and the number of flu cases recorded in each last winter. Which town had the **highest rate** of flu cases per 1000 people?',
+    stem: 'The table shows the population and flu cases of four towns. Which town had the **highest rate** of flu cases per 1000 people?',
     table: {
       headers: ['Town', 'Population', 'Flu cases'],
       rows: [
@@ -506,7 +499,7 @@ export const questions: StaticQuestion[] = [
     id: 'data-calculations-015',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'The line graph shows the number of users of an online service. The number of users grows by the **same percentage** every year. If this continues, how many users will there be in 2025?',
+    stem: 'The line graph shows users of a service, growing by the **same percentage** every year. If this continues, how many users will there be in 2025?',
     chart: {
       kind: 'line',
       title: 'Users of an online service',
@@ -538,55 +531,11 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'data-calculations-016',
-    subtopic: 'data-calculations',
-    difficulty: 'challenge',
-    stem: 'The table shows the scores of 40 students on a quiz, but two frequencies, $a$ and $b$, are missing. The mean score is $3.05$. What is the value of $a$?',
-    table: {
-      headers: ['Score', '1', '2', '3', '4', '5'],
-      rows: [['Frequency', 6, '$a$', 10, '$b$', 4]],
-    },
-    options: ['$7$', '$13$', '$10$', '$14$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'There are two unknowns, so build two equations.\n\n' +
-        '**Equation 1 (total frequency).** $6 + a + 10 + b + 4 = 40$, so $a + b = 20$.\n\n' +
-        '**Equation 2 (the mean).** Total of all scores $= \\text{mean} \\times \\text{number of students} = 3.05 \\times 40 = 122$.\n\n' +
-        'Also, total of all scores $= 1 \\times 6 + 2a + 3 \\times 10 + 4b + 5 \\times 4 = 56 + 2a + 4b$.\n\n' +
-        'So $56 + 2a + 4b = 122$, giving $2a + 4b = 66$, that is $a + 2b = 33$.\n\n' +
-        '**Solve.** Subtract equation 1 from this: $(a + 2b) - (a + b) = 33 - 20$, so $b = 13$. Then $a = 20 - 13 = 7$.\n\n' +
-        'Check: $6 + 14 + 30 + 52 + 20 = 122$ and $\\frac{122}{40} = 3.05$.',
-      whyWrong: [
-        null,
-        'This is the value of $b$, not $a$. After finding $b = 13$ you still need $a = 20 - b$.',
-        'This splits the missing 20 students equally between $a$ and $b$, which ignores the information given by the mean.',
-        'This is $2a$, the $fx$ entry for a score of 2, not the frequency itself. Divide by the score 2 to get $a$.',
-      ],
-      keyIdea: 'Missing frequencies: one equation from the total frequency, one from $\\text{mean} \\times \\sum f = \\sum fx$; then solve simultaneously.',
-    },
-    check: {
-      optionValues: [7, 13, 10, 14],
-      compute: () => {
-        // brute force every split of the missing 20 students
-        for (let a = 0; a <= 20; a++) {
-          const b = 20 - a;
-          const f = [6, a, 10, b, 4];
-          const sumFx = sumOf(f.map((k, i) => k * (i + 1)));
-          if (Math.abs(sumFx - 3.05 * 40) < 1e-9) return a;
-        }
-        return -1;
-      },
-    },
-  },
   {
     id: 'data-calculations-017',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'A year group of 50 students has a mean test score of 66. The 20 students in Class A have a mean score of 72. The other 30 students are in Class B. What is the mean score of Class B?',
+    stem: '50 students have a mean test score of 66. The 20 in Class A have a mean score of 72. What is the mean score of the other 30, in Class B?',
     options: ['$60$', '$93$', '$62$', '$37.2$'],
     correctIndex: 2,
     markScheme: {
@@ -615,46 +564,10 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'data-calculations-018',
-    subtopic: 'data-calculations',
-    difficulty: 'challenge',
-    stem: 'A dataset of 2400 images is split into training, validation and test sets in the ratio $7:2:1$. Later, $25\\%$ of the **training** images are removed because they are duplicates. What percentage of the remaining images are training images, to 1 decimal place?',
-    options: ['$52.5\\%$', '$45\\%$', '$70\\%$', '$63.6\\%$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1. Share out 2400 in the ratio** $7:2:1$. There are $7 + 2 + 1 = 10$ parts, so one part $= \\frac{2400}{10} = 240$ images.\n\n' +
-        '- Training: $7 \\times 240 = 1680$\n' +
-        '- Validation: $2 \\times 240 = 480$\n' +
-        '- Test: $1 \\times 240 = 240$\n\n' +
-        '**Step 2. Remove** $25\\%$ **of the training images.** $0.25 \\times 1680 = 420$, leaving $1680 - 420 = 1260$ training images.\n\n' +
-        '**Step 3. New total.** $1260 + 480 + 240 = 1980$ images (or $2400 - 420 = 1980$).\n\n' +
-        '**Step 4. New share.** $\\frac{1260}{1980} \\times 100 = 63.636\\ldots\\% \\approx 63.6\\%$.',
-      whyWrong: [
-        'This is $0.75 \\times 70\\%$: it reduces the training count but forgets that the total number of images also went down.',
-        'This subtracts $25$ from $70\\%$. Removing $25\\%$ of the training images is a relative change, not a drop of 25 percentage points.',
-        'This is the original training share, $\\frac{7}{10}$, which ignores the removed images.',
-        null,
-      ],
-      keyIdea: 'When a part changes, the whole changes too: recompute both the part and the new total before finding the share.',
-    },
-    check: {
-      optionValues: [52.5, 45, 70, 63.6],
-      compute: () => {
-        const total = 2400;
-        const parts = [7, 2, 1];
-        const unit = total / sumOf(parts);
-        const [train, val, test] = parts.map((p) => p * unit);
-        const newTrain = train * (1 - 0.25);
-        return round((newTrain / (newTrain + val + test)) * 100, 1);
-      },
-    },
-  },
-  {
     id: 'data-calculations-019',
     subtopic: 'data-calculations',
     difficulty: 'exam',
-    stem: 'A final grade is worked out as $40\\%$ coursework and $60\\%$ exam. A student scored 65 (out of 100) in the coursework. What exam score (out of 100) does the student need to get a final grade of exactly 80?',
+    stem: 'A final grade is $40\\%$ coursework and $60\\%$ exam. With 65 in the coursework, what exam score (out of 100) gives a final grade of exactly 80?',
     options: ['$90$', '$95$', '$54$', '$102.5$'],
     correctIndex: 0,
     markScheme: {
@@ -682,52 +595,69 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+
+  // ---------------------------------------------------------------- recall
   {
-    id: 'data-calculations-020',
+    id: 'data-calculations-021',
     subtopic: 'data-calculations',
-    difficulty: 'challenge',
-    stem: 'The grouped bar chart shows quarterly sales (in thousands of units) of two products. Considering each product separately, which product had the **greatest percentage increase** from one quarter to the next?',
-    chart: {
-      kind: 'bar',
-      title: 'Quarterly sales',
-      xLabel: 'Quarter',
-      yLabel: 'Sales (thousands)',
-      categories: ['Q1', 'Q2', 'Q3', 'Q4'],
-      series: [
-        { name: 'Product X', values: [40, 50, 60, 66] },
-        { name: 'Product Y', values: [20, 30, 33, 45] },
-      ],
-    },
-    options: ['Product Y, from Q3 to Q4', 'Product X, from Q1 to Q2', 'Product Y, from Q1 to Q2', 'Product X, from Q3 to Q4'],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'Percentage change is the change divided by which value, times 100?',
+    options: ['The original value', 'The new value', 'The larger of the two values', 'The sum of the two values'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Work out every quarter-to-quarter percentage change: (change divided by the earlier quarter) times 100.\n\n' +
-        '| Change | Product X | Product Y |\n|---|---|---|\n| Q1 to Q2 | $\\frac{10}{40} = 25\\%$ | $\\frac{10}{20} = 50\\%$ |\n| Q2 to Q3 | $\\frac{10}{50} = 20\\%$ | $\\frac{3}{30} = 10\\%$ |\n| Q3 to Q4 | $\\frac{6}{60} = 10\\%$ | $\\frac{12}{33} \\approx 36.4\\%$ |\n\n' +
-        'The greatest percentage increase is $50\\%$, for Product Y from Q1 to Q2.',
+        'Percentage change compares the change with where you started:\n\n' +
+        '$$\\text{percentage change} = \\frac{\\text{new} - \\text{old}}{\\text{old}} \\times 100$$\n\n' +
+        'So the divisor is always the **original** (old) value.',
       whyWrong: [
-        'Product Y from Q3 to Q4 has the biggest **absolute** increase (12 thousand), but $\\frac{12}{33} \\approx 36.4\\%$, which is smaller than $50\\%$.',
-        'Product X from Q1 to Q2 rose by 10 thousand, the same amount as Product Y, but from a bigger starting value, so it is only $\\frac{10}{40} = 25\\%$.',
         null,
-        'Product X in Q4 is the tallest bar (the highest sales), but high sales are not the same as fast growth: $\\frac{6}{60} = 10\\%$.',
+        'Dividing by the new value is the most common slip. For a rise from 40 to 50 it gives $20\\%$ instead of the correct $25\\%$.',
+        'For a fall, the larger value happens to be the original, but for a rise it is the new value. The rule is always the original value.',
+        'The sum of the two values plays no part in percentage change. The change is compared only with the starting value.',
       ],
-      keyIdea: 'The same absolute increase is a bigger percentage when the starting value is smaller; always divide by the earlier value.',
+      keyIdea: 'Percentage change always divides by the original value.',
     },
-    check: {
-      optionValues: ['Product Y, from Q3 to Q4', 'Product X, from Q1 to Q2', 'Product Y, from Q1 to Q2', 'Product X, from Q3 to Q4'],
-      compute: () => {
-        const series: [string, number[]][] = [
-          ['X', [40, 50, 60, 66]],
-          ['Y', [20, 30, 33, 45]],
-        ];
-        let best = { pct: -Infinity, label: '' };
-        for (const [name, v] of series)
-          for (let q = 1; q < v.length; q++) {
-            const pct = ((v[q] - v[q - 1]) / v[q - 1]) * 100;
-            if (pct > best.pct) best = { pct, label: `Product ${name}, from Q${q} to Q${q + 1}` };
-          }
-        return best.label;
-      },
+  },
+  {
+    id: 'data-calculations-022',
+    subtopic: 'data-calculations',
+    difficulty: 'foundation',
+    stem: 'A share rises from $40\\%$ to $50\\%$. By how many **percentage points** has it risen?',
+    options: ['$10$', '$25$', '$20$', '$90$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A change in **percentage points** is the plain difference between two percentages:\n\n' +
+        '$$50 - 40 = 10 \\text{ percentage points}$$\n\n' +
+        '(The relative increase is a different measure: $\\frac{10}{40} \\times 100 = 25\\%$.)',
+      whyWrong: [
+        null,
+        'This is $\\frac{10}{40} \\times 100$, the relative (percentage) increase. Percentage points are the plain difference.',
+        'This is $\\frac{10}{50} \\times 100$: a relative change divided by the new share, which is not what percentage points measure.',
+        'This adds the two shares. A rise is found by subtracting.',
+      ],
+      keyIdea: 'A difference between two percentages is measured in percentage points: just subtract.',
+    },
+    check: { optionValues: [10, 25, 20, 90], compute: () => 50 - 40 },
+  },
+  {
+    id: 'data-calculations-023',
+    subtopic: 'data-calculations',
+    difficulty: 'foundation',
+    stem: 'What does **per capita** mean?',
+    options: ['Per person', 'Per year', 'In total', 'Per household'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Per capita** is a formal way of saying "per person": the total divided by the number of people.\n\n' +
+        'For example, a town of 2000 people using 6000 litres of water a day uses $\\frac{6000}{2000} = 3$ litres per capita per day.',
+      whyWrong: [
+        null,
+        'A value per year is an annual rate. Per capita is about dividing by people, not by time.',
+        'A total is the amount before any dividing. Per capita divides that total by the number of people.',
+        'A household usually has several people. Per capita divides by each individual person.',
+      ],
+      keyIdea: 'Per capita means per person: divide the total by the number of people.',
     },
   },
 ];

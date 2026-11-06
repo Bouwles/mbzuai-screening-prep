@@ -134,14 +134,9 @@ export const generators: Generator[] = [
         const E = (n * d) / 2;
         const ctx = rng.pick([
           {
-            text: `At a meeting of ${n} people, each person shakes hands with exactly ${d} of the others (nobody shakes the same person's hand twice). How many handshakes take place in total?`,
+            text: `Each of ${n} people shakes hands once with exactly ${d} of the others. How many handshakes take place?`,
             v: 'people',
             e: 'handshakes',
-          },
-          {
-            text: `A network has ${n} computers. Each computer is connected by a cable directly to exactly ${d} other computers (at most one cable between any two). How many cables are there?`,
-            v: 'computers',
-            e: 'cables',
           },
           {
             text: `A simple graph has ${n} vertices and every vertex has degree ${d}. How many edges does the graph have?`,
@@ -196,8 +191,7 @@ export const generators: Generator[] = [
           headers: ['', ...names],
           rows: M.map((r, i) => [names[i], ...r] as (string | number)[]),
         };
-        const intro =
-          'The table shows the adjacency matrix $M$ of an undirected simple graph: 1 means the two vertices are joined by an edge, 0 means they are not.';
+        const intro = 'The table shows the adjacency matrix $M$ of an undirected simple graph (1 means an edge, 0 means no edge).';
         const mode = rng.pick(['edges', 'degree', 'walks'] as const);
         const edgeList: string[] = [];
         for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (M[i][j]) edgeList.push(`${names[i]}–${names[j]}`);
@@ -278,7 +272,7 @@ export const generators: Generator[] = [
           .map(({ z, k }) => `| ${z} | ${M[x][k] ? 'yes' : 'no'} | ${M[k][y] ? 'yes' : 'no'} | ${M[x][k] && M[k][y] ? '**yes**' : 'no'} |`)
           .join('\n');
         return {
-          stem: `${intro} The entry in row $i$, column $j$ of $M^2$ counts the walks of length 2 from vertex $i$ to vertex $j$. How many walks of length 2 are there from ${names[x]} to ${names[y]}?`,
+          stem: `${intro} How many walks of length 2 go from ${names[x]} to ${names[y]}?`,
           table,
           answer,
           answerValue: c,
@@ -367,7 +361,7 @@ export const generators: Generator[] = [
         const tableRows = edges.map(([u, v, w]) => [`${LETTERS[u]}–${LETTERS[v]}`, w] as (string | number)[]);
         const shown = paths.slice(0, 8);
         return {
-          stem: `The table lists the roads in a small network and their lengths in km. Every road can be used in both directions. What is the length of the **shortest route** from A to ${end}?`,
+          stem: `The table gives the length in km of each road in a network, and roads can be used both ways. What is the length of the **shortest route** from A to ${end}?`,
           table: { headers: ['Road', 'Length (km)'], rows: tableRows },
           answer,
           answerValue: best.len,

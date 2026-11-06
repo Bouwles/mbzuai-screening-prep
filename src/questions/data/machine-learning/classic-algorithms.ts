@@ -43,21 +43,23 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-001',
     subtopic: 'classic-algorithms',
     difficulty: 'foundation',
-    stem:
-      'Which of the following is TRUE about k-nearest neighbours (k-NN) and k-means?\n\n' +
-      'A. k-NN is a **supervised** method: it needs labelled training data to classify a new point.\n\n' +
-      'B. k-means is an **unsupervised** method: it groups unlabelled data into $k$ clusters.',
-    options: ['A only', 'B only', 'Both A and B', 'None of the above'],
+    stem: 'Statement 1: k-NN needs labelled training data to classify a new point.\n\nStatement 2: k-means groups unlabelled data into $k$ clusters.\n\nWhich is true?',
+    options: [
+      'Statement 1 only',
+      'Statement 2 only',
+      'Both statements',
+      'Neither statement',
+    ],
     correctIndex: 2,
     fixedOrder: true,
     markScheme: {
       solution:
-        '**Statement A is true.** k-NN classifies a new point by looking at the $k$ closest training points and taking a majority vote of **their labels**. Without labels there would be nothing to vote on, so k-NN is supervised.\n\n' +
-        '**Statement B is true.** k-means is given points with **no labels** and invents $k$ groups (clusters) by repeatedly assigning each point to its nearest centroid and moving each centroid to the mean of its points. Finding structure without labels is unsupervised learning.\n\n' +
+        '**Statement 1 is true.** k-NN classifies a new point by looking at the $k$ closest training points and taking a majority vote of **their labels**. Without labels there would be nothing to vote on, so k-NN is **supervised**.\n\n' +
+        '**Statement 2 is true.** k-means is given points with **no labels** and forms $k$ groups (clusters) by repeatedly assigning each point to its nearest centroid and moving each centroid to the mean of its points. Finding structure without labels is **unsupervised** learning.\n\n' +
         'Both statements are true. Watch out: the two "k"s mean different things. In k-NN, $k$ is the number of neighbours that vote; in k-means, $k$ is the number of clusters.',
       whyWrong: [
-        'A is true, but B is also true: k-means uses no labels at all, which is exactly what unsupervised means.',
-        'B is true, but A is also true: k-NN votes using the labels of the training points, so it is supervised.',
+        'Statement 1 is true, but so is Statement 2: k-means uses no labels at all.',
+        'Statement 2 is true, but so is Statement 1: k-NN votes using the labels of the training points.',
         null,
         'Both statements are correct descriptions. This choice usually comes from mixing up the two algorithms because both names start with "k".',
       ],
@@ -68,7 +70,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-002',
     subtopic: 'classic-algorithms',
     difficulty: 'foundation',
-    stem: 'A k-NN classifier uses **Euclidean** distance. What is the distance between the points $(1, 2)$ and $(4, 6)$?',
+    stem: 'What is the **Euclidean** distance between the points $(1, 2)$ and $(4, 6)$?',
     options: ['$7$', '$5$', '$25$', '$\\sqrt{7}$'],
     correctIndex: 1,
     markScheme: {
@@ -92,7 +94,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-003',
     subtopic: 'classic-algorithms',
     difficulty: 'foundation',
-    stem: 'A node in a decision tree contains 8 training examples: 6 of class "Yes" and 2 of class "No". What is the **Gini impurity** of this node?',
+    stem: 'A decision-tree node contains 6 examples of class "Yes" and 2 of class "No". What is its **Gini impurity**?',
     options: ['$0.625$', '$0.25$', '$0.1875$', '$0.375$'],
     correctIndex: 3,
     markScheme: {
@@ -116,12 +118,12 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-004',
     subtopic: 'classic-algorithms',
     difficulty: 'foundation',
-    stem: 'In the k-means clustering algorithm, every point has just been assigned to its nearest centroid. What is the **next** step?',
+    stem: 'In k-means, every point has just been assigned to its nearest centroid. What is the **next** step?',
     options: [
-      'Each centroid is moved to the mean (average position) of the points assigned to it',
-      'Each point is relabelled by a majority vote of its $k$ nearest neighbours',
-      'The two clusters whose centroids are closest are merged into one cluster',
-      'Each centroid is moved onto the single data point that is nearest to it',
+      'Move each centroid to the mean of its assigned points',
+      'Relabel each point by a vote of its $k$ nearest neighbours',
+      'Merge the two clusters with the closest centroids',
+      'Move each centroid onto its nearest data point',
     ],
     correctIndex: 0,
     markScheme: {
@@ -143,7 +145,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-005',
     subtopic: 'classic-algorithms',
     difficulty: 'foundation',
-    stem: 'A node contains 5 examples of class "Spam" and 5 examples of class "Not spam". What is its **entropy** $H = -\\sum p_i \\log_2 p_i$ (in bits)?',
+    stem: 'A node contains 5 examples of "Spam" and 5 of "Not spam". What is its **entropy** $H = -\\sum p_i \\log_2 p_i$, in bits?',
     options: ['$0$', '$0.5$', '$1$', '$2$'],
     correctIndex: 2,
     markScheme: {
@@ -165,22 +167,24 @@ export const questions: StaticQuestion[] = [
   {
     id: 'classic-algorithms-006',
     subtopic: 'classic-algorithms',
-    difficulty: 'foundation',
-    stem:
-      'A bank uses the decision tree below to decide on loan applications. Five applicants are listed in the table (income and debt in AED). Which applicants are **approved**?',
+    difficulty: 'exam',
+    stem: 'The decision tree below is applied to each applicant in the table. Which applicants are **approved**?',
     code: {
       lang: 'pseudocode',
       source: src(
-        'IF income >= 3000 THEN',
-        '    IF debt > 1000 THEN',
-        '        predict "Reject"',
-        '    ELSE',
-        '        predict "Approve"',
-        'ELSE',
-        '    IF years_employed >= 5 THEN',
-        '        predict "Approve"',
-        '    ELSE',
-        '        predict "Reject"',
+        'if income >= 3000',
+        '   if debt > 1000',
+        '      print("Reject")',
+        '   else',
+        '      print("Approve")',
+        '   end if',
+        'else',
+        '   if years_employed >= 5',
+        '      print("Approve")',
+        '   else',
+        '      print("Reject")',
+        '   end if',
+        'end if',
       ),
     },
     table: {
@@ -209,7 +213,7 @@ export const questions: StaticQuestion[] = [
       whyWrong: [
         'This rejects Eli, which happens if you read "debt > 1000" as $\\ge 1000$. Eli\'s debt is exactly 1000, which is **not** greater than 1000.',
         null,
-        'This approves Bilal, which happens if you read "income >= 3000" as $> 3000$: Bilal (income exactly 3000) is then sent to the ELSE branch, where his 10 years of employment approve him. But $3000 \\ge 3000$ is true, so Bilal goes into the first branch and is rejected because his debt of 1200 is over 1000.',
+        'This approves Bilal, which happens if you read "income >= 3000" as $> 3000$: Bilal (income exactly 3000) is then sent to the `else` branch, where his 10 years of employment approve him. But $3000 \\ge 3000$ is true, so Bilal goes into the first branch and is rejected because his debt of 1200 is over 1000.',
         'This rejects Chen, which happens if you read "years_employed >= 5" as $> 5$. Chen has exactly 5 years, and $5 \\ge 5$ is true.',
       ],
       keyIdea: 'A decision tree is a chain of if-tests: follow one branch per test, and treat boundary values exactly as the comparison sign says.',
@@ -235,7 +239,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-007',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem: 'The table shows six labelled training points. A new point $Q = (3, 4)$ is classified by **k-NN with $k = 3$**, using Euclidean distance. What class is predicted for $Q$?',
+    stem: 'The table shows six labelled training points. The point $Q = (3, 4)$ is classified by **k-NN with $k = 3$** using Euclidean distance. What class is predicted?',
     table: {
       headers: ['Point', '$x_1$', '$x_2$', 'Class'],
       rows: [
@@ -290,8 +294,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-008',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem:
-      'The table gives the distance from a new point $Q$ to each of seven labelled training points. Q is classified by k-NN (majority vote). For which of the values $k = 1, 3, 5, 7$ is the prediction **Blue**?',
+    stem: 'The table gives the distance from a point $Q$ to seven labelled training points. For which of $k = 1, 3, 5, 7$ does k-NN (majority vote) predict **Blue**?',
     table: {
       headers: ['Point', 'Distance to Q', 'Class'],
       rows: [
@@ -352,12 +355,12 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-009',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem: 'In k-nearest neighbours, which statement about the effect of the value of $k$ is correct?',
+    stem: 'In k-nearest neighbours, which statement about the effect of $k$ is correct?',
     options: [
-      'A larger $k$ averages over more neighbours, so the decision boundary becomes smoother and less sensitive to noisy points; if $k$ is too large the model underfits',
-      'A larger $k$ makes the model more flexible, so it becomes more likely to overfit the training data',
-      'With $k = 1$ the model is least likely to overfit, because each prediction uses only one neighbour',
-      'The value of $k$ is learned automatically by gradient descent during training',
+      'A larger $k$ gives a smoother boundary; too large underfits',
+      'A larger $k$ makes the model more likely to overfit',
+      'With $k = 1$ the model is least likely to overfit',
+      '$k$ is learned by gradient descent during training',
     ],
     correctIndex: 0,
     markScheme: {
@@ -379,7 +382,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-010',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem: 'During k-means, one cluster contains the three points $(1, 2)$, $(3, 8)$ and $(8, 5)$ (shown in the scatter plot). Where is this cluster\'s centroid moved to in the update step?',
+    stem: 'A k-means cluster contains the points $(1, 2)$, $(3, 8)$ and $(8, 5)$. Where does the update step move its centroid?',
     chart: {
       kind: 'scatter',
       title: 'Points in the cluster',
@@ -416,24 +419,21 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-011',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem:
-      'k-means with $k = 2$ currently has centroids $C_1 = (1, 1)$ and $C_2 = (4, 9)$. In the assignment step, each point in the table goes to its nearest centroid using **Euclidean** distance. Which points are assigned to $C_2$?',
+    stem: 'k-means with $k = 2$ has centroids $C_1 = (1, 1)$ and $C_2 = (4, 9)$. Using Euclidean distance, which points in the table are assigned to $C_2$?',
     table: {
       headers: ['Point', '$x$', '$y$'],
       rows: [
         ['$P_1$', 2, 3],
         ['$P_2$', 4, 4],
         ['$P_3$', 3, 8],
-        ['$P_4$', 6, 2],
-        ['$P_5$', 5, 7],
-        ['$P_6$', 0, 6],
+        ['$P_4$', 0, 6],
       ],
     },
     options: [
-      '$P_2$, $P_3$ and $P_5$',
-      '$P_3$, $P_5$ and $P_6$',
-      '$P_1$, $P_2$ and $P_4$',
-      '$P_2$, $P_3$, $P_4$ and $P_5$',
+      '$P_2$ and $P_3$',
+      '$P_3$ and $P_4$',
+      '$P_1$ and $P_2$',
+      '$P_3$ only',
     ],
     correctIndex: 1,
     markScheme: {
@@ -444,25 +444,23 @@ export const questions: StaticQuestion[] = [
         '| $P_1 = (2, 3)$ | $1 + 4 = 5$ | $4 + 36 = 40$ | $C_1$ |\n' +
         '| $P_2 = (4, 4)$ | $9 + 9 = 18$ | $0 + 25 = 25$ | $C_1$ |\n' +
         '| $P_3 = (3, 8)$ | $4 + 49 = 53$ | $1 + 1 = 2$ | $C_2$ |\n' +
-        '| $P_4 = (6, 2)$ | $25 + 1 = 26$ | $4 + 49 = 53$ | $C_1$ |\n' +
-        '| $P_5 = (5, 7)$ | $16 + 36 = 52$ | $1 + 4 = 5$ | $C_2$ |\n' +
-        '| $P_6 = (0, 6)$ | $1 + 25 = 26$ | $16 + 9 = 25$ | $C_2$ |\n\n' +
-        '$P_6$ is a close call ($25 < 26$), and $P_2$ goes to $C_1$ ($18 < 25$).\n\n' +
-        'Assigned to $C_2$: $P_3$, $P_5$ and $P_6$.',
+        '| $P_4 = (0, 6)$ | $1 + 25 = 26$ | $16 + 9 = 25$ | $C_2$ |\n\n' +
+        '$P_4$ is a close call ($25 < 26$).\n\n' +
+        'Assigned to $C_2$: $P_3$ and $P_4$.',
       whyWrong: [
-        'This uses **Manhattan** distance ($|\\Delta x| + |\\Delta y|$). For $P_2$ that gives 6 to $C_1$ and 5 to $C_2$, and for $P_6$ it gives 6 and 7, which flips both points. The question says Euclidean: $P_2$ has $18 < 25$ (so $C_1$) and $P_6$ has $25 < 26$ (so $C_2$).',
+        'This uses **Manhattan** distance ($|\\Delta x| + |\\Delta y|$). For $P_2$ that gives 6 to $C_1$ and 5 to $C_2$, and for $P_4$ it gives 6 and 7, which flips both points. The question says Euclidean.',
         null,
         'These are the points assigned to $C_1$, not $C_2$: the two clusters have been swapped.',
-        'This compares only the $x$-coordinates (each point goes to whichever of $x = 1$ and $x = 4$ is closer). Euclidean distance must use both coordinates.',
+        'This sends $P_4$ to $C_1$. Its squared distances are 26 to $C_1$ and 25 to $C_2$, so it is close, but $C_2$ is nearer.',
       ],
       keyIdea: 'In the k-means assignment step each point joins the centroid with the smallest distance; comparing squared distances is quicker and gives the same result.',
     },
     check: {
-      optionValues: ['P2,P3,P5', 'P3,P5,P6', 'P1,P2,P4', 'P2,P3,P4,P5'],
+      optionValues: ['P2,P3', 'P3,P4', 'P1,P2', 'P3'],
       compute: () => {
         const c1: Pt = [1, 1];
         const c2: Pt = [4, 9];
-        const pts: Pt[] = [[2, 3], [4, 4], [3, 8], [6, 2], [5, 7], [0, 6]];
+        const pts: Pt[] = [[2, 3], [4, 4], [3, 8], [0, 6]];
         return pts
           .map((p, i) => ({ i, toC2: sqDist(p, c2) < sqDist(p, c1) }))
           .filter((r) => r.toC2)
@@ -475,8 +473,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-012',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem:
-      'A decision-tree node has 4 "Yes" and 6 "No" examples. A split sends them into two child nodes as shown in the table. What is the **weighted Gini impurity** of the split?',
+    stem: 'A node with 4 "Yes" and 6 "No" examples is split as shown in the table. What is the **weighted Gini impurity** of the split?',
     table: {
       headers: ['Child node', 'Yes', 'No', 'Total'],
       rows: [
@@ -533,8 +530,7 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-014',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem:
-      'A 1-NN classifier uses **Manhattan** distance $d = |x_1 - x_2| + |y_1 - y_2|$. Which training point in the table is the nearest neighbour of the query point $(2, 1)$?',
+    stem: 'A 1-NN classifier uses **Manhattan** distance $d = |x_1 - x_2| + |y_1 - y_2|$. Which training point in the table is nearest to $(2, 1)$?',
     table: {
       headers: ['Training point', '$x$', '$y$'],
       rows: [
@@ -579,288 +575,110 @@ export const questions: StaticQuestion[] = [
     id: 'classic-algorithms-015',
     subtopic: 'classic-algorithms',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'Arrays are indexed from 1. `C` holds the class counts of a decision-tree node. What does this pseudocode print?',
     code: {
-      lang: 'python',
+      lang: 'pseudocode',
       source: src(
-        'def gini(labels):',
-        '    n = len(labels)',
-        '    total = 0',
-        '    for c in set(labels):',
-        '        p = labels.count(c) / n',
-        '        total += p * p',
-        '    return 1 - total',
-        '',
-        "print(round(gini(['a', 'a', 'b', 'b', 'b', 'c']), 4))",
+        'C = [2, 1, 1]',
+        'n = 4',
+        'total = 0',
+        'for i = 1 to 3',
+        '   p = C[i] / n',
+        '   total = total + p * p',
+        'end for',
+        'print(1 - total)',
       ),
-    },
-    options: ['`0.6111`', '`0.3889`', '`0.5`', '`0.6667`'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'The function computes the Gini impurity $1 - \\sum p_i^2$ of a list of labels. The list has $n = 6$ labels. `set(labels)` gives each distinct class once.\n\n' +
-        '| class `c` | `labels.count(c)` | `p` | `p * p` |\n' +
-        '|---|---|---|---|\n' +
-        '| a | 2 | $\\frac{2}{6}$ | $\\frac{4}{36}$ |\n' +
-        '| b | 3 | $\\frac{3}{6}$ | $\\frac{9}{36}$ |\n' +
-        '| c | 1 | $\\frac{1}{6}$ | $\\frac{1}{36}$ |\n\n' +
-        'So `total` $= \\frac{4 + 9 + 1}{36} = \\frac{14}{36} \\approx 0.3889$, and the function returns $1 - \\frac{14}{36} = \\frac{22}{36} \\approx 0.61111$.\n\n' +
-        '`round(..., 4)` gives `0.6111`.',
-      whyWrong: [
-        null,
-        'This is `total` $= \\frac{14}{36} \\approx 0.3889$, the sum of the squared proportions. The function returns `1 - total`.',
-        'This is $1 - \\frac{3}{6} = 0.5$, one minus the **largest** proportion (the misclassification rate), not what the code computes.',
-        'This is $1 - 3 \\times \\left(\\frac{1}{3}\\right)^2 = 0.6667$, which treats the three classes as equally common. The code uses the real counts 2, 3 and 1.',
-      ],
-      keyIdea: 'Gini impurity in code: for each distinct class add the squared proportion, then subtract the total from 1.',
-    },
-    check: {
-      optionValues: [0.6111, 0.3889, 0.5, 0.6667],
-      compute: () => round(gini([2, 3, 1]), 4),
-    },
-    python: { stdout: '0.6111\n' },
-  },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'classic-algorithms-016',
-    subtopic: 'classic-algorithms',
-    difficulty: 'challenge',
-    stem:
-      'A decision tree is choosing the first split for 10 training examples (5 "Yes", 5 "No"). Four candidate features each split the data into a left and a right child, with the class counts in the table. Using **weighted Gini impurity**, which feature gives the best split?',
-    table: {
-      headers: ['Feature', 'Left: Yes', 'Left: No', 'Right: Yes', 'Right: No'],
-      rows: [
-        ['Student', 1, 0, 4, 5],
-        ['Owns a house', 2, 0, 3, 5],
-        ['Age over 40', 3, 3, 2, 2],
-        ['Has a job', 4, 1, 1, 4],
-      ],
-    },
-    options: ['Student', 'Owns a house', 'Age over 40', 'Has a job'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'The best split has the **lowest** weighted Gini impurity (equivalently, the biggest drop from the parent\'s $0.5$). Use $G = 1 - \\sum p_i^2$ for each child and weight by child size out of 10.\n\n' +
-        '- **Student:** left $(1, 0)$: $G = 0$. Right $(4, 5)$: $G = 1 - \\frac{16 + 25}{81} = \\frac{40}{81} \\approx 0.494$. Weighted: $\\frac{1}{10}(0) + \\frac{9}{10}(0.494) \\approx 0.444$.\n' +
-        '- **Owns a house:** left $(2, 0)$: $G = 0$. Right $(3, 5)$: $G = 1 - \\frac{9 + 25}{64} = \\frac{30}{64} \\approx 0.469$. Weighted: $\\frac{8}{10}(0.469) = 0.375$.\n' +
-        '- **Age over 40:** both children are 50/50, $G = 0.5$ each. Weighted: $0.5$ (no improvement at all).\n' +
-        '- **Has a job:** left $(4, 1)$: $G = 1 - \\frac{16 + 1}{25} = 0.32$. Right $(1, 4)$: $G = 0.32$. Weighted: $\\frac{5}{10}(0.32) + \\frac{5}{10}(0.32) = 0.32$.\n\n' +
-        'Lowest weighted Gini: **Has a job** ($0.32$).',
-      whyWrong: [
-        'Student isolates **one** example perfectly, which looks impressive, but the other 9 examples stay almost 50/50 ($G \\approx 0.494$), so its weighted Gini is about $0.444$, worse than $0.32$.',
-        'This is what you get from the **unweighted** average of the child Ginis: $\\frac{0 + 0.469}{2} \\approx 0.234$ looks best. Weighted by size, the big impure child dominates and the score is $0.375$.',
-        'This has the **highest** weighted Gini ($0.5$, no improvement). Picking it comes from thinking a higher impurity is better; for Gini and entropy, lower is better (it is information **gain** that should be high).',
-        null,
-      ],
-      keyIdea: 'Choose the split with the lowest size-weighted child impurity; a tiny pure child does not make a good split if the large child stays mixed.',
-    },
-    check: {
-      optionValues: ['Student', 'Owns a house', 'Age over 40', 'Has a job'],
-      compute: () => {
-        const splits: [string, number[][]][] = [
-          ['Student', [[1, 0], [4, 5]]],
-          ['Owns a house', [[2, 0], [3, 5]]],
-          ['Age over 40', [[3, 3], [2, 2]]],
-          ['Has a job', [[4, 1], [1, 4]]],
-        ];
-        return [...splits].sort((a, b) => weighted(a[1], gini) - weighted(b[1], gini))[0][0];
-      },
-    },
-  },
-  {
-    id: 'classic-algorithms-017',
-    subtopic: 'classic-algorithms',
-    difficulty: 'challenge',
-    stem:
-      'A node has 5 "Yes" and 5 "No" examples. A split sends 4 examples (all "Yes") to the left child and 6 examples (1 "Yes", 5 "No") to the right child. What is the **information gain** of this split, using entropy with $\\log_2$, to 3 decimal places?',
-    options: ['$0.390$', '$0.610$', '$0.675$', '$0.423$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Information gain = parent entropy $-$ weighted average of the child entropies.\n\n' +
-        '**Parent** (5 Yes, 5 No) is 50/50, so $H_{\\text{parent}} = 1$.\n\n' +
-        '**Left child** (4 Yes, 0 No) is pure, so $H_L = 0$ (we take $0 \\log_2 0 = 0$).\n\n' +
-        '**Right child** (1 Yes, 5 No): $p = \\frac{1}{6}$ and $\\frac{5}{6}$.\n\n' +
-        '$$H_R = -\\frac{1}{6}\\log_2 \\frac{1}{6} - \\frac{5}{6}\\log_2 \\frac{5}{6} \\approx \\frac{1}{6}(2.585) + \\frac{5}{6}(0.263) \\approx 0.4308 + 0.2192 = 0.6500$$\n\n' +
-        '**Weighted child entropy:** $\\frac{4}{10}(0) + \\frac{6}{10}(0.6500) = 0.3900$.\n\n' +
-        '**Information gain:** $1 - 0.3900 = 0.6100$, which is $0.610$ to 3 decimal places.',
-      whyWrong: [
-        'This is the weighted child entropy $0.390$. You still have to subtract it from the parent entropy of 1 to get the gain.',
-        null,
-        'This averages the children **without weights**: $1 - \\frac{0 + 0.650}{2} = 0.675$. The right child holds 6 of the 10 examples, so it must count for $\\frac{6}{10}$.',
-        'This uses natural logs $\\ln$ throughout (parent $\\ln 2 \\approx 0.693$, right child $\\approx 0.451$), giving $0.693 - 0.6 \\times 0.451 \\approx 0.423$. Entropy in bits needs $\\log_2$.',
-      ],
-      keyIdea: 'Information gain = H(parent) minus the size-weighted average of H(children); a bigger gain means a better split.',
-    },
-    check: {
-      optionValues: [0.39, 0.61, 0.675, 0.423],
-      compute: () => round(entropy([5, 5]) - weighted([[4, 0], [1, 5]], (c) => entropy(c)), 3),
-    },
-  },
-  {
-    id: 'classic-algorithms-018',
-    subtopic: 'classic-algorithms',
-    difficulty: 'challenge',
-    stem:
-      'k-means with $k = 2$ is run on the six points $A(0, 1)$, $B(2, 0)$, $C(4, 2)$, $D(4, 4)$, $E(7, 5)$ and $F(7, 6)$ (shown in the plot). The initial centroids are $\\mu_1 = (1, 2)$ and $\\mu_2 = (6, 6)$. After **one full iteration** (assignment using Euclidean distance, then update), where are the centroids?',
-    chart: {
-      kind: 'scatter',
-      title: 'Data points',
-      xLabel: 'x',
-      yLabel: 'y',
-      points: [
-        { x: 0, y: 1 },
-        { x: 2, y: 0 },
-        { x: 4, y: 2 },
-        { x: 4, y: 4 },
-        { x: 7, y: 5 },
-        { x: 7, y: 6 },
-      ],
     },
     options: [
-      '$\\mu_1 = (2.5, 1.75)$, $\\mu_2 = (7, 5.5)$',
-      '$\\mu_1 = (1.75, 1.25)$, $\\mu_2 = (6, 5.25)$',
-      '$\\mu_1 = (2, 1)$, $\\mu_2 = (6, 5)$',
-      '$\\mu_1 = (2, 1)$, $\\mu_2 = (7, 5)$',
+      '$0.625$',
+      '$0.375$',
+      '$0.5$',
+      '$0.6667$',
     ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Assignment step** (squared distances to $\\mu_1 = (1, 2)$ and $\\mu_2 = (6, 6)$):\n\n' +
-        '| Point | $d^2$ to $\\mu_1$ | $d^2$ to $\\mu_2$ | cluster |\n' +
-        '|---|---|---|---|\n' +
-        '| $A(0, 1)$ | $1 + 1 = 2$ | $36 + 25 = 61$ | 1 |\n' +
-        '| $B(2, 0)$ | $1 + 4 = 5$ | $16 + 36 = 52$ | 1 |\n' +
-        '| $C(4, 2)$ | $3^2 = 9$ | $4 + 16 = 20$ | 1 |\n' +
-        '| $D(4, 4)$ | $9 + 4 = 13$ | $4 + 4 = 8$ | 2 |\n' +
-        '| $E(7, 5)$ | $36 + 9 = 45$ | $1 + 1 = 2$ | 2 |\n' +
-        '| $F(7, 6)$ | $36 + 16 = 52$ | $1^2 = 1$ | 2 |\n\n' +
-        '**Update step** (mean of each cluster):\n\n' +
-        '- Cluster 1 $= \\{A, B, C\\}$: $\\mu_1 = \\left(\\frac{0 + 2 + 4}{3}, \\frac{0 + 1 + 2}{3}\\right) = (2, 1)$\n' +
-        '- Cluster 2 $= \\{D, E, F\\}$: $\\mu_2 = \\left(\\frac{4 + 7 + 7}{3}, \\frac{4 + 5 + 6}{3}\\right) = (6, 5)$\n\n' +
-        'After one iteration: $\\mu_1 = (2, 1)$ and $\\mu_2 = (6, 5)$.',
-      whyWrong: [
-        'This puts $D(4, 4)$ into cluster 1 (it looks central on the plot). But $D$ is closer to $\\mu_2$: $8 < 13$. With $D$ in the wrong cluster the means become $(2.5, 1.75)$ and $(7, 5.5)$.',
-        'This includes the **old centroid** in the average as if it were a data point, e.g. $\\frac{0 + 1 + 2 + 4}{4} = 1.75$. The new centroid is the mean of the assigned data points only.',
-        null,
-        'This uses the **median** of cluster 2 for $\\mu_2$ ($x$: 4, 7, 7 gives 7). k-means updates each centroid to the **mean**, $\\frac{4 + 7 + 7}{3} = 6$. (For cluster 1 the median happens to equal the mean.)',
-      ],
-      keyIdea: 'One k-means iteration = assign every point to its nearest centroid, then replace each centroid by the mean of its own points.',
-    },
-    check: {
-      optionValues: ['2.5,1.75|7,5.5', '1.75,1.25|6,5.25', '2,1|6,5', '2,1|7,5'],
-      compute: () => {
-        const pts: Pt[] = [[0, 1], [2, 0], [4, 2], [4, 4], [7, 5], [7, 6]];
-        const mu: Pt[] = [[1, 2], [6, 6]];
-        const groups: Pt[][] = [[], []];
-        pts.forEach((p) => groups[sqDist(p, mu[0]) <= sqDist(p, mu[1]) ? 0 : 1].push(p));
-        return groups.map((g) => meanPt(g).join(',')).join('|');
-      },
-    },
-  },
-  {
-    id: 'classic-algorithms-019',
-    subtopic: 'classic-algorithms',
-    difficulty: 'challenge',
-    stem: 'This Python code runs a small k-NN classifier with Manhattan distance. What does it print?',
-    code: {
-      lang: 'python',
-      source: src(
-        "train = [((1, 1), 'A'), ((2, 3), 'B'), ((4, 4), 'B'),",
-        "         ((5, 1), 'A'), ((3, 2), 'A')]",
-        'q = (3, 3)',
-        'dists = []',
-        'for (x, y), label in train:',
-        '    d = abs(x - q[0]) + abs(y - q[1])',
-        '    dists.append((d, label))',
-        'dists.sort()',
-        'top = [label for d, label in dists[:3]]',
-        'print(top, max(set(top), key=top.count))',
-      ),
-    },
-    options: ["`['A', 'B', 'B'] B`", "`['B', 'A', 'B'] B`", "`['A', 'A', 'B'] A`", "`['A', 'B', 'B'] A`"],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Step 1: the loop builds `(distance, label)` pairs, with Manhattan distance to `q = (3, 3)`.\n\n' +
-        '| point | `d` | pair |\n' +
-        '|---|---|---|\n' +
-        "| (1, 1) | $2 + 2 = 4$ | `(4, 'A')` |\n" +
-        "| (2, 3) | $1$ (same $y$) | `(1, 'B')` |\n" +
-        "| (4, 4) | $1 + 1 = 2$ | `(2, 'B')` |\n" +
-        "| (5, 1) | $2 + 2 = 4$ | `(4, 'A')` |\n" +
-        "| (3, 2) | $0 + 1 = 1$ | `(1, 'A')` |\n\n" +
-        "Step 2: `dists.sort()` sorts tuples by the first item (distance) and, **when distances tie, by the second item** (the label, alphabetically). So the two pairs at distance 1 come out as `(1, 'A')` then `(1, 'B')`:\n\n" +
-        "`[(1, 'A'), (1, 'B'), (2, 'B'), (4, 'A'), (4, 'A')]`\n\n" +
-        "Step 3: `dists[:3]` takes the 3 smallest, so `top = ['A', 'B', 'B']`.\n\n" +
-        "Step 4: `max(set(top), key=top.count)` returns the label with the highest count: 'A' appears once, 'B' twice, so it returns `B`.\n\n" +
-        "Output: `['A', 'B', 'B'] B`",
+        'The code computes the Gini impurity $1 - \\sum p_i^2$ from the class counts, where $n = 4$ is the total.\n\n' +
+        '| $i$ | `C[i]` | `p` | `p * p` | `total` |\n' +
+        '|---|---|---|---|---|\n' +
+        '| 1 | 2 | 0.5 | 0.25 | 0.25 |\n' +
+        '| 2 | 1 | 0.25 | 0.0625 | 0.3125 |\n' +
+        '| 3 | 1 | 0.25 | 0.0625 | 0.375 |\n\n' +
+        'It prints $1 - 0.375 = 0.625$.',
       whyWrong: [
         null,
-        "This keeps the two distance-1 points in their original list order ((2, 3) came before (3, 2)). But sorting tuples breaks ties using the second item, and 'A' < 'B'.",
-        "This assumes `sort()` puts the **largest** distances first, so the top 3 would be the two 4s and the 2. Python's `sort()` is ascending by default.",
-        "The list is right, but the vote is wrong: `max(..., key=top.count)` picks the label that occurs most often in `top` ('B', twice), not the most common label in the whole training set ('A').",
+        'This is `total`, the sum of the squared proportions. The last line prints `1 - total`.',
+        'This is one minus the **largest** proportion, $1 - 0.5$ (the misclassification rate), which is not what the code computes.',
+        'This is $1 - 3 \\times \\left(\\frac{1}{3}\\right)^2$, which treats the three classes as equally common. The code uses the real counts 2, 1 and 1.',
       ],
-      keyIdea: 'Sorting (distance, label) tuples orders by distance, breaking ties by label; the k-NN vote is the most frequent label among the first k.',
-    },
-    python: { stdout: "['A', 'B', 'B'] B\n" },
-  },
-  {
-    id: 'classic-algorithms-020',
-    subtopic: 'classic-algorithms',
-    difficulty: 'challenge',
-    stem:
-      'k-means tries to make the **within-cluster sum of squares** (WCSS) small: the sum, over all points, of the squared Euclidean distance from each point to its own cluster\'s centroid. After an assignment step, cluster 1 is $\\{(1, 2), (3, 2), (2, 5)\\}$ and cluster 2 is $\\{(7, 7), (9, 5)\\}$. The centroids are then updated to the cluster means. What is the WCSS using the **updated** centroids?',
-    chart: {
-      kind: 'scatter',
-      title: 'Points after assignment',
-      xLabel: 'x',
-      yLabel: 'y',
-      points: [
-        { x: 1, y: 2 },
-        { x: 3, y: 2 },
-        { x: 2, y: 5 },
-        { x: 7, y: 7 },
-        { x: 9, y: 5 },
-      ],
-    },
-    options: ['$10$', '$2.4$', '$2 + 4\\sqrt{2}$', '$12$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1: updated centroids** (means).\n\n' +
-        '- Cluster 1: $\\left(\\frac{1 + 3 + 2}{3}, \\frac{2 + 2 + 5}{3}\\right) = (2, 3)$\n' +
-        '- Cluster 2: $\\left(\\frac{7 + 9}{2}, \\frac{7 + 5}{2}\\right) = (8, 6)$\n\n' +
-        '**Step 2: squared distance from each point to its own centroid.**\n\n' +
-        '| Point | centroid | $d^2$ |\n' +
-        '|---|---|---|\n' +
-        '| $(1, 2)$ | $(2, 3)$ | $1^2 + 1^2 = 2$ |\n' +
-        '| $(3, 2)$ | $(2, 3)$ | $1^2 + 1^2 = 2$ |\n' +
-        '| $(2, 5)$ | $(2, 3)$ | $0^2 + 2^2 = 4$ |\n' +
-        '| $(7, 7)$ | $(8, 6)$ | $1^2 + 1^2 = 2$ |\n' +
-        '| $(9, 5)$ | $(8, 6)$ | $1^2 + 1^2 = 2$ |\n\n' +
-        '**Step 3: add them.** $\\text{WCSS} = 2 + 2 + 4 + 2 + 2 = 12$.',
-      whyWrong: [
-        'This uses Manhattan distances ($2 + 2 + 2 + 2 + 2 = 10$) instead of squared Euclidean distances. For $(2, 5)$ the squared distance is $0^2 + 2^2 = 4$, not $0 + 2 = 2$.',
-        'This is the **mean** squared distance $\\frac{12}{5} = 2.4$. WCSS is the **sum**, not the average.',
-        'This adds the plain (unsquared) distances $\\sqrt{2} + \\sqrt{2} + 2 + \\sqrt{2} + \\sqrt{2}$. WCSS uses **squared** distances, so no square roots are taken.',
-        null,
-      ],
-      keyIdea: 'WCSS adds the squared distance from every point to its own centroid; no k-means step ever increases it.',
+      keyIdea: 'Gini impurity in code: add the squared proportion of each class, then subtract the total from 1.',
     },
     check: {
-      optionValues: [10, 2.4, 2 + 4 * Math.SQRT2, 12],
-      compute: () => {
-        const clusters: Pt[][] = [
-          [[1, 2], [3, 2], [2, 5]],
-          [[7, 7], [9, 5]],
-        ];
-        return clusters.reduce((acc, cl) => {
-          const c = meanPt(cl);
-          return acc + cl.reduce((s, p) => s + sqDist(p, c), 0);
-        }, 0);
-      },
+      optionValues: [0.625, 0.375, 0.5, 0.6667],
+      compute: () => round(gini([2, 1, 1]), 4),
+    },
+  },
+
+  // ---------------------------------------------------------------- recall
+  {
+    id: 'classic-algorithms-021',
+    subtopic: 'classic-algorithms',
+    difficulty: 'foundation',
+    stem: 'In k-means, what does $k$ stand for?',
+    options: ['The number of clusters', 'The number of neighbours', 'The number of features', 'The number of iterations'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'k-means splits unlabelled points into groups called clusters, with one centroid per cluster. $k$ is the number of clusters, and it is chosen before the algorithm runs.',
+      whyWrong: [
+        null,
+        'The number of neighbours is what $k$ means in **k-NN**, a different algorithm.',
+        'The number of features is fixed by the data, whatever value of $k$ is chosen.',
+        'The number of iterations is not fixed in advance: the algorithm repeats until the assignments stop changing.',
+      ],
+      keyIdea: 'In k-means $k$ is the number of clusters; in k-NN $k$ is the number of neighbours that vote.',
+    },
+  },
+  {
+    id: 'classic-algorithms-022',
+    subtopic: 'classic-algorithms',
+    difficulty: 'foundation',
+    stem: 'What is the Gini impurity of a **pure** node (all examples in one class)?',
+    options: ['$0$', '$1$', '$0.5$', '$-1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'In a pure node one class has proportion $p = 1$ and every other class has $p = 0$.\n\n' +
+        '$$G = 1 - \\sum p_i^2 = 1 - 1^2 = 0$$\n\n' +
+        'An impurity of $0$ means the node is not mixed at all.',
+      whyWrong: [
+        null,
+        'This is $\\sum p_i^2 = 1$, the sum of the squared proportions, which still has to be subtracted from 1.',
+        'This is the Gini impurity of a 50/50 node of two classes, the **most** mixed case, not the pure one.',
+        'Gini impurity is never negative, because $\\sum p_i^2$ is never more than 1.',
+      ],
+      keyIdea: 'A pure node has Gini impurity 0; a 50/50 node of two classes has the maximum, 0.5.',
+    },
+    check: { optionValues: [0, 1, 0.5, -1], compute: () => gini([8, 0]) },
+  },
+  {
+    id: 'classic-algorithms-023',
+    subtopic: 'classic-algorithms',
+    difficulty: 'foundation',
+    stem: 'Which of these is an **unsupervised** method?',
+    options: ['k-means', 'k-nearest neighbours', 'Decision tree', 'Logistic regression'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**k-means** takes points with no labels and finds groups in them, so it is unsupervised.\n\n' +
+        'The other three all learn from examples that come with the correct label.',
+      whyWrong: [
+        null,
+        'k-NN classifies by a vote of the **labels** of nearby training points, so it is supervised.',
+        'A decision tree is built by choosing splits that separate the **labels**, so it is supervised.',
+        'Logistic regression is fitted to labelled examples of each class, so it is supervised.',
+      ],
+      keyIdea: 'k-means is the unsupervised method: it needs no labels.',
     },
   },
 ];

@@ -17,13 +17,6 @@ function twoTerm(a1: number, a2: number, target: number, rule: (prev: number, pr
   return y;
 }
 
-/** All binary strings of a given length. */
-function binaryStrings(len: number): string[] {
-  const out: string[] = [];
-  for (let k = 0; k < 2 ** len; k++) out.push(k.toString(2).padStart(len, '0'));
-  return out;
-}
-
 export const questions: StaticQuestion[] = [
   // ================================================================ foundation
   {
@@ -39,8 +32,7 @@ export const questions: StaticQuestion[] = [
         '- $a_2 = a_1 + 3 = 4 + 3 = 7$\n' +
         '- $a_3 = a_2 + 3 = 7 + 3 = 10$\n' +
         '- $a_4 = a_3 + 3 = 10 + 3 = 13$\n' +
-        '- $a_5 = a_4 + 3 = 13 + 3 = 16$\n\n' +
-        'Check with the closed form of an arithmetic sequence: $a_5 = 4 + (5 - 1) \\times 3 = 16$.',
+        '- $a_5 = a_4 + 3 = 13 + 3 = 16$',
       whyWrong: [
         'This adds 3 five times ($4 + 5 \\times 3$). Going from $a_1$ to $a_5$ takes only **four** steps, so 3 is added four times.',
         'This is $a_4$: the working stopped one step too early.',
@@ -64,12 +56,11 @@ export const questions: StaticQuestion[] = [
         '- $a_1 = 3 \\times 2 = 6$\n' +
         '- $a_2 = 3 \\times 6 = 18$\n' +
         '- $a_3 = 3 \\times 18 = 54$\n' +
-        '- $a_4 = 3 \\times 54 = 162$\n\n' +
-        'From $a_0$ to $a_4$ is four steps, so $a_4 = 2 \\times 3^4 = 2 \\times 81 = 162$.',
+        '- $a_4 = 3 \\times 54 = 162$',
       whyWrong: [
-        'This is $2 \\times 3^3$: it assumes the sequence starts at $a_1$, so it only multiplies by 3 three times. Starting from $a_0$ there are four steps to $a_4$.',
+        'This is $a_3$: it assumes the sequence starts at $a_1$, so it only multiplies by 3 three times. Starting from $a_0$ there are four steps to $a_4$.',
         null,
-        'This is $2 \\times 3^5$: one multiplication too many (that is $a_5$).',
+        'This is $a_5$: one multiplication too many.',
         'This adds 3 four times ($2 + 4 \\times 3$), treating the rule as $a_n = a_{n-1} + 3$ instead of multiplying by 3.',
       ],
       keyIdea: 'Always check where the sequence starts: from $a_0$ to $a_n$ is $n$ steps, from $a_1$ to $a_n$ is $n - 1$ steps.',
@@ -139,36 +130,6 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'recurrence-relations-005',
-    subtopic: 'recurrence-relations',
-    difficulty: 'foundation',
-    stem: 'A colony of bacteria doubles every hour. At the start (hour 0) there are 300 bacteria, so $P_0 = 300$ and $P_n = 2P_{n-1}$ for $n \\ge 1$. Which formula gives the number of bacteria after $n$ hours?',
-    options: ['$P_n = 300 \\times 2^{n-1}$', '$P_n = 300 + 2n$', '$P_n = 600^{n}$', '$P_n = 300 \\times 2^{n}$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Each hour the number is multiplied by 2, so this is a geometric sequence with first value 300 and ratio 2.\n\n' +
-        '- $P_1 = 300 \\times 2$\n' +
-        '- $P_2 = 300 \\times 2 \\times 2 = 300 \\times 2^2$\n' +
-        '- $P_3 = 300 \\times 2^3$\n\n' +
-        'After $n$ hours we have multiplied by 2 exactly $n$ times: $P_n = 300 \\times 2^{n}$.\n\n' +
-        'Quick check with $n = 0$: $300 \\times 2^0 = 300$, which matches $P_0$.',
-      whyWrong: [
-        'This is the formula for a sequence that starts at $P_1 = 300$. Here the starting value is $P_0$, and $n = 0$ would give $300 \\times 2^{-1} = 150$, not 300.',
-        'This adds 2 each hour instead of doubling: it treats the rule as arithmetic.',
-        'This multiplies 300 by 2 first and then raises the result to the power $n$. Only the 2 is repeated; the 300 is used once. At $n = 0$ it gives 1, not 300.',
-        null,
-      ],
-      keyIdea: 'For $P_n = rP_{n-1}$ starting at $P_0$, the closed form is $P_n = P_0 r^{n}$; test $n = 0$ to check the index.',
-    },
-    check: {
-      optionValues: [300 * 2 ** 4, 300 + 2 * 5, 600 ** 5, 300 * 2 ** 5],
-      compute: () => iterate(300, 5, (p) => 2 * p, 0),
-    },
-  },
-
-  // ================================================================ exam
-  {
     id: 'recurrence-relations-006',
     subtopic: 'recurrence-relations',
     difficulty: 'foundation',
@@ -192,31 +153,84 @@ export const questions: StaticQuestion[] = [
     check: { optionValues: [41, 14, 122, 15], compute: () => iterate(2, 3, (p) => 3 * p - 1) },
   },
   {
-    id: 'recurrence-relations-007',
+    id: 'recurrence-relations-021',
     subtopic: 'recurrence-relations',
-    difficulty: 'exam',
-    stem: 'A sequence is defined by $a_1 = 7$ and $a_n = a_{n-1} - 4$ for $n \\ge 2$. Which of the following is a closed-form formula for $a_n$?',
-    options: ['$a_n = 7 - 4n$', '$a_n = 11 - 4n$', '$a_n = 3 + 4n$', '$a_n = 7(-4)^{n-1}$'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'What does a **recurrence relation** define?',
+    options: ['Each term from earlier terms', 'Each term directly from $n$', 'The sum of all the terms', 'Only the first term'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Subtracting 4 each time makes an **arithmetic** sequence with first term $a_1 = 7$ and common difference $d = -4$.\n\n' +
-        'Arithmetic closed form: $a_n = a_1 + (n - 1)d$.\n\n' +
-        '$$a_n = 7 + (n - 1)(-4) = 7 - 4n + 4 = 11 - 4n$$\n\n' +
-        'Check: $n = 1$ gives $11 - 4 = 7$ and $n = 2$ gives $11 - 8 = 3 = 7 - 4$. Both correct.',
+        'A **recurrence relation** gives a rule for a term using the term or terms before it, such as $a_n = a_{n-1} + 3$. Together with a starting value, it fixes the whole sequence.',
       whyWrong: [
-        'This uses $n$ instead of $n - 1$: at $n = 1$ it gives $7 - 4 = 3$, but $a_1$ should be 7.',
         null,
-        'This has the sign of the difference wrong ($d = +4$): it gives $7, 11, 15, \\dots$, an increasing sequence.',
-        'This treats the rule as **multiplying** by $-4$ (a geometric sequence). The rule subtracts 4.',
+        'This describes a direct formula such as $a_n = 3n + 1$, which does not need the earlier terms.',
+        'A recurrence builds the terms one by one. Adding them up is a separate calculation.',
+        'The first term is the starting value, which is given separately from the rule.',
       ],
-      keyIdea: 'An "add a constant" recurrence is arithmetic: $a_n = a_1 + (n - 1)d$; check your formula at $n = 1$ and $n = 2$.',
-    },
-    check: {
-      optionValues: [7 - 4 * 10, 11 - 4 * 10, 3 + 4 * 10, 7 * (-4) ** 9],
-      compute: () => iterate(7, 9, (p) => p - 4),
+      keyIdea: 'A recurrence relation gives each term from the term or terms before it.',
     },
   },
+  {
+    id: 'recurrence-relations-022',
+    subtopic: 'recurrence-relations',
+    difficulty: 'foundation',
+    stem: 'How many starting values does a second-order recurrence such as $a_n = a_{n-1} + a_{n-2}$ need?',
+    options: ['$2$', '$1$', '$3$', '$0$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Second-order** means each term uses the **two** terms before it, $a_{n-1}$ and $a_{n-2}$.\n\n' +
+        'To compute the first new term you must already know two terms, so it needs $2$ starting values.',
+      whyWrong: [
+        null,
+        'One value is enough for a first-order rule such as $a_n = 2a_{n-1}$. Here the rule looks two terms back.',
+        'The rule only looks back two terms, so a third starting value is not needed: it would be worked out by the rule.',
+        'Without starting values the rule has nothing to work from, so no term can be computed.',
+      ],
+      keyIdea: 'A rule that looks back $k$ terms needs $k$ starting values.',
+    },
+  },
+  {
+    id: 'recurrence-relations-023',
+    subtopic: 'recurrence-relations',
+    difficulty: 'foundation',
+    stem: 'The Fibonacci sequence begins $1, 1, 2, 3, 5, 8, \\dots$ What is the next term?',
+    options: ['$13$', '$11$', '$16$', '$40$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Each term is the sum of the two terms before it, so the next term is $5 + 8 = 13$.',
+      whyWrong: [
+        null,
+        'This repeats the last gap, $8 + 3 = 11$. The rule adds the two previous terms, not a fixed gap.',
+        'This doubles the last term. The rule adds the term before it, which is 5, not 8 again.',
+        'This multiplies the last two terms, $5 \\times 8 = 40$. The rule adds them.',
+      ],
+      keyIdea: 'In the Fibonacci sequence each term is the sum of the two terms before it.',
+    },
+    check: { optionValues: [13, 11, 16, 40], compute: () => twoTerm(1, 1, 7, (p, q) => p + q) },
+  },
+  {
+    id: 'recurrence-relations-024',
+    subtopic: 'recurrence-relations',
+    difficulty: 'foundation',
+    stem: 'A sequence is defined by $a_1 = 5$ and $a_n = a_{n-1} - 2$ for $n \\ge 2$. What is $a_3$?',
+    options: ['$1$', '$3$', '$-1$', '$9$'],
+    correctIndex: 0,
+    markScheme: {
+      solution: 'Subtract 2 at each step: $a_2 = 5 - 2 = 3$ and $a_3 = 3 - 2 = 1$.',
+      whyWrong: [
+        null,
+        'This is $a_2$: the working stopped one step early.',
+        'This is $a_4$: one step too many. From $a_1$ to $a_3$ takes two steps.',
+        'This adds 2 at each step instead of subtracting it.',
+      ],
+      keyIdea: 'From $a_1$ to $a_3$ you apply the rule twice.',
+    },
+    check: { optionValues: [1, 3, -1, 9], compute: () => iterate(5, 2, (p) => p - 2) },
+  },
+
+  // ================================================================ exam
   {
     id: 'recurrence-relations-008',
     subtopic: 'recurrence-relations',
@@ -241,75 +255,10 @@ export const questions: StaticQuestion[] = [
     check: { optionValues: [19, 70, 37, 75], compute: () => twoTerm(2, 5, 5, (p, q) => p + 2 * q) },
   },
   {
-    id: 'recurrence-relations-009',
-    subtopic: 'recurrence-relations',
-    difficulty: 'exam',
-    stem: 'A staircase has 6 steps. You climb it taking either 1 step or 2 steps at a time. Let $S_n$ be the number of different ways to climb $n$ steps, so $S_1 = 1$ and $S_2 = 2$. How many ways are there to climb all 6 steps?',
-    options: ['$8$', '$13$', '$21$', '$64$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Think about the **last move**. To finish on step $n$ you either:\n\n' +
-        '- came from step $n - 1$ with a 1-step move ($S_{n-1}$ ways to get there), or\n' +
-        '- came from step $n - 2$ with a 2-step move ($S_{n-2}$ ways to get there).\n\n' +
-        'So $S_n = S_{n-1} + S_{n-2}$, a Fibonacci-type recurrence.\n\n' +
-        '| $n$ | 1 | 2 | 3 | 4 | 5 | 6 |\n' +
-        '| --- | --- | --- | --- | --- | --- | --- |\n' +
-        '| $S_n$ | 1 | 2 | 3 | 5 | 8 | 13 |\n\n' +
-        'There are 13 ways.',
-      whyWrong: [
-        'This is $S_5$, or the Fibonacci number $F_6$ using starting values $1, 1$. Here $S_2 = 2$ (you can do 1+1 or 2), so the list is shifted along by one.',
-        null,
-        'This is $S_7$: one step too far.',
-        'This is $2^6$, as if every step offered an independent choice of 2. A 2-step move uses up two steps at once, so the choices are not independent.',
-      ],
-      keyIdea: 'Counting recurrences come from splitting on the last move: the cases give the terms that are added.',
-    },
-    check: {
-      optionValues: [8, 13, 21, 64],
-      compute: () => {
-        // brute force: count sequences of 1s and 2s summing to 6
-        const ways = (left: number): number => (left === 0 ? 1 : left < 0 ? 0 : ways(left - 1) + ways(left - 2));
-        return ways(6);
-      },
-    },
-  },
-  {
-    id: 'recurrence-relations-010',
-    subtopic: 'recurrence-relations',
-    difficulty: 'exam',
-    stem: 'Binary search on a sorted list of $n$ items makes $T(n)$ comparisons in the worst case, where $T(1) = 1$ and $T(n) = T\\left(\\frac{n}{2}\\right) + 1$ for $n$ a power of 2. What is $T(32)$?',
-    options: ['$5$', '$16$', '$6$', '$32$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Keep halving until you reach $T(1)$, adding 1 each time.\n\n' +
-        '- $T(1) = 1$\n' +
-        '- $T(2) = T(1) + 1 = 2$\n' +
-        '- $T(4) = T(2) + 1 = 3$\n' +
-        '- $T(8) = 4$, $T(16) = 5$, $T(32) = 6$\n\n' +
-        'In general $T(n) = \\log_2 n + 1$, and $\\log_2 32 = 5$, so $T(32) = 6$.',
-      whyWrong: [
-        'This is $\\log_2 32$: it counts the 5 halvings but forgets the 1 comparison made at $T(1)$.',
-        'This is $\\frac{32}{2}$: it halves only once instead of repeatedly.',
-        null,
-        'This is $n$, the worst case for a **linear** search that checks every item. Binary search halves the list each time.',
-      ],
-      keyIdea: 'A recurrence that halves $n$ and adds a constant grows like $\\log_2 n$: count the halvings, then add the base case.',
-    },
-    check: {
-      optionValues: [5, 16, 6, 32],
-      compute: () => {
-        const T = (n: number): number => (n === 1 ? 1 : T(n / 2) + 1);
-        return T(32);
-      },
-    },
-  },
-  {
     id: 'recurrence-relations-011',
     subtopic: 'recurrence-relations',
     difficulty: 'exam',
-    stem: 'In the Tower of Hanoi puzzle, the minimum number of moves $H_n$ needed to move $n$ discs satisfies $H_1 = 1$ and $H_n = 2H_{n-1} + 1$. What is the minimum number of moves for 6 discs?',
+    stem: 'A sequence is defined by $H_1 = 1$ and $H_n = 2H_{n-1} + 1$ for $n \\ge 2$. What is $H_6$?',
     options: ['$64$', '$32$', '$31$', '$63$'],
     correctIndex: 3,
     markScheme: {
@@ -318,15 +267,14 @@ export const questions: StaticQuestion[] = [
         '| $n$ | 1 | 2 | 3 | 4 | 5 | 6 |\n' +
         '| --- | --- | --- | --- | --- | --- | --- |\n' +
         '| $H_n$ | 1 | 3 | 7 | 15 | 31 | 63 |\n\n' +
-        'For example $H_2 = 2 \\times 1 + 1 = 3$ and $H_6 = 2 \\times 31 + 1 = 63$.\n\n' +
-        'The pattern is $H_n = 2^{n} - 1$, and indeed $2^6 - 1 = 63$.',
+        'For example $H_2 = 2 \\times 1 + 1 = 3$ and $H_6 = 2 \\times 31 + 1 = 63$.',
       whyWrong: [
-        'This is $2^6$: it forgets the $-1$ in the closed form $H_n = 2^{n} - 1$.',
-        'This ignores the $+1$ in the rule and just doubles: $1, 2, 4, 8, 16, 32$. Each extra disc needs the smaller tower moved **twice** plus one more move for the new disc.',
-        'This is $H_5$: one disc short.',
+        'This is $H_6 + 1$: it adds 1 once more after the last step.',
+        'This ignores the $+1$ in the rule and just doubles: $1, 2, 4, 8, 16, 32$.',
+        'This is $H_5$: one step short.',
         null,
       ],
-      keyIdea: 'The recurrence $H_n = 2H_{n-1} + 1$ with $H_1 = 1$ has closed form $H_n = 2^{n} - 1$.',
+      keyIdea: 'Apply the rule one step at a time: double, then add 1, counting from $H_1$.',
     },
     check: { optionValues: [64, 32, 31, 63], compute: () => iterate(1, 5, (p) => 2 * p + 1) },
   },
@@ -334,23 +282,22 @@ export const questions: StaticQuestion[] = [
     id: 'recurrence-relations-012',
     subtopic: 'recurrence-relations',
     difficulty: 'exam',
-    stem: 'A loan of AED 10,000 is charged 10% interest at the end of each year, and then a repayment of AED 2,000 is made. So the balance $B_n$ after $n$ years satisfies $B_0 = 10000$ and $B_n = 1.1B_{n-1} - 2000$. What is the balance after 3 years?',
-    options: ['AED 6,028', 'AED 7,000', 'AED 6,690', 'AED 7,900'],
+    stem: 'A sequence is defined by $B_0 = 10000$ and $B_n = 1.1B_{n-1} - 2000$ for $n \\ge 1$. What is $B_3$?',
+    options: ['$6028$', '$7000$', '$6690$', '$7900$'],
     correctIndex: 2,
     markScheme: {
       solution:
-        'Each year: multiply by 1.1 (add 10% interest), then subtract 2000.\n\n' +
+        'At each step multiply by 1.1, then subtract 2000.\n\n' +
         '- $B_1 = 1.1 \\times 10000 - 2000 = 11000 - 2000 = 9000$\n' +
         '- $B_2 = 1.1 \\times 9000 - 2000 = 9900 - 2000 = 7900$\n' +
-        '- $B_3 = 1.1 \\times 7900 - 2000 = 8690 - 2000 = 6690$\n\n' +
-        'The balance after 3 years is AED 6,690.',
+        '- $B_3 = 1.1 \\times 7900 - 2000 = 8690 - 2000 = 6690$',
       whyWrong: [
-        'This subtracts the repayment **before** adding interest, i.e. uses $1.1(B_{n-1} - 2000)$: $8800, 7480, 6028$. The question says interest is charged first.',
-        'This uses simple interest on the original AED 10,000 ($3 \\times 1000$ added, $3 \\times 2000$ repaid). Interest is charged on the **current** balance each year.',
+        'This subtracts 2000 **before** multiplying, i.e. uses $1.1(B_{n-1} - 2000)$: $8800, 7480, 6028$. The rule multiplies first.',
+        'This adds 10% of $B_0$ at every step ($3 \\times 1000$ added, $3 \\times 2000$ taken away). The 1.1 applies to the **current** term.',
         null,
-        'This is $B_2$, the balance after only 2 years.',
+        'This is $B_2$: one step short.',
       ],
-      keyIdea: 'Money problems with a percentage change plus a fixed payment give $B_n = rB_{n-1} + d$; apply it in the stated order.',
+      keyIdea: 'Apply a "multiply, then subtract" rule in the order written, using the current term each time.',
     },
     check: {
       optionValues: [6028, 7000, 6690, 7900],
@@ -361,16 +308,16 @@ export const questions: StaticQuestion[] = [
     id: 'recurrence-relations-013',
     subtopic: 'recurrence-relations',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
+    stem: 'What does this pseudocode print?',
     code: {
-      lang: 'python',
-      source: 'def f(n):\n    if n <= 1:\n        return n\n    return f(n - 1) + 2 * f(n - 2)\n\nprint(f(6))',
+      lang: 'pseudocode',
+      source: 'function f(n)\n   if n <= 1\n      return n\n   end if\n   return f(n - 1) + 2 * f(n - 2)\nend function\nprint(f(6))',
     },
-    options: ['`8`', '`11`', '`70`', '`21`'],
+    options: ['8', '11', '70', '21'],
     correctIndex: 3,
     markScheme: {
       solution:
-        'The function defines the recurrence $f(n) = f(n-1) + 2f(n-2)$ with base cases $f(0) = 0$ and $f(1) = 1$ (because `return n` when `n <= 1`). Build up from the bottom:\n\n' +
+        'The function defines the recurrence $f(n) = f(n-1) + 2f(n-2)$ with base cases $f(0) = 0$ and $f(1) = 1$ (because `return n` runs when `n <= 1`). Build up from the bottom:\n\n' +
         '| $n$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |\n' +
         '| --- | --- | --- | --- | --- | --- | --- | --- |\n' +
         '| $f(n)$ | 0 | 1 | 1 | 3 | 5 | 11 | 21 |\n\n' +
@@ -379,7 +326,7 @@ export const questions: StaticQuestion[] = [
         '- $f(4) = 3 + 2 \\times 1 = 5$\n' +
         '- $f(5) = 5 + 2 \\times 3 = 11$\n' +
         '- $f(6) = 11 + 2 \\times 5 = 21$\n\n' +
-        'It prints `21`.',
+        'It prints **21**.',
       whyWrong: [
         'This ignores the `2 *` and computes the ordinary Fibonacci number $f(6) = f(5) + f(4)$, which is 8.',
         'This is $f(5)$: one level short.',
@@ -395,40 +342,7 @@ export const questions: StaticQuestion[] = [
         return f(6);
       },
     },
-    python: { stdout: '21\n' },
   },
-  {
-    id: 'recurrence-relations-014',
-    subtopic: 'recurrence-relations',
-    difficulty: 'exam',
-    stem: 'Merge sort on $n$ items (where $n$ is a power of 2) makes at most $T(n)$ comparisons, where $T(1) = 0$ and $T(n) = 2T\\left(\\frac{n}{2}\\right) + n$. Using this recurrence, what is $T(8)$?',
-    options: ['$14$', '$24$', '$8$', '$32$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Work up from $T(1)$, doubling the previous value and adding the current $n$.\n\n' +
-        '- $T(2) = 2T(1) + 2 = 2 \\times 0 + 2 = 2$\n' +
-        '- $T(4) = 2T(2) + 4 = 2 \\times 2 + 4 = 8$\n' +
-        '- $T(8) = 2T(4) + 8 = 2 \\times 8 + 8 = 24$\n\n' +
-        'This matches the known result $T(n) = n\\log_2 n$: $8 \\times 3 = 24$.',
-      whyWrong: [
-        'This forgets the factor 2, using $T(n) = T\\left(\\frac{n}{2}\\right) + n$: $2, 6, 14$. Merge sort sorts **two** halves.',
-        null,
-        'This is $T(4)$: the working stopped one level early. The question asks for $T(8)$, so one more step $2T(4) + 8$ is needed.',
-        'This uses $T(1) = 1$ instead of $T(1) = 0$: $4, 12, 32$. A single item needs no comparisons.',
-      ],
-      keyIdea: 'Divide-and-conquer recurrences are evaluated by working up from the base case; $T(n) = 2T(\\frac{n}{2}) + n$ gives $n\\log_2 n$.',
-    },
-    check: {
-      optionValues: [14, 24, 8, 32],
-      compute: () => {
-        const T = (n: number): number => (n === 1 ? 0 : 2 * T(n / 2) + n);
-        return T(8);
-      },
-    },
-  },
-
-  // ================================================================ challenge
   {
     id: 'recurrence-relations-015',
     subtopic: 'recurrence-relations',
@@ -457,162 +371,150 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'recurrence-relations-016',
-    subtopic: 'recurrence-relations',
-    difficulty: 'challenge',
-    stem: 'A sequence is defined by $a_0 = 3$ and $a_n = 2a_{n-1} + 5$ for $n \\ge 1$. Which of the following is a closed-form formula for $a_n$?',
-    options: ['$a_n = 3 \\times 2^{n} - 5$', '$a_n = 8 \\times 2^{n} + 5$', '$a_n = 8 \\times 2^{n} - 5$', '$a_n = 3 \\times 2^{n} + 5n$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'For $a_n = ra_{n-1} + d$ with $r \\ne 1$, first find the **fixed point** $L$, the value that the rule leaves unchanged:\n\n' +
-        '$$L = 2L + 5 \\implies L = -5$$\n\n' +
-        'The distance from the fixed point is multiplied by $r = 2$ each step, so\n\n' +
-        '$$a_n - L = (a_0 - L) \\times 2^{n} \\implies a_n + 5 = (3 + 5) \\times 2^{n}$$\n\n' +
-        'so $a_n = 8 \\times 2^{n} - 5$.\n\n' +
-        'Check: $a_0 = 8 - 5 = 3$, $a_1 = 16 - 5 = 11 = 2 \\times 3 + 5$, $a_2 = 32 - 5 = 27 = 2 \\times 11 + 5$. Correct.',
-      whyWrong: [
-        'This multiplies $a_0$ itself by $2^{n}$ instead of $a_0 - L = 8$. At $n = 0$ it gives $3 - 5 = -2$, not 3.',
-        'This has the sign of the fixed point wrong ($L = 5$ instead of $-5$). At $n = 0$ it gives 13, not 3.',
-        null,
-        'This treats the $+5$ as being added once per step without being doubled later. At $n = 2$ it gives $12 + 10 = 22$, but $a_2 = 27$.',
-      ],
-      keyIdea: 'For $a_n = ra_{n-1} + d$, the closed form is $a_n = (a_0 - L)r^{n} + L$ where $L = \\frac{d}{1 - r}$; always check $n = 0, 1, 2$.',
-    },
-    check: {
-      optionValues: [3 * 2 ** 5 - 5, 8 * 2 ** 5 + 5, 8 * 2 ** 5 - 5, 3 * 2 ** 5 + 5 * 5],
-      compute: () => iterate(3, 5, (p) => 2 * p + 5, 0),
-    },
-  },
-  {
-    id: 'recurrence-relations-017',
-    subtopic: 'recurrence-relations',
-    difficulty: 'challenge',
-    stem: 'A sequence is defined by $a_1 = 5$ and $a_n = 3a_{n-1} - 4$ for $n \\ge 2$. What is $a_{10}$?',
-    options: ['$59049$', '$59051$', '$19685$', '$98411$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Computing nine steps by hand is slow, so find a closed form.\n\n' +
-        'Fixed point: $L = 3L - 4 \\implies 2L = 4 \\implies L = 2$.\n\n' +
-        'The gap from 2 is multiplied by 3 each step. At $n = 1$ the gap is $5 - 2 = 3$, so\n\n' +
-        '$$a_n - 2 = 3 \\times 3^{n-1} = 3^{n} \\implies a_n = 3^{n} + 2$$\n\n' +
-        'Check: $a_1 = 3 + 2 = 5$, $a_2 = 9 + 2 = 11 = 3 \\times 5 - 4$, $a_3 = 27 + 2 = 29 = 3 \\times 11 - 4$.\n\n' +
-        'So $a_{10} = 3^{10} + 2 = 59049 + 2 = 59051$.',
-      whyWrong: [
-        'This is $3^{10}$: it forgets to add back the fixed point 2.',
-        null,
-        'This is $3^{9} + 2$: it uses the exponent $n - 1$ but forgets that the starting gap is 3, which adds one more factor of 3.',
-        'This is $5 \\times 3^{9} - 4$: it multiplies the first term by 3 nine times and subtracts 4 only once, but the $-4$ is applied (and then tripled) at every step.',
-      ],
-      keyIdea: 'For a far-away term of $a_n = ra_{n-1} + d$, use the fixed point $L$: $a_n = L + (a_1 - L)r^{n-1}$.',
-    },
-    check: {
-      optionValues: [59049, 59051, 19685, 98411],
-      compute: () => iterate(5, 9, (p) => 3 * p - 4),
-    },
-  },
-  {
-    id: 'recurrence-relations-018',
+    id: 'recurrence-relations-025',
     subtopic: 'recurrence-relations',
     difficulty: 'exam',
-    stem: 'Let $b_n$ be the number of binary strings of length $n$ (strings of 0s and 1s) that contain **no two consecutive 1s**. For example $b_1 = 2$ and $b_2 = 3$ (00, 01, 10). It can be shown that $b_n = b_{n-1} + b_{n-2}$. How many such strings of length 6 are there?',
-    options: ['$13$', '$43$', '$64$', '$21$'],
-    correctIndex: 3,
+    stem: 'A sequence is defined by $a_1 = 1$ and $a_n = 2a_{n-1} + 3$ for $n \\ge 2$. What are its first four terms?',
+    options: ['$1, 5, 13, 29$', '$1, 8, 22, 50$', '$5, 13, 29, 61$', '$1, 4, 7, 10$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Why the recurrence holds: look at the **last** digit of a valid string of length $n$.\n\n' +
-        '- If it ends in 0, the first $n - 1$ digits can be any valid string: $b_{n-1}$ ways.\n' +
-        '- If it ends in 1, the digit before must be 0, and the first $n - 2$ digits can be any valid string: $b_{n-2}$ ways.\n\n' +
-        'Now build the table:\n\n' +
-        '| $n$ | 1 | 2 | 3 | 4 | 5 | 6 |\n' +
-        '| --- | --- | --- | --- | --- | --- | --- |\n' +
-        '| $b_n$ | 2 | 3 | 5 | 8 | 13 | 21 |\n\n' +
-        'There are 21 strings.',
+        'Start at $a_1 = 1$. At each step double, then add 3.\n\n' +
+        '- $a_2 = 2 \\times 1 + 3 = 5$\n' +
+        '- $a_3 = 2 \\times 5 + 3 = 13$\n' +
+        '- $a_4 = 2 \\times 13 + 3 = 29$',
       whyWrong: [
-        'This is $b_5$: one step short.',
-        'This is $64 - 21$, the number of strings that **do** contain two consecutive 1s. It counts the complement.',
-        'This is $2^6$, the number of **all** binary strings of length 6, ignoring the restriction.',
         null,
+        'This adds 3 **before** doubling, i.e. uses $2(a_{n-1} + 3)$. The rule doubles first.',
+        'This starts at $a_2$ and leaves out the first term, $a_1 = 1$.',
+        'This only adds 3 and forgets to double.',
       ],
-      keyIdea: 'Split on how a valid string ends to get a recurrence, then compute terms from the starting values.',
+      keyIdea: 'The first term is given; each later term comes from applying the rule to the one before.',
     },
     check: {
-      optionValues: [13, 43, 64, 21],
-      compute: () => binaryStrings(6).filter((s) => !s.includes('11')).length,
+      optionValues: ['1,5,13,29', '1,8,22,50', '5,13,29,61', '1,4,7,10'],
+      compute: () => [0, 1, 2, 3].map((k) => iterate(1, k, (p) => 2 * p + 3)).join(','),
     },
   },
   {
-    id: 'recurrence-relations-019',
+    id: 'recurrence-relations-026',
     subtopic: 'recurrence-relations',
-    difficulty: 'challenge',
-    stem: 'How many times is "hi" printed when `HELLO(3)` is called?',
-    code: {
-      lang: 'pseudocode',
-      source:
-        'procedure HELLO(n)\n    if n = 0 then\n        return\n    end if\n    print("hi")\n    HELLO(n - 1)\n    HELLO(n - 1)\n    HELLO(n - 1)\nend procedure',
-    },
-    options: ['$27$', '$13$', '$9$', '$40$'],
-    correctIndex: 1,
+    difficulty: 'exam',
+    stem: 'A sequence is defined by $a_1 = 1$, $a_2 = 3$ and $a_n = 3a_{n-1} - 2a_{n-2}$ for $n \\ge 3$. What is $a_4$?',
+    options: ['$15$', '$7$', '$31$', '$-3$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Let $P(n)$ be the number of prints made by `HELLO(n)`. A call with $n = 0$ prints nothing, so $P(0) = 0$. A call with $n \\ge 1$ prints once and then makes three calls with $n - 1$:\n\n' +
-        '$$P(n) = 1 + 3P(n-1)$$\n\n' +
-        '- $P(1) = 1 + 3 \\times 0 = 1$\n' +
-        '- $P(2) = 1 + 3 \\times 1 = 4$\n' +
-        '- $P(3) = 1 + 3 \\times 4 = 13$\n\n' +
-        'Level by level: 1 print from `HELLO(3)`, 3 from the `HELLO(2)` calls, 9 from the `HELLO(1)` calls: $1 + 3 + 9 = 13$.',
+        'Each new term uses the two terms before it.\n\n' +
+        '- $a_3 = 3a_2 - 2a_1 = 9 - 2 = 7$\n' +
+        '- $a_4 = 3a_3 - 2a_2 = 21 - 6 = 15$',
       whyWrong: [
-        'This is $3^3$, the number of `HELLO(0)` calls at the bottom. Those calls return straight away and print nothing.',
         null,
-        'This counts only the 9 prints made by the `HELLO(1)` calls and forgets the prints at the higher levels.',
-        'This is the total number of **calls**, $1 + 3 + 9 + 27 = 40$, including the 27 calls with $n = 0$ that print nothing.',
+        'This is $a_3$: one step short.',
+        'This is $a_5 = 3 \\times 15 - 2 \\times 7$: one step too many.',
+        'This swaps the coefficients, using $2a_{n-1} - 3a_{n-2}$: $a_3 = 3$ and $a_4 = -3$. The 3 goes with the previous term.',
       ],
-      keyIdea: 'Write the work of a recursive procedure as a recurrence: work per call plus (number of recursive calls) times the work of each.',
+      keyIdea: 'In a two-term recurrence, $a_{n-1}$ is one term back and $a_{n-2}$ is two terms back.',
+    },
+    check: { optionValues: [15, 7, 31, -3], compute: () => twoTerm(1, 3, 4, (p, q) => 3 * p - 2 * q) },
+  },
+  {
+    id: 'recurrence-relations-027',
+    subtopic: 'recurrence-relations',
+    difficulty: 'exam',
+    stem: 'A sequence is defined by $a_1 = 1$ and $a_n = a_{n-1} + n$ for $n \\ge 2$. What is $a_5$?',
+    options: ['$15$', '$10$', '$21$', '$9$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The amount added changes with $n$.\n\n' +
+        '- $a_2 = 1 + 2 = 3$\n' +
+        '- $a_3 = 3 + 3 = 6$\n' +
+        '- $a_4 = 6 + 4 = 10$\n' +
+        '- $a_5 = 10 + 5 = 15$',
+      whyWrong: [
+        null,
+        'This is $a_4$: one step short.',
+        'This is $a_6 = 15 + 6$: one step too many.',
+        'This adds 2 at every step, using $n = 2$ throughout. The value of $n$ goes up by 1 at each step.',
+      ],
+      keyIdea: 'When the rule contains $n$, use the index of the term being worked out at each step.',
+    },
+    check: { optionValues: [15, 10, 21, 9], compute: () => iterate(1, 4, (p, n) => p + n) },
+  },
+  {
+    id: 'recurrence-relations-028',
+    subtopic: 'recurrence-relations',
+    difficulty: 'exam',
+    stem: 'Which recurrence (for $n \\ge 2$, with $a_1 = 5$) generates the terms $5, 8, 14, 26$?',
+    options: ['$a_n = 2a_{n-1} - 2$', '$a_n = a_{n-1} + 3$', '$a_n = 3a_{n-1} - 7$', '$a_n = 2a_{n-1} + 2$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Test each rule on every pair of neighbouring terms.\n\n' +
+        '- $a_n = 2a_{n-1} - 2$: $5 \\to 8$, $8 \\to 14$, $14 \\to 26$. All work.\n' +
+        '- $a_n = a_{n-1} + 3$: $5 \\to 8$ works, but $8 \\to 11$, not 14.\n' +
+        '- $a_n = 3a_{n-1} - 7$: $5 \\to 8$ works, but $8 \\to 17$, not 14.\n' +
+        '- $a_n = 2a_{n-1} + 2$: $5 \\to 12$, not 8.',
+      whyWrong: [
+        null,
+        'This fits only the first step. The gaps are $3, 6, 12$, so they are not constant.',
+        'This fits only the first step: $3 \\times 8 - 7 = 17$, not 14.',
+        'This has the sign wrong: $2 \\times 5 + 2 = 12$, not 8.',
+      ],
+      keyIdea: 'A rule must fit every consecutive pair of terms, not only the first.',
     },
     check: {
-      optionValues: [27, 13, 9, 40],
+      optionValues: ['2a-2', 'a+3', '3a-7', '2a+2'],
       compute: () => {
-        let prints = 0;
-        const hello = (n: number): void => {
-          if (n === 0) return;
-          prints++;
-          hello(n - 1);
-          hello(n - 1);
-          hello(n - 1);
-        };
-        hello(3);
-        return prints;
+        const seq = [5, 8, 14, 26];
+        const rules: [string, (p: number) => number][] = [
+          ['2a-2', (p) => 2 * p - 2],
+          ['a+3', (p) => p + 3],
+          ['3a-7', (p) => 3 * p - 7],
+          ['2a+2', (p) => 2 * p + 2],
+        ];
+        const ok = rules.filter(([, f]) => seq.slice(1).every((t, i) => f(seq[i]) === t));
+        return ok.length === 1 ? ok[0][0] : 'none or many';
       },
     },
   },
   {
-    id: 'recurrence-relations-020',
+    id: 'recurrence-relations-029',
     subtopic: 'recurrence-relations',
-    difficulty: 'challenge',
-    stem: 'Straight lines (extending forever in both directions) are drawn on an infinite flat plane so that no two are parallel and no three meet at one point. Let $R_n$ be the number of regions the plane is divided into by $n$ lines: $R_0 = 1$, $R_1 = 2$, $R_2 = 4$, $R_3 = 7$. The $n$th line crosses each of the earlier $n - 1$ lines exactly once. What is $R_6$?',
-    options: ['$22$', '$64$', '$21$', '$16$'],
+    difficulty: 'exam',
+    stem: 'What does this pseudocode print?',
+    code: {
+      lang: 'pseudocode',
+      source: 'a = 3\nfor i = 1 to 4\n   a = 2 * a - 1\nend for\nprint(a)',
+    },
+    options: ['33', '17', '65', 'Infinite loop'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'The $n$th line crosses the $n - 1$ earlier lines at $n - 1$ points, which cut it into $n$ pieces. Each piece splits one existing region into two, so the line adds $n$ new regions:\n\n' +
-        '$$R_n = R_{n-1} + n$$\n\n' +
-        'Check: $R_3 = R_2 + 3 = 4 + 3 = 7$. Correct. Continue:\n\n' +
-        '- $R_4 = 7 + 4 = 11$\n' +
-        '- $R_5 = 11 + 5 = 16$\n' +
-        '- $R_6 = 16 + 6 = 22$\n\n' +
-        'Closed form: $R_n = 1 + \\frac{n(n+1)}{2}$, and $1 + \\frac{6 \\times 7}{2} = 22$.',
+        'The loop applies the rule $a_n = 2a_{n-1} - 1$ exactly 4 times, starting from 3.\n\n' +
+        '| `i` | `a` |\n' +
+        '| --- | --- |\n' +
+        '| 1 | 5 |\n' +
+        '| 2 | 9 |\n' +
+        '| 3 | 17 |\n' +
+        '| 4 | 33 |\n\n' +
+        'It prints **33**.',
       whyWrong: [
         null,
-        'This guesses doubling from $2, 4$ ($2^6$). The next value $R_3 = 7$, not 8, already shows the pattern is not doubling.',
-        'This is $1 + 2 + \\dots + 6$: it adds up the new regions but forgets that the plane is already 1 region before any lines are drawn.',
-        'This is $R_5$: one line short.',
+        'This is the value after 3 passes. `for i = 1 to 4` includes $i = 4$, so there are 4 passes.',
+        'This is the value after 5 passes. The loop stops after $i = 4$.',
+        'A `for` loop runs a fixed number of times, here 4, so it always stops.',
       ],
-      keyIdea: 'Find the recurrence by asking how much the $n$th step adds, then test it on the given values before extending.',
+      keyIdea: 'A loop that repeats `a = 2 * a - 1` computes the terms of a recurrence, and `for i = 1 to n` runs exactly $n$ times.',
     },
     check: {
-      optionValues: [22, 64, 21, 16],
-      compute: () => iterate(1, 6, (p, n) => p + n, 0),
+      optionValues: [33, 17, 65, 'Infinite loop'],
+      compute: () => {
+        let a = 3;
+        for (let i = 1; i <= 4; i++) a = 2 * a - 1;
+        return a;
+      },
     },
   },
 ];

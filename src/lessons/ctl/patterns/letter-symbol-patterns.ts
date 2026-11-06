@@ -71,7 +71,7 @@ export const lesson: Lesson = {
     { label: 'Shift cipher (encode by k)', tex: '\\text{new position} = \\text{position} + k', note: 'If the result is above 26, subtract 26 (wrap past Z).' },
     { label: 'Shift cipher (decode by k)', tex: '\\text{original position} = \\text{code position} - k', note: 'If the result is below 1, add 26 (wrap past A).' },
     { label: 'Reverse-alphabet code', tex: '\\text{code position} = 27 - \\text{position}', note: 'A swaps with Z, B with Y, M with N: each pair adds to 27.' },
-    { label: 'Wrap-around in code (0-based)', tex: '\\text{new index} = (\\text{index} + k) \\bmod 26', note: 'In Python: `chr((ord(ch) - ord("A") + k) % 26 + ord("A"))`, where A has index 0 (so Z has index 25).' },
+    { label: 'Wrap-around in code (0-based)', tex: '\\text{new index} = (\\text{index} + k) \\bmod 26', note: 'In pseudocode: `mod(index + k, 26)`, where A has index 0 (so Z has index 25).' },
     { label: 'Repeating block of length L', tex: 'n = qL + r \\;\\Rightarrow\\; n\\text{th symbol} = r\\text{th symbol of the block}', note: 'Here $r$ is the remainder. If $r = 0$, it is the **last** symbol of the block.' },
     { label: 'Count of a symbol in the first n places', tex: '\\text{count} = q \\times (\\text{count per block}) + (\\text{count in the first } r \\text{ symbols})', note: 'Here $n = qL + r$, with $q$ complete blocks and $r$ leftover symbols.' },
   ],

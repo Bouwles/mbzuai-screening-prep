@@ -106,7 +106,7 @@ export const lesson: Lesson = {
       answer: 'Split Y (weighted Gini $\\approx 0.317$, against $0.343$ for X)',
     },
     {
-      title: 'Information gain of a split (exam level)',
+      title: 'Information gain of a split',
       problem:
         'A node has 5 "Yes" and 5 "No". A split gives a left child with 4 Yes, 0 No and a right child with 1 Yes, 5 No. Find the information gain to 3 decimal places.',
       steps: [
@@ -128,7 +128,7 @@ export const lesson: Lesson = {
     'In the k-means update, using the median or including the old centroid in the average. The new centroid is the **mean of the assigned points only**.',
   ],
   examTip:
-    'Expect one calculation per question: a distance, a vote, a centroid, a Gini value or an information gain. To save time:\n\n' +
+    'Expect one calculation per question: a distance, a vote, a centroid or a Gini value. To save time:\n\n' +
     '- **Distances:** compare squared distances; you only need square roots if the question asks for the distance itself.\n' +
     '- **Sanity-check impurities:** Gini is between 0 and 0.5 for two classes and entropy is between 0 and 1. A weighted impurity must lie between the two child values, and it must be below the parent for a useful split. Any option outside these ranges is a distractor.\n' +
     '- **Spot the trap options:** the wrong answers are usually the parent impurity, the unweighted average, the result with $\\ln$ instead of $\\log_2$, the $k = 1$ class, or the most common class overall. If your answer matches one of these, recheck the step.\n' +

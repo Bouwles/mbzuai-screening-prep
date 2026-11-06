@@ -73,7 +73,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'sets-venn-003',
     subtopic: 'sets-venn',
-    difficulty: 'foundation',
+    difficulty: 'exam',
     stem: 'The universal set is $U = \\{1, 2, 3, 4, 5, 6, 7, 8, 9, 10\\}$. Let $A = \\{2, 4, 6, 8, 10\\}$ and $B = \\{1, 2, 3, 4\\}$. What is $(A \\cup B)\'$?',
     options: ['$\\{5, 7, 9\\}$', '$\\{1, 3, 5, 6, 7, 8, 9, 10\\}$', '$\\{1, 3, 5, 7, 9\\}$', '$\\{2, 4\\}$'],
     correctIndex: 0,
@@ -259,7 +259,19 @@ export const questions: StaticQuestion[] = [
     id: 'sets-venn-010',
     subtopic: 'sets-venn',
     difficulty: 'exam',
-    stem: 'In a survey of 100 people, 45 like tea, 50 like coffee and 35 like juice. 15 like tea and coffee, 10 like tea and juice, 12 like coffee and juice, and 5 like all three. (Each "likes two drinks" count includes the people who like all three.) How many people like **none** of the three drinks?',
+    stem: 'The table gives counts for 100 people; each pair count includes those who like all three. How many people like **none** of the three drinks?',
+    table: {
+      headers: ['Likes', 'People'],
+      rows: [
+        ['Tea', 45],
+        ['Coffee', 50],
+        ['Juice', 35],
+        ['Tea and coffee', 15],
+        ['Tea and juice', 10],
+        ['Coffee and juice', 12],
+        ['All three', 5],
+      ],
+    },
     options: ['$7$', '$2$', '$98$', '$12$'],
     correctIndex: 1,
     markScheme: {
@@ -499,106 +511,29 @@ export const questions: StaticQuestion[] = [
     id: 'sets-venn-017',
     subtopic: 'sets-venn',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source: 'A = {1, 2, 3, 4}\nB = {3, 4, 5, 6}\nprint(sorted(A - B), sorted(A ^ B), len(A | B))',
-    },
-    options: ['`[1, 2] [3, 4] 6`', '`[1, 2] [1, 2, 5, 6] 6`', '`[1, 2] [1, 2, 5, 6] 8`', '`[1, 2, 5, 6] [1, 2, 5, 6] 6`'],
+    stem: 'Let $A = \\{1, 2, 3, 4\\}$ and $B = \\{3, 4, 5, 6\\}$. What is the **symmetric difference** $(A \\cup B) \\setminus (A \\cap B)$?',
+    options: ['$\\{3, 4\\}$', '$\\{1, 2, 5, 6\\}$', '$\\{1, 2, 3, 4, 5, 6\\}$', '$\\{1, 2\\}$'],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Python sets use operators for the set operations:\n\n' +
-        '| Operator | Meaning | Result here |\n' +
-        '| --- | --- | --- |\n' +
-        '| `A - B` | difference (in `A`, not in `B`) | `{1, 2}` |\n' +
-        '| `A ^ B` | symmetric difference (in exactly one) | `{1, 2, 5, 6}` |\n' +
-        '| `A \\| B` | union | `{1, 2, 3, 4, 5, 6}` |\n' +
-        '| `A & B` | intersection | `{3, 4}` |\n\n' +
-        '`sorted(...)` turns a set into a sorted list, and `len(A | B)` counts the 6 distinct elements of the union.\n\n' +
-        'Output: `[1, 2] [1, 2, 5, 6] 6`.',
+        'The **symmetric difference** is the set of elements in exactly one of the two sets.\n\n' +
+        '1. Union: $A \\cup B = \\{1, 2, 3, 4, 5, 6\\}$.\n' +
+        '2. Intersection: $A \\cap B = \\{3, 4\\}$.\n' +
+        '3. Remove the intersection from the union: $\\{1, 2, 5, 6\\}$.',
       whyWrong: [
-        'This treats `^` as intersection. In Python, intersection is `&`; `^` is the symmetric difference (elements in exactly one set).',
+        'This is $A \\cap B$, the part that has to be removed, not what is left after removing it.',
         null,
-        'This counts $4 + 4 = 8$ for the union, but a set stores each element once, so the shared elements 3 and 4 are counted only once: 6.',
-        'This treats `A - B` as the symmetric difference. `A - B` only keeps the elements of `A` that are not in `B`.',
+        'This is $A \\cup B$: it forgets to remove the elements 3 and 4 that are in both sets.',
+        'This is $A \\setminus B$ only. The elements 5 and 6 are in exactly one set too, so they also belong.',
       ],
-      keyIdea: 'Python set operators: `|` union, `&` intersection, `-` difference, `^` symmetric difference.',
-    },
-    python: { stdout: '[1, 2] [1, 2, 5, 6] 6\n' },
-  },
-
-  // ================================================================ challenge
-  {
-    id: 'sets-venn-018',
-    subtopic: 'sets-venn',
-    difficulty: 'challenge',
-    stem: 'Set $A$ has 3 more elements than set $B$. Set $A$ also has 56 more subsets than set $B$. How many elements does $A$ have?',
-    options: ['$3$', '$8$', '$6$', '$11$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Let $n(B) = b$, so $n(A) = b + 3$.\n\n' +
-        '1. Number of subsets: $A$ has $2^{b+3}$ and $B$ has $2^{b}$.\n' +
-        '2. Difference: $2^{b+3} - 2^{b} = 56$.\n' +
-        '3. Write $2^{b+3} = 2^{3} \\times 2^{b} = 8 \\times 2^{b}$, so $8 \\times 2^{b} - 2^{b} = 7 \\times 2^{b} = 56$.\n' +
-        '4. Divide by 7: $2^{b} = 8$, so $b = 3$.\n' +
-        '5. $n(A) = 3 + 3 = 6$.\n\n' +
-        'Check: $2^{6} - 2^{3} = 64 - 8 = 56$.',
-      whyWrong: [
-        'This is the number of elements of $B$ (which is 3). The question asks for the number of elements of $A$, which has 3 more.',
-        'This is the value of $2^{b}$, the number of **subsets** of $B$, not a number of elements. Solve $2^{b} = 8$ to get $b = 3$.',
-        null,
-        'This reads $2^{b} = 8$ as $b = 8$ and then adds 3. But $2^{b} = 8$ means $b = 3$ (since $2^{3} = 8$).',
-      ],
-      keyIdea: 'Write both subset counts as powers of 2 and factor: $2^{b+3} - 2^{b} = 7 \\times 2^{b}$.',
+      keyIdea: 'The symmetric difference keeps the elements that are in exactly one of the two sets.',
     },
     check: {
-      optionValues: [3, 8, 6, 11],
+      optionValues: ['3,4', '1,2,5,6', '1,2,3,4,5,6', '1,2'],
       compute: () => {
-        for (let b = 0; b <= 20; b++) if (2 ** (b + 3) - 2 ** b === 56) return b + 3;
-        return -1;
-      },
-    },
-  },
-  {
-    id: 'sets-venn-019',
-    subtopic: 'sets-venn',
-    difficulty: 'challenge',
-    stem: 'Of 60 students, 30 take Maths, 25 take Physics and 20 take Chemistry. 10 take Maths and Physics, 8 take Maths and Chemistry, and 7 take Physics and Chemistry (each of these counts includes students who take all three). 5 students take none of the three subjects. How many students take **exactly one** of the three subjects?',
-    options: ['$55$', '$25$', '$10$', '$40$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1: find the number taking all three, $x$.**\n\n' +
-        '- At least one subject: $60 - 5 = 55$.\n' +
-        '- Inclusion-exclusion: $55 = 30 + 25 + 20 - 10 - 8 - 7 + x = 50 + x$, so $x = 5$.\n\n' +
-        '**Step 2: fill the Venn diagram from the centre outwards.**\n\n' +
-        '- Maths and Physics only: $10 - 5 = 5$\n' +
-        '- Maths and Chemistry only: $8 - 5 = 3$\n' +
-        '- Physics and Chemistry only: $7 - 5 = 2$\n' +
-        '- Maths only: $30 - 5 - 3 - 5 = 17$\n' +
-        '- Physics only: $25 - 5 - 2 - 5 = 13$\n' +
-        '- Chemistry only: $20 - 3 - 2 - 5 = 10$\n\n' +
-        '**Step 3:** exactly one subject $= 17 + 13 + 10 = 40$.\n\n' +
-        'Check: $40 + (5 + 3 + 2) + 5 + 5 = 60$.',
-      whyWrong: [
-        'This is the number taking **at least one** subject ($60 - 5$). It still includes students taking two or three subjects.',
-        'This finds each "only" region by subtracting the full pair totals, e.g. $30 - 10 - 8 = 12$. That removes the 5 students taking all three twice, so they must be added back: $12 + 5 = 17$.',
-        'This is the number taking **exactly two** subjects ($5 + 3 + 2$), not exactly one.',
-        null,
-      ],
-      keyIdea: 'Find the centre first, then work outwards: pairs-only, then singles-only regions.',
-    },
-    check: {
-      optionValues: [55, 25, 10, 40],
-      compute: () => {
-        let x = -1;
-        for (let t = 0; t <= 20; t++) if (30 + 25 + 20 - 10 - 8 - 7 + t === 60 - 5) x = t;
-        const mp = 10 - x;
-        const mc = 8 - x;
-        const pc = 7 - x;
-        return 30 - mp - mc - x + (25 - mp - pc - x) + (20 - mc - pc - x);
+        const A = [1, 2, 3, 4];
+        const B = [3, 4, 5, 6];
+        return key(minus(union(A, B), inter(A, B)));
       },
     },
   },
@@ -639,7 +574,7 @@ export const questions: StaticQuestion[] = [
   {
     id: 'sets-venn-021',
     subtopic: 'sets-venn',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'How many subsets of $\\{1, 2, 3, \\dots, 10\\}$ contain **at least one** odd number?',
     options: ['$1023$', '$31$', '$32$', '$992$'],
     correctIndex: 3,
@@ -667,37 +602,84 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'sets-venn-022',
+    id: 'sets-venn-023',
     subtopic: 'sets-venn',
-    difficulty: 'challenge',
-    stem: 'A school has 100 students and every student belongs to **at least one** of three clubs $A$, $B$ and $C$. Club $A$ has 50 members, club $B$ has 40 and club $C$ has 50. Exactly 16 students belong to exactly two clubs. How many students belong to all three clubs?',
-    options: ['$12$', '$24$', '$8$', '$40$'],
+    difficulty: 'foundation',
+    stem: 'What is the **cardinality** of the set $\\{2, 4, 6, 8, 10\\}$?',
+    options: ['$5$', '$10$', '$30$', '$2$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Let $e_1$, $e_2$, $e_3$ be the numbers of students in exactly one, exactly two and all three clubs.\n\n' +
-        '1. Every student is in some club: $e_1 + e_2 + e_3 = 100$.\n' +
-        '2. Adding the club sizes counts each student once per club: $50 + 40 + 50 = 140 = e_1 + 2e_2 + 3e_3$.\n' +
-        '3. Subtract the first equation from the second: $140 - 100 = e_2 + 2e_3$, so $40 = 16 + 2e_3$.\n' +
-        '4. $2e_3 = 24$, so $e_3 = 12$.\n\n' +
-        'Check: $e_1 = 100 - 16 - 12 = 72$, and $72 + 2(16) + 3(12) = 72 + 32 + 36 = 140$.',
+        'The **cardinality** of a set, written $n(A)$ or $|A|$, is the number of elements it contains.\n\n' +
+        'This set lists the elements $2, 4, 6, 8, 10$, so its cardinality is $5$.',
       whyWrong: [
         null,
-        'This uses $40 = 16 + e_3$, as if a student in all three clubs were over-counted only once. They are counted 3 times, which is **2** extra times.',
-        'This uses $40 = 16 + 3e_3$. A student in all three clubs is counted 3 times in total, but only 2 of those counts are extra.',
-        'This is the total over-count $140 - 100$. That over-count comes from both the exactly-two students and the all-three students, so it still has to be split up.',
+        'This is the largest element. Cardinality counts the elements; it does not depend on how big they are.',
+        'This is the sum of the elements. Cardinality counts them instead of adding them.',
+        'This is the smallest element (and the gap between neighbouring elements), not the number of elements.',
       ],
-      keyIdea: 'Sum of set sizes $= e_1 + 2e_2 + 3e_3$; subtracting the total $e_1 + e_2 + e_3$ leaves the over-count $e_2 + 2e_3$.',
+      keyIdea: 'Cardinality means the number of elements in a set.',
     },
-    check: {
-      optionValues: [12, 24, 8, 40],
-      compute: () => {
-        for (let e3 = 0; e3 <= 100; e3++) {
-          const e1 = 100 - 16 - e3;
-          if (e1 >= 0 && e1 + 2 * 16 + 3 * e3 === 50 + 40 + 50) return e3;
-        }
-        return -1;
-      },
+    check: { optionValues: [5, 10, 30, 2], compute: () => new Set([2, 4, 6, 8, 10]).size },
+  },
+  {
+    id: 'sets-venn-024',
+    subtopic: 'sets-venn',
+    difficulty: 'foundation',
+    stem: 'Sets $A$ and $B$ are called **disjoint** when:',
+    options: ['$A \\cap B = \\varnothing$', '$A \\cup B = U$', '$A \\subseteq B$', '$A = B$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '**Disjoint** sets have no elements in common, so their intersection is the empty set: $A \\cap B = \\varnothing$.\n\n' +
+        'On a Venn diagram the two circles do not overlap.',
+      whyWrong: [
+        null,
+        'This says that together the sets cover the whole universal set. It says nothing about whether they overlap.',
+        'This says $A$ sits inside $B$, so (unless $A$ is empty) they do share elements.',
+        'Equal sets share every element, which is the opposite of disjoint (unless both are empty).',
+      ],
+      keyIdea: 'Disjoint means no overlap: $A \\cap B = \\varnothing$.',
+    },
+  },
+  {
+    id: 'sets-venn-025',
+    subtopic: 'sets-venn',
+    difficulty: 'foundation',
+    stem: "The complement $A'$ of a set $A$ contains the elements that are:",
+    options: ['in $U$ but not in $A$', 'in $A$ but not in $U$', 'in both $A$ and $U$', 'in neither $A$ nor $U$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **complement** $A\'$ is everything in the universal set $U$ that is not in $A$.\n\n' +
+        'On a Venn diagram it is the part of the rectangle outside the circle for $A$.',
+      whyWrong: [
+        null,
+        'Every element of $A$ is already in $U$, so this set is empty. The order is the wrong way round.',
+        'Every element of $A$ is in $U$, so this is just $A$ itself, the opposite of the complement.',
+        '$U$ contains everything being talked about, so nothing in the question lies outside it.',
+      ],
+      keyIdea: "$A'$ means in the universal set but not in $A$.",
+    },
+  },
+  {
+    id: 'sets-venn-026',
+    subtopic: 'sets-venn',
+    difficulty: 'foundation',
+    stem: 'The empty set $\\varnothing$ is a subset of:',
+    options: ['every set', 'only itself', 'no set', 'only infinite sets'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '$X \\subseteq Y$ means every element of $X$ is in $Y$. The empty set has no elements, so there is nothing that could fail this test.\n\n' +
+        'So $\\varnothing \\subseteq A$ for every set $A$.',
+      whyWrong: [
+        null,
+        'It is a subset of itself, but the same reasoning works for any other set as well.',
+        'Having no elements does not stop it being a subset: no element of it is missing from the other set.',
+        'The size of the other set makes no difference, so finite sets count too.',
+      ],
+      keyIdea: 'The empty set is a subset of every set.',
     },
   },
 ];

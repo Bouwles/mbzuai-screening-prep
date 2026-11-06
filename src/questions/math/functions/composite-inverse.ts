@@ -21,11 +21,6 @@ function solveFor(f: (x: number) => number, target: number, lo: number, hi: numb
   return (a + b) / 2;
 }
 
-/** True if g(g(t)) = t at several test points (a numerical self-inverse test). */
-function isSelfInverse(g: (x: number) => number, pts: number[]): boolean {
-  return pts.every((t) => Math.abs(g(g(t)) - t) < 1e-9);
-}
-
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------------ foundation
   {
@@ -385,42 +380,7 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-  {
-    id: 'composite-inverse-013',
-    subtopic: 'composite-inverse',
-    difficulty: 'exam',
-    stem: 'A function is **self-inverse** if $f^{-1}(x) = f(x)$ for every $x$ in its domain. Which of these functions is self-inverse?',
-    options: ['$f(x) = 5 - x$', '$f(x) = x - 5$', '$f(x) = 5x$', '$f(x) = \\frac{x}{5}$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Self-inverse means applying the function twice gets you back to the start: $f(f(x)) = x$.\n\n' +
-        '- $f(x) = 5 - x$: $f(f(x)) = 5 - (5 - x) = x$. Self-inverse.\n' +
-        '- $f(x) = x - 5$: $f(f(x)) = x - 10$. Not self-inverse.\n' +
-        '- $f(x) = 5x$: $f(f(x)) = 25x$. Not self-inverse.\n' +
-        '- $f(x) = \\frac{x}{5}$: $f(f(x)) = \\frac{x}{25}$. Not self-inverse.\n\n' +
-        'Graph check: $y = 5 - x$ has gradient $-1$ and is perpendicular to $y = x$, so it is its own reflection in $y = x$.',
-      whyWrong: [
-        null,
-        'Applying it twice gives $x - 10$, not $x$. Its inverse is $x + 5$, a different function.',
-        'Applying it twice gives $25x$. Its inverse is $\\frac{x}{5}$, a different function.',
-        'Applying it twice gives $\\frac{x}{25}$. It is the inverse of $5x$, but it is not the inverse of itself.',
-      ],
-      keyIdea: '$f$ is self-inverse exactly when $f(f(x)) = x$; its graph is symmetric in the line $y = x$.',
-    },
-    check: {
-      optionValues: ['5-x', 'x-5', '5x', 'x/5'],
-      compute: () => {
-        const cands: [string, (x: number) => number][] = [
-          ['5-x', (x) => 5 - x],
-          ['x-5', (x) => x - 5],
-          ['5x', (x) => 5 * x],
-          ['x/5', (x) => x / 5],
-        ];
-        return cands.filter(([, g]) => isSelfInverse(g, [0, 1, 2.5, 7])).map(([l]) => l).join('|');
-      },
-    },
-  },
+
   {
     id: 'composite-inverse-014',
     subtopic: 'composite-inverse',
@@ -486,7 +446,6 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ------------------------------------------------------------------ challenge
   {
     id: 'composite-inverse-016',
     subtopic: 'composite-inverse',
@@ -526,47 +485,9 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'composite-inverse-017',
-    subtopic: 'composite-inverse',
-    difficulty: 'challenge',
-    stem: 'The function $f(x) = \\frac{2x+5}{x+k}$, $x \\ne -k$, is **self-inverse**. Find the value of the constant $k$.',
-    options: ['$2$', '$-2$', 'There is no such value of $k$', '$\\frac{5}{2}$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Find $f^{-1}$ and make it match $f$.\n\n' +
-        '1. Swap: $x = \\frac{2y+5}{y+k}$.\n' +
-        '2. Multiply out: $xy + kx = 2y + 5$.\n' +
-        '3. Collect $y$: $xy - 2y = 5 - kx$, so $y(x - 2) = 5 - kx$.\n' +
-        '4. So $f^{-1}(x) = \\frac{-kx + 5}{x - 2}$.\n' +
-        '5. Compare with $f(x) = \\frac{2x + 5}{x + k}$: the denominators match when $k = -2$, and then the numerator is $2x + 5$ as well.\n\n' +
-        'So $k = -2$. Check with $f(x) = \\frac{2x+5}{x-2}$: $f(3) = 11$ and $f(11) = \\frac{27}{9} = 3$. Applying $f$ twice returns $3$.\n\n' +
-        'General rule: $\\frac{ax+b}{cx+d}$ is self-inverse when $d = -a$.',
-      whyWrong: [
-        'This comes from a sign slip, thinking the rule is $d = a$. With $k = 2$: $f(0) = \\frac{5}{2}$ but $f\\left(\\frac{5}{2}\\right) = \\frac{20}{9} \\ne 0$, so $f$ is not self-inverse.',
-        null,
-        'There is a value: $k = -2$ makes $f^{-1}(x) = \\frac{2x+5}{x-2} = f(x)$.',
-        'This sets $2k - 5 = 0$. That makes the top exactly $2$ times the bottom, so $f(x) = 2$ for every $x$: a constant function, which has no inverse at all.',
-      ],
-      keyIdea: 'Self-inverse means $f^{-1} = f$ (equivalently $f(f(x)) = x$); for $\\frac{ax+b}{cx+d}$ this happens when $d = -a$.',
-    },
-    check: {
-      optionValues: [2, -2, null, 5 / 2],
-      compute: () => {
-        const found: number[] = [];
-        for (let k = -10; k <= 10; k += 0.5) {
-          if (2 * k - 5 === 0) continue; // degenerate (constant) function
-          const f = (x: number) => (2 * x + 5) / (x + k);
-          if (isSelfInverse(f, [0.3, 1.7, 4.1, -6.9])) found.push(k);
-        }
-        return found.length === 1 ? found[0] : NaN;
-      },
-    },
-  },
-  {
     id: 'composite-inverse-018',
     subtopic: 'composite-inverse',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: 'A linear function $f(x) = ax + b$ satisfies $f^{-1}(7) = 2$ and $f^{-1}(1) = -1$. Find $f(f(1))$.',
     options: ['$13$', '$5$', '$-2$', '$25$'],
     correctIndex: 0,
@@ -631,70 +552,92 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'composite-inverse-020',
+    id: 'composite-inverse-022',
     subtopic: 'composite-inverse',
-    difficulty: 'challenge',
-    stem: 'The function $f(x) = x^2 - 4x + 7$ has domain $x \\ge 2$. Which of the following is its inverse?',
-    options: [
-      '$f^{-1}(x) = 2 - \\sqrt{x-3}$, $x \\ge 3$',
-      '$f^{-1}(x) = 2 + \\sqrt{x-3}$, $x \\ge 3$',
-      '$f^{-1}(x) = 2 + \\sqrt{x+3}$, $x \\ge -3$',
-      '$f^{-1}(x) = \\sqrt{x-3} - 2$, $x \\ge 3$',
-    ],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'A function has an inverse function only if it is:',
+    options: ['One-to-one', 'Linear', 'Defined for all real numbers', 'Always positive'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Complete the square so that $x$ appears only once, then swap $x$ and $y$. The restricted domain $x \\ge 2$ will decide the sign of the square root.\n\n' +
-        '1. Complete the square: $x^2 - 4x + 7 = (x-2)^2 - 4 + 7 = (x-2)^2 + 3$.\n' +
-        '2. So the range of $f$ (for $x \\ge 2$) is $y \\ge 3$; this will be the domain of $f^{-1}$.\n' +
-        '3. Swap: $x = (y-2)^2 + 3$, so $(y-2)^2 = x - 3$.\n' +
-        '4. Square root: $y - 2 = \\pm\\sqrt{x-3}$. The original domain was $x \\ge 2$, so the outputs of $f^{-1}$ must be at least $2$: take the $+$ sign.\n' +
-        '5. $y = 2 + \\sqrt{x-3}$.\n\n' +
-        'So $f^{-1}(x) = 2 + \\sqrt{x-3}$, $x \\ge 3$. Check: $f(5) = 25 - 20 + 7 = 12$ and $f^{-1}(12) = 2 + 3 = 5$.',
+        'An inverse must send each output back to **one** input. That is only possible if no two inputs share an output, which is what **one-to-one** means.\n\n' +
+        'For example, $x^2$ on all real numbers has no inverse, because $(-3)^2 = 3^2$. Restricted to $x \\ge 0$ it is one-to-one, and then it does.',
       whyWrong: [
-        'This takes the negative square root, which gives outputs of $2$ or less. That is the inverse of the **other** half of the parabola ($x \\le 2$), not of this $f$.',
         null,
-        'This completes the square wrongly as $(x-2)^2 - 3$: since $(x-2)^2 = x^2 - 4x + 4$, you need $+3$ to reach $+7$.',
-        'This undoes the $-2$ inside the bracket by subtracting $2$; to undo "subtract $2$" you must add $2$.',
+        'Many non-linear functions have inverses, such as $x^3$ and $e^x$.',
+        'A restricted domain is fine: $\\sqrt{x}$ has an inverse although it is defined only for $x \\ge 0$.',
+        'The sign of the outputs does not matter: $f(x) = x - 5$ takes negative values and still has an inverse.',
       ],
-      keyIdea: 'Complete the square to invert a quadratic, and use the restricted domain to choose the sign of the square root.',
-    },
-    check: {
-      // value of each option at x = 12
-      optionValues: [-1, 5, 2 + Math.sqrt(15), 1],
-      compute: () => solveFor((x) => x * x - 4 * x + 7, 12, 2, 100),
+      keyIdea: 'Only one-to-one functions have inverses: each output must come from exactly one input.',
     },
   },
   {
-    id: 'composite-inverse-021',
+    id: 'composite-inverse-023',
     subtopic: 'composite-inverse',
-    difficulty: 'challenge',
-    stem: 'Let $f(x) = \\frac{1}{1-x}$. Start with $x_0 = 2$ and apply $f$ repeatedly: $x_1 = f(x_0)$, $x_2 = f(x_1)$, and so on. What is $x_{100}$?',
-    options: ['$\\frac{1}{2}$', '$2$', '$1$', '$-1$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'The notation $(f \\circ g)(x)$ means:',
+    options: ['$f(g(x))$', '$g(f(x))$', '$f(x) \\times g(x)$', '$f(x) + g(x)$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Work out the first few values:\n\n' +
-        '1. $x_1 = f(2) = \\frac{1}{1-2} = -1$\n' +
-        '2. $x_2 = f(-1) = \\frac{1}{1-(-1)} = \\frac{1}{2}$\n' +
-        '3. $x_3 = f\\left(\\frac{1}{2}\\right) = \\frac{1}{1 - \\frac{1}{2}} = 2$\n\n' +
-        'We are back at $2$, so the values repeat in a cycle of length $3$: $2, -1, \\frac{1}{2}, 2, -1, \\frac{1}{2}, \\dots$ (in fact $f(f(f(x))) = x$).\n\n' +
-        'So $x_n$ depends only on the remainder when $n$ is divided by $3$. $100 = 3 \\times 33 + 1$, remainder $1$, so $x_{100} = x_1 = -1$.',
+        'The symbol $\\circ$ means **composition**: one function is applied to the output of the other.\n\n' +
+        'Read from the inside out. In $(f \\circ g)(x) = f(g(x))$, the function $g$ acts first, because it is written next to $x$, and then $f$ acts on the result.',
       whyWrong: [
-        'This is $x_2$ (or $x_{101}$): an off-by-one slip when matching the remainder to the cycle. Remainder $1$ matches $x_1 = -1$.',
-        'This assumes $x_{100}$ is back at the start, but the cycle returns to $2$ only at multiples of $3$ ($x_{99} = 2$), and $100$ is not a multiple of $3$.',
-        'This treats applying $f$ one hundred times as raising $f(2)$ to the power $100$: $(-1)^{100} = 1$. Repeated composition is not a power of the output.',
         null,
+        'This is $(g \\circ f)(x)$, the reverse order. In $f \\circ g$, the function next to $x$, which is $g$, acts first.',
+        'This multiplies the two outputs. Composition feeds one output into the other function.',
+        'This adds the two outputs. Composition feeds one output into the other function.',
       ],
-      keyIdea: 'When repeated composition cycles back to the start, use the remainder of the step count to find any later value.',
-    },
-    check: {
-      optionValues: [1 / 2, 2, 1, -1],
-      compute: () => {
-        let x = new Frac(2);
-        for (let i = 0; i < 100; i++) x = new Frac(1).div(new Frac(1).sub(x));
-        return x.value();
-      },
+      keyIdea: '$(f \\circ g)(x) = f(g(x))$: apply $g$ first, then $f$.',
     },
   },
-];
+  {
+    id: 'composite-inverse-024',
+    subtopic: 'composite-inverse',
+    difficulty: 'foundation',
+    stem: 'The domain of $f^{-1}$ is the same as which set?',
+    options: ['The range of $f$', 'The domain of $f$', 'All real numbers', 'The set of $x$ with $f(x) = 0$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The inverse swaps inputs and outputs: if $f(a) = b$ then $f^{-1}(b) = a$.\n\n' +
+        'So the inputs of $f^{-1}$ are exactly the outputs of $f$. The domain of $f^{-1}$ is the **range** of $f$, and the range of $f^{-1}$ is the domain of $f$.',
+      whyWrong: [
+        null,
+        'This is the range of $f^{-1}$, not its domain. The inverse swaps the two sets.',
+        'This is only true when $f$ can output every real number. For $f(x) = e^x$, the inverse $\\ln x$ accepts only $x > 0$.',
+        'These are the zeros of $f$, which are just points in the domain of $f$. They have nothing to do with the inputs of $f^{-1}$.',
+      ],
+      keyIdea: 'Inverses swap inputs and outputs: domain of $f^{-1}$ = range of $f$.',
+    },
+  },
+  {
+    id: 'composite-inverse-025',
+    subtopic: 'composite-inverse',
+    difficulty: 'exam',
+    stem: 'Let $f(x) = 2x + 1$ and $g(x) = x + 3$. For the composition $g \\circ f$, find $(g \\circ f)^{-1}(10)$.',
+    options: ['$3$', '$\\frac{3}{2}$', '$24$', '$\\frac{1}{24}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **composition** $g \\circ f$ means "apply $f$ first, then $g$".\n\n' +
+        '1. $(g \\circ f)(x) = g(2x + 1) = 2x + 1 + 3 = 2x + 4$.\n' +
+        '2. To find the inverse at $10$, solve $2x + 4 = 10$.\n' +
+        '3. $2x = 6$, so $x = 3$.\n\n' +
+        'Check: $f(3) = 7$ and $g(7) = 10$.',
+      whyWrong: [
+        null,
+        'This composes in the wrong order: $f(g(x)) = 2x + 7$, and $2x + 7 = 10$ gives $\\frac{3}{2}$. In $g \\circ f$, the function $f$ acts first.',
+        'This evaluates $g \\circ f$ at $10$: $2(10) + 4 = 24$. The inverse at $10$ asks which input gives the output $10$.',
+        'This treats $-1$ as a power and takes $\\frac{1}{24}$. The notation means the inverse function, not a reciprocal.',
+      ],
+      keyIdea: 'To find $h^{-1}(k)$, solve $h(x) = k$; for a composite, build $h$ in the right order first.',
+    },
+    check: {
+      optionValues: [3, 3 / 2, 24, 1 / 24],
+      compute: () => {
+        const h = (x: number) => 2 * x + 1 + 3;
+        return (10 - h(0)) / (h(1) - h(0));
+      },
+    },
+  },];

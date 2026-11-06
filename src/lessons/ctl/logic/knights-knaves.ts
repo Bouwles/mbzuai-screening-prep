@@ -29,10 +29,6 @@ export const lesson: Lesson = {
       cue: "**Exactly one statement is true (or false)**: who did it?",
       method: "Try each suspect as the culprit and count the true statements. Shortcuts: two identical claims stand or fall together, and \"X is lying\" means exactly one of those two statements is false.",
     },
-    {
-      cue: "A **one-question** riddle with two guards and two doors",
-      method: "Ask about what the other guard would say, so exactly one lie always happens along the chain; then do the opposite of the reply.",
-    },
   ],
   know:
     '### The set-up\n\n' +
@@ -66,9 +62,7 @@ export const lesson: Lesson = {
     'Method: **try each suspect as the culprit**, mark every statement true or false, and count. Keep the suspect that gives the right count.\n\n' +
     'Two shortcuts:\n\n' +
     '- If A says "B is lying" (or A and B say opposite things), exactly **one** of them is true.\n' +
-    '- If two people say the **same** thing, they are both true or both false.\n\n' +
-    '### Lists of statements about themselves\n\n' +
-    'A list like "1. At least one of these is false. 2. At least two are false..." is solved by letting $f$ be the number of false statements, working out which statements that makes true, and requiring the count to agree. The same works for a row of islanders who each claim a number of knaves.',
+    '- If two people say the **same** thing, they are both true or both false.',
   formulas: [
     { label: 'Knight rule', tex: '\\text{speaker is a knight} \\iff \\text{statement is true}', note: 'Equivalently: a knave\'s statement is always false.' },
     { label: 'Number of cases', tex: '2^{n} \\text{ cases for } n \\text{ people}', note: 'Small enough to check every case in a table: 4 for two people, 8 for three.' },
@@ -105,25 +99,14 @@ export const lesson: Lesson = {
     },
     {
       title: 'Exactly one statement is true',
-      problem: 'Exactly one of four friends ate the cake. Rana: "Sami ate it." Sami: "Tala ate it." Tala: "Sami is lying." Umar: "I didn\'t eat it." Exactly **one** statement is true. Who ate the cake?',
+      problem: 'One of Rana, Sami and Tala ate the cake. Rana: "Tala ate it." Sami: "Tala ate it." Tala: "Sami ate it." Exactly **one** statement is true. Who ate the cake?',
       steps: [
-        'Tala says Sami is lying, so exactly one of Sami and Tala is telling the truth.',
-        'Only one statement in total is true, so that true statement is Sami\'s or Tala\'s. Rana and Umar must both be **false**.',
-        'Umar\'s "I didn\'t eat it" is false, so **Umar** ate the cake.',
-        'Check: Rana ("Sami") false, Sami ("Tala") false, Tala ("Sami is lying") true, Umar false. Exactly one true statement.',
+        'Rana and Sami make the same claim, so they are both true or both false.',
+        'Only one statement in total is true, so they cannot both be true. Both are **false**.',
+        'That leaves Tala\'s statement as the true one: **Sami** ate the cake.',
+        'Check: Rana false, Sami false, Tala true. Exactly one true statement.',
       ],
-      answer: 'Umar ate the cake.',
-    },
-    {
-      title: 'A self-referential list',
-      problem: 'Three statements: (1) "Exactly one of these statements is false." (2) "Exactly two of these statements are false." (3) "All three of these statements are false." Which statements are true?',
-      steps: [
-        'The statements claim different numbers, so at most one of them is true.',
-        'If none were true, all three would be false, which would make statement 3 true. Contradiction.',
-        'So exactly one is true and the other two are false: exactly two are false.',
-        'That is what statement 2 says, so statement 2 is the true one; statements 1 and 3 are false.',
-      ],
-      answer: 'Only statement 2 is true.',
+      answer: 'Sami ate the cake.',
     },
   ],
   traps: [

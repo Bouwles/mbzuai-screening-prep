@@ -33,7 +33,7 @@ function knnVote(rng: Rng) {
   const [X, Y, Z] = rng.shuffle(rng.pick(CLASS_SETS));
   for (;;) {
     const q: Pt = [rng.int(2, 7), rng.int(2, 7)];
-    const n = rng.int(6, 7);
+    const n = 6;
     const pts: Pt[] = [];
     let guard = 0;
     while (pts.length < n && guard++ < 200) {
@@ -47,10 +47,7 @@ function knnVote(rng: Rng) {
     // strict gaps among the four nearest, so "the 3 nearest" is unambiguous
     if (!(order[0].d2 < order[1].d2 && order[1].d2 < order[2].d2 && order[2].d2 < order[3].d2)) continue;
     // the overall-majority trap needs the far points to be clearly further away
-    const labelsByRank: string[] = [Y, X, X];
-    const extraPos = n === 7 ? rng.int(3, 6) : -1;
-    const extraLabel = rng.pick([Y, Z]);
-    for (let r = 3; r < n; r++) labelsByRank.push(r === extraPos ? extraLabel : Z);
+    const labelsByRank: string[] = [Y, X, X, Z, Z, Z];
     // build the table in random order
     const ranked = order.map((o, r) => ({ ...o, label: labelsByRank[r] }));
     const tableOrder = rng.shuffle(ranked);
@@ -131,7 +128,7 @@ function kmeansUpdate(rng: Rng) {
       [rng.int(1, 4), rng.int(1, 4)],
       [rng.int(5, 9), rng.int(5, 9)],
     ];
-    const n = rng.int(5, 7);
+    const n = rng.int(4, 5);
     const pts: Pt[] = [];
     let guard = 0;
     while (pts.length < n && guard++ < 200) {
@@ -232,181 +229,6 @@ function kmeansUpdate(rng: Rng) {
   }
 }
 
-// ---------------------------------------------------------------- split impurity (Gini or entropy)
-const SPLIT_CTX: { yes: string; no: string; intro: string }[] = [
-  { yes: 'Yes', no: 'No', intro: 'A decision-tree node holds training examples labelled "Yes" or "No".' },
-  { yes: 'Spam', no: 'Not spam', intro: 'A decision tree for a spam filter has a node holding emails labelled "Spam" or "Not spam".' },
-  { yes: 'Pass', no: 'Fail', intro: 'A decision tree that predicts exam results has a node holding students labelled "Pass" or "Fail".' },
-  { yes: 'Buy', no: 'No buy', intro: 'A decision tree for an online shop has a node holding customers labelled "Buy" or "No buy".' },
-];
-
-const giniF = (y: number, n: number): Frac => {
-  const t = y + n;
-  return new Frac(1).sub(new Frac(y * y + n * n, t * t));
-};
-const H = (counts: number[], log: (x: number) => number = Math.log2): number => {
-  const t = counts.reduce((a, b) => a + b, 0);
-  return -counts.reduce((acc, c) => (c === 0 ? acc : acc + (c / t) * log(c / t)), 0);
-};
-/** " = 0.375" when the fraction is an exact short decimal, " \approx 0.4688" otherwise, "" for integers. */
-const decTex = (f: Frac): string => {
-  if (f.isInt()) return '';
-  const s = num(f.value(), 4);
-  return Math.abs(Number(s) - f.value()) < 1e-12 ? ` = ${s}` : ` \\approx ${s}`;
-};
-const r3 = (x: number) => (Math.round(x * 1000 + 1e-9) / 1000).toFixed(3);
-const nearBoundary = (x: number) => Math.abs(((x * 1000) % 1) - 0.5) < 0.02;
-/** Options must be clearly different: at least 0.02 apart once rounded to 3 d.p. */
-const MIN_GAP = 0.02;
-const tooClose = (v: number, others: number[]) => others.some((o) => Math.abs(Number(r3(v)) - Number(r3(o))) < MIN_GAP);
-
-function giniWorking(label: string, y: number, n: number, ctx: { yes: string; no: string }): string {
-  const t = y + n;
-  const G = giniF(y, n);
-  if (y === 0 || n === 0) return `- ${label} (${y} ${ctx.yes}, ${n} ${ctx.no}) is pure, so $G_{${label[0]}} = 0$.`;
-  const py = new Frac(y, t);
-  const pn = new Frac(n, t);
-  return (
-    `- ${label} (${y} ${ctx.yes}, ${n} ${ctx.no}): ` +
-    m(`G_{${label[0]}} = 1 - \\left(${py.tex()}\\right)^2 - \\left(${pn.tex()}\\right)^2 = ${G.tex()}${decTex(G)}`)
-  );
-}
-
-function entropyWorking(label: string, sub: string, y: number, n: number, ctx: { yes: string; no: string }): string {
-  const t = y + n;
-  const h = H([y, n]);
-  if (y === 0 || n === 0) return `- ${label} (${y} ${ctx.yes}, ${n} ${ctx.no}) is pure, so $H_{${sub}} = 0$ (we take $0 \\log_2 0 = 0$).`;
-  const py = new Frac(y, t).tex();
-  const pn = new Frac(n, t).tex();
-  return (
-    `- ${label} (${y} ${ctx.yes}, ${n} ${ctx.no}): ` +
-    m(`H_{${sub}} = -${py}\\log_2 ${py} - ${pn}\\log_2 ${pn} ${y === n ? '=' : '\\approx'} ${num(h, 4)}`)
-  );
-}
-
-function splitImpurity(rng: Rng) {
-  const ctx = rng.pick(SPLIT_CTX);
-  const mode = rng.pick(['gini', 'entropy'] as const);
-  for (;;) {
-    const a = rng.int(0, 6);
-    const b = rng.int(0, 6);
-    const c = rng.int(0, 6);
-    const d = rng.int(0, 6);
-    const nL = a + b;
-    const nR = c + d;
-    if (nL < 2 || nR < 2) continue;
-    const N = nL + nR;
-    const Y = a + c;
-    const No = b + d;
-    if (Y === 0 || No === 0) continue;
-    // child proportions must differ (otherwise the split does nothing)
-    if (a * nR === c * nL) continue;
-    const table = {
-      headers: ['Child node', ctx.yes, ctx.no, 'Total'],
-      rows: [
-        ['Left', a, b, nL],
-        ['Right', c, d, nR],
-      ] as (string | number)[][],
-    };
-    const wL = new Frac(nL, N);
-    const wR = new Frac(nR, N);
-
-    if (mode === 'gini') {
-      const GL = giniF(a, b);
-      const GR = giniF(c, d);
-      const GP = giniF(Y, No);
-      const W = wL.mul(GL).add(wR.mul(GR));
-      if (nearBoundary(W.value())) continue;
-      // the split must do something useful, otherwise answer, parent Gini and averages bunch together
-      if (GP.sub(W).value() < 0.03) continue;
-      const ans = r3(W.value());
-      const pool: { v: number; why: string }[] = [
-        { v: GL.add(GR).div(2).value(), why: `This is the plain average of the two child Ginis, ${m(`\\frac{${[GL.value(), GR.value()].sort((x, y) => x - y).map((v) => num(v, 4)).join(' + ')}}{2}`)}. Each child must be weighted by its size (${nL} and ${nR} out of ${N}).` },
-        { v: GP.value(), why: `This is the Gini impurity of the **parent** node (${Y} ${ctx.yes}, ${No} ${ctx.no}) before the split.` },
-        { v: GP.sub(W).value(), why: 'This is the Gini **gain** (parent Gini minus the weighted Gini). The question asks for the weighted Gini of the split itself.' },
-        { v: new Frac(1).sub(W).value(), why: 'This is the weighted sum of the squared proportions: the "1 minus" in $G = 1 - \\sum p_i^2$ was forgotten for each child.' },
-        { v: GL.add(GR).value(), why: 'This adds the two child Ginis without any weights.' },
-      ];
-      const chosen: { v: number; why: string }[] = [];
-      for (const p of pool) {
-        if (chosen.length === 3) break;
-        if (nearBoundary(p.v)) continue;
-        if (tooClose(p.v, [W.value(), ...chosen.map((o) => o.v)])) continue;
-        chosen.push(p);
-      }
-      if (chosen.length < 3) continue;
-      const answer = m(ans);
-      return {
-        stem: `${ctx.intro} It contains ${Y} "${ctx.yes}" and ${No} "${ctx.no}" examples. A split sends them into two child nodes as shown in the table. What is the **weighted Gini impurity** of the split, to 3 decimal places?`,
-        table,
-        answer,
-        answerValue: Number(ans),
-        distractors: chosen.map((p) => ({ text: m(r3(p.v)), value: Number(r3(p.v)), why: p.why })),
-        solution:
-          '**Step 1: Gini of each child**, $G = 1 - \\sum p_i^2$.\n\n' +
-          giniWorking('Left', a, b, ctx) +
-          '\n' +
-          giniWorking('Right', c, d, ctx) +
-          '\n\n' +
-          `**Step 2: weight each child by its share of the ${N} examples.**\n\n` +
-          `$$G_{\\text{split}} = ${wL.tex()} \\times ${GL.tex()} + ${wR.tex()} \\times ${GR.tex()} = ${W.tex()}${decTex(W)}$$\n\n` +
-          `Answer: ${answer}`,
-        keyIdea: 'The impurity of a split is the size-weighted average of the child impurities: lower is better.',
-      };
-    }
-
-    // entropy / information gain
-    const HL = H([a, b]);
-    const HR = H([c, d]);
-    const HP = H([Y, No]);
-    const Wt = (nL / N) * HL + (nR / N) * HR;
-    const IG = HP - Wt;
-    if (IG < 0.08 || nearBoundary(IG)) continue;
-    const ans = r3(IG);
-    const ln = Math.log;
-    const IGln = H([Y, No], ln) - (nL / N) * H([a, b], ln) - (nR / N) * H([c, d], ln);
-    const GG = giniF(Y, No).sub(wL.mul(giniF(a, b)).add(wR.mul(giniF(c, d)))).value();
-    const pool: { v: number; why: string }[] = [
-      { v: Wt, why: `This is the weighted child entropy, about ${num(Wt, 3)}. It still has to be subtracted from the parent entropy (about ${num(HP, 3)}).` },
-      { v: HP - (HL + HR) / 2, why: `This averages the child entropies **without weights**. The children hold ${nL} and ${nR} of the ${N} examples, so they must be weighted ${m(wL.tex())} and ${m(wR.tex())}.` },
-      { v: IGln, why: 'This uses the natural log $\\ln$ instead of $\\log_2$. Entropy in bits needs base 2 (on a calculator, $\\log_2 x = \\frac{\\ln x}{\\ln 2}$).' },
-      { v: HP, why: 'This is just the parent entropy; the entropy left after the split was never subtracted.' },
-      { v: GG, why: 'This is the **Gini** gain (using $1 - \\sum p_i^2$), not the information gain based on entropy.' },
-    ];
-    const chosen: { v: number; why: string }[] = [];
-    for (const p of pool) {
-      if (chosen.length === 3) break;
-      if (p.v < 0 || nearBoundary(p.v)) continue;
-      if (tooClose(p.v, [IG, ...chosen.map((o) => o.v)])) continue;
-      chosen.push(p);
-    }
-    if (chosen.length < 3) continue;
-    const answer = m(ans);
-    return {
-      stem: `${ctx.intro} It contains ${Y} "${ctx.yes}" and ${No} "${ctx.no}" examples. A split sends them into two child nodes as shown in the table. What is the **information gain** of the split, using entropy with $\\log_2$, to 3 decimal places?`,
-      table,
-      answer,
-      answerValue: Number(ans),
-      distractors: chosen.map((p) => ({ text: m(r3(p.v)), value: Number(r3(p.v)), why: p.why })),
-      solution:
-        'Information gain = parent entropy minus the weighted average of the child entropies, with $H = -\\sum p_i \\log_2 p_i$.\n\n' +
-        entropyWorking('Parent', '\\text{parent}', Y, No, ctx) +
-        '\n' +
-        entropyWorking('Left', 'L', a, b, ctx) +
-        '\n' +
-        entropyWorking('Right', 'R', c, d, ctx) +
-        '\n\n' +
-        `Weighted child entropy: ${m(`${wL.tex()} \\times ${num(HL, 4)} + ${wR.tex()} \\times ${num(HR, 4)} \\approx ${num(Wt, 4)}`)}.\n\n` +
-        (Wt === 0
-          ? `Both children are pure, so nothing is subtracted and the information gain equals the parent entropy, ${m(`\\approx ${num(IG, 4)}`)}`
-          : `Information gain: ${m(`${num(HP, 4)} - ${num(Wt, 4)} \\approx ${num(IG, 4)}`)} (using unrounded values)`) +
-        `, which is ${answer} to 3 decimal places.\n\n` +
-        `Answer: ${answer}`,
-      keyIdea: 'Information gain = H(parent) minus the size-weighted average of H(children); the best split has the largest gain.',
-    };
-  }
-}
-
 export const generators: Generator[] = [
   {
     id: 'gen-classic-algorithms-knn-vote',
@@ -421,12 +243,5 @@ export const generators: Generator[] = [
     difficulty: 'exam',
     title: 'One k-means iteration: where does the centroid move?',
     generate: kmeansUpdate,
-  },
-  {
-    id: 'gen-classic-algorithms-split-impurity',
-    subtopic: 'classic-algorithms',
-    difficulty: 'challenge',
-    title: 'Weighted Gini or information gain of a decision-tree split',
-    generate: splitImpurity,
   },
 ];

@@ -94,7 +94,7 @@ export const questions: StaticQuestion[] = [
     id: 'counting-002',
     subtopic: 'counting',
     difficulty: 'foundation',
-    stem: 'A restaurant menu has 4 starters, 5 main courses and 3 desserts. A set meal is **one** starter, **one** main course and **one** dessert. How many different set meals are possible?',
+    stem: 'A set meal is **one** starter, **one** main course and **one** dessert, from a menu of 4 starters, 5 main courses and 3 desserts. How many different set meals are possible?',
     options: ['$12$', '$60$', '$220$', '$1320$'],
     correctIndex: 1,
     markScheme: {
@@ -125,7 +125,7 @@ export const questions: StaticQuestion[] = [
     id: 'counting-003',
     subtopic: 'counting',
     difficulty: 'foundation',
-    stem: 'Ten runners take part in a race. In how many different ways can the gold, silver and bronze medals be awarded? (There are no ties, and a runner can win at most one medal.)',
+    stem: 'In how many ways can gold, silver and bronze medals be awarded to 3 of 10 runners, with no ties?',
     options: ['$120$', '$1000$', '$30$', '$720$'],
     correctIndex: 3,
     markScheme: {
@@ -159,7 +159,7 @@ export const questions: StaticQuestion[] = [
     id: 'counting-004',
     subtopic: 'counting',
     difficulty: 'foundation',
-    stem: 'Maya has 9 different books and wants to take 4 of them on holiday. The order of the books does not matter. In how many ways can she choose the 4 books?',
+    stem: 'In how many ways can 4 books be chosen from 9 different books, if the order does not matter?',
     options: ['$126$', '$3024$', '$36$', '$24$'],
     correctIndex: 0,
     markScheme: {
@@ -384,7 +384,7 @@ export const questions: StaticQuestion[] = [
     id: 'counting-012',
     subtopic: 'counting',
     difficulty: 'exam',
-    stem: 'A login code is made of **2 letters** (A to Z, 26 choices each) followed by **3 digits** (0 to 9). Letters and digits **may be repeated**. How many different codes are possible?',
+    stem: 'A login code is **2 letters** (A to Z) followed by **3 digits** (0 to 9), and characters **may be repeated**. How many different codes are possible?',
     options: ['$468\\,000$', '$82$', '$676\\,000$', '$60\\,466\\,176$'],
     correctIndex: 2,
     markScheme: {
@@ -411,47 +411,31 @@ export const questions: StaticQuestion[] = [
     id: 'counting-013',
     subtopic: 'counting',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source: 'count = 0\nfor i in range(8):\n    for j in range(i + 1, 8):\n        count += 1\nprint(count)',
-    },
-    options: ['`56`', '`64`', '`36`', '`28`'],
+    stem: 'How many pairs of integers $(i, j)$ satisfy $1 \\le i < j \\le 8$?',
+    options: ['$56$', '$64$', '$36$', '$28$'],
     correctIndex: 3,
     markScheme: {
       solution:
-        'The outer loop runs $i = 0, 1, \\dots, 7$. For each $i$, the inner loop runs $j = i + 1, \\dots, 7$, so it counts each **pair** $i < j$ exactly once.\n\n' +
-        '| `i` | values of `j` | inner loop runs |\n' +
-        '|---|---|---|\n' +
-        '| 0 | 1 to 7 | 7 |\n' +
-        '| 1 | 2 to 7 | 6 |\n' +
-        '| 2 | 3 to 7 | 5 |\n' +
-        '| 3 | 4 to 7 | 4 |\n' +
-        '| 4 | 5 to 7 | 3 |\n' +
-        '| 5 | 6 to 7 | 2 |\n' +
-        '| 6 | 7 | 1 |\n' +
-        '| 7 | none | 0 |\n\n' +
-        'Adding the last column (the final row adds nothing): `count` $= 7 + 6 + 5 + 4 + 3 + 2 + 1 = 28$.\n\n' +
-        'This is exactly the number of ways to choose 2 items from 8: $\\binom{8}{2} = \\frac{8 \\times 7}{2} = 28$. The code prints `28`.',
+        'Each valid pair comes from choosing 2 different numbers from $\\{1, 2, \\dots, 8\\}$: the smaller is $i$ and the larger is $j$, so the order is already fixed.\n\n' +
+        '$$\\binom{8}{2} = \\frac{8 \\times 7}{2} = 28$$\n\n' +
+        'Check by counting for each $i$: $i = 1$ allows 7 values of $j$, $i = 2$ allows 6, and so on down to $i = 7$, which allows 1. The total is $7 + 6 + 5 + 4 + 3 + 2 + 1 = 28$.',
       whyWrong: [
-        'This is $8 \\times 7 = 56$, the number of **ordered** pairs with $i \\ne j$. The inner loop only uses $j > i$, so each pair is counted once, not twice.',
-        'This is $8 \\times 8 = 64$, as if the inner loop ran over all 8 values every time. It starts at `i + 1`, so it gets shorter each time.',
-        'This is $8 + 7 + \\dots + 1 = 36$, as if the inner loop were `range(i, 8)`, which would also count $j = i$. Because it starts at `i + 1`, the pairs with $j = i$ are skipped.',
+        'This is $8 \\times 7 = 56$, the number of **ordered** pairs with $i \\ne j$. Requiring $i < j$ keeps only one order of each pair, so you must halve it.',
+        'This is $8 \\times 8 = 64$, all pairs with no condition at all.',
+        'This is $8 + 7 + \\dots + 1 = 36$, which also counts the pairs with $i = j$. The condition $i < j$ is strict.',
         null,
       ],
-      keyIdea: 'A double loop over $j > i$ visits every unordered pair once, so it runs $\\binom{n}{2}$ times.',
+      keyIdea: 'Pairs with $i < j$ are unordered selections, so count them with $\\binom{n}{2}$.',
     },
     check: {
       optionValues: [56, 64, 36, 28],
       compute: () => {
         let count = 0;
-        for (let i = 0; i < 8; i++) for (let j = i + 1; j < 8; j++) count++;
+        for (let i = 1; i <= 8; i++) for (let j = i + 1; j <= 8; j++) count++;
         return count;
       },
     },
-    python: { stdout: '28\n' },
   },
-  // ------------------------------------------------------------------ challenge
   {
     id: 'counting-014',
     subtopic: 'counting',
@@ -478,132 +462,6 @@ export const questions: StaticQuestion[] = [
       optionValues: [112, 74, 84, 10],
       // people 0-4 are men, 5-8 are women
       compute: () => countSubsets(9, 3, (s) => s.some((p) => p >= 5)),
-    },
-  },
-  {
-    id: 'counting-015',
-    subtopic: 'counting',
-    difficulty: 'challenge',
-    stem: 'The word **STATISTICS** has 10 letters. How many different arrangements of all its letters **begin and end with S**?',
-    options: ['$50\\,400$', '$6720$', '$3360$', '$20\\,160$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Count the letters in STATISTICS: S $\\times 3$, T $\\times 3$, I $\\times 2$, A $\\times 1$, C $\\times 1$ (total $10$).\n\n' +
-        '1. Put an S in the first place and an S in the last place. Because the S\'s are identical, there is only **one** way to do this.\n' +
-        '2. The 8 letters left for the middle are: S $\\times 1$, T $\\times 3$, I $\\times 2$, A $\\times 1$, C $\\times 1$.\n' +
-        '3. Arrange these 8 letters, dividing for the repeats:\n\n' +
-        '$$\\frac{8!}{3!\\,2!} = \\frac{40320}{6 \\times 2} = \\frac{40320}{12} = 3360$$',
-      whyWrong: [
-        'This is $\\frac{10!}{3!\\,3!\\,2!} = 50\\,400$, every arrangement of STATISTICS. It ignores the condition about the first and last letters.',
-        'This is $\\frac{8!}{3!} = 6720$: it divides for the three T\'s but forgets the two I\'s, which are also repeated.',
-        null,
-        'This is $3360 \\times 3 \\times 2 = 20\\,160$, which multiplies by the number of ways to choose "which S" goes first and last. The S\'s are identical, so there is only one way to place them.',
-      ],
-      keyIdea: 'Place the restricted letters first, then arrange what is left, dividing by $k!$ for each letter still repeated $k$ times.',
-    },
-    check: {
-      optionValues: [50400, 6720, 3360, 20160],
-      compute: () => countWordArrangements('STATISTICS', (s) => s[0] === 'S' && s[s.length - 1] === 'S'),
-    },
-  },
-  {
-    id: 'counting-016',
-    subtopic: 'counting',
-    difficulty: 'challenge',
-    stem: 'Four boys and three girls line up in a random order. What is the probability that the **three girls are all next to each other**?',
-    options: ['$\\frac{1}{42}$', '$\\frac{6}{7}$', '$\\frac{1}{35}$', '$\\frac{1}{7}$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Treat the 7 people as different people, so every one of the $7! = 5040$ orders is equally likely.\n\n' +
-        '1. Favourable orders: glue the 3 girls into one block. That leaves $5$ things to arrange (the block and 4 boys): $5! = 120$ ways.\n' +
-        '2. Inside the block the girls can be in $3! = 6$ orders. Favourable total: $120 \\times 6 = 720$.\n' +
-        '3. Probability: $\\frac{720}{5040} = \\frac{1}{7}$.\n\n' +
-        'Check another way: the girls\' 3 positions are equally likely to be any of the $\\binom{7}{3} = 35$ sets of positions, and $5$ of those sets are three places in a row (starting at place 1, 2, 3, 4 or 5). So $P = \\frac{5}{35} = \\frac{1}{7}$.',
-      whyWrong: [
-        'This is $\\frac{5!}{7!} = \\frac{120}{5040}$: it glues the girls together but forgets that the girls can be arranged in $3! = 6$ ways inside the block.',
-        'This is $1 - \\frac{1}{7}$, the probability that the girls are **not** all together.',
-        'This is $\\frac{1}{35}$, which counts only one set of positions for the girls. A block of 3 can start in 5 different places, giving $\\frac{5}{35}$.',
-        null,
-      ],
-      keyIdea: 'Probability from counting: (favourable arrangements) divided by (all arrangements), using the "glue" method for the favourable ones.',
-    },
-    check: {
-      optionValues: [1 / 42, 6 / 7, 1 / 35, 1 / 7],
-      // people 4, 5, 6 are the girls
-      compute: () => {
-        const orders = allOrders(7);
-        const fav = orders.filter((o) => {
-          const pos = [4, 5, 6].map((g) => o.indexOf(g));
-          return Math.max(...pos) - Math.min(...pos) === 2;
-        }).length;
-        return new Frac(fav, orders.length).value();
-      },
-    },
-  },
-  {
-    id: 'counting-017',
-    subtopic: 'counting',
-    difficulty: 'challenge',
-    stem: 'From 8 volunteers, a group is formed with a **chair**, a **secretary** and **2 ordinary members** (the two ordinary members have no separate roles). No person can hold two positions. How many different groups are possible?',
-    options: ['$840$', '$1680$', '$70$', '$1568$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Fill the named roles first (order matters), then choose the ordinary members (order does not matter).\n\n' +
-        '1. Chair: $8$ choices.\n' +
-        '2. Secretary: $7$ choices left.\n' +
-        '3. Two ordinary members from the $6$ people left, order irrelevant: $\\binom{6}{2} = \\frac{6 \\times 5}{2} = 15$.\n\n' +
-        'Total: $8 \\times 7 \\times 15 = 56 \\times 15 = 840$.\n\n' +
-        'Check: choose the 4 people, $\\binom{8}{4} = 70$, then pick the chair ($4$ ways) and the secretary ($3$ ways) from them: $70 \\times 4 \\times 3 = 840$.',
-      whyWrong: [
-        null,
-        'This is ${}^{8}P_{4} = 8 \\times 7 \\times 6 \\times 5 = 1680$, which treats the two ordinary members as if they had different roles. Swapping them gives the same group, so this counts every group twice.',
-        'This is $\\binom{8}{4} = 70$, which only chooses the 4 people and ignores who is chair and who is secretary.',
-        'This is $8 \\times 7 \\times \\binom{8}{2} = 56 \\times 28 = 1568$, which picks the ordinary members from all 8 people, so the chair or secretary could be chosen again.',
-      ],
-      keyIdea: 'Mix the tools: use ordered choices for distinct roles and $\\binom{n}{r}$ for members whose order does not matter.',
-    },
-    check: {
-      optionValues: [840, 1680, 70, 1568],
-      compute: () => {
-        let c = 0;
-        for (let ch = 0; ch < 8; ch++)
-          for (let se = 0; se < 8; se++) {
-            if (se === ch) continue;
-            for (let a = 0; a < 8; a++)
-              for (let b = a + 1; b < 8; b++) if (![ch, se].includes(a) && ![ch, se].includes(b)) c++;
-          }
-        return c;
-      },
-    },
-  },
-  {
-    id: 'counting-018',
-    subtopic: 'counting',
-    difficulty: 'challenge',
-    stem: 'Eight people are to be split into **two groups of 4** for a discussion. The two groups are not named or numbered in any way. In how many ways can the split be made?',
-    options: ['$70$', '$35$', '$1680$', '$140$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Start by choosing 4 people for "the first group": $\\binom{8}{4} = \\frac{8 \\times 7 \\times 6 \\times 5}{4 \\times 3 \\times 2 \\times 1} = 70$. The other 4 automatically form the second group.\n\n' +
-        'But the groups have no names. Choosing {A, B, C, D} (leaving {E, F, G, H}) gives exactly the same split as choosing {E, F, G, H} (leaving {A, B, C, D}). So every split has been counted **twice**.\n\n' +
-        'Number of splits: $\\frac{70}{2} = 35$.\n\n' +
-        'Quick check: just choose the 3 people who join person A in A\'s group: $\\binom{7}{3} = 35$.',
-      whyWrong: [
-        'This is $\\binom{8}{4} = 70$, which would be correct if the groups were named (for example "Room 1" and "Room 2"). With unnamed groups, each split is counted twice.',
-        null,
-        'This is ${}^{8}P_{4} = 1680$, which picks people in order. Order within a group does not matter.',
-        'This is $70 \\times 2 = 140$: it multiplies by 2 for "which group is which" when it should divide by 2, because the groups are not named.',
-      ],
-      keyIdea: 'When groups of equal size are unlabelled, divide by the number of ways to order the groups.',
-    },
-    check: {
-      optionValues: [70, 35, 1680, 140],
-      // a split is fixed by the 4-person group containing person 0
-      compute: () => countSubsets(8, 4, (s) => s.includes(0)),
     },
   },
   {
@@ -639,4 +497,72 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
-];
+  {
+    id: 'counting-020',
+    subtopic: 'counting',
+    difficulty: 'foundation',
+    stem: 'What is the value of $0!$?',
+    options: ['$1$', '$0$', 'Not defined', '$-1$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'By definition, $0! = 1$.\n\n' +
+        'This keeps the pattern $n! = n \\times (n-1)!$ working: at $n = 1$ it says $1! = 1 \\times 0!$, which forces $0! = 1$. It also says that there is exactly one way to arrange nothing.',
+      whyWrong: [
+        null,
+        'This treats the factorial as a product that contains $0$. The product $n!$ runs from $n$ down to $1$, so $0$ is never a factor.',
+        '$0!$ is defined, and formulas such as $\\binom{n}{n} = \\frac{n!}{n! \\, 0!}$ rely on it.',
+        'A factorial is never negative: it counts arrangements.',
+      ],
+      keyIdea: '$0! = 1$ by definition.',
+    },
+    check: {
+      optionValues: [1, 0, null, -1],
+      compute: () => factorial(0),
+    },
+  },
+  {
+    id: 'counting-021',
+    subtopic: 'counting',
+    difficulty: 'foundation',
+    stem: 'Which counting method is used when the order of the chosen items does **not** matter?',
+    options: ['Combinations', 'Permutations', 'Arrangements in a row', 'Repeated choices with replacement'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **combination** is a selection in which only the group matters: choosing Ali then Bea is the same as choosing Bea then Ali.\n\n' +
+        'A **permutation** is an ordered selection, so those two count separately.',
+      whyWrong: [
+        null,
+        'Permutations count different orders as different results, so order does matter.',
+        'An arrangement in a row is an ordering, so order does matter.',
+        'Repeated choices, such as digit codes, are counted with $n^r$, and order matters there too.',
+      ],
+      keyIdea: 'Order matters: permutation. Order does not matter: combination.',
+    },
+  },
+  {
+    id: 'counting-022',
+    subtopic: 'counting',
+    difficulty: 'foundation',
+    stem: 'Which expression equals $\\binom{n}{r}$, the number of ways to choose $r$ items from $n$?',
+    options: ['$\\frac{n!}{r!(n-r)!}$', '$\\frac{n!}{(n-r)!}$', '$\\frac{n!}{r!}$', '$n^r$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'There are $\\frac{n!}{(n-r)!}$ ordered selections of $r$ items. Each unordered group appears $r!$ times among them, so divide by $r!$:\n\n' +
+        '$$\\binom{n}{r} = \\frac{n!}{r!(n-r)!}$$',
+      whyWrong: [
+        null,
+        'This is the permutation count, which treats different orders as different. It still needs dividing by $r!$.',
+        'This divides by $r!$ but forgets the $(n-r)!$ for the items that are not chosen.',
+        'This counts ordered choices where items can be picked again. Here each item is chosen at most once and order does not matter.',
+      ],
+      keyIdea: '$\\binom{n}{r} = \\frac{n!}{r!(n-r)!}$.',
+    },
+    check: {
+      // n = 7, r = 3
+      optionValues: [35, 210, 840, 343],
+      compute: () => countSubsets(7, 3),
+    },
+  },];

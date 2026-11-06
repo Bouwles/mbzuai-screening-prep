@@ -10,7 +10,7 @@ export const lesson: Lesson = {
     { cue: 'Keys inserted **in that order** into an empty BST, then parent, height or number of comparisons', method: 'Build the tree key by key: from the root go left if smaller, right if larger, attach at the first empty spot. A search for a key at depth $d$ makes $d + 1$ comparisons.' },
     { cue: '**Maximum** nodes at level $k$ or in a tree of height $h$, or **smallest height** for $n$ nodes', method: 'Level $k$ holds at most $2^k$ nodes; height $h$ holds at most $2^{h+1} - 1$. The minimum height for $n$ nodes is $\\lfloor \\log_2 n \\rfloor$. Check whether height counts edges or levels.' },
     { cue: 'A recursive function on a tree (`1 + max(left, right)`, sum of leaves, ...)', method: 'Work bottom-up: evaluate the base case at empty children and leaves first, then combine the results of the two subtrees at each parent.' },
-    { cue: 'A **heap** stored in a list', method: 'The maximum (max-heap) is at index 0. With 0-based indices the children of $i$ are at $2i + 1$ and $2i + 2$, and the parent is at $\\lfloor \\frac{i - 1}{2} \\rfloor$. Insert = add at the end, then swap upwards while larger than the parent.' },
+    { cue: 'A **heap** stored in an array', method: 'The maximum (max-heap) is at index 1. With arrays indexed from 1 the children of $i$ are at $2i$ and $2i + 1$, and the parent is at $\\lfloor \\frac{i}{2} \\rfloor$. Insert = add at the end, then swap upwards while larger than the parent.' },
   ],
   know:
     '### What is a tree?\n\n' +
@@ -56,8 +56,8 @@ export const lesson: Lesson = {
     'A **heap** is a **complete** binary tree (every level full except possibly the last, which fills from the left) with the **heap property**:\n\n' +
     '- **max-heap:** every parent is $\\ge$ its children, so the **maximum is at the root**.\n' +
     '- **min-heap:** every parent is $\\le$ its children, so the minimum is at the root.\n\n' +
-    'A heap is **not** sorted and it is not a BST: left and right children have no order between them. Because it is complete, a heap is stored in a plain list, level by level. With index 0 as the root, the children of index $i$ are at $2i + 1$ and $2i + 2$, and its parent is at $\\left\\lfloor \\frac{i - 1}{2} \\right\\rfloor$.\n\n' +
-    'To **insert**, put the new value at the end of the list and **sift up**: swap it with its parent while it is larger (max-heap). Removing the root moves the last element to the top and sifts it down. Both take $O(\\log n)$, which is why heaps are used for priority queues.',
+    'A heap is **not** sorted and it is not a BST: left and right children have no order between them. Because it is complete, a heap is stored in a plain array, level by level. With index 1 as the root, the children of index $i$ are at $2i$ and $2i + 1$, and its parent is at $\\left\\lfloor \\frac{i}{2} \\right\\rfloor$.\n\n' +
+    'To **insert**, put the new value at the end of the array and **sift up**: swap it with its parent while it is larger (max-heap). Removing the root moves the last element to the top and sifts it down. Both take $O(\\log n)$, which is why heaps are used for priority queues.',
   formulas: [
     { label: 'Edges in a tree', tex: '\\text{edges} = n - 1', note: 'Every node except the root has exactly one edge coming down into it.' },
     { label: 'Maximum nodes on level k (root at level 0)', tex: '2^k' },
@@ -69,7 +69,7 @@ export const lesson: Lesson = {
     { label: 'In-order', tex: '\\text{left} \\to \\text{node} \\to \\text{right}', note: 'On a BST this gives the keys in ascending order.' },
     { label: 'Post-order', tex: '\\text{left} \\to \\text{right} \\to \\text{node}', note: 'The root comes last.' },
     { label: 'BST search comparisons', tex: '\\text{comparisons} = d + 1', note: 'For a key at depth d. In a balanced BST this is at most about the log base 2 of n; in the worst case (a chain) it is n.' },
-    { label: 'Heap stored in a list (index 0 = root)', tex: '\\text{children of } i: 2i + 1, \\; 2i + 2 \\qquad \\text{parent of } i: \\left\\lfloor \\frac{i - 1}{2} \\right\\rfloor' },
+    { label: 'Heap stored in an array (index 1 = root)', tex: '\\text{children of } i: 2i, \\; 2i + 1 \\qquad \\text{parent of } i: \\left\\lfloor \\frac{i}{2} \\right\\rfloor' },
   ],
   examples: [
     {
@@ -118,12 +118,12 @@ export const lesson: Lesson = {
       answer: 'Height 3; the search makes 4 comparisons.',
     },
     {
-      title: 'Inserting into a max-heap stored in a list',
-      problem: 'The max-heap `[50, 30, 40, 10, 20]` (index 0 is the root) has 45 inserted. What is the list afterwards?',
+      title: 'Inserting into a max-heap stored in an array',
+      problem: 'The max-heap `[50, 30, 40, 10, 20]` (indexed from 1, so index 1 is the root) has 45 inserted. What is the array afterwards?',
       steps: [
-        'Append 45 at the end, index 5: `[50, 30, 40, 10, 20, 45]`.',
-        'Its parent is at index $\\left\\lfloor \\frac{5 - 1}{2} \\right\\rfloor = 2$, which holds 40. Since $45 > 40$, swap: `[50, 30, 45, 10, 20, 40]`.',
-        'Now 45 is at index 2; its parent is index $\\left\\lfloor \\frac{1}{2} \\right\\rfloor = 0$, which holds 50. Since $45 < 50$, stop.',
+        'Append 45 at the end, index 6: `[50, 30, 40, 10, 20, 45]`.',
+        'Its parent is at index $\\left\\lfloor \\frac{6}{2} \\right\\rfloor = 3$, which holds 40. Since $45 > 40$, swap: `[50, 30, 45, 10, 20, 40]`.',
+        'Now 45 is at index 3; its parent is index $\\left\\lfloor \\frac{3}{2} \\right\\rfloor = 1$, which holds 50. Since $45 < 50$, stop.',
         'Check the heap property: 50 is at least 30 and 45; 30 is at least 10 and 20; 45 is at least 40. Valid.',
       ],
       answer: '`[50, 30, 45, 10, 20, 40]`',
@@ -134,8 +134,8 @@ export const lesson: Lesson = {
     '**Mixing up the traversals.** Pre-order is not "the reverse of post-order". Use the root as a quick test: first in pre-order, last in post-order, and right after its left subtree for in-order.',
     '**Assuming a BST is balanced.** The shape depends on the insertion order. Inserting sorted keys makes a chain, so worst-case search is $n$ comparisons, not $\\log_2 n$. Always build the tree from the given order.',
     '**Stopping BST insertion too early.** A new key does not attach to the first node where you turn; keep comparing until you reach an empty spot.',
-    '**Thinking a heap is sorted, or is a BST.** A max-heap only promises that each parent is at least as big as its children. The largest value is at the root, but the rest of the list is not in order, and left/right have no meaning.',
-    '**Off-by-one in heap indices.** With index 0 as the root, children are at $2i + 1$ and $2i + 2$. The formulas $2i$ and $2i + 1$ are for lists that start at index 1.',
+    '**Thinking a heap is sorted, or is a BST.** A max-heap only promises that each parent is at least as big as its children. The largest value is at the root, but the rest of the array is not in order, and left/right have no meaning.',
+    '**Off-by-one in heap indices.** With index 1 as the root, children are at $2i$ and $2i + 1$. The formulas $2i + 1$ and $2i + 2$ are for arrays that start at index 0.',
   ],
   examTip:
     'Tree questions come as "which list is the traversal?", "what is the height / how many nodes?", "where does this key go in the BST?" or "what does this recursive function return?". To eliminate fast:\n\n' +
@@ -143,5 +143,5 @@ export const lesson: Lesson = {
     '- **Counting questions:** the wrong options are almost always off by one ($2^h$ versus $2^{h+1} - 1$, levels versus edges). Test your formula on a tiny tree (a root with two children: height 1, 3 nodes) before trusting it.\n' +
     '- **BST questions:** sketch the tree quickly from the insertion order; it takes about 20 seconds and avoids guessing the shape.\n' +
     '- **Recursive functions:** evaluate the leaves first (what does the function return for an empty tree and for a leaf?), then work upwards. "1 + max(left, right)" with 0 for empty counts levels; "1 + left + right" counts nodes.\n' +
-    '- **Heaps:** check each option against the heap property (parent at least as big as each child, using $2i + 1$ and $2i + 2$).',
+    '- **Heaps:** check each option against the heap property (parent at least as big as each child, using $2i$ and $2i + 1$).',
 };

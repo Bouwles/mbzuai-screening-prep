@@ -26,8 +26,8 @@ export const lesson: Lesson = {
       method: 'If $n = p^{a} q^{b}$ it has $(a + 1)(b + 1)$ divisors. Digit sum for 3 and 9; alternating sum (plus, minus, plus, minus, ...) for 11.',
     },
     {
-      cue: 'Solve $ax \\equiv b \\pmod{m}$, or Python `%` and `//` with negative numbers',
-      method: 'For a small modulus, test each value or each option (you cannot just divide). In Python `//` rounds down and `%` has the sign of the divisor.',
+      cue: 'Solve $ax \\equiv b \\pmod{m}$, or find the remainder of a negative number',
+      method: 'For a small modulus, test each value or each option (you cannot just divide). For a negative number, round the quotient down, so the remainder stays between 0 and $n - 1$.',
     },
   ],
   know:
@@ -36,7 +36,7 @@ export const lesson: Lesson = {
     '$$a = n \\times q + r, \\qquad 0 \\le r < n$$\n\n' +
     'The remainder is written $a \\bmod n$. For example $47 = 6 \\times 7 + 5$, so $47 \\bmod 6 = 5$. The remainder is always smaller than $n$, so dividing by 6 can only leave $0, 1, 2, 3, 4$ or $5$.\n\n' +
     '**Calculator method:** $47 \\div 6 = 7.83...$; keep the whole part 7; then $47 - 6 \\times 7 = 5$.\n\n' +
-    'In Python, `%` is mod and `//` is whole-number (floor) division: `47 % 6` is `5` and `47 // 6` is `7`. With negative numbers Python rounds **down**, so `-17 // 5` is `-4` and `-17 % 5` is `3`.\n\n' +
+    'In pseudocode the remainder is written `mod(a,b)` and whole-number division `div(a,b)`: `mod(47,6)` is 5 and `div(47,6)` is 7. For a negative number, round the quotient **down** so the remainder stays between 0 and $n - 1$: $-17 = 5 \\times (-4) + 3$, so the remainder is 3.\n\n' +
     '### Congruences\n\n' +
     'We write $a \\equiv b \\pmod{n}$ ("$a$ is congruent to $b$ mod $n$") when $a$ and $b$ leave the **same remainder** when divided by $n$, which is the same as saying $n$ divides $a - b$. Example: $17 \\equiv 2 \\pmod{5}$ because $17 - 2 = 15$. Think of a clock: 15:00 is 3 o\'clock because $15 \\equiv 3 \\pmod{12}$.\n\n' +
     'The big time-saver: you may replace numbers by their remainders **before** adding, subtracting, multiplying or taking powers. If $a \\equiv 3$ and $b \\equiv 6 \\pmod{8}$, then $ab \\equiv 18 \\equiv 2 \\pmod{8}$. You **cannot** divide freely, though: to solve $3x \\equiv 4 \\pmod{7}$, test $x = 0, 1, \\ldots, 6$ (the answer is $x = 6$, since $18 \\equiv 4$).\n\n' +
@@ -71,7 +71,7 @@ export const lesson: Lesson = {
     'The **highest common factor** is the biggest number dividing both; the **lowest common multiple** is the smallest number both divide. From the prime factorisations: HCF takes the shared primes with the **lower** power; LCM takes every prime with the **higher** power. With $84 = 2^2 \\times 3 \\times 7$ and $126 = 2 \\times 3^2 \\times 7$: HCF $= 2 \\times 3 \\times 7 = 42$, LCM $= 2^2 \\times 3^2 \\times 7 = 252$. Always $\\text{HCF} \\times \\text{LCM} = a \\times b$.\n\n' +
     'Word clues: "largest that divides both / biggest equal groups" means HCF; "next time they happen together" means LCM.\n\n' +
     '### The Euclidean algorithm\n\n' +
-    'A fast way to find the HCF without factorising: replace (bigger, smaller) by (smaller, remainder) until the remainder is 0. The last non-zero remainder is the HCF. This is exactly the loop `while b != 0: a, b = b, a % b`, after which `a` is the GCD.\n\n' +
+    'A fast way to find the HCF without factorising: replace (bigger, smaller) by (smaller, remainder) until the remainder is 0. The last non-zero remainder is the HCF. In a loop: while `b != 0`, set `r = mod(a,b)`, then `a = b` and `b = r`. When the loop ends, `a` is the GCD.\n\n' +
     '### Counting divisors\n\n' +
     'If $n = p^a \\times q^b$, every divisor is $p^i \\times q^j$ with $i$ from 0 to $a$ and $j$ from 0 to $b$. So there are $(a + 1)(b + 1)$ divisors. For $72 = 2^3 \\times 3^2$: $4 \\times 3 = 12$ divisors.',
   formulas: [
@@ -138,7 +138,7 @@ export const lesson: Lesson = {
     '**Reducing the exponent by the wrong number.** For $2^{100} \\bmod 7$ reduce the exponent by the cycle length 3, not by 7.',
     '**Mixing up HCF and LCM.** The HCF is never bigger than the smaller number; the LCM is never smaller than the bigger number. The product $a \\times b$ is a common multiple but usually not the lowest.',
     '**Counting divisors.** Add 1 to every exponent before multiplying: $2^3 \\times 3^2$ has $4 \\times 3 = 12$ divisors, not $3 \\times 2 = 6$.',
-    '**Negative numbers in Python.** `-17 % 5` is `3` and `-17 // 5` is `-4`, because Python rounds down. Other languages may give `-2` and `-3`.',
+    '**Negative numbers.** The remainder of $-17$ divided by 5 is 3, not $-2$: round the quotient down to $-4$, so that $0 \\le r < 5$.',
   ],
   examTip:
     'In a 4-option question you rarely need to do everything from scratch. **Plug the options back in**: for a congruence like $3x \\equiv 4 \\pmod{7}$, multiply each option by 3 and divide by 7. **Use size checks**: an HCF cannot exceed the smaller number, an LCM cannot be below the larger, a remainder mod $n$ must be less than $n$ and a last digit is a single digit, so options like 18 for a last digit or 54 for a remainder mod 8 are out immediately. For powers, write the cycle out (it takes 10 seconds) and divide the exponent by its length. On a calculator, find $a \\bmod n$ (for positive $a$) as $a - n \\times (\\text{whole part of } a \\div n)$. Distractors are usually built from the classic slips: the quotient instead of the remainder, the LCM instead of the HCF, the product instead of the LCM, or the cycle position off by one.',

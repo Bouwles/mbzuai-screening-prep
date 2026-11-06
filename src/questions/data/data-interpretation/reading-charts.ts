@@ -106,30 +106,11 @@ const TOWNS: { name: string; y2015: number; y2025: number }[] = [
   { name: 'D', y2015: 9000, y2025: 9600 },
 ];
 
-const PUZZLE_EDGES = [0, 10, 20, 30, 40, 50];
-const PUZZLE_FREQ = [5, 15, 20, 10, 10];
-
 const TRAVEL_ANGLES = [
   { label: 'Walk', value: 120 },
   { label: 'Bus', value: 105 },
   { label: 'Car', value: 90 },
   { label: 'Cycle', value: 45 },
-];
-
-const APP_TOTAL = [5, 15, 20, 35, 45, 50];
-
-const TESTS = [
-  { x: 20, y: 30 },
-  { x: 25, y: 20 },
-  { x: 30, y: 35 },
-  { x: 35, y: 30 },
-  { x: 40, y: 45 },
-  { x: 45, y: 35 },
-  { x: 15, y: 25 },
-  { x: 30, y: 20 },
-  { x: 40, y: 50 },
-  { x: 45, y: 50 },
-  { x: 35, y: 35 },
 ];
 
 export const questions: StaticQuestion[] = [
@@ -138,7 +119,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-001',
     subtopic: 'reading-charts',
     difficulty: 'foundation',
-    stem: 'The bar chart shows the number of books borrowed from a school library on each day of one week. How many **more** books were borrowed on Thursday than on Wednesday?',
+    stem: 'The bar chart shows the books borrowed from a library on each day of one week. How many **more** books were borrowed on Thursday than on Wednesday?',
     chart: {
       kind: 'bar',
       title: 'Books borrowed per day',
@@ -174,7 +155,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-002',
     subtopic: 'reading-charts',
     difficulty: 'foundation',
-    stem: 'Every student in a year group chose one favourite subject. The pie chart shows the **number** of students choosing each subject. What fraction of the students chose Science?',
+    stem: 'The pie chart shows the **number** of students choosing each favourite subject. What fraction of the students chose Science?',
     chart: { kind: 'pie', title: 'Favourite subject (number of students)', slices: SUBJECTS },
     options: ['$\\frac{7}{13}$', '$\\frac{7}{10}$', '$\\frac{1}{4}$', '$\\frac{7}{20}$'],
     correctIndex: 3,
@@ -206,7 +187,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-003',
     subtopic: 'reading-charts',
     difficulty: 'foundation',
-    stem: 'The line graph shows the temperature in a desert town, measured every 3 hours on one day. Between which two consecutive readings did the temperature **rise** the most?',
+    stem: 'The line graph shows a temperature measured every 3 hours. Between which two consecutive readings did the temperature **rise** the most?',
     chart: {
       kind: 'line',
       title: 'Temperature during one day',
@@ -249,7 +230,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-004',
     subtopic: 'reading-charts',
     difficulty: 'foundation',
-    stem: 'The table shows how many students in Years 10 and 11 joined each club. One value is missing. How many Year 11 students joined the Sport club?',
+    stem: 'The table shows club membership in Years 10 and 11, with one value missing. How many Year 11 students joined the Sport club?',
     table: {
       headers: ['Club', 'Year 10', 'Year 11', 'Total'],
       rows: [
@@ -281,7 +262,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-005',
     subtopic: 'reading-charts',
     difficulty: 'foundation',
-    stem: 'The scatter plot shows the number of hours ten students spent revising and their score in a test. Which statement is best supported by the scatter plot?',
+    stem: 'The scatter plot shows revision time and test score for ten students. Which statement is best supported by the plot?',
     chart: {
       kind: 'scatter',
       title: 'Revision time and test score',
@@ -290,22 +271,22 @@ export const questions: StaticQuestion[] = [
       points: REVISION,
     },
     options: [
-      'As revision time increases, test scores tend to increase.',
-      'As revision time increases, test scores tend to decrease.',
-      'Every student who revised for longer scored higher than every student who revised for less time.',
-      'There is no relationship between revision time and test score.',
+      'Scores tend to rise as revision time increases',
+      'Scores tend to fall as revision time increases',
+      'More revision always gives a higher score',
+      'There is no relationship',
     ],
     correctIndex: 0,
     markScheme: {
       solution:
         '**Step 1: look at the overall direction of the points.** Reading from left to right, the points go **up**: students with few hours (1 or 2 h) scored around 35 to 50, and students with many hours (8 or 9 h) scored around 80 to 85.\n\n' +
         'This upward pattern is called **positive correlation**: as one variable increases, the other **tends** to increase.\n\n' +
-        '**Step 2: check the strong claims.** "Tends to" allows exceptions, but "every" does not. The student who revised 5 hours scored 55, **less** than the student who revised 4 hours (60). So "every student who revised longer scored higher" is false.\n\n' +
+        '**Step 2: check the strong claims.** "Tend to" allows exceptions, but "always" does not. The student who revised 5 hours scored 55, **less** than the student who revised 4 hours (60). So "more revision always gives a higher score" is false.\n\n' +
         'The best supported statement is that scores **tend to increase** as revision time increases.',
       whyWrong: [
         null,
         'That would be **negative** correlation, where the points slope **down** from left to right. Here they slope up.',
-        'Correlation describes a general trend, not a rule for every pair. The student with 5 hours (55) scored lower than the student with 4 hours (60), so "every" is false.',
+        'Correlation describes a general trend, not a rule for every pair. The student with 5 hours (55) scored lower than the student with 4 hours (60), so "always" is false.',
         'With no relationship the points would be scattered randomly. Here they clearly follow an upward pattern.',
       ],
       keyIdea: 'Points rising from left to right show positive correlation: a tendency, not a guarantee for every individual.',
@@ -317,7 +298,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-006',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'A juice bar sells five flavours. The grouped bar chart shows how many cups (in hundreds) of each flavour were sold in 2023 and in 2024. Which flavour had the **largest increase** in sales from 2023 to 2024?',
+    stem: 'The grouped bar chart shows cups of juice sold (in hundreds) by flavour in 2023 and 2024. Which flavour had the **largest increase** from 2023 to 2024?',
     chart: {
       kind: 'bar',
       title: 'Cups sold (hundreds)',
@@ -360,7 +341,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-007',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'A family\'s monthly budget is AED 12,000. The pie chart shows the **percentage** of the budget spent on each category. How much more does the family spend on Housing than on Transport each month?',
+    stem: 'A monthly budget of AED 12,000 is split as shown in the **percentage** pie chart. How much more is spent on Housing than on Transport each month?',
     chart: { kind: 'pie', title: 'Monthly budget (%)', slices: BUDGET },
     options: ['AED 4,200', 'AED 6,000', 'AED 1,800', 'AED 2,400'],
     correctIndex: 3,
@@ -371,7 +352,7 @@ export const questions: StaticQuestion[] = [
         '$$35\\% - 15\\% = 20\\%$$\n\n' +
         '**Step 3: convert to money.** 20% of AED 12,000:\n\n' +
         '$$0.20 \\times 12000 = 2400$$\n\n' +
-        'So the family spends AED 2,400 more on Housing.\n\n' +
+        'So AED 2,400 more is spent on Housing.\n\n' +
         '(Check the long way: Housing $= 0.35 \\times 12000 = 4200$, Transport $= 0.15 \\times 12000 = 1800$, and $4200 - 1800 = 2400$.)',
       whyWrong: [
         'This is the Housing amount on its own ($0.35 \\times 12000$). You still need to subtract the Transport amount.',
@@ -393,7 +374,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-008',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'The histogram shows the heights of the plants in a greenhouse. Each class includes its lower boundary but not its upper boundary (for example, the first bar is $0 \\le h < 10$). What percentage of the plants are **at least 20 cm** tall?',
+    stem: 'The histogram shows plant heights $h$. Each class includes its lower boundary but not its upper boundary. What percentage of the plants are **at least 20 cm** tall?',
     chart: {
       kind: 'histogram',
       title: 'Plant heights',
@@ -434,7 +415,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-009',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'The line graph shows the monthly number of visitors (in thousands) to two websites. In which month was the **difference** between the numbers of visitors to the two sites the greatest?',
+    stem: 'The line graph shows monthly visitors (in thousands) to two websites. In which month was the **difference** between the two sites greatest?',
     chart: {
       kind: 'line',
       title: 'Monthly visitors (thousands)',
@@ -481,7 +462,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-010',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'The table is part of a bus timetable. Amira arrives at the City Mall stop at 08:40 and catches the **next** bus to the Airport. How long is her bus journey from City Mall to the Airport?',
+    stem: 'A passenger reaches the City Mall stop at 08:40 and catches the **next** bus to the Airport. Using the timetable, how long is the bus journey?',
     table: {
       caption: 'Bus times at each stop',
       headers: ['Stop', 'Bus 1', 'Bus 2', 'Bus 3'],
@@ -498,8 +479,8 @@ export const questions: StaticQuestion[] = [
         '- 09:00 to 09:38 is 38 minutes.\n\n' +
         '$$8 + 38 = 46 \\text{ minutes}$$',
       whyWrong: [
-        'This is the journey time of **Bus 1** (08:05 to 08:47), which had already left City Mall before Amira arrived at 08:40.',
-        'This counts from 08:40, when Amira arrived at the stop, so it includes her 12 minutes of waiting. The bus journey starts at 08:52.',
+        'This is the journey time of **Bus 1** (08:05 to 08:47), which had already left City Mall before the passenger arrived at 08:40.',
+        'This counts from 08:40, when the passenger arrived at the stop, so it includes 12 minutes of waiting. The bus journey starts at 08:52.',
         null,
         'This is the time from **Central Station** (08:35) to the Airport (09:38): it uses the wrong row as the starting stop.',
       ],
@@ -521,7 +502,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-011',
     subtopic: 'reading-charts',
     difficulty: 'foundation',
-    stem: 'The scatter plot shows hours studied, $x$, and test score, $y$, for nine students. The dashed line of best fit has equation $y = 5x + 40$. Use the line to estimate the score of a student who studies for 7 hours.',
+    stem: 'The dashed line of best fit has equation $y = 5x + 40$, where $x$ is hours studied and $y$ is test score. Estimate the score of a student who studies for 7 hours.',
     chart: {
       kind: 'scatter',
       title: 'Hours studied and test score',
@@ -553,7 +534,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-012',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'Every student in a year group chose one favourite sport. The bar chart shows the results. What percentage of the students chose Basketball **or** Swimming?',
+    stem: 'The bar chart shows the favourite sports of a year group. What percentage of the students chose Basketball **or** Swimming?',
     chart: {
       kind: 'bar',
       title: 'Favourite sport',
@@ -591,7 +572,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-013',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'The table shows how many students passed and failed the same exam at four schools. Which school had the highest **pass rate** (the percentage of its own students who passed)?',
+    stem: 'The table shows how many students passed and failed an exam at four schools. Which school had the highest **pass rate**?',
     table: {
       headers: ['School', 'Passed', 'Failed'],
       rows: SCHOOLS.map((s) => [s.name, s.pass, s.fail]),
@@ -627,7 +608,7 @@ export const questions: StaticQuestion[] = [
     id: 'reading-charts-014',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'A car leaves home and drives away along a straight road. The line graph shows its distance from home, recorded every hour. During which one-hour period was the car travelling **fastest**?',
+    stem: 'The line graph shows a car\'s distance from home, recorded every hour. During which one-hour period was the car travelling **fastest**?',
     chart: {
       kind: 'line',
       title: 'Distance from home',
@@ -666,12 +647,11 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ================================================================ challenge
   {
     id: 'reading-charts-015',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: 'The table shows the populations of four towns in 2015 and in 2025. What was the **largest percentage increase** in population among the four towns? (Where needed, percentages are given to 1 decimal place.)',
+    stem: 'The table shows the populations of four towns in 2015 and 2025. What was the **largest percentage increase** among the four towns? (Options to 1 decimal place where needed.)',
     table: {
       headers: ['Town', '2015', '2025'],
       rows: TOWNS.map((t) => [t.name, t.y2015, t.y2025]),
@@ -702,58 +682,10 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'reading-charts-016',
-    subtopic: 'reading-charts',
-    difficulty: 'challenge',
-    stem: 'The histogram shows the time taken by a group of people to finish a puzzle. Each class includes its lower boundary but not its upper boundary. Assuming the times are spread evenly within each class, estimate how many people took **more than 25 minutes**.',
-    chart: {
-      kind: 'histogram',
-      title: 'Time to finish the puzzle',
-      xLabel: 'Time (minutes)',
-      yLabel: 'Frequency',
-      edges: PUZZLE_EDGES,
-      frequencies: PUZZLE_FREQ,
-    },
-    options: ['$30$', '$20$', '$40$', '$25$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        '**Step 1: read the bars** (gridlines every 5 people):\n\n' +
-        '| Time (min) | 0 to 10 | 10 to 20 | 20 to 30 | 30 to 40 | 40 to 50 |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| Frequency | 5 | 15 | 20 | 10 | 10 |\n\n' +
-        '**Step 2: whole classes above 25 minutes.** The 30 to 40 and 40 to 50 classes are entirely above 25: $10 + 10 = 20$ people.\n\n' +
-        '**Step 3: the split class.** 25 minutes is in the middle of the 20 to 30 class. The part above 25 is 5 minutes out of the class width of 10 minutes, so take that fraction of its frequency:\n\n' +
-        '$$\\frac{30 - 25}{30 - 20} \\times 20 = \\frac{5}{10} \\times 20 = 10$$\n\n' +
-        '**Step 4: add.** $20 + 10 = 30$ people (an estimate, because we assumed even spread inside the class).',
-      whyWrong: [
-        null,
-        'This counts only the classes completely above 30 minutes and leaves out the people between 25 and 30 minutes.',
-        'This includes the **whole** 20 to 30 class, but the people between 20 and 25 minutes did not take more than 25 minutes.',
-        'This takes only 5 people from the 20 to 30 class, using the 5 minutes as a number of people. The 5 minutes is half of the class **width** (10), so you need half of the class **frequency** (20), which is 10.',
-      ],
-      keyIdea: 'When a boundary falls inside a class, take the fraction of the class width that you need and apply it to that class\'s frequency.',
-    },
-    check: {
-      optionValues: [30, 20, 40, 25],
-      compute: () => {
-        const cut = 25;
-        let total = 0;
-        PUZZLE_FREQ.forEach((f, i) => {
-          const lo = PUZZLE_EDGES[i];
-          const hi = PUZZLE_EDGES[i + 1];
-          const overlap = Math.max(0, hi - Math.max(lo, cut));
-          total += (f * overlap) / (hi - lo);
-        });
-        return total;
-      },
-    },
-  },
-  {
     id: 'reading-charts-017',
     subtopic: 'reading-charts',
     difficulty: 'exam',
-    stem: '240 students were asked how they travel to school. The pie chart shows the **angle** (in degrees) of each sector. How many more students walk than cycle?',
+    stem: '240 students were asked how they travel to school. The pie chart shows each sector\'s **angle** in degrees. How many more students walk than cycle?',
     chart: { kind: 'pie', title: 'Travel to school: sector angles (degrees)', slices: TRAVEL_ANGLES },
     options: ['$50$', '$75$', '$112.5$', '$80$'],
     correctIndex: 0,
@@ -781,92 +713,90 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+
+  // ================================================================ recall
   {
-    id: 'reading-charts-018',
+    id: 'reading-charts-020',
     subtopic: 'reading-charts',
-    difficulty: 'challenge',
-    stem: 'A new app launched on 1 January. The line graph shows the **total** number of users (in thousands) at the end of each month, counting everyone who has joined since launch. In which month did the **most new users** join?',
-    chart: {
-      kind: 'line',
-      title: 'Total users since launch (thousands)',
-      xLabel: 'End of month',
-      yLabel: 'Total users (thousands)',
-      categories: MONTHS6,
-      series: [{ name: 'Total users', values: APP_TOTAL }],
-    },
-    options: ['June', 'February', 'March', 'April'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'A sector of a pie chart has an angle of $90^\\circ$. What fraction of the total does it represent?',
+    options: ['$\\frac{1}{4}$', '$\\frac{1}{2}$', '$\\frac{9}{10}$', '$\\frac{1}{3}$'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'This is a **running total** (cumulative) graph. The number who joined **during** a month is the total at the end of that month minus the total at the end of the month before.\n\n' +
-        '**Step 1: read the points** (gridlines every 10 thousand): 5, 15, 20, 35, 45, 50.\n\n' +
-        '**Step 2: new users each month.**\n\n' +
-        '| Month | Total at end | New users |\n' +
-        '| --- | --- | --- |\n' +
-        '| Jan | 5 | $5$ (the total started at $0$) |\n' +
-        '| Feb | 15 | $15 - 5 = 10$ |\n' +
-        '| Mar | 20 | $20 - 15 = 5$ |\n' +
-        '| Apr | 35 | $35 - 20 = 15$ |\n' +
-        '| May | 45 | $45 - 35 = 10$ |\n' +
-        '| Jun | 50 | $50 - 45 = 5$ |\n\n' +
-        '**Step 3:** the most new users (15 thousand) joined in **April**: the steepest part of the graph, from the March point to the April point.',
+        'A whole circle is $360^\\circ$, so a sector is the fraction $\\frac{\\text{angle}}{360^\\circ}$ of the total.\n\n' +
+        '$$\\frac{90}{360} = \\frac{1}{4}$$',
       whyWrong: [
-        'June has the **highest point**, but that is the running total. Only 5 thousand new users joined in June, so the graph is almost flat there.',
-        'February is when the total grew by the biggest **percentage** of any month after January (it tripled from 5 to 15), but only 10 thousand people joined, fewer than the 15 thousand in April.',
-        'The steepest segment runs **from** the March point **to** the April point. Each point is an end-of-month total, so that rise happened during April, not March (only 5 thousand joined in March).',
         null,
+        'This treats the whole circle as $180^\\circ$. A full circle is $360^\\circ$; $180^\\circ$ is only a half turn.',
+        'This is $\\frac{90}{100}$: it reads the angle as a percentage. Degrees are out of 360, not 100.',
+        'This is $\\frac{90}{270}$: it compares the sector with the rest of the circle instead of with the whole circle.',
       ],
-      keyIdea: 'On a cumulative (running total) graph, the amount added in each period is the rise between consecutive points, so the steepest segment shows the busiest period.',
+      keyIdea: 'A sector with angle $\\theta$ represents the fraction $\\frac{\\theta}{360^\\circ}$ of the total.',
     },
-    check: {
-      optionValues: ['June', 'February', 'March', 'April'],
-      compute: () => {
-        const full = ['January', 'February', 'March', 'April', 'May', 'June'];
-        return full[argMax(steps([0, ...APP_TOTAL]))];
-      },
+    check: { optionValues: [1 / 4, 1 / 2, 9 / 10, 1 / 3], compute: () => new Frac(90, 360).value() },
+  },
+  {
+    id: 'reading-charts-021',
+    subtopic: 'reading-charts',
+    difficulty: 'foundation',
+    stem: 'Which type of chart is most suitable for showing how one quantity changes over time?',
+    options: ['Line graph', 'Pie chart', 'Histogram', 'Scatter plot'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **line graph** plots a value at each time and joins the points, so rises and falls show up as the slope of the line.\n\n' +
+        'The other charts have different jobs:\n\n' +
+        '- Pie chart: the parts of a whole.\n' +
+        '- Histogram: how the values of one variable are spread across classes.\n' +
+        '- Scatter plot: the relationship between two variables.',
+      whyWrong: [
+        null,
+        'A pie chart shows how a whole is shared out at one moment. It has no time axis.',
+        'A histogram shows how values are spread across classes, not how a quantity changes from one time to the next.',
+        'A scatter plot shows whether two variables are related. It does not join readings in time order.',
+      ],
+      keyIdea: 'Use a line graph for change over time, a pie chart for parts of a whole, a histogram for a distribution and a scatter plot for a relationship.',
     },
   },
   {
-    id: 'reading-charts-019',
+    id: 'reading-charts-022',
     subtopic: 'reading-charts',
-    difficulty: 'challenge',
-    stem: 'Eleven students took two tests, each marked out of 50. Each point shows one student\'s Test 1 mark ($x$) and Test 2 mark ($y$). The dashed line is $y = x$. How many students scored **strictly higher** on Test 2 than on Test 1?',
-    chart: {
-      kind: 'scatter',
-      title: 'Test 1 and Test 2 marks',
-      xLabel: 'Test 1 mark, x',
-      yLabel: 'Test 2 mark, y',
-      points: TESTS,
-      line: { slope: 1, intercept: 0 },
-    },
-    options: ['$7$', '$6$', '$4$', '$5$'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'On a distance-time graph, what does a horizontal section show?',
+    options: ['The object has stopped', 'The object is moving fast', 'The object is speeding up', 'The object is returning to its start'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'On the line $y = x$ the two marks are equal. A point **above** the line has $y > x$ (better on Test 2); a point **below** it has $y < x$.\n\n' +
-        '**Step 1: read each point and compare $y$ with $x$.**\n\n' +
-        '| Test 1 ($x$) | Test 2 ($y$) | Compare |\n' +
-        '| --- | --- | --- |\n' +
-        '| 15 | 25 | higher |\n' +
-        '| 20 | 30 | higher |\n' +
-        '| 25 | 20 | lower |\n' +
-        '| 30 | 35 | higher |\n' +
-        '| 30 | 20 | lower |\n' +
-        '| 35 | 30 | lower |\n' +
-        '| 35 | 35 | equal (on the line) |\n' +
-        '| 40 | 45 | higher |\n' +
-        '| 40 | 50 | higher |\n' +
-        '| 45 | 35 | lower |\n' +
-        '| 45 | 50 | higher |\n\n' +
-        '**Step 2: count.** 6 points are above the line, 4 below and 1 on it. So **6** students scored strictly higher on Test 2.',
+        'The gradient (slope) of a distance-time graph is the speed.\n\n' +
+        'A horizontal section has gradient $0$: time passes but the distance does not change, so the speed is $0$ and the object has stopped.',
       whyWrong: [
-        'This also counts the student on the line (35 on both tests). That student scored the same, not strictly higher.',
         null,
-        'This counts the points **below** the line, the students who did better on Test 1. Above the line means $y > x$.',
-        'This counts the students who did **not** score higher on Test 2 (4 below the line plus 1 on it).',
+        'Fast movement is a **steep** section. A horizontal section has no slope at all, so the speed is zero.',
+        'Speeding up shows as a curve that gets steeper. A horizontal line has a constant slope of zero.',
+        'Returning to the start shows as a downward slope, because the distance from the start is falling.',
       ],
-      keyIdea: 'With the line $y = x$ drawn on a scatter plot, points above it have $y > x$, points below have $y < x$, and points on it are equal.',
+      keyIdea: 'On a distance-time graph the gradient is the speed, so a horizontal section means the object is not moving.',
     },
-    check: { optionValues: [7, 6, 4, 5], compute: () => TESTS.filter((p) => p.y > p.x).length },
+  },
+  {
+    id: 'reading-charts-023',
+    subtopic: 'reading-charts',
+    difficulty: 'foundation',
+    stem: 'In a histogram with equal class widths, the **modal class** is the class with:',
+    options: ['The tallest bar', 'The widest bar', 'The middle position on the axis', 'The largest values'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '"Modal" comes from **mode**, the most common value. The modal class is the class with the highest frequency.\n\n' +
+        'When all the classes have the same width, the highest frequency is simply the tallest bar.',
+      whyWrong: [
+        null,
+        'The classes here all have the same width, so no bar is wider than another. Width is not what "modal" refers to.',
+        'The middle of the data is linked to the **median**, not the mode.',
+        'The class with the largest values is at the right-hand end of the axis. It can have a very low frequency.',
+      ],
+      keyIdea: 'The modal class is the most frequent class: the tallest bar when the class widths are equal.',
+    },
   },
 ];

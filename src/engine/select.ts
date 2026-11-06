@@ -120,8 +120,6 @@ export function buildMock(n: number, seed: number): QRef[] {
   const perDiff = apportion(n, EXAM.difficultyMix as Record<Difficulty, number>);
   (Object.keys(perDiff) as Difficulty[]).forEach((d) => diffs.push(...Array(perDiff[d]).fill(d)));
   const diffQueue = rng.shuffle(diffs);
-  // Difficulties with a zero share (Challenge, by default) never appear, even as a fallback.
-  const allowed = (d: Difficulty) => (EXAM.difficultyMix as Record<Difficulty, number>)[d] > 0;
   const refs: QRef[] = [];
   const used = new Set<string>();
   const usedGen = new Set<string>();
@@ -137,17 +135,20 @@ export function buildMock(n: number, seed: number): QRef[] {
       const fresh = subs.filter((s) => !usedSubs.includes(s));
       const sub = rng.pick(fresh.length ? fresh : subs);
       const wantGen = rng.bool(EXAM.generatedShare);
-      const gens = GENERATORS.filter((g) => g.subtopic === sub && allowed(g.difficulty) && !usedGen.has(g.id));
+      const gens = GENERATORS.filter((g) => g.subtopic === sub && !usedGen.has(g.id));
       const gensD = gens.filter((g) => g.difficulty === diff);
       const stat = STATIC.filter((q) => q.subtopic === sub && q.difficulty === diff && !used.has(q.id));
-      const statAny = STATIC.filter((q) => q.subtopic === sub && allowed(q.difficulty) && !used.has(q.id));
+      const statAny = STATIC.filter((q) => q.subtopic === sub && !used.has(q.id));
       let ref: QRef | null = null;
       if (wantGen && (gensD.length || gens.length)) {
         const g = rng.pick(gensD.length ? gensD : gens);
         usedGen.add(g.id);
         ref = { kind: 'gen', id: g.id, seed: rng.int(1, 2 ** 31 - 1) };
       } else {
-        const pool = stat.length ? stat : statAny;
+        const mixed = stat.length ? stat : statAny;
+        // Code in a mock is pseudocode by default; Python only when nothing else is left.
+        const pseudo = mixed.filter((q) => q.code?.lang !== 'python');
+        const pool = pseudo.length ? pseudo : mixed;
         if (pool.length) {
           const unseen = pool.filter((q) => !last.has(q.id));
           const q = rng.pick(unseen.length ? unseen : pool);

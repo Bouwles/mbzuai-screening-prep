@@ -21,7 +21,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-001',
     subtopic: 'neural-networks',
     difficulty: 'foundation',
-    stem: 'A neuron has inputs $x_1 = 2$ and $x_2 = 3$, weights $w_1 = 0.4$ and $w_2 = -0.2$, and bias $b = 0.5$. What is the weighted sum $z = w_1x_1 + w_2x_2 + b$ (the value **before** the activation function is applied)?',
+    stem: 'A neuron has inputs $x_1 = 2$, $x_2 = 3$, weights $w_1 = 0.4$, $w_2 = -0.2$ and bias $b = 0.5$. What is the weighted sum $z = w_1x_1 + w_2x_2 + b$?',
     options: ['$0.2$', '$1.9$', '$0.7$', '$-0.3$'],
     correctIndex: 2,
     markScheme: {
@@ -48,7 +48,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-002',
     subtopic: 'neural-networks',
     difficulty: 'foundation',
-    stem: 'Which activation function always gives an output strictly between $0$ and $1$, which makes it a natural choice when a neuron should output a probability?',
+    stem: 'Which activation function always outputs a value strictly between $0$ and $1$, so that it can be read as a probability?',
     options: [
       'Sigmoid, $\\sigma(z) = \\frac{1}{1 + e^{-z}}$',
       'ReLU, $f(z) = \\max(0, z)$',
@@ -79,7 +79,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-003',
     subtopic: 'neural-networks',
     difficulty: 'foundation',
-    stem: 'The chart shows the output $f(z)$ of an activation function for several inputs $z$ (values rounded to 2 decimal places). Which activation function is it?',
+    stem: 'The chart shows the output $f(z)$ of an activation function (rounded to 2 decimal places). Which function is it?',
     chart: {
       kind: 'line',
       title: 'Output of an activation function',
@@ -122,12 +122,12 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-004',
     subtopic: 'neural-networks',
     difficulty: 'foundation',
-    stem: 'An artificial neuron computes $z = w_1x_1 + w_2x_2 + b$ and then outputs $f(z)$. What is the job of the **bias** $b$?',
+    stem: 'A neuron computes $z = w_1x_1 + w_2x_2 + b$ and outputs $f(z)$. What is the job of the **bias** $b$?',
     options: [
-      'It is multiplied by each input to decide how important that input is.',
-      'It squashes the weighted sum into a fixed range, such as between $0$ and $1$.',
-      'It measures how far the network\'s prediction is from the correct answer.',
-      'It is added to the weighted sum to shift it up or down, which moves the point at which the neuron switches on.',
+      'It scales each input by its importance',
+      'It squashes $z$ into a fixed range',
+      'It measures the prediction error',
+      'It shifts $z$, moving the point where the neuron switches on',
     ],
     correctIndex: 3,
     markScheme: {
@@ -149,8 +149,8 @@ export const questions: StaticQuestion[] = [
   {
     id: 'neural-networks-005',
     subtopic: 'neural-networks',
-    difficulty: 'foundation',
-    stem: 'A neuron with a sigmoid activation $\\sigma(z) = \\frac{1}{1 + e^{-z}}$ has inputs $x_1 = 2$, $x_2 = 4$, weights $w_1 = 1.5$, $w_2 = -1$ and bias $b = 1$. What is its output? (Give non-exact answers to 3 decimal places.)',
+    difficulty: 'exam',
+    stem: 'A sigmoid neuron, $\\sigma(z) = \\frac{1}{1 + e^{-z}}$, has inputs $x_1 = 2$, $x_2 = 4$, weights $w_1 = 1.5$, $w_2 = -1$ and bias $b = 1$. What is its output?',
     options: ['$0$', '$0.5$', '$1$', '$0.269$'],
     correctIndex: 1,
     markScheme: {
@@ -179,7 +179,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-006',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'A fully connected neural network has $4$ input features, one hidden layer of $5$ neurons and an output layer of $3$ neurons. Every hidden and output neuron has its own bias. How many trainable parameters (weights plus biases) does the network have?',
+    stem: 'A fully connected network has $4$ inputs, one hidden layer of $5$ neurons and $3$ output neurons, with a bias on every hidden and output neuron. How many trainable parameters (weights plus biases) does it have?',
     options: ['$35$', '$60$', '$47$', '$43$'],
     correctIndex: 3,
     markScheme: {
@@ -203,7 +203,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-007',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'A small network has inputs $x_1 = 1$ and $x_2 = 2$, two hidden neurons $h_1$ and $h_2$ with ReLU activation, and one output neuron $y$ with **no** activation (identity). The weights and biases are in the table. What is the output $y$?',
+    stem: 'A network has inputs $x_1 = 1$ and $x_2 = 2$, hidden ReLU neurons $h_1$ and $h_2$, and an output $y$ with **no** activation. Using the weights and biases in the table, what is $y$?',
     table: {
       caption: 'Weights and biases',
       headers: ['Neuron', 'Weight on 1st input', 'Weight on 2nd input', 'Bias', 'Activation'],
@@ -245,12 +245,12 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-008',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'A neural network has three hidden layers, but every neuron uses the identity activation $f(z) = z$, so there is no non-linearity anywhere. Which statement about this network is TRUE?',
+    stem: 'A network has three hidden layers, but every neuron uses the identity activation $f(z) = z$. Which statement is TRUE?',
     options: [
-      'With enough neurons it can learn any curved decision boundary.',
-      'It cannot be trained by gradient descent, because a linear function has no derivative.',
-      'It is equivalent to a single linear layer, so the extra layers add no extra power.',
-      'It can solve the XOR problem, because it has more than one layer.',
+      'With enough neurons it can learn any curved boundary',
+      'It cannot be trained, because a linear function has no derivative',
+      'It is equivalent to a single linear layer',
+      'It can solve XOR, because it has more than one layer',
     ],
     correctIndex: 2,
     markScheme: {
@@ -272,7 +272,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-009',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'A sigmoid neuron, $\\sigma(z) = \\frac{1}{1 + e^{-z}}$, has inputs $x_1 = 2$ and $x_2 = 1$, weights $w_1 = 0.5$ and $w_2 = 1.5$, and bias $b = -0.5$. What is its output, to 3 decimal places?',
+    stem: 'A sigmoid neuron, $\\sigma(z) = \\frac{1}{1 + e^{-z}}$, has inputs $x_1 = 2$, $x_2 = 1$, weights $w_1 = 0.5$, $w_2 = 1.5$ and bias $b = -0.5$. What is its output, to 3 decimal places?',
     options: ['$0.924$', '$0.881$', '$0.119$', '$2$'],
     correctIndex: 1,
     markScheme: {
@@ -299,7 +299,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-010',
     subtopic: 'neural-networks',
     difficulty: 'foundation',
-    stem: 'During training, backpropagation finds that for a weight $w = 0.8$ the gradient of the loss is $\\frac{\\partial L}{\\partial w} = -2.5$. The learning rate is $\\eta = 0.1$. What is the value of $w$ after one gradient descent update?',
+    stem: 'A weight is $w = 0.8$, the gradient of the loss is $\\frac{\\partial L}{\\partial w} = -2.5$ and the learning rate is $\\eta = 0.1$. What is $w$ after one gradient descent update?',
     options: ['$0.55$', '$3.3$', '$-1.7$', '$1.05$'],
     correctIndex: 3,
     markScheme: {
@@ -323,12 +323,12 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-011',
     subtopic: 'neural-networks',
     difficulty: 'foundation',
-    stem: 'When a neural network is trained using **backpropagation**, what is calculated for every weight in the network?',
+    stem: 'In **backpropagation**, what is calculated for every weight in the network?',
     options: [
-      'The partial derivative of the loss with respect to that weight, found with the chain rule working backwards from the output layer.',
-      'The output of every neuron, found by working forwards from the input layer to the output layer.',
-      'The derivative of the loss with respect to the input data, so that the inputs can be changed to reduce the loss.',
-      'A new random value for the weight, which is kept only if the loss goes down.',
+      'The partial derivative of the loss with respect to that weight',
+      'The output of each neuron, working forwards',
+      'The derivative of the loss with respect to the input data',
+      'A new random value, kept if the loss falls',
     ],
     correctIndex: 0,
     markScheme: {
@@ -351,7 +351,7 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-012',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'A single perceptron has two binary inputs $x_1, x_2 \\in \\{0, 1\\}$, weights $w_1 = w_2 = 1$, bias $b = -1.5$ and the step activation: output $1$ if $z \\ge 0$, otherwise output $0$. Which logic gate does it implement?',
+    stem: 'A perceptron has binary inputs $x_1, x_2$, weights $w_1 = w_2 = 1$, bias $b = -1.5$ and a step activation: output $1$ if $z \\ge 0$, otherwise $0$. Which logic gate does it implement?',
     options: ['OR', 'XOR', 'AND', 'NAND'],
     correctIndex: 2,
     markScheme: {
@@ -381,52 +381,53 @@ export const questions: StaticQuestion[] = [
     id: 'neural-networks-013',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'What does this Python program print?',
+    stem: 'Arrays are indexed from 1. This pseudocode computes the output of a ReLU neuron. What does it print?',
     code: {
-      lang: 'python',
+      lang: 'pseudocode',
       source:
-        'def relu(z):\n' +
-        '    return max(0, z)\n' +
-        '\n' +
-        'def neuron(x, w, b):\n' +
-        '    z = 0\n' +
-        '    for i in range(len(x)):\n' +
-        '        z = z + x[i] * w[i]\n' +
-        '    return relu(z + b)\n' +
-        '\n' +
-        'w = [2, -1, 1]\n' +
+        'X = [0, 3, 1]\n' +
+        'W = [2, -1, 1]\n' +
         'b = -1\n' +
-        'outputs = []\n' +
-        'for x in [[1, 2, 2], [3, 1, -2], [0, 3, 1]]:\n' +
-        '    outputs.append(neuron(x, w, b))\n' +
-        'print(outputs)\n',
+        'z = b\n' +
+        'for i = 1 to 3\n' +
+        '   z = z + X[i] * W[i]\n' +
+        'end for\n' +
+        'print(max(0, z)) // max gives the larger value',
     },
-    options: ['`[1, 2, -3]`', '`[1, 2, 0]`', '`[2, 3, 0]`', '`[0, 0, -3]`'],
-    correctIndex: 1,
+    options: [
+      '$0$',
+      '$-3$',
+      '$3$',
+      'Infinite loop',
+    ],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'The function `neuron` adds up `x[i] * w[i]`, adds the bias `b = -1`, then applies `relu`, which returns `max(0, z)`. With `w = [2, -1, 1]`:\n\n' +
-        '| `x` | weighted sum | `+ b` | `relu` |\n' +
-        '| --- | --- | --- | --- |\n' +
-        '| `[1, 2, 2]` | $2 - 2 + 2 = 2$ | $1$ | $1$ |\n' +
-        '| `[3, 1, -2]` | $6 - 1 - 2 = 3$ | $2$ | $2$ |\n' +
-        '| `[0, 3, 1]` | $0 - 3 + 1 = -2$ | $-3$ | $0$ |\n\n' +
-        'Each result is appended to `outputs`, so the program prints `[1, 2, 0]`.',
+        'The loop adds each input times its weight to `z`, which starts at the bias $-1$.\n\n' +
+        '| $i$ | `X[i]` | `W[i]` | `X[i] * W[i]` | `z` |\n' +
+        '|---|---|---|---|---|\n' +
+        '| 1 | 0 | 2 | 0 | $-1$ |\n' +
+        '| 2 | 3 | $-1$ | $-3$ | $-4$ |\n' +
+        '| 3 | 1 | 1 | 1 | $-3$ |\n\n' +
+        'The last line is ReLU: `max(0, -3)` is $0$, so it prints $0$.',
       whyWrong: [
-        'This forgets the ReLU on the last input: $-3$ is negative, and `max(0, -3)` returns `0`.',
         null,
-        'This forgets to add the bias `b = -1`: the weighted sums $2$, $3$, $-2$ go straight into `relu`, giving $2$, $3$, $0$.',
-        'This treats `max(0, z)` as if it were `min(0, z)`, keeping negatives and turning positives into $0$. ReLU keeps positive values and replaces negative ones with $0$.',
+        'This is `z` before the last line. ReLU turns a negative value into $0$, and `max(0, -3)` returns $0$.',
+        'This drops the minus sign on the weight $-1$, giving $-1 + 3 + 1 = 3$. The second input must be multiplied by $-1$.',
+        'A `for` loop runs a fixed number of times, here 3, so the program always stops.',
       ],
-      keyIdea: 'A neuron in code is a loop that adds up input times weight, then adds the bias and applies the activation; ReLU is just `max(0, z)`.',
+      keyIdea: 'A neuron adds up input times weight, adds the bias and applies the activation; ReLU is just the larger of $0$ and $z$.',
     },
-    python: { stdout: '[1, 2, 0]' },
+    check: {
+      optionValues: [0, -3, 3, 'Infinite loop'],
+      compute: () => relu(weighted([0, 3, 1], [2, -1, 1], -1)),
+    },
   },
   {
     id: 'neural-networks-014',
     subtopic: 'neural-networks',
     difficulty: 'exam',
-    stem: 'Backpropagation through a sigmoid neuron uses its derivative, $\\sigma\'(z) = \\sigma(z)\\,(1 - \\sigma(z))$. If the neuron\'s output is $\\sigma(z) = 0.8$, what is $\\sigma\'(z)$?',
+    stem: 'A sigmoid neuron has derivative $\\sigma\'(z) = \\sigma(z)\\,(1 - \\sigma(z))$. If its output is $\\sigma(z) = 0.8$, what is $\\sigma\'(z)$?',
     options: ['$0.8$', '$0.2$', '$0.64$', '$0.16$'],
     correctIndex: 3,
     markScheme: {
@@ -452,191 +453,90 @@ export const questions: StaticQuestion[] = [
     },
   },
 
-  // ---------------------------------------------------------------- challenge
+  // ---------------------------------------------------------------- recall and counting
   {
-    id: 'neural-networks-015',
+    id: 'neural-networks-020',
     subtopic: 'neural-networks',
-    difficulty: 'challenge',
-    stem: 'A fully connected network for recognising handwritten digits takes a $28 \\times 28$ pixel image as $784$ inputs. It has two hidden layers with $128$ and $64$ neurons and an output layer of $10$ neurons. Every hidden and output neuron has a bias. How many trainable parameters does it have?',
-    options: ['$109\\,386$', '$109\\,184$', '$110\\,170$', '$64\\,225\\,280$'],
+    difficulty: 'foundation',
+    stem: 'What does ReLU, $f(z) = \\max(0, z)$, output when its input is $-3$?',
+    options: ['$0$', '$-3$', '$3$', '$1$'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'For each pair of neighbouring layers: weights $= n_{\\text{in}} \\times n_{\\text{out}}$, biases $= n_{\\text{out}}$.\n\n' +
-        '| Connection | Weights | Biases |\n' +
-        '| --- | --- | --- |\n' +
-        '| $784 \\to 128$ | $784 \\times 128 = 100\\,352$ | $128$ |\n' +
-        '| $128 \\to 64$ | $128 \\times 64 = 8192$ | $64$ |\n' +
-        '| $64 \\to 10$ | $64 \\times 10 = 640$ | $10$ |\n\n' +
-        'Weights: $100\\,352 + 8192 + 640 = 109\\,184$.\n\n' +
-        'Biases: $128 + 64 + 10 = 202$.\n\n' +
-        'Total: $109\\,184 + 202 = 109\\,386$.',
+        'ReLU returns the larger of $0$ and $z$:\n\n' +
+        '$$f(-3) = \\max(0, -3) = 0$$\n\n' +
+        'Every negative input gives $0$, and every positive input passes straight through.',
       whyWrong: [
         null,
-        'This is $109\\,184$, the number of **weights** only. The $202$ biases are trainable parameters as well.',
-        'This is $109\\,386 + 784$: it gives every one of the $784$ input pixels a bias too. Inputs are data, so they have no bias.',
-        'This is $784 \\times 128 \\times 64 \\times 10$: all the layer sizes were multiplied together. Weights only connect neighbouring layers, so multiply each neighbouring pair and then **add**.',
+        'This returns the input unchanged, which ReLU only does for positive inputs.',
+        'This takes the absolute value. ReLU does not flip negative inputs; it replaces them with $0$.',
+        'ReLU has no fixed maximum of $1$, and a negative input gives $0$. A step function is the one with outputs $0$ and $1$.',
       ],
-      keyIdea: 'Total parameters $= \\sum (n_{\\text{in}} \\times n_{\\text{out}} + n_{\\text{out}})$ over each pair of neighbouring layers; the first layer of weights usually dominates.',
+      keyIdea: 'ReLU turns negative inputs into 0 and leaves positive inputs unchanged.',
     },
-    check: {
-      optionValues: [109386, 109184, 110170, 64225280],
-      compute: () => paramCount([784, 128, 64, 10]),
-    },
+    check: { optionValues: [0, -3, 3, 1], compute: () => relu(-3) },
   },
   {
-    id: 'neural-networks-016',
+    id: 'neural-networks-021',
     subtopic: 'neural-networks',
-    difficulty: 'challenge',
-    stem:
-      'A network takes the input $\\mathbf{x} = \\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$. The hidden layer computes $\\mathbf{h} = \\text{ReLU}(W\\mathbf{x} + \\mathbf{b})$ with\n\n' +
-      '$$W = \\begin{bmatrix} 1 & 2 \\\\ 3 & -1 \\end{bmatrix}, \\qquad \\mathbf{b} = \\begin{bmatrix} 0.5 \\\\ -1 \\end{bmatrix}$$\n\n' +
-      'and the output is $y = \\sigma(2h_1 - 0.5h_2 + 1)$, where $\\sigma(z) = \\frac{1}{1 + e^{-z}}$. What is $y$, to 3 decimal places?',
-    options: ['$0.182$', '$-0.5$', '$0.378$', '$0.622$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        '**Step 1: matrix times vector.** Each row of $W$ is one hidden neuron\'s weights.\n\n' +
-        '$$W\\mathbf{x} = \\begin{bmatrix} 1(1) + 2(-1) \\\\ 3(1) + (-1)(-1) \\end{bmatrix} = \\begin{bmatrix} -1 \\\\ 4 \\end{bmatrix}$$\n\n' +
-        '**Step 2: add the biases.**\n\n' +
-        '$$W\\mathbf{x} + \\mathbf{b} = \\begin{bmatrix} -1 + 0.5 \\\\ 4 - 1 \\end{bmatrix} = \\begin{bmatrix} -0.5 \\\\ 3 \\end{bmatrix}$$\n\n' +
-        '**Step 3: ReLU** (negative values become $0$): $h_1 = 0$, $h_2 = 3$.\n\n' +
-        '**Step 4: output neuron.** $z = 2(0) - 0.5(3) + 1 = -0.5$.\n\n' +
-        '**Step 5: sigmoid.** $e^{0.5} \\approx 1.6487$, so\n\n' +
-        '$$y = \\frac{1}{1 + e^{0.5}} \\approx \\frac{1}{2.6487} \\approx 0.378$$\n\n' +
-        'Sanity check: $z$ is negative, so the output must be below $0.5$.',
-      whyWrong: [
-        'This skips the ReLU and keeps $h_1 = -0.5$: then $z = 2(-0.5) - 0.5(3) + 1 = -1.5$ and $\\sigma(-1.5) \\approx 0.182$.',
-        'This is $z = -0.5$, the output neuron\'s weighted sum **before** the sigmoid. A sigmoid output is always between $0$ and $1$, so it cannot be negative.',
-        null,
-        'This is $\\frac{1}{1 + e^{-0.5}} \\approx 0.622$, which is $\\sigma(0.5)$: the sign of $z$ was lost. A negative $z$ must give an output below $0.5$.',
-      ],
-      keyIdea: 'A forward pass in matrix form is $\\mathbf{h} = f(W\\mathbf{x} + \\mathbf{b})$ layer after layer: multiply, add the bias, apply the activation, repeat.',
-    },
-    check: {
-      optionValues: [0.182, -0.5, 0.378, 0.622],
-      compute: () => {
-        const x = [1, -1];
-        const W = [
-          [1, 2],
-          [3, -1],
-        ];
-        const b = [0.5, -1];
-        const h = W.map((row, i) => relu(weighted(x, row, b[i])));
-        return round(sigmoid(weighted(h, [2, -0.5], 1)), 3);
-      },
-    },
-  },
-  {
-    id: 'neural-networks-017',
-    subtopic: 'neural-networks',
-    difficulty: 'challenge',
-    stem: 'A single neuron with no activation predicts $y = wx + b$, and the loss for one example is $L = (y - t)^2$, where $t$ is the target. For the example $x = 3$, $t = 2$, with current values $w = 1.5$ and $b = 0.5$, and learning rate $\\eta = 0.01$, what is $w$ after one gradient descent step?',
-    options: ['$1.44$', '$1.32$', '$1.68$', '$1.41$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '**Step 1: forward pass.** $y = 1.5 \\times 3 + 0.5 = 5$, so the error is $y - t = 5 - 2 = 3$.\n\n' +
-        '**Step 2: chain rule (the backpropagation idea).** $L$ depends on $w$ through $y$:\n\n' +
-        '$$\\frac{\\partial L}{\\partial w} = \\frac{\\partial L}{\\partial y} \\times \\frac{\\partial y}{\\partial w} = 2(y - t) \\times x$$\n\n' +
-        '**Step 3: substitute.** $\\frac{\\partial L}{\\partial w} = 2 \\times 3 \\times 3 = 18$.\n\n' +
-        '**Step 4: update.**\n\n' +
-        '$$w_{\\text{new}} = w - \\eta \\frac{\\partial L}{\\partial w} = 1.5 - 0.01 \\times 18 = 1.5 - 0.18 = 1.32$$\n\n' +
-        'Sense check: the prediction $5$ is too big and the input $x = 3$ is positive, so making $w$ smaller makes the prediction smaller. So $w$ should decrease, and it does.',
-      whyWrong: [
-        'This uses a gradient of $2(y - t) = 6$, forgetting the second factor of the chain rule, $\\frac{\\partial y}{\\partial w} = x = 3$. Then $1.5 - 0.06 = 1.44$.',
-        null,
-        'This is $1.5 + 0.18$: the step was added instead of subtracted (or the error was taken as $t - y$). The prediction is too high and $x$ is positive, so $w$ must go **down**.',
-        'This uses a gradient of $(y - t) \\times x = 9$, forgetting the factor $2$ from differentiating the square. Then $1.5 - 0.09 = 1.41$.',
-      ],
-      keyIdea: 'Backpropagation is the chain rule: $\\frac{\\partial L}{\\partial w} = \\frac{\\partial L}{\\partial y} \\cdot \\frac{\\partial y}{\\partial w}$, and gradient descent then subtracts $\\eta$ times this gradient.',
-    },
-    check: {
-      optionValues: [1.44, 1.32, 1.68, 1.41],
-      compute: () => {
-        const x = 3;
-        const t = 2;
-        const b = 0.5;
-        const w = 1.5;
-        const L = (wv: number) => (wv * x + b - t) ** 2;
-        const h = 1e-4;
-        const grad = (L(w + h) - L(w - h)) / (2 * h);
-        return round(w - 0.01 * grad, 6);
-      },
-    },
-  },
-  {
-    id: 'neural-networks-018',
-    subtopic: 'neural-networks',
-    difficulty: 'challenge',
-    stem: 'A tiny network has one input $x$, two hidden neurons and one output, and **every** neuron uses the identity activation (no non-linearity):\n\n$$h_1 = 2x + 1, \\qquad h_2 = -x + 3, \\qquad y = 3h_1 + h_2 - 4$$\n\nWhich single neuron $y = wx + b$ gives exactly the same output for every value of $x$?',
-    options: ['$y = 5x - 4$', '$y = 7x + 2$', '$y = 5x + 6$', '$y = 5x + 2$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'Substitute the hidden neurons into the output neuron:\n\n' +
-        '$$y = 3(2x + 1) + (-x + 3) - 4$$\n\n' +
-        'Expand the bracket: $3(2x + 1) = 6x + 3$.\n\n' +
-        '$$y = 6x + 3 - x + 3 - 4$$\n\n' +
-        'Collect the $x$ terms: $6x - x = 5x$. Collect the numbers: $3 + 3 - 4 = 2$.\n\n' +
-        '$$y = 5x + 2$$\n\n' +
-        'Check with $x = 3$: $h_1 = 7$ and $h_2 = 0$, so $y = 3 \\times 7 - 4 = 17$, and $5(3) + 2 = 17$. The whole 3-neuron network is just one linear neuron, which is why hidden layers need a non-linear activation.',
-      whyWrong: [
-        'This drops the hidden biases $+1$ and $+3$ and keeps only the output bias $-4$. The biases inside the hidden neurons carry through to the output: $3 \\times 1 + 3 - 4 = 2$.',
-        'This is what you get with a sign slip on $h_2$, using $+x$ instead of $-x$: $6x + x = 7x$. The weight on $x$ in $h_2$ is $-1$, so $6x - x = 5x$.',
-        'This forgets the output bias $-4$: $3 + 3 = 6$. The constant term must include every bias: $3 + 3 - 4 = 2$.',
-        null,
-      ],
-      keyIdea: 'Linear layers composed together give another linear function: substitute, expand and collect terms.',
-    },
-    check: {
-      // evaluate each option at x = 3 and compare with a forward pass through the network
-      optionValues: [5 * 3 - 4, 7 * 3 + 2, 5 * 3 + 6, 5 * 3 + 2],
-      compute: () => {
-        const x = 3;
-        const h1 = 2 * x + 1;
-        const h2 = -x + 3;
-        return 3 * h1 + h2 - 4;
-      },
-    },
-  },
-  {
-    id: 'neural-networks-019',
-    subtopic: 'neural-networks',
-    difficulty: 'challenge',
-    stem:
-      'A network has two binary inputs $x_1, x_2 \\in \\{0, 1\\}$ and uses the step activation $s(z) = 1$ if $z \\ge 0$, otherwise $s(z) = 0$:\n\n' +
-      '$$h_1 = s(x_1 + x_2 - 0.5), \\qquad h_2 = s(x_1 + x_2 - 1.5), \\qquad y = s(h_1 - h_2 - 0.5)$$\n\n' +
-      'Which logic function does the output $y$ compute?',
-    options: ['XOR', 'OR', 'AND', 'XNOR'],
+    difficulty: 'foundation',
+    stem: 'Which logic gate can a single perceptron **not** compute?',
+    options: ['XOR', 'AND', 'OR', 'NAND'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Work through all four input pairs, hidden layer first, then the output.\n\n' +
-        '| $x_1$ | $x_2$ | $h_1$ | $h_2$ | $h_1 - h_2 - 0.5$ | $y$ |\n' +
-        '| --- | --- | --- | --- | --- | --- |\n' +
-        '| $0$ | $0$ | $s(-0.5) = 0$ | $s(-1.5) = 0$ | $-0.5$ | $0$ |\n' +
-        '| $0$ | $1$ | $s(0.5) = 1$ | $s(-0.5) = 0$ | $0.5$ | $1$ |\n' +
-        '| $1$ | $0$ | $s(0.5) = 1$ | $s(-0.5) = 0$ | $0.5$ | $1$ |\n' +
-        '| $1$ | $1$ | $s(1.5) = 1$ | $s(0.5) = 1$ | $-0.5$ | $0$ |\n\n' +
-        'So $y = 1$ exactly when the inputs are **different**: this is **XOR**.\n\n' +
-        'How it works: $h_1$ is an OR gate, $h_2$ is an AND gate, and the output fires for "OR but not AND". A single perceptron cannot compute XOR, but one hidden layer with a non-linear (step) activation can.',
+        'A single perceptron separates its inputs with one straight line.\n\n' +
+        'XOR outputs $1$ for $(0, 1)$ and $(1, 0)$ and $0$ for $(0, 0)$ and $(1, 1)$. No single straight line can separate these two pairs, so XOR is **not linearly separable** and needs a hidden layer.',
       whyWrong: [
         null,
-        'OR is what the hidden neuron $h_1$ computes on its own. The output also subtracts $h_2$, which switches $y$ off when both inputs are $1$.',
-        'AND is what the hidden neuron $h_2$ computes. For input $(1, 1)$ the output is $s(1 - 1 - 0.5) = s(-0.5) = 0$, so $y$ is not AND.',
-        'XNOR outputs $1$ when the inputs are the **same**, which is the exact opposite of this network: for $(0, 0)$ it gives $y = s(-0.5) = 0$.',
+        'AND is linearly separable: weights $1, 1$ and bias $-1.5$ compute it.',
+        'OR is linearly separable: weights $1, 1$ and bias $-0.5$ compute it.',
+        'NAND is linearly separable: weights $-1, -1$ and bias $1.5$ compute it.',
       ],
-      keyIdea: 'XOR needs a hidden layer: combine an OR neuron and an AND neuron to get "OR but not AND".',
+      keyIdea: 'A single perceptron draws one straight line, so it cannot compute XOR.',
     },
-    check: {
-      optionValues: ['XOR', 'OR', 'AND', 'XNOR'],
-      compute: () =>
-        gateName((a, b) => {
-          const h1 = step(a + b - 0.5);
-          const h2 = step(a + b - 1.5);
-          return step(h1 - h2 - 0.5);
-        }),
+  },
+  {
+    id: 'neural-networks-022',
+    subtopic: 'neural-networks',
+    difficulty: 'foundation',
+    stem: 'Why do the hidden layers of a network need a **non-linear** activation function?',
+    options: ['To let the network learn non-linear patterns', 'To store the training data', 'To reduce the number of weights', 'To set the learning rate'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A linear function of a linear function is still linear, so without non-linear activations any number of layers collapses into one linear layer.\n\n' +
+        'A non-linear activation such as ReLU is what lets extra layers add power, so that the network can learn curved decision boundaries.',
+      whyWrong: [
+        null,
+        'A network does not store its training data. It keeps only its learned weights and biases.',
+        'The number of weights depends on the layer sizes. The activation function does not change it.',
+        'The learning rate is a separate setting of gradient descent, chosen before training.',
+      ],
+      keyIdea: 'Non-linear activations are what make extra layers useful.',
     },
+  },
+  {
+    id: 'neural-networks-023',
+    subtopic: 'neural-networks',
+    difficulty: 'exam',
+    stem: 'A fully connected network has layer sizes $3$, $4$ and $2$. How many **weights** does it have, not counting biases?',
+    options: ['$20$', '$26$', '$24$', '$9$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Weights connect neighbouring layers only, with one weight for every pair of neurons.\n\n' +
+        '- $3 \\to 4$: $3 \\times 4 = 12$ weights.\n' +
+        '- $4 \\to 2$: $4 \\times 2 = 8$ weights.\n\n' +
+        'Total: $12 + 8 = 20$ weights.',
+      whyWrong: [
+        null,
+        'This also counts the $4 + 2 = 6$ biases. The question asks for weights only.',
+        'This multiplies all three sizes together, $3 \\times 4 \\times 2$. Multiply each neighbouring pair of layers and then add.',
+        'This adds the layer sizes, $3 + 4 + 2$, which counts neurons rather than connections.',
+      ],
+      keyIdea: 'Weights $= \\sum n_{\\text{in}} \\times n_{\\text{out}}$ over each neighbouring pair of layers.',
+    },
+    check: { optionValues: [20, 26, 24, 9], compute: () => paramCount([3, 4, 2]) - (4 + 2) },
   },
 ];

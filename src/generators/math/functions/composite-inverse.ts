@@ -145,7 +145,7 @@ export const generators: Generator[] = [
         c = rng.int(1, 3);
         d = rng.intNonZero(-6, 6);
         if (a * d - b * c === 0) continue; // constant function: no inverse
-        if (d === -a) continue; // self-inverse: keep those for the static questions
+        if (d === -a) continue; // f would equal its own inverse, so "f itself" could not be a wrong option
         if (gcd(gcd(a, b), gcd(c, d)) !== 1) continue; // avoid a common factor top and bottom
         break;
       }
@@ -157,7 +157,7 @@ export const generators: Generator[] = [
         { r: [d, -b, c, -a], why: `This has a sign slip when moving terms across: after collecting the $y$ terms the right-hand side should be ${m(sum([[-d, 'x'], [b, '']]))}, not ${m(sum([[d, 'x'], [-b, '']]))}. The result is the negative of the true inverse.` },
         { r: [-a, b, c, -d], why: `This misuses the shortcut "swap the $x$-coefficient on top with the constant on the bottom, and change the signs of the other two numbers": it changes the signs but never swaps ${m(num(a))} (the $x$-coefficient on top) with ${m(num(d))} (the constant on the bottom). Substituting a value shows it does not undo $f$.` },
         { r: [-d, b, c, a], why: `This forgets to change the sign of ${m(term(a, 'y', true))} when moving it to the left-hand side, so the bracket becomes ${m(sum([[c, 'x'], [a, '']]))} instead of ${m(sum([[c, 'x'], [-a, '']]))}.` },
-        { r: [a, b, c, d], why: `This is $f(x)$ itself; it was never inverted. $f$ is not self-inverse here, because ${m(`${num(d)} \\ne ${num(-a)}`)}.` },
+        { r: [a, b, c, d], why: `This is $f(x)$ itself; it was never inverted.` },
         { r: [-d, -b, c, -a], why: `This has a sign slip on the constant: the right-hand side should be ${m(sum([[-d, 'x'], [b, '']]))}, not ${m(sum([[-d, 'x'], [-b, '']]))}.` },
       ];
       const distractors: { text: string; why: string }[] = [];

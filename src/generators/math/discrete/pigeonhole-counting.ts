@@ -49,18 +49,18 @@ const PIGEON_CTX: PigeonCtx[] = [
     boxes: "months",
     items: "people",
     stemA: (N) =>
-      `There are ${N} people at a concert. What is the **largest** number $n$ for which we can be **certain** that at least $n$ of them were born in the same month?`,
+      `Among ${N} people, what is the **largest** $n$ for which at least $n$ must have been born in the same month?`,
     stemB: (r) =>
-      `What is the **smallest** number of people needed to be **certain** that at least ${r} of them were born in the same month?`,
+      `What is the **smallest** number of people needed to be **certain** that at least ${r} were born in the same month?`,
   },
   {
     k: 7,
     boxes: "days of the week",
     items: "people",
     stemA: (N) =>
-      `${N} people belong to a sports club. What is the **largest** number $n$ for which we can be **certain** that at least $n$ of them were born on the same day of the week?`,
+      `Among ${N} people, what is the **largest** $n$ for which at least $n$ must have been born on the same day of the week?`,
     stemB: (r) =>
-      `What is the **smallest** number of people needed to be **certain** that at least ${r} of them were born on the same day of the week?`,
+      `What is the **smallest** number of people needed to be **certain** that at least ${r} were born on the same day of the week?`,
   },
   {
     k: null,
@@ -68,18 +68,18 @@ const PIGEON_CTX: PigeonCtx[] = [
     boxes: "colours",
     items: "socks",
     stemA: (N, k) =>
-      `A drawer holds ${N} socks, and each sock is one of ${k} colours. What is the **largest** number $n$ for which we can be **certain** that at least $n$ of the socks are the same colour?`,
+      `Each of ${N} socks is one of ${k} colours. What is the **largest** $n$ for which at least $n$ must be the same colour?`,
     stemB: (r, k) =>
-      `A drawer contains plenty of socks in ${k} different colours. In the dark, what is the **smallest** number of socks you must take out to be **certain** of having at least ${r} socks of the same colour?`,
+      `Socks come in ${k} colours. What is the **smallest** number of socks you must take to be **certain** of having ${r} of the same colour?`,
   },
   {
     k: 5,
     boxes: "grades",
     items: "students",
     stemA: (N) =>
-      `${N} students sit a test that is graded with one of 5 grades (A, B, C, D or E). What is the **largest** number $n$ for which we can be **certain** that at least $n$ students receive the same grade?`,
+      `Each of ${N} students gets one of 5 grades. What is the **largest** $n$ for which at least $n$ must get the same grade?`,
     stemB: (r) =>
-      `A test is graded with one of 5 grades (A, B, C, D or E). What is the **smallest** number of students who must sit the test to be **certain** that at least ${r} of them receive the same grade?`,
+      `Each student gets one of 5 grades. What is the **smallest** number of students needed to be **certain** that at least ${r} get the same grade?`,
   },
   {
     k: null,
@@ -87,9 +87,9 @@ const PIGEON_CTX: PigeonCtx[] = [
     boxes: "mailboxes",
     items: "letters",
     stemA: (N, k) =>
-      `${N} letters are delivered into ${k} mailboxes. What is the **largest** number $n$ for which we can be **certain** that some mailbox receives at least $n$ letters?`,
+      `${N} letters go into ${k} mailboxes. What is the **largest** $n$ for which some mailbox must receive at least $n$ letters?`,
     stemB: (r, k) =>
-      `Letters are delivered into ${k} mailboxes. What is the **smallest** number of letters that must be delivered to be **certain** that some mailbox receives at least ${r} letters?`,
+      `Letters go into ${k} mailboxes. What is the **smallest** number of letters needed to be **certain** that some mailbox receives at least ${r}?`,
   },
 ];
 
@@ -373,7 +373,7 @@ export const generators: Generator[] = [
           const distractors = pickDistinct(ans, pool);
           if (distractors.length < 3) continue; // re-roll
           return {
-            stem: `A robot moves on a square grid from $(0, 0)$ to $(${w}, ${h})$, one unit at a time, only to the **right** or **up**. How many different shortest routes are there?`,
+            stem: `How many shortest routes go from $(0, 0)$ to $(${w}, ${h})$ on a square grid, moving only **right** or **up**?`,
             answer: m(big(ans)),
             answerValue: ans,
             distractors: distractors.map((d) => ({
@@ -422,7 +422,7 @@ export const generators: Generator[] = [
         const distractors = pickDistinct(ans, pool);
         if (distractors.length < 3) continue; // re-roll the grid
         return {
-          stem: `A robot moves on a square grid from $(0, 0)$ to $(${w}, ${h})$, one unit at a time, only to the **right** or **up**. How many shortest routes **pass through** the point $(${p}, ${q})$?`,
+          stem: `Moving only **right** or **up** on a square grid, how many shortest routes from $(0, 0)$ to $(${w}, ${h})$ **pass through** $(${p}, ${q})$?`,
           answer: m(big(ans)),
           answerValue: ans,
           distractors: distractors.map((d) => ({

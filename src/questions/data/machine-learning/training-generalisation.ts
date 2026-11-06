@@ -10,12 +10,12 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-001',
     subtopic: 'training-generalisation',
     difficulty: 'foundation',
-    stem: 'A dataset is split into a **training** set, a **validation** set and a **test** set. What is the main purpose of the **test** set?',
+    stem: 'A dataset is split into **training**, **validation** and **test** sets. What is the main purpose of the **test** set?',
     options: [
-      "To learn the model's weights (its parameters)",
-      'To compare different hyperparameter settings and pick the best model',
-      'To give an unbiased estimate of how the final model will perform on new, unseen data',
-      'To provide extra examples so that the model can be trained for longer',
+      'To learn the model\'s weights',
+      'To compare settings and pick the best model',
+      'To estimate how the final model performs on unseen data',
+      'To give extra examples for more training',
     ],
     correctIndex: 2,
     markScheme: {
@@ -38,7 +38,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-002',
     subtopic: 'training-generalisation',
     difficulty: 'foundation',
-    stem: 'In the training data, the feature "hours studied" has a minimum of $10$ and a maximum of $60$. Using **min-max scaling** to the range $[0, 1]$, what is the scaled value of $40$?',
+    stem: 'A feature has a training minimum of $10$ and a maximum of $60$. Using **min-max scaling** to the range $[0, 1]$, what is the scaled value of $40$?',
     options: ['$\\frac{2}{3}$', '$0.5$', '$0.4$', '$0.6$'],
     correctIndex: 3,
     markScheme: {
@@ -65,7 +65,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-003',
     subtopic: 'training-generalisation',
     difficulty: 'foundation',
-    stem: 'Four models were trained on the same task. The table shows their accuracy on the training set and on the validation set. Which model is **overfitting**?',
+    stem: 'The table shows the training and validation accuracy of four models on the same task. Which model is **overfitting**?',
     table: {
       headers: ['Model', 'Training accuracy (%)', 'Validation accuracy (%)'],
       rows: [
@@ -125,12 +125,12 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-005',
     subtopic: 'training-generalisation',
     difficulty: 'foundation',
-    stem: 'On a task where good models reach about $5\\%$ error, a model has a training error of $35\\%$ and a validation error of $37\\%$. What is most likely happening?',
+    stem: 'Good models reach about $5\\%$ error on a task. A model has training error $35\\%$ and validation error $37\\%$. What is most likely happening?',
     options: [
-      'The model is overfitting (high variance)',
-      'The model is a good fit, because its training and validation errors are close',
-      'There is data leakage from the validation set into the training set',
-      'The model is underfitting (high bias)',
+      'Overfitting (high variance)',
+      'A good fit, because the two errors are close',
+      'Data leakage from the validation set',
+      'Underfitting (high bias)',
     ],
     correctIndex: 3,
     markScheme: {
@@ -154,7 +154,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-006',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'A feature has training values $2, 4, 4, 4, 5, 5, 7, 9$. The feature is **standardised** using the mean and the **population** standard deviation (divide by $n$) of these values. What is the standardised value (z-score) of $9$?',
+    stem: 'A feature has training values $2, 4, 4, 4, 5, 5, 7, 9$. Using their mean and **population** standard deviation (divide by $n$), what is the standardised value (z-score) of $9$?',
     options: ['$4$', '$2$', '$4.5$', '$1$'],
     correctIndex: 1,
     markScheme: {
@@ -216,7 +216,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-008',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'Two models, P and Q, were compared using 5-fold cross-validation. The table shows the validation accuracy in each fold. The model with the better **cross-validation accuracy** is chosen. What is the cross-validation accuracy of the chosen model?',
+    stem: 'The table shows the fold accuracies of two models under 5-fold cross-validation. The model with the better **cross-validation accuracy** is chosen. What is that accuracy?',
     table: {
       headers: ['Fold', '1', '2', '3', '4', '5'],
       rows: [
@@ -257,9 +257,9 @@ export const questions: StaticQuestion[] = [
     stem: 'Which of the following is an example of **data leakage**?',
     options: [
       'Training on $80\\%$ of the data and testing on the other $20\\%$',
-      'Computing the mean and standard deviation for standardisation from the **whole** dataset, and only then splitting it into training and test sets',
-      'Using the validation set to choose the regularisation strength $\\lambda$',
-      'Shuffling the data randomly before splitting it into training and test sets',
+      'Computing the scaling statistics from the **whole** dataset, then splitting it',
+      'Choosing $\\lambda$ with the validation set',
+      'Shuffling the data before splitting it',
     ],
     correctIndex: 1,
     markScheme: {
@@ -280,7 +280,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-010',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'Polynomial regression models of degree $1$ to $8$ were trained on the same data. The graph shows the training error and validation error for each degree. Which statement is correct?',
+    stem: 'The graph shows training and validation error for polynomial models of degree $1$ to $8$. Which statement is correct?',
     chart: {
       kind: 'line',
       title: 'Error against polynomial degree',
@@ -293,10 +293,10 @@ export const questions: StaticQuestion[] = [
       ],
     },
     options: [
-      'At degree $8$ the model is overfitting: its training error is very low but its validation error is high.',
-      'At degree $1$ the model is overfitting, because its training and validation errors are almost equal.',
-      'Degree $8$ is the best choice, because it has the lowest training error.',
-      'At degree $4$ the model has high bias, because its validation error is higher than its training error.',
+      'Degree $8$ overfits: low training error, high validation error',
+      'Degree $1$ overfits, because its two errors are almost equal',
+      'Degree $8$ is best, because it has the lowest training error',
+      'Degree $4$ has high bias, because validation error exceeds training error',
     ],
     correctIndex: 0,
     markScheme: {
@@ -319,7 +319,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-011',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'A linear model has a training mean squared error of $2.5$ and weights $w_1 = 3$ and $w_2 = -1$. **L2 regularisation** with $\\lambda = 0.1$ adds the penalty $\\lambda (w_1^2 + w_2^2)$ to the loss. What is the regularised loss?',
+    stem: 'A model has training mean squared error $2.5$ and weights $w_1 = 3$, $w_2 = -1$. **L2 regularisation** with $\\lambda = 0.1$ adds the penalty $\\lambda (w_1^2 + w_2^2)$. What is the regularised loss?',
     options: ['$2.9$', '$12.5$', '$3.5$', '$3.3$'],
     correctIndex: 2,
     markScheme: {
@@ -348,26 +348,26 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-012',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'A model is **overfitting**: it has $98\\%$ training accuracy but only $75\\%$ validation accuracy. Which of the following is likely to help it generalise better?',
+    stem: 'A model has $98\\%$ training accuracy but $75\\%$ validation accuracy.\n\nStatement 1: more training data is likely to help it generalise.\n\nStatement 2: regularisation that penalises large weights is likely to help.\n\nWhich is true?',
     options: [
-      'Collecting more training data',
-      'Adding regularisation that penalises large weights',
-      'Both A and B',
-      'None of the above',
+      'Statement 1 only',
+      'Statement 2 only',
+      'Both statements',
+      'Neither statement',
     ],
     correctIndex: 2,
     fixedOrder: true,
     markScheme: {
       solution:
-        'Overfitting means **high variance**: the model is flexible enough to memorise noise in the training set.\n\n' +
-        '- **More training data** (option A) makes it much harder to memorise every example, so the model is pushed to learn the real pattern. This reduces variance.\n' +
-        '- **Regularisation** (option B) adds a penalty for large weights. Smaller weights give a smoother, simpler model, which reduces variance.\n\n' +
-        'Both A and B help, so the answer is C.',
+        'A big gap between training and validation accuracy means **overfitting** (high variance): the model is flexible enough to memorise noise in the training set.\n\n' +
+        '- **More training data** (Statement 1) makes it much harder to memorise every example, so the model is pushed to learn the real pattern. This reduces variance.\n' +
+        '- **Regularisation** (Statement 2) adds a penalty for large weights. Smaller weights give a smoother, simpler model, which reduces variance.\n\n' +
+        'Both statements are true.',
       whyWrong: [
-        'More data does help, but it is not the only correct choice here: regularisation also reduces overfitting, so option C is better.',
-        'Regularisation does help, but collecting more data also reduces overfitting, so option C is better.',
+        'More data does help, but regularisation also reduces overfitting, so Statement 2 is true as well.',
+        'Regularisation does help, but collecting more data also reduces overfitting, so Statement 1 is true as well.',
         null,
-        'Both A and B are standard fixes for overfitting (high variance), so "None of the above" is false.',
+        'Both are standard fixes for overfitting (high variance), so neither statement is false.',
       ],
       keyIdea: 'Overfitting (high variance) is reduced by more training data and by regularisation (a simpler, smoother model).',
     },
@@ -376,12 +376,12 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-013',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'A student tries $50$ different hyperparameter settings. For each one she trains on the training set and measures the accuracy on the **test** set. She then reports the best test accuracy, $94\\%$, as the accuracy to expect on new data. What is the main problem?',
+    stem: 'A student tries $50$ hyperparameter settings, keeps the one with the best **test** accuracy, and reports that $94\\%$ as the accuracy to expect on new data. What is the main problem?',
     options: [
-      'She tried too few settings; trying more would make the test accuracy more reliable',
-      'The $94\\%$ is probably too optimistic: the test set was used to choose the model, so it is no longer unseen data',
-      'She should have reported the training accuracy instead, which is a fairer estimate',
-      'Nothing is wrong: the test set is the right place to tune hyperparameters',
+      'She tried too few settings',
+      'The $94\\%$ is too optimistic: the test set chose the model',
+      'She should have reported the training accuracy',
+      'Nothing: hyperparameters should be tuned on the test set',
     ],
     correctIndex: 1,
     markScheme: {
@@ -402,7 +402,7 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-014',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'A min-max scaler was fitted on the training data, where the feature had minimum $20$ and maximum $100$. A new test example has the value $110$. Using the **training** minimum and maximum, what is its scaled value?',
+    stem: 'A min-max scaler fitted on training data has minimum $20$ and maximum $100$. A test example has the value $110$. What is its scaled value?',
     options: ['$1.1$', '$1.375$', '$1.125$', '$1$'],
     correctIndex: 2,
     markScheme: {
@@ -427,12 +427,12 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-015',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'A hospital builds a model to predict whether a patient has diabetes. It scores $99.8\\%$ accuracy on the test set. One of the input features is "currently prescribed insulin (yes/no)". What is the most likely explanation of the very high score?',
+    stem: 'A model predicting diabetes scores $99.8\\%$ on the test set. One input feature is "currently prescribed insulin (yes/no)". What is the most likely explanation of the high score?',
     options: [
-      'The model is underfitting, because it relies on only a few features',
-      'The model has generalised perfectly and can be used with confidence to screen new, undiagnosed patients',
-      'The features were not scaled, which inflates the accuracy',
-      'Data leakage: insulin is usually prescribed **because** of a diabetes diagnosis, so this feature gives away the answer',
+      'Underfitting: it relies on too few features',
+      'It has generalised perfectly and is safe for screening',
+      'The features were not scaled, which inflates accuracy',
+      'Data leakage: insulin is usually prescribed **because** of a diabetes diagnosis',
     ],
     correctIndex: 3,
     markScheme: {
@@ -453,56 +453,49 @@ export const questions: StaticQuestion[] = [
     id: 'training-generalisation-016',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'What does this Python code print?',
-    code: {
-      lang: 'python',
-      source:
-        'data = [10, 20, 35, 50]\n' +
-        'lo, hi = min(data), max(data)\n' +
-        'scaled = [(x - lo) / (hi - lo) for x in data]\n' +
-        'print(scaled)',
-    },
-    options: ['`[0.2, 0.4, 0.7, 1.0]`', '`[0.0, 0.25, 0.625, 1.0]`', '`[0, 0.25, 0.625, 1]`', '`[0.25, 0.5, 0.875, 1.25]`'],
+    stem: 'The values $10, 20, 35, 50$ are min-max scaled to the range $[0, 1]$. What are the scaled values?',
+    options: [
+      '$0.2, 0.4, 0.7, 1$',
+      '$0, 0.25, 0.625, 1$',
+      '$0, 0.2, 0.5, 0.8$',
+      '$0.25, 0.5, 0.875, 1.25$',
+    ],
     correctIndex: 1,
     markScheme: {
       solution:
-        'Line 2: `lo = 10`, `hi = 50`, so `hi - lo = 40`.\n\n' +
-        'Line 3 applies min-max scaling to each value:\n\n' +
-        '| `x` | `x - lo` | `(x - lo) / 40` |\n' +
+        'The minimum is $10$ and the maximum is $50$, so the range is $50 - 10 = 40$.\n\n' +
+        'Min-max scaling is $x\' = \\frac{x - 10}{40}$:\n\n' +
+        '| $x$ | $x - 10$ | $x\'$ |\n' +
         '|---|---|---|\n' +
-        '| 10 | 0 | 0.0 |\n' +
+        '| 10 | 0 | 0 |\n' +
         '| 20 | 10 | 0.25 |\n' +
         '| 35 | 25 | 0.625 |\n' +
-        '| 50 | 40 | 1.0 |\n\n' +
-        'In Python 3 the `/` operator always gives a `float`, so `0 / 40` is `0.0` and `40 / 40` is `1.0`.\n\n' +
-        'Output: `[0.0, 0.25, 0.625, 1.0]`',
+        '| 50 | 40 | 1 |\n\n' +
+        'The scaled values are $0, 0.25, 0.625, 1$.',
       whyWrong: [
-        'This is each value divided by `hi` (`x / 50`): it forgets to subtract `lo` and divides by the maximum instead of the range.',
+        'This is $\\frac{x}{50}$: it forgets to subtract the minimum and divides by the maximum instead of the range.',
         null,
-        'The numbers are right, but `/` always returns a `float` in Python 3, so Python prints `0.0` and `1.0`, not `0` and `1`.',
-        'This divides each value by the range `40` but forgets to subtract `lo` first, so the smallest value does not map to `0.0`.',
+        'This is $\\frac{x - 10}{50}$: it subtracts the minimum but divides by the maximum. The largest value must map to $1$, so divide by the range, $40$.',
+        'This is $\\frac{x}{40}$: it divides by the range but forgets to subtract the minimum, so the smallest value does not map to $0$.',
       ],
-      keyIdea: 'Min-max scaling maps the minimum to 0 and the maximum to 1; in Python 3, `/` always returns a float.',
+      keyIdea: 'Min-max scaling subtracts the minimum and divides by the range, which maps the minimum to 0 and the maximum to 1.',
     },
-    python: { stdout: '[0.0, 0.25, 0.625, 1.0]' },
     check: {
-      optionValues: ['[0.2, 0.4, 0.7, 1.0]', '[0.0, 0.25, 0.625, 1.0]', '[0, 0.25, 0.625, 1]', '[0.25, 0.5, 0.875, 1.25]'],
+      optionValues: ['0.2,0.4,0.7,1', '0,0.25,0.625,1', '0,0.2,0.5,0.8', '0.25,0.5,0.875,1.25'],
       compute: () => {
         const data = [10, 20, 35, 50];
         const lo = Math.min(...data);
         const hi = Math.max(...data);
-        const pyFloat = (v: number) => (Number.isInteger(v) ? v.toFixed(1) : String(v));
-        return `[${data.map((x) => pyFloat((x - lo) / (hi - lo))).join(', ')}]`;
+        return data.map((x) => minMax(x, lo, hi)).join(',');
       },
     },
   },
 
-  // ---------------------------------------------------------------- challenge
   {
     id: 'training-generalisation-017',
     subtopic: 'training-generalisation',
     difficulty: 'exam',
-    stem: 'The training values of a feature are $4, 8, 10, 12, 16$. A standardiser is fitted on these values using their mean and **population** standard deviation (divide by $n$). A test example has the value $19$. What is its standardised value?',
+    stem: 'A standardiser is fitted on training values $4, 8, 10, 12, 16$ using their mean and **population** standard deviation. A test example has the value $19$. What is its standardised value?',
     options: ['$2.25$', '$1.25$', '$0.5625$', '$4.75$'],
     correctIndex: 0,
     markScheme: {
@@ -528,152 +521,65 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+
+  // ---------------------------------------------------------------- recall
   {
-    id: 'training-generalisation-018',
+    id: 'training-generalisation-022',
     subtopic: 'training-generalisation',
-    difficulty: 'challenge',
-    stem: 'A team compares $4$ values of the regularisation strength $\\lambda$ using **10-fold cross-validation** on $600$ examples. After picking the best $\\lambda$, they retrain one final model on all $600$ examples. In total, how many times is a model trained?',
-    options: ['$40$', '$14$', '$11$', '$41$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        '**Step 1: one value of $\\lambda$.** 10-fold cross-validation trains one model per fold, so $10$ models.\n\n' +
-        '**Step 2: all four values.** Each value of $\\lambda$ needs its own full cross-validation: $4 \\times 10 = 40$ models.\n\n' +
-        '**Step 3: the final model.** One more model trained on all $600$ examples with the best $\\lambda$: $40 + 1 = 41$.\n\n' +
-        'The number of examples ($600$) does not affect the count; it only decides how big each fold is ($60$ examples).',
-      whyWrong: [
-        'This is $4 \\times 10$, which forgets the final model retrained on all the data.',
-        'This adds instead of multiplies: $4 + 10 = 14$. Every value of $\\lambda$ needs all $10$ folds, so it is $4 \\times 10$.',
-        'This is $10 + 1$: it runs cross-validation for only one value of $\\lambda$, forgetting that all $4$ values must be cross-validated.',
-        null,
-      ],
-      keyIdea: 'Tuning $h$ settings with $k$-fold cross-validation trains $h \\times k$ models, plus one final model on all the data.',
-    },
-    check: {
-      optionValues: [40, 14, 11, 41],
-      compute: () => {
-        let trained = 0;
-        for (let setting = 0; setting < 4; setting++) for (let fold = 0; fold < 10; fold++) trained++;
-        return trained + 1;
-      },
-    },
-  },
-  {
-    id: 'training-generalisation-019',
-    subtopic: 'training-generalisation',
-    difficulty: 'challenge',
-    stem: 'Four models were trained on the same training set. The team must **pick one model** and then report an **honest estimate** of its error on future data. Which error should they report?',
-    table: {
-      headers: ['Model', 'Training error (%)', 'Validation error (%)', 'Test error (%)'],
-      rows: [
-        ['W', 2, 15, 16],
-        ['X', 8, 9, 10],
-        ['Y', 20, 21, 22],
-        ['Z', 6, 10, 8],
-      ],
-    },
-    options: ['$8\\%$', '$10\\%$', '$9\\%$', '$2\\%$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'There are two separate decisions, and each uses a different column.\n\n' +
-        '**Step 1: choose the model with the validation set.** Validation errors: W $15\\%$, X $9\\%$, Y $21\\%$, Z $10\\%$. The lowest is **model X** ($9\\%$).\n\n' +
-        '**Step 2: report the chosen model\'s test error.** The test set was not used for training or for choosing, so its score is the honest estimate. Model X\'s test error is $10\\%$.\n\n' +
-        'The validation error ($9\\%$) is slightly optimistic, because we picked X *because* it had the lowest validation error.',
-      whyWrong: [
-        'This picks model Z because it has the lowest **test** error. Using the test set to choose the model turns it into a second validation set, so its score is no longer an honest estimate.',
-        null,
-        'This is model X\'s **validation** error. It was used to choose the model, so it is optimistically biased; the untouched test error should be reported.',
-        'This is model W\'s **training** error. Model W is overfitting (training $2\\%$ but validation $15\\%$), and training error is never an honest estimate of performance on new data.',
-      ],
-      keyIdea: 'Choose the model by validation error, then report the chosen model\'s test error as the honest estimate.',
-    },
-    check: {
-      optionValues: [8, 10, 9, 2],
-      compute: () => {
-        const models = [
-          { val: 15, test: 16 },
-          { val: 9, test: 10 },
-          { val: 21, test: 22 },
-          { val: 10, test: 8 },
-        ];
-        const best = models.reduce((a, b) => (b.val < a.val ? b : a));
-        return best.test;
-      },
-    },
-  },
-  {
-    id: 'training-generalisation-020',
-    subtopic: 'training-generalisation',
-    difficulty: 'challenge',
-    stem: 'Two trained models are compared using an L2-regularised loss $J = \\text{MSE} + \\lambda \\sum w_i^2$ with $\\lambda = 0.1$.\n\n- Model 1: MSE $= 2.0$, weights $w_1 = 4$, $w_2 = -2$\n- Model 2: MSE $= 3.0$, weights $w_1 = 1$, $w_2 = 1$\n\nWhich model has the **lower** regularised loss, and what is that loss?',
-    options: [
-      'Model 1, with regularised loss $2.0$',
-      'Model 1, with regularised loss $2.6$',
-      'Model 2, with regularised loss $3.2$',
-      'Model 1, with regularised loss $2.4$',
-    ],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Work out $J$ for each model.\n\n' +
-        '**Model 1.** $\\sum w_i^2 = 4^2 + (-2)^2 = 16 + 4 = 20$. Penalty $= 0.1 \\times 20 = 2$. $J = 2.0 + 2 = 4.0$.\n\n' +
-        '**Model 2.** $\\sum w_i^2 = 1^2 + 1^2 = 2$. Penalty $= 0.1 \\times 2 = 0.2$. $J = 3.0 + 0.2 = 3.2$.\n\n' +
-        'Since $3.2 < 4.0$, **Model 2** has the lower regularised loss, $3.2$.\n\n' +
-        'This is the point of regularisation: Model 1 fits the training data a little better, but it needs large weights to do so, and the penalty prefers the simpler Model 2.',
-      whyWrong: [
-        'This compares the plain MSE values and ignores the penalty term $\\lambda \\sum w_i^2$ completely.',
-        'This uses absolute values (the L1 penalty): $2.0 + 0.1 \\times (4 + 2) = 2.6$. The question uses squared weights.',
-        null,
-        'This squares the **sum** of the weights instead of summing the squares: $2.0 + 0.1 \\times (4 - 2)^2 = 2.4$.',
-      ],
-      keyIdea: 'Regularisation can make a model with slightly worse training error win, because large weights are penalised.',
-    },
-    check: {
-      optionValues: [2.0, 2.6, 3.2, 2.4],
-      compute: () => {
-        const J = (mse: number, w: number[]) => mse + 0.1 * sumOf(w.map((x) => x * x));
-        return Math.min(J(2.0, [4, -2]), J(3.0, [1, 1]));
-      },
-    },
-  },
-  {
-    id: 'training-generalisation-021',
-    subtopic: 'training-generalisation',
-    difficulty: 'challenge',
-    stem: 'The **learning curve** shows the training and validation error of a model as the training set grows. The team needs an error below $5\\%$. Which action is most likely to help?',
-    chart: {
-      kind: 'line',
-      title: 'Learning curve',
-      xLabel: 'Number of training examples',
-      yLabel: 'Error (%)',
-      categories: ['100', '200', '400', '800', '1600', '3200'],
-      series: [
-        { name: 'Training error', values: [18, 22, 25, 26, 27, 27] },
-        { name: 'Validation error', values: [40, 33, 30, 29, 28, 28] },
-      ],
-    },
-    options: [
-      'Use a more flexible model, or add more informative features',
-      'Collect ten times more training data',
-      'Increase the regularisation strength $\\lambda$',
-      'Remove some of the input features to make the model simpler',
-    ],
+    difficulty: 'foundation',
+    stem: 'What is a **hyperparameter**?',
+    options: ['A setting chosen before training', 'A weight learned during training', 'An input feature', 'A score on the test set'],
     correctIndex: 0,
     markScheme: {
       solution:
-        'Read the curve at the right-hand end.\n\n' +
-        '- The two curves have **met**: training error $27\\%$, validation error $28\\%$. A gap of only $1$ point, so there is no overfitting.\n' +
-        '- Both have **flattened out** at about $27$ to $28\\%$, far above the $5\\%$ target.\n\n' +
-        'High error on both sets with a tiny gap means **high bias (underfitting)**: the model is too simple to capture the pattern. Even the training error is $27\\%$, so the model cannot fit the data it already has.\n\n' +
-        'The fix for high bias is to make the model **more** expressive: a more flexible model (for example a higher-degree polynomial or a bigger network) or more informative features.',
+        'A **hyperparameter** is a setting that is chosen rather than learned, such as the learning rate, the regularisation strength $\\lambda$ or the $k$ in k-NN.\n\n' +
+        'It is usually chosen by trying several values on a validation set. **Parameters** (the weights and biases) are the numbers learned from the data during training.',
       whyWrong: [
         null,
-        'The curves are already flat: going from $1600$ to $3200$ examples changed nothing. More data helps high **variance** (a big gap), but here the training error itself is too high, so extra data will not reach $5\\%$.',
-        'Stronger regularisation shrinks the weights and makes the model **simpler**, which increases bias. The model is already underfitting, so this makes things worse.',
-        'Removing features makes the model simpler, increasing bias even further. An underfitting model needs more expressive power, not less.',
+        'Weights are **parameters**: training finds their values from the data. Hyperparameters are set from outside.',
+        'A feature is an input variable in the data, not a setting of the training process.',
+        'A test score measures the final model. It is a result, not a setting.',
       ],
-      keyIdea: 'If training and validation error converge at a high value, the model has high bias: make it more flexible rather than adding data or regularisation.',
+      keyIdea: 'Parameters are learned from data; hyperparameters are chosen, usually with a validation set.',
+    },
+  },
+  {
+    id: 'training-generalisation-023',
+    subtopic: 'training-generalisation',
+    difficulty: 'foundation',
+    stem: 'Low training error with much higher validation error is a sign of:',
+    options: ['Overfitting', 'Underfitting', 'Feature scaling', 'Regularisation'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The model does very well on the data it has seen and much worse on data it has not seen. It has memorised the training data, including its noise, rather than the general pattern. That is **overfitting**, also called high variance.',
+      whyWrong: [
+        null,
+        'Underfitting means the error is high on **both** sets, because the model is too simple. Here the training error is low.',
+        'Feature scaling is a preprocessing step that changes the range of an input. It is not a pattern of errors.',
+        'Regularisation is a **remedy** for this situation: it penalises large weights to reduce overfitting.',
+      ],
+      keyIdea: 'A large gap between low training error and higher validation error means overfitting.',
+    },
+  },
+  {
+    id: 'training-generalisation-024',
+    subtopic: 'training-generalisation',
+    difficulty: 'foundation',
+    stem: 'Which part of the data should be used to choose between models?',
+    options: ['The validation set', 'The training set', 'The test set', 'All of the data together'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **validation set** is held back from training so that models and hyperparameters can be compared on data they have not seen.\n\n' +
+        'The test set stays untouched until the very end, so that it gives an honest final estimate.',
+      whyWrong: [
+        null,
+        'Training error keeps falling as a model gets more complex, so choosing on the training set always favours the most complex model, which may be overfitting.',
+        'If the test set is used to choose, it is no longer unseen data and its score becomes too optimistic.',
+        'Using all the data includes the test set, so no honest estimate of performance on new data remains.',
+      ],
+      keyIdea: 'Train on the training set, choose with the validation set, and report once on the test set.',
     },
   },
 ];

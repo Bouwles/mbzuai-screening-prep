@@ -69,9 +69,9 @@ interface MeanCtx {
 
 const MEAN_CTX: MeanCtx[] = [
   { groups: ['Class A', 'Class B'], member: 'students', measure: 'test score', unit: '' },
-  { groups: ['the morning shift', 'the afternoon shift'], member: 'workers', measure: 'number of parcels packed per hour', unit: '' },
+  { groups: ['the morning shift', 'the afternoon shift'], member: 'workers', measure: 'output', unit: ' parcels per hour' },
   { groups: ['Batch 1', 'Batch 2'], member: 'phones', measure: 'battery life', unit: ' hours' },
-  { groups: ['the first team', 'the second team'], member: 'annotators', measure: 'number of images labelled per day', unit: '' },
+  { groups: ['the first team', 'the second team'], member: 'annotators', measure: 'output', unit: ' images per day' },
 ];
 
 export const generators: Generator[] = [
@@ -132,7 +132,7 @@ export const generators: Generator[] = [
         const from = ctx.cats[i];
         const to = ctx.cats[j];
         return {
-          stem: `The ${ctx.kind === 'bar' ? 'bar chart' : 'line graph'} shows ${ctx.what} in each ${ctx.catWord}. What is the percentage change in ${ctx.what} from ${from} to ${to}? (Percentages are rounded to 2 decimal places where necessary.)`,
+          stem: `The ${ctx.kind === 'bar' ? 'bar chart' : 'line graph'} shows ${ctx.what} in each ${ctx.catWord}. What is the percentage change from ${from} to ${to}? (Options to 2 decimal places where needed.)`,
           chart: { kind: ctx.kind, title: ctx.title, xLabel: ctx.catWord[0].toUpperCase() + ctx.catWord.slice(1), yLabel: ctx.yLabel, categories: ctx.cats, series: [{ name: ctx.yLabel, values }] },
           answer,
           answerValue,
@@ -188,7 +188,7 @@ export const generators: Generator[] = [
 
         const rows = f.map((fi, i) => `| ${m(`${lows[i]} \\le ${ctx.v} < ${lows[i] + w}`)} | ${num(mids[i])} | ${fi} | ${num(fi * mids[i])} |`);
         return {
-          stem: `${ctx.intro(N)} Estimate the mean ${ctx.label.toLowerCase()}. (Give your answer to 2 decimal places where necessary.)`,
+          stem: `${ctx.intro(N)} Estimate the mean ${ctx.label.toLowerCase()}. (Options to 2 decimal places where needed.)`,
           table: {
             headers: [`${ctx.label} ${m(ctx.v)} (${ctx.unit})`, 'Frequency'],
             rows: f.map((fi, i) => [m(`${lows[i]} \\le ${ctx.v} < ${lows[i] + w}`), fi]),
@@ -247,7 +247,7 @@ export const generators: Generator[] = [
           const distractors = pickDistinct(ans, M, pool);
           if (distractors.length < 3) continue;
           return {
-            stem: `${cap(g1)} has ${n1} ${ctx.member} with a mean ${ctx.measure} of ${m1}${u}. ${cap(g2)} has ${n2} ${ctx.member} with a mean ${ctx.measure} of ${m2}${u}. What is the mean ${ctx.measure} of all ${N} ${ctx.member} together? (Options are given to 2 decimal places where necessary.)`,
+            stem: `${cap(g1)} has ${n1} ${ctx.member} with a mean ${ctx.measure} of ${m1}${u}. ${cap(g2)} has ${n2} with a mean of ${m2}${u}. What is the mean ${ctx.measure} of all ${N} together?`,
             answer: ans,
             answerValue: M,
             distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
@@ -274,7 +274,7 @@ export const generators: Generator[] = [
         const distractors = pickDistinct(ans, m2, pool);
         if (distractors.length < 3) continue;
         return {
-          stem: `A group of ${N} ${ctx.member} has a mean ${ctx.measure} of ${num(M, 2)}${u}. The ${n1} ${ctx.member} in ${g1} have a mean ${ctx.measure} of ${m1}${u}. The other ${n2} ${ctx.member} are in ${g2}. What is the mean ${ctx.measure} of ${g2}? (Options are given to 2 decimal places where necessary.)`,
+          stem: `${N} ${ctx.member} have a mean ${ctx.measure} of ${num(M, 2)}${u}. The ${n1} in ${g1} have a mean of ${m1}${u}. What is the mean ${ctx.measure} of the other ${n2}, in ${g2}?`,
           answer: ans,
           answerValue: m2,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),

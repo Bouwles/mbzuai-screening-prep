@@ -24,17 +24,16 @@ const show2 = (v: number): string => m(dp2(v).toFixed(2));
 
 // ---------------------------------------------------------------- feature scaling contexts
 interface ScaleCtx {
-  feature: string; // "house size (in square metres)"
   los: number[];
   ranges: number[]; // all multiples of 20
 }
 
 const SCALE_CTX: ScaleCtx[] = [
-  { feature: 'house size (in square metres)', los: [40, 50, 60, 80, 100], ranges: [80, 100, 120, 160, 200] },
-  { feature: 'exam score', los: [10, 20], ranges: [40, 60] },
-  { feature: 'age (in years)', los: [16, 18, 20, 25], ranges: [40, 60] },
-  { feature: 'weekly screen time (in minutes)', los: [60, 100, 120, 150], ranges: [200, 240, 300, 400] },
-  { feature: 'monthly salary (in thousands of AED)', los: [5, 8, 10, 12], ranges: [20, 40, 60] },
+  { los: [40, 50, 60, 80, 100], ranges: [80, 100, 120, 160, 200] },
+  { los: [10, 20], ranges: [40, 60] },
+  { los: [16, 18, 20, 25], ranges: [40, 60] },
+  { los: [60, 100, 120, 150], ranges: [200, 240, 300, 400] },
+  { los: [5, 8, 10, 12], ranges: [20, 40, 60] },
 ];
 
 function minMaxCore(rng: Rng): GeneratedCore {
@@ -68,16 +67,16 @@ function minMaxCore(rng: Rng): GeneratedCore {
     const ds = pickDistinct(ans, pool);
     if (ds.length < 3) continue;
 
-    const whose = outside
-      ? `A min-max scaler was fitted on the **training** data, where the feature "${ctx.feature}" had minimum ${m(String(lo))} and maximum ${m(String(hi))}. A new **test** example has the value ${m(String(x))}. Using the training minimum and maximum, what is its scaled value?`
-      : `In the training data, the feature "${ctx.feature}" has a minimum of ${m(String(lo))} and a maximum of ${m(String(hi))}. Using **min-max scaling** to the range ${m('[0, 1]')}, what is the scaled value of ${m(String(x))}?`;
+    const stem = outside
+      ? `A min-max scaler fitted on **training** data has minimum ${m(String(lo))} and maximum ${m(String(hi))}. A **test** example has the value ${m(String(x))}. What is its scaled value, to 2 decimal places?`
+      : `A feature has a training minimum of ${m(String(lo))} and a maximum of ${m(String(hi))}. Using **min-max scaling** to the range ${m('[0, 1]')}, what is the scaled value of ${m(String(x))}, to 2 decimal places?`;
     const showFrac = Math.abs(exact.n) === Math.abs(x - lo) && exact.d === r ? '' : ` = ${exact.tex()}`;
     const numer = x - lo < 0 ? `-\\frac{${lo - x}}{${r}}` : `\\frac{${x - lo}}{${r}}`;
     const note = outside
       ? `\n\nThe value ${m(String(x))} lies ${j > 20 ? 'above the training maximum' : 'below the training minimum'}, so its scaled value is ${j > 20 ? `above ${m('1')}` : `below ${m('0')}`}. That is normal: the scaler always uses the numbers learned from the training data.`
       : `\n\nSanity check: ${m(String(lo))} maps to ${m('0')} and ${m(String(hi))} maps to ${m('1')}, and the answer lies between them.`;
     return {
-      stem: `${whose} Give your answer to 2 decimal places.`,
+      stem,
       answer: ans.text,
       answerValue: ans.value,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
@@ -93,11 +92,8 @@ function minMaxCore(rng: Rng): GeneratedCore {
   }
 }
 
-const Z_FEATURES = ['exam score', 'house price (in thousands of AED)', 'reaction time (in milliseconds)', 'daily step count (in hundreds)', 'blood pressure reading'];
-
 function zScoreCore(rng: Rng): GeneratedCore {
   for (;;) {
-    const feature = rng.pick(Z_FEATURES);
     const mu = 5 * rng.int(4, 30);
     const givesVar = rng.bool(0.4);
     const sigma = givesVar ? rng.pick([2, 3, 4, 5, 6, 8, 10]) : rng.pick([2, 4, 5, 8, 10, 12, 15, 20]);
@@ -137,7 +133,7 @@ function zScoreCore(rng: Rng): GeneratedCore {
     const zDecimal = z.isInt() ? '' : ` = ${num(z.value())}`;
     const absZ = Math.abs(z.value());
     return {
-      stem: `A feature, "${feature}", is **standardised** using statistics computed from the training data, which has ${spread}. What is the standardised value (z-score) of ${m(String(x))}? Give your answer to 2 decimal places.`,
+      stem: `A feature is **standardised** using its training ${spread}. What is the standardised value (z-score) of ${m(String(x))}, to 2 decimal places?`,
       answer: ans.text,
       answerValue: ans.value,
       distractors: ds.map((c) => ({ text: c.text, value: c.value, why: c.why })),
@@ -204,7 +200,7 @@ function modelCountCore(rng: Rng): GeneratedCore {
     const ds = pickDistinct(ans, pool);
     if (ds.length < 3) continue;
     return {
-      stem: `A team compares ${m(String(h))} different ${what} using **${k}-fold cross-validation** on ${m(String(N))} examples. After picking the best setting, they retrain one final model on all ${m(String(N))} examples. In total, how many times is a model trained?`,
+      stem: `${m(String(h))} different ${what} are compared using **${k}-fold cross-validation** on ${m(String(N))} examples, then one final model is trained on all the data. In total, how many times is a model trained?`,
       answer: ans.text,
       answerValue: answer,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),

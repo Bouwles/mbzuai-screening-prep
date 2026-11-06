@@ -272,14 +272,14 @@ export const generators: Generator[] = [
     title: 'Build a BST from an insertion order: height or search cost',
     generate(rng) {
       for (;;) {
-        const n = rng.int(7, 9);
+        const n = rng.int(6, 8);
         const pool10: number[] = [];
         for (let k = 10; k <= 99; k++) pool10.push(k);
         const keys = rng.sample(pool10, n);
         const tree = bst(keys);
         const h = height(tree);
         const kind = rng.pick(['height', 'search'] as const);
-        const intro = `The keys ${keys.join(', ')} are inserted, **in that order**, into an empty binary search tree.`;
+        const intro = `The keys ${keys.join(', ')} are inserted in that order into an empty binary search tree.`;
         const build = `Insert each key by starting at the root and going left if it is smaller, right if it is larger:\n\n${insertionSteps(keys)}\n\n${fence(draw(tree))}`;
 
         if (kind === 'height') {
@@ -295,7 +295,7 @@ export const generators: Generator[] = [
           const distractors = pickDistinct(String(h), h, pool);
           if (distractors.length < 3) continue;
           return {
-            stem: `${intro} Taking the height as the number of **edges** on the longest path from the root to a leaf, what is the height of the resulting tree?`,
+            stem: `${intro} What is its height, counted in **edges** on the longest root-to-leaf path?`,
             answer: String(h),
             answerValue: h,
             distractors,
@@ -334,7 +334,7 @@ export const generators: Generator[] = [
           return `| ${i + 1} | ${v} | ${m(`${target.key} ${rel} ${v}`)} | ${res} |`;
         });
         return {
-          stem: `${intro} You then search the tree for the key **${target.key}**. Counting one comparison for every node whose key is compared with ${target.key} (including the node where it is found), how many comparisons are made?`,
+          stem: `${intro} How many nodes are compared when searching for **${target.key}**, including ${target.key} itself?`,
           answer: String(comps),
           answerValue: comps,
           distractors,
@@ -356,7 +356,7 @@ export const generators: Generator[] = [
     generate(rng) {
       for (;;) {
         const kind = rng.pick(['level', 'total', 'minHeight'] as const);
-        const heightDef = 'The height of a binary tree is the number of edges on the longest path from the root to a leaf (a single node has height 0).';
+        const heightDef = 'Taking height as the number of edges on the longest root-to-leaf path,';
         if (kind === 'level') {
           const k = rng.int(3, 10);
           const ans = 2 ** k;
@@ -398,7 +398,7 @@ export const generators: Generator[] = [
           const terms: string[] = [];
           for (let x = 0; x <= h; x++) terms.push(String(2 ** x));
           return {
-            stem: `${heightDef} What is the **maximum** number of nodes in a binary tree of height ${h}?`,
+            stem: `${heightDef} what is the **maximum** number of nodes in a binary tree of height ${h}?`,
             answer: String(ans),
             answerValue: ans,
             distractors,
@@ -423,7 +423,7 @@ export const generators: Generator[] = [
         const distractors = pickDistinct(String(h), h, pool);
         if (distractors.length < 3) continue;
         return {
-          stem: `A binary tree has **${n} nodes**. ${heightDef} What is the **smallest possible height** of the tree?`,
+          stem: `${heightDef} what is the **smallest possible height** of a binary tree with ${n} nodes?`,
           answer: String(h),
           answerValue: h,
           distractors,

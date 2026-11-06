@@ -1,6 +1,6 @@
 import type { StaticQuestion } from '../../../types';
 import { Frac } from '../../../lib/frac';
-import { det, det3, dot, norm, rank, round } from '../../../lib/mathx';
+import { det, dot, norm, rank, round } from '../../../lib/mathx';
 
 /** Column vector in LaTeX (pmatrix, the IB style). Entries are numbers or ready-made LaTeX. */
 const col = (...xs: (number | string)[]) => `\\begin{pmatrix} ${xs.join(' \\\\ ')} \\end{pmatrix}`;
@@ -490,150 +490,45 @@ export const questions: StaticQuestion[] = [
     id: 'vectors-015',
     subtopic: 'vectors',
     difficulty: 'exam',
-    stem: 'What does this Python code print? (The two values are printed on one line, separated by a space.)',
+    stem: 'Arrays are indexed from 1. What does this pseudocode print?',
     code: {
-      lang: 'python',
+      lang: 'pseudocode',
       source:
-        'def dot(u, v):\n    return sum(a * b for a, b in zip(u, v))\n\nu = [2, -1, 3]\nv = [4, 5, -2]\nw = [1, 2, 0]\nprint(dot(u, v), dot(u, w))',
+        'u = [2, -1, 3]\n' +
+        'v = [4, 5, -2]\n' +
+        's = 0\n' +
+        'for i = 1 to 3\n' +
+        '   s = s + u[i] * v[i]\n' +
+        'end for\n' +
+        'print(s)',
     },
-    options: ['`[8, -5, -6] [2, -2, 0]`', '`19 4`', '`-3 0`', '`11 7`'],
+    options: ['`8`', '`19`', '`-3`', '`11`'],
     correctIndex: 2,
     markScheme: {
       solution:
-        '`zip(u, v)` pairs up matching components; the generator multiplies each pair and `sum` adds the products. That is exactly the dot product.\n\n' +
-        '| pair from `zip(u, v)` | `a * b` |\n' +
-        '|---|---|\n' +
-        '| `(2, 4)` | 8 |\n' +
-        '| `(-1, 5)` | -5 |\n' +
-        '| `(3, -2)` | -6 |\n\n' +
-        'So `dot(u, v)` $= 8 - 5 - 6 = -3$.\n\n' +
-        '| pair from `zip(u, w)` | `a * b` |\n' +
-        '|---|---|\n' +
-        '| `(2, 1)` | 2 |\n' +
-        '| `(-1, 2)` | -2 |\n' +
-        '| `(3, 0)` | 0 |\n\n' +
-        'The three products are $2$, $-2$ and $0$, so `dot(u, w)` $= 2 - 2 = 0$ (a dot product of zero means `u` and `w` are perpendicular).\n\n' +
-        '`print` separates its two arguments with a space, so the output is `-3 0`.',
+        'The loop multiplies matching components and adds the products, which is the dot product of `u` and `v`.\n\n' +
+        '| `i` | `u[i]` | `v[i]` | `u[i] * v[i]` | `s` |\n' +
+        '|---|---|---|---|---|\n' +
+        '| 1 | 2 | 4 | 8 | 8 |\n' +
+        '| 2 | -1 | 5 | -5 | 3 |\n' +
+        '| 3 | 3 | -2 | -6 | -3 |\n\n' +
+        'So the program prints `-3`.',
       whyWrong: [
-        'This is the list of products before adding. `sum(...)` adds them up, so the function returns a single number.',
-        'This adds the sizes of the products ($8 + 5 + 6 = 19$ for the first call and $2 + 2 = 4$ for the second), ignoring the negative signs.',
+        'This stops after the first pass, when `s` is 8. The loop `for i = 1 to 3` runs for all three components.',
+        'This adds the sizes of the products ($8 + 5 + 6$), ignoring the negative signs.',
         null,
-        'This adds each pair instead of multiplying it ($6 + 4 + 1$ and $3 + 1 + 3$). The code uses `a * b`.',
+        'This adds each pair instead of multiplying it ($6 + 4 + 1$). The code multiplies `u[i] * v[i]`.',
       ],
-      keyIdea: '`sum(a * b for a, b in zip(u, v))` is the dot product written in Python.',
-    },
-    python: { stdout: '-3 0\n' },
-  },
-  // ------------------------------------------------------------------ challenge
-  {
-    id: 'vectors-016',
-    subtopic: 'vectors',
-    difficulty: 'challenge',
-    stem: `For which value of $k$ are the vectors $${col(1, 2, 'k')}$, $${col(2, 1, 1)}$ and $${col(1, -1, 0)}$ **linearly dependent**?`,
-    options: ['$k = -\\frac{1}{3}$', '$k = 1$', '$k = 3$', 'No value of $k$: three vectors in 3D are always linearly independent'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Three vectors in 3D are linearly dependent exactly when the determinant of the matrix they form is $0$.\n\n' +
-        '$$\\det\\begin{pmatrix} 1 & 2 & k \\\\ 2 & 1 & 1 \\\\ 1 & -1 & 0 \\end{pmatrix} = 1\\begin{vmatrix} 1 & 1 \\\\ -1 & 0 \\end{vmatrix} - 2\\begin{vmatrix} 2 & 1 \\\\ 1 & 0 \\end{vmatrix} + k\\begin{vmatrix} 2 & 1 \\\\ 1 & -1 \\end{vmatrix}$$\n\n' +
-        '- First minor: $(1)(0) - (1)(-1) = 1$\n' +
-        '- Second minor: $(2)(0) - (1)(1) = -1$\n' +
-        '- Third minor: $(2)(-1) - (1)(1) = -3$\n\n' +
-        'So the determinant is $1(1) - 2(-1) + k(-3) = 3 - 3k$.\n\n' +
-        'Setting $3 - 3k = 0$ gives $k = 1$.\n\n' +
-        `Check: with $k = 1$, $${col(2, 1, 1)} - ${col(1, -1, 0)} = ${col(1, 2, 1)}$, so the first vector is a combination of the other two.`,
-      whyWrong: [
-        'This forgets the minus sign on the middle term of the cofactor expansion (the signs go plus, minus, plus), getting $1 + 2(-1) - 3k = -1 - 3k = 0$.',
-        null,
-        'This makes a sign slip in the last minor, computing $(2)(-1) - (1)(1)$ as $-2 + 1 = -1$, which gives $3 - k = 0$.',
-        'Three vectors in 3D can be dependent: it happens whenever one is a combination of the others (determinant $0$). Only **four or more** vectors in 3D are always dependent.',
-      ],
-      keyIdea: '$n$ vectors in $n$ dimensions are linearly dependent exactly when the determinant of the matrix they form is zero.',
+      keyIdea: 'Multiplying matching components and adding the products, as this loop does, is the dot product.',
     },
     check: {
-      optionValues: [-1 / 3, 1, 3, null],
+      optionValues: [8, 19, -3, 11],
       compute: () => {
-        // det is linear in k: d(k) = d(0) + (d(1) - d(0)) k
-        const d = (k: number) =>
-          det3([
-            [1, 2, k],
-            [2, 1, 1],
-            [1, -1, 0],
-          ]);
-        return -d(0) / (d(1) - d(0));
-      },
-    },
-  },
-  {
-    id: 'vectors-017',
-    subtopic: 'vectors',
-    difficulty: 'challenge',
-    stem: `Let $\\mathbf{a} = ${col(1, 2, -1)}$, $\\mathbf{b} = ${col(2, 0, 1)}$ and $\\mathbf{c} = ${col(0, 1, 3)}$. Find the scalars $(x, y, z)$ such that $x\\mathbf{a} + y\\mathbf{b} + z\\mathbf{c} = ${col(5, 3, 4)}$.`,
-    options: ['$(2, 1, 1)$', '$(3, 1, 0)$', '$(5, 3, 4)$', '$(1, 2, 1)$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'One equation per component:\n\n' +
-        '$$x + 2y = 5 \\qquad (1)$$\n\n' +
-        '$$2x + z = 3 \\qquad (2)$$\n\n' +
-        '$$-x + y + 3z = 4 \\qquad (3)$$\n\n' +
-        'From (1): $x = 5 - 2y$. From (2): $z = 3 - 2x = 3 - 2(5 - 2y) = 4y - 7$.\n\n' +
-        'Substitute into (3): $-(5 - 2y) + y + 3(4y - 7) = 4$, so $-5 + 2y + y + 12y - 21 = 4$, giving $15y = 30$ and $y = 2$.\n\n' +
-        'Then $x = 5 - 4 = 1$ and $z = 8 - 7 = 1$.\n\n' +
-        `Check: $\\mathbf{a} + 2\\mathbf{b} + \\mathbf{c} = ${col('1 + 4', '2 + 1', '-1 + 2 + 3')} = ${col(5, 3, 4)}$.\n\n` +
-        'Exam speed-up: with options given, just test each one by plugging it into $x\\mathbf{a} + y\\mathbf{b} + z\\mathbf{c}$.',
-      whyWrong: [
-        'This swaps $x$ and $y$. Check: $2\\mathbf{a} + \\mathbf{b} + \\mathbf{c} = (4, 5, 2)$, not $(5, 3, 4)$.',
-        'This only satisfies the first component ($3 + 2 = 5$). The full combination is $3\\mathbf{a} + \\mathbf{b} = (5, 6, -2)$, so all three components must be checked.',
-        'This copies the target vector as the scalars. Check: $5\\mathbf{a} + 3\\mathbf{b} + 4\\mathbf{c} = (11, 14, 10)$.',
-        null,
-      ],
-      keyIdea: 'Writing a vector as a linear combination means solving a system of linear equations, one equation per component.',
-    },
-    check: {
-      optionValues: [vs([2, 1, 1]), vs([3, 1, 0]), vs([5, 3, 4]), vs([1, 2, 1])],
-      compute: () => {
-        const a = [1, 2, -1];
-        const b = [2, 0, 1];
-        const c = [0, 1, 3];
-        const t = [5, 3, 4];
-        // Cramer's rule with the vectors as columns
-        const M = (u: number[], v: number[], w: number[]) => [0, 1, 2].map((i) => [u[i], v[i], w[i]]);
-        const D = det3(M(a, b, c));
-        return vs([det3(M(t, b, c)) / D, det3(M(a, t, c)) / D, det3(M(a, b, t)) / D]);
-      },
-    },
-  },
-  {
-    id: 'vectors-018',
-    subtopic: 'vectors',
-    difficulty: 'challenge',
-    stem: 'The vectors $\\mathbf{a}$ and $\\mathbf{b}$ have $|\\mathbf{a}| = 2$, $|\\mathbf{b}| = 3$, and the angle between them is $60^\\circ$. Find $|2\\mathbf{a} - \\mathbf{b}|$.',
-    options: ['$5$', '$1$', '$\\sqrt{13}$', '$\\sqrt{37}$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Work with the square of the length, using $|\\mathbf{v}|^2 = \\mathbf{v} \\cdot \\mathbf{v}$.\n\n' +
-        '1. $\\mathbf{a} \\cdot \\mathbf{b} = |\\mathbf{a}||\\mathbf{b}|\\cos 60^\\circ = 2 \\times 3 \\times \\frac{1}{2} = 3$.\n' +
-        '2. Expand: $|2\\mathbf{a} - \\mathbf{b}|^2 = (2\\mathbf{a} - \\mathbf{b}) \\cdot (2\\mathbf{a} - \\mathbf{b}) = 4|\\mathbf{a}|^2 - 4\\,\\mathbf{a} \\cdot \\mathbf{b} + |\\mathbf{b}|^2$.\n' +
-        '3. Substitute: $4(4) - 4(3) + 9 = 16 - 12 + 9 = 13$.\n' +
-        '4. Take the square root: $|2\\mathbf{a} - \\mathbf{b}| = \\sqrt{13}$.',
-      whyWrong: [
-        'This ignores the cross term: $\\sqrt{16 + 9} = 5$ would only be right if $\\mathbf{a}$ and $\\mathbf{b}$ were perpendicular.',
-        'This assumes lengths subtract like numbers: $2|\\mathbf{a}| - |\\mathbf{b}| = 4 - 3 = 1$. That only works when the vectors point the same way.',
-        null,
-        'This has the wrong sign on the cross term, using $16 + 12 + 9 = 37$, which is $|2\\mathbf{a} + \\mathbf{b}|^2$.',
-      ],
-      keyIdea: 'To find the length of a combination of vectors, expand $|\\mathbf{v}|^2 = \\mathbf{v} \\cdot \\mathbf{v}$ and use $\\mathbf{a} \\cdot \\mathbf{b} = |\\mathbf{a}||\\mathbf{b}|\\cos\\theta$.',
-    },
-    check: {
-      optionValues: [5, 1, Math.sqrt(13), Math.sqrt(37)],
-      compute: () => {
-        // place the vectors in the plane with the required lengths and angle
-        const t = Math.PI / 3;
-        const a = [2, 0];
-        const b = [3 * Math.cos(t), 3 * Math.sin(t)];
-        return norm([2 * a[0] - b[0], 2 * a[1] - b[1]]);
+        const u = [2, -1, 3];
+        const v = [4, 5, -2];
+        let s = 0;
+        for (let i = 1; i <= 3; i++) s += u[i - 1] * v[i - 1];
+        return s;
       },
     },
   },
@@ -672,63 +567,113 @@ export const questions: StaticQuestion[] = [
       },
     },
   },
+  // ------------------------------------------------------------------ recall and short calculations
   {
-    id: 'vectors-020',
+    id: 'vectors-021',
     subtopic: 'vectors',
-    difficulty: 'challenge',
-    stem: 'Which of the following sets of vectors in $\\mathbb{R}^3$ is **linearly independent**?',
-    options: [
-      '$(1, 0, 0),\\ (0, 1, 0),\\ (1, 1, 0)$',
-      '$(1, 2, 3),\\ (2, 4, 6),\\ (0, 0, 1)$',
-      '$(1, 0, 0),\\ (1, 1, 0),\\ (1, 1, 1)$',
-      '$(1, 0, 1),\\ (0, 1, 0),\\ (1, 1, 1),\\ (2, 0, 1)$',
-    ],
-    correctIndex: 2,
+    difficulty: 'foundation',
+    stem: 'What does the dot product of two vectors produce?',
+    options: ['A single number (a scalar)', 'A vector', 'A matrix', 'An angle'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'A set is linearly independent when no vector in it can be built from the others (the only way to get $\\mathbf{0}$ is with all coefficients $0$).\n\n' +
-        '- $(1, 0, 0), (0, 1, 0), (1, 1, 0)$: the third is the sum of the first two, so **dependent**.\n' +
-        '- $(1, 2, 3), (2, 4, 6), (0, 0, 1)$: $(2, 4, 6) = 2(1, 2, 3)$, so **dependent**.\n' +
-        '- $(1, 0, 0), (1, 1, 0), (1, 1, 1)$: as rows of a matrix this is triangular with determinant $1 \\times 1 \\times 1 = 1 \\neq 0$, so **independent**.\n' +
-        '- Four vectors in $\\mathbb{R}^3$: any 4 vectors in 3 dimensions are always **dependent**.\n\n' +
-        'Direct check of the independent set: $a(1, 0, 0) + b(1, 1, 0) + c(1, 1, 1) = (0, 0, 0)$. The third component gives $c = 0$, then the second gives $b = 0$, then the first gives $a = 0$.',
+        'The dot product multiplies matching components and **adds** the results, so the answer is one number, called a **scalar**.\n\n' +
+        'For example, $(1, 2) \\cdot (3, 4) = 3 + 8 = 11$.',
       whyWrong: [
-        'The third vector is $(1, 0, 0) + (0, 1, 0)$, so the set is dependent. All three also lie in the flat $xy$-plane.',
-        'The second vector is exactly twice the first (they are parallel), so the set is dependent. Any set containing two parallel vectors is dependent.',
         null,
-        'Four vectors in 3D space can never be independent: at most 3 vectors in $\\mathbb{R}^3$ can be independent. Here, for example, $(1, 1, 1) = (1, 0, 1) + (0, 1, 0)$.',
+        'This stops after multiplying the components. Adding the products gives a single number, not a vector.',
+        'A matrix comes from arranging numbers in rows and columns. The dot product ends with one number.',
+        'The dot product is linked to the angle by $\\mathbf{a} \\cdot \\mathbf{b} = |\\mathbf{a}|\\,|\\mathbf{b}|\\cos\\theta$, but it is not the angle itself.',
       ],
-      keyIdea: 'Vectors are independent when none is a combination of the others; more than $n$ vectors in $n$ dimensions are always dependent.',
+      keyIdea: 'The dot product of two vectors is a scalar.',
+    },
+  },
+  {
+    id: 'vectors-022',
+    subtopic: 'vectors',
+    difficulty: 'foundation',
+    stem: 'When are two non-zero vectors perpendicular?',
+    options: ['When their dot product is $0$', 'When their dot product is $1$', 'When one is a multiple of the other', 'When they have the same magnitude'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'From $\\mathbf{a} \\cdot \\mathbf{b} = |\\mathbf{a}|\\,|\\mathbf{b}|\\cos\\theta$: at a right angle $\\cos 90^\\circ = 0$, so the dot product is $0$.\n\n' +
+        '"Perpendicular" and "orthogonal" mean the same thing.',
+      whyWrong: [
+        null,
+        'A dot product of $1$ has no special meaning for the angle. Perpendicular means the dot product is exactly $0$.',
+        'A scalar multiple points along the same line, so that is the test for **parallel** vectors.',
+        'Equal lengths say nothing about the angle between two vectors.',
+      ],
+      keyIdea: 'Non-zero vectors are perpendicular exactly when their dot product is zero.',
+    },
+  },
+  {
+    id: 'vectors-023',
+    subtopic: 'vectors',
+    difficulty: 'foundation',
+    stem: 'What is a **unit vector**?',
+    options: ['A vector of magnitude $1$', 'A vector with every component equal to $1$', 'A vector with one component', 'The zero vector'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A unit vector is any vector whose length (magnitude) is exactly $1$. For example, $\\left(\\frac{3}{5}, \\frac{4}{5}\\right)$ is a unit vector, because $\\frac{9}{25} + \\frac{16}{25} = 1$.',
+      whyWrong: [
+        null,
+        'The vector $(1, 1)$ has magnitude $\\sqrt{2}$, not $1$. "Unit" refers to the length, not to the components.',
+        '"Unit" refers to the length of the vector, not to how many components it has.',
+        'The zero vector has magnitude $0$, so it is not a unit vector.',
+      ],
+      keyIdea: 'A unit vector has magnitude 1.',
+    },
+  },
+  {
+    id: 'vectors-024',
+    subtopic: 'vectors',
+    difficulty: 'foundation',
+    stem: 'For any vector $\\mathbf{a}$, what is $\\mathbf{a} \\cdot \\mathbf{a}$?',
+    options: ['$|\\mathbf{a}|^{2}$', '$|\\mathbf{a}|$', '$2|\\mathbf{a}|$', '$0$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Multiplying matching components of $\\mathbf{a}$ with itself gives the sum of the squares of its components, which is the magnitude squared.\n\n' +
+        'For example, for $\\mathbf{a} = (3, 4)$: $\\mathbf{a} \\cdot \\mathbf{a} = 9 + 16 = 25 = 5^{2}$.',
+      whyWrong: [
+        null,
+        'This forgets that the magnitude takes a square root at the end. The dot product is the sum of squares, before any root.',
+        'This doubles the magnitude. The dot product multiplies matching components; it does not add the vector to itself.',
+        'A dot product of $0$ means perpendicular. A non-zero vector is never perpendicular to itself.',
+      ],
+      keyIdea: 'A vector dotted with itself gives its magnitude squared.',
     },
     check: {
-      optionValues: ['set 0', 'set 1', 'set 2', 'set 3'],
-      compute: () => {
-        const sets = [
-          [
-            [1, 0, 0],
-            [0, 1, 0],
-            [1, 1, 0],
-          ],
-          [
-            [1, 2, 3],
-            [2, 4, 6],
-            [0, 0, 1],
-          ],
-          [
-            [1, 0, 0],
-            [1, 1, 0],
-            [1, 1, 1],
-          ],
-          [
-            [1, 0, 1],
-            [0, 1, 0],
-            [1, 1, 1],
-            [2, 0, 1],
-          ],
-        ];
-        const hits = sets.map((s, i) => ({ s, i })).filter(({ s }) => rank(s) === s.length);
-        return hits.length === 1 ? `set ${hits[0].i}` : 'none or several';
-      },
+      // the options for a = (3, 4)
+      optionValues: [25, 5, 10, 0],
+      compute: () => dot([3, 4], [3, 4]),
+    },
+  },
+  {
+    id: 'vectors-025',
+    subtopic: 'vectors',
+    difficulty: 'exam',
+    stem: 'Find the distance between the points $A(1, 2, 3)$ and $B(3, -1, 9)$.',
+    options: ['$7$', '$49$', '$11$', '$5$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        `1. End minus start: $\\overrightarrow{AB} = ${col('3 - 1', '-1 - 2', '9 - 3')} = ${col(2, -3, 6)}$.\n` +
+        '2. The distance is the magnitude: $\\sqrt{2^{2} + (-3)^{2} + 6^{2}} = \\sqrt{4 + 9 + 36} = \\sqrt{49} = 7$.',
+      whyWrong: [
+        null,
+        'This is $|\\overrightarrow{AB}|^{2}$: the square root at the end was forgotten.',
+        'This adds the sizes of the components, $2 + 3 + 6$. Lengths in different directions combine by Pythagoras.',
+        'This adds the components with their signs, $2 - 3 + 6$, instead of squaring them first.',
+      ],
+      keyIdea: 'The distance between two points is the magnitude of the vector joining them.',
+    },
+    check: {
+      optionValues: [7, 49, 11, 5],
+      compute: () => norm([3 - 1, -1 - 2, 9 - 3]),
     },
   },
 ];

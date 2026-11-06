@@ -154,7 +154,7 @@ function genArgForm(rng: Rng): GeneratedCore {
   };
   const { given, concl } = parts[form];
   const stem =
-    `Consider this argument:\n\n"${ifThen(A, B)} ${cap(given)}. Therefore, ${concl}."\n\n` + 'Which description of the argument is correct?';
+    `"${ifThen(A, B)} ${cap(given)}. Therefore, ${concl}."\n\n` + 'This argument is:';
 
   // What each form would have needed, in this argument's own words.
   const needs: Record<ArgForm, string> = {

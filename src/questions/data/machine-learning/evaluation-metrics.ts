@@ -37,19 +37,6 @@ const SPAM_SCORES: [number, boolean][] = [
   [0.1, false],
 ];
 
-const TUMOUR_SCORES: [number, boolean][] = [
-  [0.92, true],
-  [0.81, true],
-  [0.74, false],
-  [0.66, true],
-  [0.58, true],
-  [0.47, false],
-  [0.39, true],
-  [0.33, false],
-  [0.21, false],
-  [0.12, false],
-];
-
 const yesNo = (b: boolean) => (b ? 'Yes' : 'No');
 
 export const questions: StaticQuestion[] = [
@@ -80,7 +67,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-002',
     subtopic: 'evaluation-metrics',
     difficulty: 'foundation',
-    stem: 'An image classifier decides whether each photo shows a cat. Its results on 100 test photos are shown in the confusion matrix. What is the **accuracy** of the classifier?',
+    stem: 'The confusion matrix shows a cat classifier\'s results on 100 test photos. What is its **accuracy**?',
     table: {
       caption: 'Rows: actual class. Columns: predicted class.',
       headers: ['Actual class', 'Predicted: cat', 'Predicted: not cat'],
@@ -147,7 +134,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-004',
     subtopic: 'evaluation-metrics',
     difficulty: 'foundation',
-    stem: 'A model screens 200 patients for a disease. 20 of the patients actually have the disease. The model correctly flags 15 of these 20, and it also wrongly flags 10 healthy patients. What is the model\'s **recall**?',
+    stem: 'A model screens 200 patients, 20 of whom have a disease. It flags 15 of those 20 and also 10 healthy patients. What is its **recall**?',
     options: ['$0.75$', '$0.6$', '$0.075$', '$0.925$'],
     correctIndex: 0,
     markScheme: {
@@ -180,7 +167,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-005',
     subtopic: 'evaluation-metrics',
     difficulty: 'foundation',
-    stem: 'In a dataset of 500 bank transactions, 10 are fraudulent. A lazy model predicts **not fraud** for every single transaction. What is its accuracy?',
+    stem: 'In a dataset of 500 transactions, 10 are fraudulent. A model predicts **not fraud** for every transaction. What is its accuracy?',
     options: ['$2\\%$', '$0\\%$', '$50\\%$', '$98\\%$'],
     correctIndex: 3,
     markScheme: {
@@ -213,7 +200,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-006',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A factory uses a model to spot **defective** parts (defective = positive class). Its results on 200 parts are shown in the confusion matrix. Which statement is **true**?',
+    stem: 'A model flags **defective** parts (the positive class). Its results on 200 parts are in the confusion matrix. Which statement is **true**?',
     table: {
       caption: 'Rows: actual class. Columns: predicted class.',
       headers: ['Actual class', 'Predicted: defective', 'Predicted: not defective'],
@@ -304,7 +291,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-008',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A streaming company predicts which customers will **churn** (cancel their subscription); churn is the positive class. The results for 200 customers are shown. **Note that the rows are the predicted class.** What is the F1 score of the model?',
+    stem: 'The table shows a churn model\'s results on 200 customers, with churn as the positive class. **The rows are the predicted class.** What is the F1 score?',
     table: {
       caption: 'Rows: predicted class. Columns: actual class.',
       headers: ['Predicted class', 'Actually churned', 'Actually stayed'],
@@ -350,8 +337,13 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-009',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A hospital uses a model as the **first screening step** for a serious but treatable cancer. Anyone the model flags gets a cheap, safe follow-up test. Missing a patient who really has cancer could be fatal. Which metric should the hospital make as high as possible?',
-    options: ['Precision', 'Recall', 'Accuracy', 'Specificity (the fraction of healthy patients correctly cleared)'],
+    stem: 'A model is the first screening step for a serious but treatable cancer. Flagged patients get a cheap, safe follow-up test. Which metric should be made as high as possible?',
+    options: [
+      'Precision',
+      'Recall',
+      'Accuracy',
+      'Specificity',
+    ],
     correctIndex: 1,
     markScheme: {
       solution:
@@ -360,7 +352,7 @@ export const questions: StaticQuestion[] = [
         '- A **false positive** (a healthy patient flagged) only costs a cheap, safe follow-up test.\n\n' +
         'The metric that punishes false negatives is **recall**:\n\n' +
         '$$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$$\n\n' +
-        'Recall is $1$ only when there are no false negatives, i.e. every patient with cancer is caught. So the hospital should maximise recall (even if that means more false alarms).',
+        'Recall is $1$ only when there are no false negatives, i.e. every patient with cancer is caught. So recall should be maximised (even if that means more false alarms).',
       whyWrong: [
         'Precision, $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$, punishes **false positives**. Here false positives are cheap; the dangerous mistake is the false negative.',
         null,
@@ -376,10 +368,10 @@ export const questions: StaticQuestion[] = [
     difficulty: 'exam',
     stem: 'For which task is high **precision** more important than high recall?',
     options: [
-      'An airport scanner that flags bags for a quick manual check, where missing a weapon would be a disaster',
-      'A first-stage screening test for a serious disease, where flagged patients get a cheap second test',
-      'A system that flags possibly faulty aircraft engine parts for an engineer to inspect',
-      'A spam filter that **permanently deletes** every email it flags as spam',
+      'An airport scanner flagging bags for a quick manual check',
+      'A first-stage disease screen followed by a cheap second test',
+      'A system flagging engine parts for an engineer to inspect',
+      'A spam filter that **permanently deletes** flagged emails',
     ],
     correctIndex: 3,
     markScheme: {
@@ -405,7 +397,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-011',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A logistic regression model outputs a probability for each example and predicts **positive** when that probability is at least a chosen threshold. The threshold is raised from $0.5$ to $0.8$. What typically happens?',
+    stem: 'A classifier predicts **positive** when its probability is at least a threshold. The threshold is raised from $0.5$ to $0.8$. What typically happens?',
     options: [
       'Precision falls and recall rises',
       'Both precision and recall rise',
@@ -432,7 +424,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-012',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A spam filter gives each of 10 emails a score. It predicts **spam** when the score is at least $0.5$. The scores and the true labels are shown. What is the **precision** of the filter at this threshold?',
+    stem: 'A spam filter predicts **spam** when an email\'s score is at least $0.5$. Using the scores and true labels in the table, what is the **precision**?',
     table: {
       headers: ['Email', 'Score', 'Actually spam?'],
       rows: SPAM_SCORES.map(([s, pos], i) => [i + 1, s.toFixed(2), yesNo(pos)]),
@@ -472,11 +464,11 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-013',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A bank has 1000 transactions, of which 10 are fraudulent. **Model A** predicts "not fraud" for every transaction. **Model B** flags 50 transactions as fraud, and 8 of those 50 really are fraud. Which statement is correct?',
+    stem: 'Of 1000 transactions, 10 are fraudulent. **Model A** predicts "not fraud" every time. **Model B** flags 50 as fraud, and 8 of those really are. Which statement is correct?',
     options: [
-      'Model B has the higher accuracy, because it catches 8 of the 10 frauds',
-      'Model A has the higher accuracy, but Model B has far higher recall, so B is more useful for catching fraud',
-      'Model A is the better fraud detector, because its accuracy of 99% is higher',
+      'Model B has the higher accuracy',
+      'Model A has higher accuracy, but Model B has higher recall',
+      'Model A is the better fraud detector, with 99% accuracy',
       'Model B has a precision of 80%',
     ],
     correctIndex: 1,
@@ -503,7 +495,7 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-014',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A model is tested on a dataset that contains 60 actual positives. Its recall is $0.75$ and its precision is $0.9$. How many **false positives** does it make?',
+    stem: 'A model is tested on data with 60 actual positives. Its recall is $0.75$ and its precision is $0.9$. How many **false positives** does it make?',
     options: ['$15$', '$5$', '$6$', '$50$'],
     correctIndex: 1,
     markScheme: {
@@ -536,173 +528,72 @@ export const questions: StaticQuestion[] = [
     id: 'evaluation-metrics-015',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'What does this Python program print?',
+    stem: 'Arrays are indexed from 1. `T` holds true labels and `P` holds predictions, with 1 meaning positive. What does this pseudocode print?',
     code: {
-      lang: 'python',
-      source: `y_true = [1, 0, 1, 1, 0, 1, 0, 0, 1, 0]
-y_pred = [1, 0, 0, 1, 1, 1, 0, 0, 0, 0]
-
-tp = fp = fn = 0
-for t, p in zip(y_true, y_pred):
-    if t == 1 and p == 1:
-        tp += 1
-    elif t == 0 and p == 1:
-        fp += 1
-    elif t == 1 and p == 0:
-        fn += 1
-
-precision = tp / (tp + fp)
-recall = tp / (tp + fn)
-print(precision, recall)`,
+      lang: 'pseudocode',
+      source: `T = [1, 0, 1, 1, 0, 1, 0, 0]
+P = [1, 0, 0, 1, 1, 1, 0, 1]
+tp = 0
+fp = 0
+for i = 1 to 8
+   if T[i] == 1 and P[i] == 1
+      tp = tp + 1
+   end if
+   if T[i] == 0 and P[i] == 1
+      fp = fp + 1
+   end if
+end for
+print(tp / (tp + fp))`,
     },
-    options: ['`0.75 0.6`', '`0.6 0.75`', '`0.7 0.6`', '`0.3 0.6`'],
+    options: [
+      '$0.6$',
+      '$0.75$',
+      '$0.625$',
+      '$0.375$',
+    ],
     correctIndex: 0,
     markScheme: {
       solution:
-        '`zip` pairs each true label `t` with its prediction `p`:\n\n' +
-        '| Index | `t` | `p` | Branch taken | tp | fp | fn |\n' +
-        '|---|---|---|---|---|---|---|\n' +
-        '| 0 | 1 | 1 | TP | 1 | 0 | 0 |\n' +
-        '| 1 | 0 | 0 | none (TN) | 1 | 0 | 0 |\n' +
-        '| 2 | 1 | 0 | FN | 1 | 0 | 1 |\n' +
-        '| 3 | 1 | 1 | TP | 2 | 0 | 1 |\n' +
-        '| 4 | 0 | 1 | FP | 2 | 1 | 1 |\n' +
-        '| 5 | 1 | 1 | TP | 3 | 1 | 1 |\n' +
-        '| 6 | 0 | 0 | none (TN) | 3 | 1 | 1 |\n' +
-        '| 7 | 0 | 0 | none (TN) | 3 | 1 | 1 |\n' +
-        '| 8 | 1 | 0 | FN | 3 | 1 | 2 |\n' +
-        '| 9 | 0 | 0 | none (TN) | 3 | 1 | 2 |\n\n' +
-        'Final counts: `tp = 3`, `fp = 1`, `fn = 2`.\n\n' +
-        '- `precision = 3 / (3 + 1) = 0.75`\n' +
-        '- `recall = 3 / (3 + 2) = 0.6`\n\n' +
-        '`print(precision, recall)` prints the two values separated by a space: `0.75 0.6`.',
+        'The loop counts true positives and false positives, pair by pair:\n\n' +
+        '| $i$ | `T[i]` | `P[i]` | Outcome | `tp` | `fp` |\n' +
+        '|---|---|---|---|---|---|\n' +
+        '| 1 | 1 | 1 | TP | 1 | 0 |\n' +
+        '| 2 | 0 | 0 | TN | 1 | 0 |\n' +
+        '| 3 | 1 | 0 | FN | 1 | 0 |\n' +
+        '| 4 | 1 | 1 | TP | 2 | 0 |\n' +
+        '| 5 | 0 | 1 | FP | 2 | 1 |\n' +
+        '| 6 | 1 | 1 | TP | 3 | 1 |\n' +
+        '| 7 | 0 | 0 | TN | 3 | 1 |\n' +
+        '| 8 | 0 | 1 | FP | 3 | 2 |\n\n' +
+        'It prints `tp / (tp + fp)` $= \\frac{3}{3 + 2} = 0.6$, which is the **precision**.',
       whyWrong: [
         null,
-        'This swaps the two metrics (or swaps FP and FN): $\\frac{3}{3 + 2} = 0.6$ is the recall and $\\frac{3}{3 + 1} = 0.75$ is the precision, and they are printed precision first.',
-        'The first number here is the **accuracy**, $\\frac{3 + 4}{10} = 0.7$, but the code divides `tp` by `tp + fp`, which is the precision $0.75$.',
-        'The first number here is $\\frac{3}{10}$, the true positives divided by all 10 examples. The code divides by `tp + fp = 4`.',
+        'This is the **recall**, $\\frac{3}{4}$, dividing by the 4 actual positives. The code divides by `tp + fp`, the predicted positives.',
+        'This is the **accuracy**, $\\frac{5}{8}$, counting the 5 positions where the two arrays agree. The code only counts positive predictions.',
+        'This is $\\frac{3}{8}$: the true positives divided by all 8 examples. The code divides by `tp + fp` $= 5$.',
       ],
-      keyIdea: 'Count TP, FP and FN pair by pair, then precision = tp / (tp + fp) and recall = tp / (tp + fn).',
-    },
-    python: { stdout: '0.75 0.6\n' },
-  },
-
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'evaluation-metrics-016',
-    subtopic: 'evaluation-metrics',
-    difficulty: 'challenge',
-    stem: 'A classifier is tested on 200 examples. Its accuracy is $0.85$, its precision is $0.8$ and its recall is $0.8$. How many **true negatives** are there?',
-    options: ['$60$', '$125$', '$110$', '$170$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Let $\\text{TP} = x$.\n\n' +
-        '**Precision** $= \\frac{x}{x + \\text{FP}} = 0.8$, so $x + \\text{FP} = \\frac{x}{0.8} = 1.25x$, giving $\\text{FP} = 0.25x$.\n\n' +
-        '**Recall** $= \\frac{x}{x + \\text{FN}} = 0.8$, so in the same way $\\text{FN} = 0.25x$.\n\n' +
-        '**Accuracy**: correct predictions $= 0.85 \\times 200 = 170$, so the wrong ones are $\\text{FP} + \\text{FN} = 200 - 170 = 30$.\n\n' +
-        'So $0.25x + 0.25x = 30$, i.e. $0.5x = 30$ and $x = 60$. Then $\\text{FP} = 15$ and $\\text{FN} = 15$.\n\n' +
-        '$$\\text{TN} = 200 - 60 - 15 - 15 = 110$$\n\n' +
-        'Check: accuracy $= \\frac{60 + 110}{200} = 0.85$, precision $= \\frac{60}{75} = 0.8$, recall $= \\frac{60}{75} = 0.8$.',
-      whyWrong: [
-        'This is the number of **true positives** ($x = 60$), not true negatives.',
-        'This is $200 - 75 = 125$, the number of **actual negatives** ($\\text{TN} + \\text{FP}$). The 15 false positives still need to be removed.',
-        null,
-        'This is $0.85 \\times 200$, the number of **correct** predictions, which is $\\text{TP} + \\text{TN}$, not TN alone.',
-      ],
-      keyIdea: 'Write FP and FN in terms of TP using precision and recall, then use accuracy (or the total) to find TP and the remaining cells.',
+      keyIdea: 'Count TP and FP pair by pair; precision is tp divided by tp + fp.',
     },
     check: {
-      optionValues: [60, 125, 110, 170],
+      optionValues: [0.6, 0.75, 0.625, 0.375],
       compute: () => {
-        // brute force every confusion matrix with 200 examples
-        const N = 200;
-        const found: number[] = [];
-        for (let tp = 1; tp <= N; tp++)
-          for (let fp = 0; tp + fp <= N; fp++)
-            for (let fn = 0; tp + fp + fn <= N; fn++) {
-              const tn = N - tp - fp - fn;
-              if (20 * (tp + tn) === 17 * N && 5 * tp === 4 * (tp + fp) && 5 * tp === 4 * (tp + fn)) found.push(tn);
-            }
-        if (found.length !== 1) throw new Error('not unique');
-        return found[0];
+        const T = [1, 0, 1, 1, 0, 1, 0, 0];
+        const P = [1, 0, 0, 1, 1, 1, 0, 1];
+        let tp = 0;
+        let fp = 0;
+        T.forEach((t, i) => {
+          if (t === 1 && P[i] === 1) tp++;
+          if (t === 0 && P[i] === 1) fp++;
+        });
+        return precisionOf(tp, fp);
       },
-    },
-  },
-  {
-    id: 'evaluation-metrics-017',
-    subtopic: 'evaluation-metrics',
-    difficulty: 'challenge',
-    stem: 'A model gives each of 10 scans a score for "tumour present" and predicts **tumour** when the score is at least the threshold $t$. The scores and true labels are shown. Which threshold gives the **highest F1 score**?',
-    table: {
-      headers: ['Scan', 'Score', 'Tumour present?'],
-      rows: TUMOUR_SCORES.map(([s, pos], i) => [i + 1, s.toFixed(2), yesNo(pos)]),
-    },
-    options: ['$t = 0.7$', '$t = 0.3$', '$t = 0.9$', '$t = 0.5$'],
-    correctIndex: 3,
-    markScheme: {
-      solution:
-        'There are 5 scans with a tumour (scans 1, 2, 4, 5, 7). For each threshold, count TP and FP among the scans predicted "tumour", then $\\text{FN} = 5 - \\text{TP}$ and $F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$.\n\n' +
-        '| $t$ | Predicted tumour | TP | FP | FN | Precision | Recall | $F_1$ |\n' +
-        '|---|---|---|---|---|---|---|---|\n' +
-        '| $0.3$ | scans 1 to 8 | 5 | 3 | 0 | $\\frac{5}{8}$ | $1$ | $\\frac{10}{13} \\approx 0.769$ |\n' +
-        '| $0.5$ | scans 1 to 5 | 4 | 1 | 1 | $\\frac{4}{5}$ | $\\frac{4}{5}$ | $\\frac{8}{10} = 0.8$ |\n' +
-        '| $0.7$ | scans 1 to 3 | 2 | 1 | 3 | $\\frac{2}{3}$ | $\\frac{2}{5}$ | $\\frac{4}{8} = 0.5$ |\n' +
-        '| $0.9$ | scan 1 only | 1 | 0 | 4 | $1$ | $\\frac{1}{5}$ | $\\frac{2}{6} \\approx 0.333$ |\n\n' +
-        'The largest F1 is $0.8$, at $t = 0.5$.',
-      whyWrong: [
-        'At $t = 0.7$ only 2 of the 5 tumours are caught (recall $\\frac{2}{5}$), so $F_1 = 0.5$. Moving the threshold up from $0.5$ loses two true positives (scans 4 and 5) without removing the false positive at $0.74$.',
-        'At $t = 0.3$ recall is perfect, but precision is only $\\frac{5}{8}$, so $F_1 = \\frac{10}{13} \\approx 0.769 < 0.8$. Averaging precision and recall the ordinary way gives $0.8125$ and wrongly makes this look best; F1 uses the harmonic mean.',
-        'At $t = 0.9$ precision is perfect ($1$), but only 1 tumour of 5 is found, so $F_1 = \\frac{2}{6} \\approx 0.333$. Choosing the threshold with the best precision ignores recall.',
-        null,
-      ],
-      keyIdea: 'F1 rewards a balance of precision and recall: the extreme thresholds make one of them high but the other low.',
-    },
-    check: {
-      optionValues: [0.7, 0.3, 0.9, 0.5],
-      compute: () => {
-        let best = -1;
-        let bestT = 0;
-        for (const t of [0.7, 0.3, 0.9, 0.5]) {
-          const c = countAt(TUMOUR_SCORES, t);
-          const f = f1Of(c.tp, c.fp, c.fn);
-          if (f > best) {
-            best = f;
-            bestT = t;
-          }
-        }
-        return bestT;
-      },
-    },
-  },
-  {
-    id: 'evaluation-metrics-018',
-    subtopic: 'evaluation-metrics',
-    difficulty: 'challenge',
-    stem: 'A classifier predicts positive when its output score is at least a threshold. The threshold is **lowered** (and nothing else changes). Which of these metrics can **never decrease** as a result?',
-    options: ['Precision', 'Accuracy', 'Recall', 'F1 score'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Lowering the threshold means every example that was predicted positive **stays** positive, and some extra examples may become positive.\n\n' +
-        '- The true positives can only stay the same or increase.\n' +
-        '- The number of actual positives, $\\text{TP} + \\text{FN}$, does not depend on the model at all; it is fixed by the data.\n\n' +
-        'So $\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$ has a growing (or unchanged) top and a fixed bottom: **it can never decrease**.\n\n' +
-        'The others can all go down. Example: 2 positives and 8 negatives; at the old threshold the model flags just the 2 positives (precision $1$, recall $1$, accuracy $1$, $F_1 = 1$). Lower the threshold so that it also flags 3 negatives: precision $= \\frac{2}{5}$, accuracy $= \\frac{7}{10}$, $F_1 = \\frac{4}{4 + 3} = \\frac{4}{7}$, all lower, while recall stays $1$.',
-      whyWrong: [
-        'Precision can fall: the extra examples now predicted positive may be mostly negatives, adding false positives to the bottom of $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$.',
-        'Accuracy can fall: if the newly flagged examples are actually negative, correct true negatives turn into false positives.',
-        null,
-        'F1 depends on precision as well as recall, so if precision drops sharply F1 drops too (from $1$ to $\\frac{4}{7}$ in the example in the solution).',
-      ],
-      keyIdea: 'Lowering the threshold can only add positive predictions, so TP cannot fall while the number of actual positives is fixed: recall never decreases.',
     },
   },
   {
     id: 'evaluation-metrics-019',
     subtopic: 'evaluation-metrics',
     difficulty: 'exam',
-    stem: 'A disease affects 1% of a population of 10,000 people. A diagnostic model has a recall of 90%, and it wrongly flags 5% of healthy people. What is the model\'s **precision** (the fraction of flagged people who really have the disease)?',
+    stem: 'A disease affects 1% of 10,000 people. A model has recall 90% and wrongly flags 5% of healthy people. What is its **precision** (the fraction of flagged people who really have the disease)?',
     options: ['$\\frac{2}{13}$', '$\\frac{9}{10}$', '$\\frac{9}{1000}$', '$\\frac{19}{20}$'],
     correctIndex: 0,
     markScheme: {
@@ -732,39 +623,74 @@ print(precision, recall)`,
       },
     },
   },
+
+  // ---------------------------------------------------------------- recall
   {
-    id: 'evaluation-metrics-020',
+    id: 'evaluation-metrics-021',
     subtopic: 'evaluation-metrics',
-    difficulty: 'challenge',
-    stem: 'A classifier has precision $0.5$ and an F1 score of $0.6$. What is its **recall**?',
-    options: ['$0.7$', '$0.3$', '$0.55$', '$0.75$'],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'What is a **false negative**?',
+    options: ['An actual positive predicted as negative', 'An actual negative predicted as positive', 'An actual negative predicted as negative', 'An actual positive predicted as positive'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'F1 is the harmonic mean, which is easiest to rearrange in "reciprocal" form:\n\n' +
-        '$$\\frac{2}{F_1} = \\frac{1}{P} + \\frac{1}{R}$$\n\n' +
-        'Substitute $F_1 = 0.6$ and $P = 0.5$:\n\n' +
-        '$$\\frac{2}{0.6} = \\frac{1}{0.5} + \\frac{1}{R}$$\n\n' +
-        '$$\\frac{10}{3} = 2 + \\frac{1}{R}$$\n\n' +
-        '$$\\frac{1}{R} = \\frac{10}{3} - 2 = \\frac{4}{3}$$\n\n' +
-        'So $R = \\frac{3}{4} = 0.75$.\n\n' +
-        'Check: $\\frac{2 \\times 0.5 \\times 0.75}{0.5 + 0.75} = \\frac{0.75}{1.25} = 0.6$.',
+        'Read the name in two parts. "Negative" is what the model **predicted**, and "false" says that prediction was wrong.\n\n' +
+        'A wrong negative prediction means the example was really positive. It is a case the model **missed**.',
       whyWrong: [
-        'This treats F1 as the ordinary average, $\\frac{0.5 + R}{2} = 0.6$, giving $R = 0.7$. F1 is the harmonic mean.',
-        'This is $0.5 \\times 0.6$: it multiplies the two given numbers, which is not a rearrangement of the F1 formula.',
-        'This is the ordinary average of the two given numbers, $\\frac{0.5 + 0.6}{2}$, which has nothing to do with the F1 formula.',
         null,
+        'This is a **false positive**: the model predicted positive and was wrong, a false alarm.',
+        'This is a **true negative**: the prediction of negative was correct.',
+        'This is a **true positive**: the prediction of positive was correct.',
       ],
-      keyIdea: 'Rearrange F1 using reciprocals: 2/F1 = 1/P + 1/R.',
+      keyIdea: 'The second word is the prediction and the first says if it was right, so a false negative is a missed positive.',
     },
-    check: {
-      optionValues: [0.7, 0.3, 0.55, 0.75],
-      compute: () => {
-        const f1 = new Frac(6, 10);
-        const p = new Frac(1, 2);
-        const invR = new Frac(2).div(f1).sub(new Frac(1).div(p));
-        return new Frac(1).div(invR).value();
-      },
+  },
+  {
+    id: 'evaluation-metrics-022',
+    subtopic: 'evaluation-metrics',
+    difficulty: 'foundation',
+    stem: 'Which formula gives the **recall** of a binary classifier?',
+    options: [
+      '$\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$',
+      '$\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$',
+      '$\\frac{\\text{TP} + \\text{TN}}{\\text{TP} + \\text{TN} + \\text{FP} + \\text{FN}}$',
+      '$\\frac{\\text{TN}}{\\text{TN} + \\text{FP}}$',
+    ],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Recall answers: **"Of all the real positives, how many did the model find?"**\n\n' +
+        '- All the real positives are the ones found plus the ones missed: $\\text{TP} + \\text{FN}$.\n' +
+        '- The ones found: $\\text{TP}$.\n\n' +
+        'So recall is $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$.',
+      whyWrong: [
+        null,
+        'This is **precision**, which divides by everything **predicted** positive. Recall divides by everything **actually** positive.',
+        'This is **accuracy**: the fraction of all predictions that are correct.',
+        'This is **specificity**: the fraction of actual negatives correctly predicted negative.',
+      ],
+      keyIdea: 'Recall = TP divided by all actual positives (TP + FN).',
+    },
+  },
+  {
+    id: 'evaluation-metrics-023',
+    subtopic: 'evaluation-metrics',
+    difficulty: 'foundation',
+    stem: 'The F1 score is which type of mean of precision and recall?',
+    options: ['Harmonic mean', 'Arithmetic mean', 'Geometric mean', 'Quadratic mean'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The F1 score is the **harmonic mean** of precision $P$ and recall $R$:\n\n' +
+        '$$F_1 = \\frac{2PR}{P + R}$$\n\n' +
+        'The harmonic mean is pulled towards the smaller value, so a model only scores well if **both** $P$ and $R$ are good.',
+      whyWrong: [
+        null,
+        'The arithmetic mean is $\\frac{P + R}{2}$, the ordinary average. It would let a high value hide a very low one.',
+        'The geometric mean is $\\sqrt{PR}$, which is a different average and is not what F1 uses.',
+        'The quadratic mean is $\\sqrt{\\frac{P^2 + R^2}{2}}$, which is pulled towards the **larger** value, the opposite of what F1 wants.',
+      ],
+      keyIdea: 'F1 is the harmonic mean of precision and recall, $\\frac{2PR}{P + R}$.',
     },
   },
 ];

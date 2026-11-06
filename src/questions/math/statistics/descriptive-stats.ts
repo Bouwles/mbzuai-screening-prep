@@ -1,12 +1,6 @@
 import type { StaticQuestion } from '../../../types';
 import { mean, median, modes, quartiles, sumOf } from '../../../lib/mathx';
 
-const outliers = (xs: number[]): number[] => {
-  const { q1, q3 } = quartiles(xs);
-  const iqr = q3 - q1;
-  return [...xs].sort((a, b) => a - b).filter((x) => x < q1 - 1.5 * iqr || x > q3 + 1.5 * iqr);
-};
-
 export const questions: StaticQuestion[] = [
   // ---------------------------------------------------------------- foundation
   {
@@ -93,7 +87,7 @@ export const questions: StaticQuestion[] = [
     id: 'descriptive-stats-004',
     subtopic: 'descriptive-stats',
     difficulty: 'foundation',
-    stem: 'The monthly salaries of the 7 people working in a small company are shown in the table. Which average gives the best idea of a **typical** salary?',
+    stem: 'The table shows the monthly salaries of 7 people in a small company. Which of these gives the best idea of a **typical** salary?',
     table: {
       caption: 'Monthly salaries',
       headers: ['Employee', 'Salary (AED)'],
@@ -107,12 +101,7 @@ export const questions: StaticQuestion[] = [
         ['V (owner)', '60,000'],
       ],
     },
-    options: [
-      'The mean, because it uses every salary, so it is always the most typical value',
-      'The median, because it is not pulled up by the one very large salary',
-      'The mode, because it is the most common salary',
-      'The range, because it shows how much the salaries vary',
-    ],
+    options: ['The mean', 'The median', 'The mode', 'The range'],
     correctIndex: 1,
     markScheme: {
       solution:
@@ -272,9 +261,7 @@ export const questions: StaticQuestion[] = [
     id: 'descriptive-stats-009',
     subtopic: 'descriptive-stats',
     difficulty: 'exam',
-    stem:
-      'Find the **interquartile range** of these 11 values. Find the quartiles as the medians of the lower and upper halves (the median itself is not in either half).\n\n' +
-      '13, 5, 21, 8, 3, 18, 10, 25, 7, 15, 12',
+    stem: 'Find the **interquartile range** of $13, 5, 21, 8, 3, 18, 10, 25, 7, 15, 12$, taking the quartiles as the medians of the lower and upper halves (leaving out the median).',
     options: ['$22$', '$11$', '$6$', '$18$'],
     correctIndex: 1,
     markScheme: {
@@ -304,7 +291,7 @@ export const questions: StaticQuestion[] = [
     id: 'descriptive-stats-010',
     subtopic: 'descriptive-stats',
     difficulty: 'exam',
-    stem: 'A data set has lower quartile $Q_1 = 20$, median $25$ and upper quartile $Q_3 = 32$. Using the rule that an outlier is more than $1.5 \\times \\text{IQR}$ below $Q_1$ or above $Q_3$, which of these values would be an **outlier**?',
+    stem: 'A data set has $Q_1 = 20$, median $25$ and $Q_3 = 32$. An outlier is more than $1.5 \\times \\text{IQR}$ below $Q_1$ or above $Q_3$. Which of these values is an **outlier**?',
     options: ['$46$', '$5$', '$52$', '$44$'],
     correctIndex: 2,
     markScheme: {
@@ -423,7 +410,7 @@ export const questions: StaticQuestion[] = [
     id: 'descriptive-stats-014',
     subtopic: 'descriptive-stats',
     difficulty: 'exam',
-    stem: 'A year group has two classes. Class A has 20 students with a mean mark of $64$. Class B has 30 students. The mean mark of all 50 students is $70$. What is the mean mark of Class B?',
+    stem: 'Class A has 20 students with a mean mark of $64$. Class B has 30 students. The mean mark of all 50 students is $70$. What is the mean mark of Class B?',
     options: ['$76$', '$74$', '$111$', '$44.4$'],
     correctIndex: 1,
     markScheme: {
@@ -446,84 +433,11 @@ export const questions: StaticQuestion[] = [
       compute: () => (70 * 50 - 64 * 20) / 30,
     },
   },
-  // ---------------------------------------------------------------- challenge
-  {
-    id: 'descriptive-stats-015',
-    subtopic: 'descriptive-stats',
-    difficulty: 'challenge',
-    stem: 'A list of five positive whole numbers has a median of $6$, a **unique** mode of $4$ and a mean of $7$. What is the **largest possible** value in the list?',
-    options: ['$15$', '$21$', '$14$', '$11$'],
-    correctIndex: 2,
-    markScheme: {
-      solution:
-        'Write the numbers in order: $a \\le b \\le c \\le d \\le e$.\n\n' +
-        '1. Median $6$ means the middle number $c = 6$.\n' +
-        '2. Mean $7$ means the total is $7 \\times 5 = 35$.\n' +
-        '3. Mode $4$: since $4 < 6$, the 4s must be below the median, so $a = b = 4$. Then $4$ appears twice, so no other value may appear twice (otherwise the mode would not be unique).\n' +
-        '4. So far $4 + 4 + 6 = 14$, leaving $d + e = 35 - 14 = 21$.\n' +
-        '5. $d \\ge 6$, but $d = 6$ would make $6$ appear twice and tie with $4$, so $d \\ge 7$. To make $e$ as large as possible, make $d$ as small as possible: $d = 7$, $e = 14$.\n\n' +
-        'Check: 4, 4, 6, 7, 14 has median $6$, mean $\\frac{35}{5} = 7$ and unique mode $4$. The largest possible value is $14$.',
-      whyWrong: [
-        'This takes $d = 6$, giving 4, 4, 6, 6, 15. But then $6$ appears twice, just like $4$, so the mode is no longer unique.',
-        'This forgets the fourth number: $35 - 4 - 4 - 6 = 21$ uses up the whole total on $e$, but $d$ must be at least $6$.',
-        null,
-        'This is the **smallest** possible largest value ($d = 10$, $e = 11$, splitting $21$ as evenly as allowed). The question asks for the largest possible value.',
-      ],
-      keyIdea: 'Translate each average into a fact (median $=$ middle value, $\\text{mean} \\times n = \\text{total}$, mode $=$ most repeated), then push the free values to their limits.',
-    },
-    check: {
-      optionValues: [15, 21, 14, 11],
-      compute: () => {
-        let best = -1;
-        for (let a = 1; a <= 6; a++)
-          for (let b = a; b <= 6; b++)
-            for (let d = 6; d <= 35; d++) {
-              const e = 35 - a - b - 6 - d;
-              if (e < d) continue;
-              const list = [a, b, 6, d, e];
-              const ms = modes(list);
-              const counts = list.filter((v) => v === ms[0]).length;
-              if (ms.length === 1 && ms[0] === 4 && counts > 1 && median(list) === 6) best = Math.max(best, e);
-            }
-        return best;
-      },
-    },
-  },
-  {
-    id: 'descriptive-stats-016',
-    subtopic: 'descriptive-stats',
-    difficulty: 'challenge',
-    stem:
-      'Using the $1.5 \\times \\text{IQR}$ rule, which values in this data set are **outliers**? Find the quartiles as the medians of the lower and upper halves (the median itself is not in either half).\n\n' +
-      '28, 3, 43, 21, 25, 50, 19, 7, 30, 22, 27',
-    options: ['$3$, $7$, $43$ and $50$', '$50$ only', '$3$, $43$ and $50$', '$3$ and $50$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        '**Step 1:** Order the 11 values: 3, 7, 19, 21, 22, **25**, 27, 28, 30, 43, 50. The median is the 6th value, $25$.\n\n' +
-        '**Step 2:** Lower half: 3, 7, 19, 21, 22, so $Q_1 = 19$. Upper half: 27, 28, 30, 43, 50, so $Q_3 = 30$.\n\n' +
-        '**Step 3:** $\\text{IQR} = 30 - 19 = 11$ and $1.5 \\times 11 = 16.5$.\n\n' +
-        '**Step 4:** Lower fence: $19 - 16.5 = 2.5$. Upper fence: $30 + 16.5 = 46.5$.\n\n' +
-        '**Step 5:** Values below $2.5$: none ($3 > 2.5$). Values above $46.5$: only $50$.\n\n' +
-        'So $50$ is the only outlier.',
-      whyWrong: [
-        'This uses fences $Q_1 - \\text{IQR} = 8$ and $Q_3 + \\text{IQR} = 41$, forgetting to multiply the IQR by $1.5$.',
-        null,
-        'This includes the median $25$ in both halves, giving $Q_1 = 20$, $Q_3 = 29$, $\\text{IQR} = 9$ and fences $6.5$ and $42.5$. The question says the median is not in either half.',
-        'This labels the smallest and largest values as outliers just because they look far from the rest. Check against the fence: $3$ is above the lower fence $2.5$, so it is not an outlier.',
-      ],
-      keyIdea: 'Compute $Q_1$, $Q_3$ and the IQR carefully, then compare every value with the fences $Q_1 - 1.5 \\times \\text{IQR}$ and $Q_3 + 1.5 \\times \\text{IQR}$.',
-    },
-    check: {
-      optionValues: ['3,7,43,50', '50', '3,43,50', '3,50'],
-      compute: () => outliers([28, 3, 43, 21, 25, 50, 19, 7, 30, 22, 27]).join(','),
-    },
-  },
   {
     id: 'descriptive-stats-017',
     subtopic: 'descriptive-stats',
     difficulty: 'exam',
-    stem: 'The mean of four numbers is $9$. When a fifth number $x$ is added, the mean rises to $10$. When a sixth number $y$ is then added, the mean of all six numbers falls back to $9$. What is $y$?',
+    stem: 'The mean of four numbers is $9$. Adding a fifth number $x$ raises the mean to $10$. Adding a sixth number $y$ brings the mean of all six back to $9$. What is $y$?',
     options: ['$14$', '$4$', '$-5$', '$9$'],
     correctIndex: 1,
     markScheme: {
@@ -552,93 +466,95 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'descriptive-stats-018',
+    id: 'descriptive-stats-020',
     subtopic: 'descriptive-stats',
-    difficulty: 'challenge',
-    stem: 'The table shows how many books 20 students read last month. The mean number of books read is $2.2$. Find $a$ and $b$.',
-    table: {
-      headers: ['Books read', 'Frequency'],
-      rows: [
-        [0, 2],
-        [1, '$a$'],
-        [2, '$b$'],
-        [3, 5],
-        [4, 3],
-      ],
-    },
-    options: ['$a = 7$, $b = 5$', '$a = 3$, $b = 7$', '$a = 5$, $b = 5$', '$a = 7$, $b = 3$'],
-    correctIndex: 1,
+    difficulty: 'foundation',
+    stem: 'Which average is most affected by one very large value?',
+    options: ['The mean', 'The median', 'The mode', 'All three equally'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        'Two facts give two equations.\n\n' +
-        '1. **Total frequency** is 20: $2 + a + b + 5 + 3 = 20$, so $a + b = 10$.\n' +
-        '2. **Mean** is 2.2, so $\\sum fx = 2.2 \\times 20 = 44$:\n' +
-        '$$0 \\times 2 + 1 \\times a + 2 \\times b + 3 \\times 5 + 4 \\times 3 = 44$$\n' +
-        'which gives $a + 2b + 27 = 44$, so $a + 2b = 17$.\n' +
-        '3. Subtract the first equation from the second: $(a + 2b) - (a + b) = 17 - 10$, so $b = 7$.\n' +
-        '4. Then $a = 10 - 7 = 3$.\n\n' +
-        'Check: frequencies $2 + 3 + 7 + 5 + 3 = 20$ and $\\sum fx = 0 + 3 + 14 + 15 + 12 = 44$, mean $\\frac{44}{20} = 2.2$.',
+        'The mean uses the size of every value, so one very large value pulls it up.\n\n' +
+        'For $1, 2, 2, 3, 100$ the mean is $21.6$, while the median and the mode are both $2$.',
       whyWrong: [
-        'This leaves out the 2 students who read 0 books when totalling the frequencies, giving $a + b = 12$ instead of $10$.',
         null,
-        'This counts the 2 students who read 0 books as contributing 2 books (adding $f$ instead of $f \\times x$ for that row), giving $a + 2b = 15$.',
-        'These are the right numbers the wrong way round: $b$ is the frequency of 2 books, so it is the one multiplied by 2.',
+        'The median depends only on the middle position, so it hardly moves when the largest value grows.',
+        'The mode depends only on which value occurs most often, so one large value does not change it.',
+        'The three behave differently: only the mean uses the size of every value.',
       ],
-      keyIdea: 'A frequency table with unknowns gives two equations: one from the total frequency and one from the mean ($\\sum fx = \\bar{x} \\times n$).',
+      keyIdea: 'The mean is sensitive to extreme values; the median and the mode are not.',
     },
     check: {
-      optionValues: ['7,5', '3,7', '5,5', '7,3'],
+      optionValues: ['mean', 'median', 'mode', 'equal'],
       compute: () => {
-        const sols: string[] = [];
-        for (let a = 0; a <= 20; a++)
-          for (let b = 0; b <= 20; b++) {
-            const f = [2, a, b, 5, 3];
-            const n = sumOf(f);
-            const s = sumOf(f.map((v, x) => v * x));
-            // mean 2.2 <=> 10 * sum(fx) = 22 * n (kept in integers to avoid floating-point error)
-            if (n === 20 && 10 * s === 22 * n) sols.push(`${a},${b}`);
-          }
-        return sols.length === 1 ? sols[0] : 'not unique';
+        const before = [1, 2, 2, 3, 4];
+        const after = [1, 2, 2, 3, 100];
+        const shift = (f: (d: number[]) => number) => Math.abs(f(after) - f(before));
+        const changes: [string, number][] = [
+          ['mean', shift(mean)],
+          ['median', shift(median)],
+          ['mode', shift((d) => modes(d)[0])],
+        ];
+        return changes.reduce((a, b) => (b[1] > a[1] ? b : a))[0];
       },
     },
   },
   {
-    id: 'descriptive-stats-019',
+    id: 'descriptive-stats-021',
     subtopic: 'descriptive-stats',
-    difficulty: 'challenge',
-    stem: 'A data set has mean $10$, median $9$, range $12$ and interquartile range $8$. Every value is **multiplied by 2 and then 3 is added**. Which row gives the new mean, median, range and IQR?',
-    options: [
-      'Mean $23$, median $21$, range $27$, IQR $19$',
-      'Mean $26$, median $24$, range $24$, IQR $16$',
-      'Mean $23$, median $21$, range $12$, IQR $8$',
-      'Mean $23$, median $21$, range $24$, IQR $16$',
-    ],
-    correctIndex: 3,
+    difficulty: 'foundation',
+    stem: 'Which of these is a measure of **spread**?',
+    options: ['Interquartile range', 'Mean', 'Median', 'Mode'],
+    correctIndex: 0,
     markScheme: {
       solution:
-        '**Averages** (mean, median) go through exactly the same change as the data:\n\n' +
-        '- Mean: $2 \\times 10 + 3 = 23$\n' +
-        '- Median: $2 \\times 9 + 3 = 21$\n\n' +
-        '**Spreads** (range, IQR) are differences between two values. Adding 3 moves both values up by 3, so the difference does not change; multiplying by 2 doubles the difference:\n\n' +
-        '- Range: $2 \\times 12 = 24$\n' +
-        '- IQR: $2 \\times 8 = 16$\n\n' +
-        'Example: the data 4, 6, 8, 9, 13, 14, 16 have exactly these statistics; after the change they become 11, 15, 19, 21, 29, 31, 35, with mean $23$, median $21$, range $35 - 11 = 24$ and IQR $31 - 15 = 16$.',
+        'A measure of **spread** says how far apart the values are. The interquartile range, $Q_3 - Q_1$, gives the width of the middle half of the data.\n\n' +
+        'The mean, median and mode are averages, which say where the centre of the data is.',
       whyWrong: [
-        'This adds 3 to the range and IQR as well. Adding a constant shifts every value equally, so differences between values (the spread) do not change.',
-        'This adds 3 **before** multiplying by 2 ($2 \\times (10 + 3) = 26$). The order matters: multiply first, then add 3.',
-        'This leaves the spread unchanged. Adding does not change spread, but multiplying every value by 2 does double it.',
         null,
+        'The mean is an average: it describes the centre of the data, not how spread out it is.',
+        'The median is an average: it is the middle value, and says nothing about how far apart the values are.',
+        'The mode is the most common value, so it says nothing about how far apart the values are.',
       ],
-      keyIdea: 'Under $y = ax + b$, averages become $a \\times \\text{average} + b$, while range and IQR are only multiplied by $|a|$.',
-    },
-    check: {
-      optionValues: ['23,21,27,19', '26,24,24,16', '23,21,12,8', '23,21,24,16'],
-      compute: () => {
-        const data = [4, 6, 8, 9, 13, 14, 16];
-        const y = data.map((v) => 2 * v + 3);
-        const { q1, q2, q3 } = quartiles(y);
-        return `${mean(y)},${q2},${Math.max(...y) - Math.min(...y)},${q3 - q1}`;
-      },
+      keyIdea: 'Averages describe the centre; the range, interquartile range and standard deviation describe the spread.',
     },
   },
-];
+  {
+    id: 'descriptive-stats-022',
+    subtopic: 'descriptive-stats',
+    difficulty: 'foundation',
+    stem: 'The **mode** of a data set is the value that:',
+    options: ['Occurs most often', 'Is in the middle when the data are ordered', 'Equals the total divided by the number of values', 'Equals the largest minus the smallest'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The mode is the most frequent value. In $2, 3, 3, 5, 9$ the mode is $3$, because it appears twice and every other value appears once.',
+      whyWrong: [
+        null,
+        'This is the **median**.',
+        'This is the **mean**.',
+        'This is the **range**, which measures spread.',
+      ],
+      keyIdea: 'Mode = most frequent; median = middle; mean = total divided by count.',
+    },
+  },
+  {
+    id: 'descriptive-stats-023',
+    subtopic: 'descriptive-stats',
+    difficulty: 'foundation',
+    stem: 'The lower quartile $Q_1$ is also known as which percentile?',
+    options: ['The 25th percentile', 'The 50th percentile', 'The 75th percentile', 'The 1st percentile'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'A **percentile** is the value below which that percentage of the data lies.\n\n' +
+        'The lower quartile has a quarter of the data below it, so it is the 25th percentile. The median is the 50th and the upper quartile is the 75th.',
+      whyWrong: [
+        null,
+        'The 50th percentile is the **median**, with half of the data below it.',
+        'The 75th percentile is the **upper** quartile, $Q_3$.',
+        'The "1" in $Q_1$ means the first of the three quartiles, not 1% of the data.',
+      ],
+      keyIdea: '$Q_1$, the median and $Q_3$ are the 25th, 50th and 75th percentiles.',
+    },
+  },];

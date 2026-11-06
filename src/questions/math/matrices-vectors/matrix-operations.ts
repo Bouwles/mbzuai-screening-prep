@@ -20,6 +20,13 @@ function productOrder(...shapes: [number, number][]): string {
   return `${cur[0]}x${cur[1]}`;
 }
 const isSymmetric = (a: Mat) => a.length === a[0].length && J(a) === J(transpose(a));
+type Shape = [number, number];
+/** The pairs of shapes whose product is (or is not) defined, as "3x4,4x2" keys. */
+const pairsWhere = (defined: boolean, pairs: [Shape, Shape][]) =>
+  pairs
+    .filter(([a, b]) => (productOrder(a, b) !== 'undefined') === defined)
+    .map(([a, b]) => `${a[0]}x${a[1]},${b[0]}x${b[1]}`)
+    .join('|');
 
 export const questions: StaticQuestion[] = [
   // ------------------------------------------------------------------ foundation
@@ -68,7 +75,7 @@ export const questions: StaticQuestion[] = [
         'So $a_{23} = -5$.',
       whyWrong: [
         'This is $a_{32}$ (row 3, column 2). It mixes up the order: the first subscript is the row, the second is the column.',
-        'This counts rows and columns from 0, as Python list indexing does (`A[2][3]`). In maths, $a_{23}$ counts from 1, so it is row 2, column 3.',
+        'This counts rows and columns from 0, which lands on row 3, column 4. In maths, $a_{23}$ counts from 1, so it is row 2, column 3.',
         'This finds the right position (row 2, column 3) but drops the minus sign. The entry is $-5$.',
         null,
       ],
@@ -494,42 +501,47 @@ export const questions: StaticQuestion[] = [
     id: 'matrix-operations-016',
     subtopic: 'matrix-operations',
     difficulty: 'exam',
-    stem: 'What does this Python program print?',
+    stem: 'Arrays are indexed from 1, and `A[i][j]` is the entry in row `i`, column `j`. What does this pseudocode print?',
     code: {
-      lang: 'python',
+      lang: 'pseudocode',
       source:
         'A = [[1, 2], [3, 4]]\n' +
         'B = [[2, 0], [1, 3]]\n' +
-        'C = [[0, 0], [0, 0]]\n' +
-        'for i in range(2):\n' +
-        '    for j in range(2):\n' +
-        '        for k in range(2):\n' +
-        '            C[i][j] += A[i][k] * B[k][j]\n' +
-        'print(C)',
+        's = 0\n' +
+        'for k = 1 to 2\n' +
+        '   s = s + A[2][k] * B[k][1]\n' +
+        'end for\n' +
+        'print(s)',
     },
-    options: ['`[[2, 0], [3, 12]]`', '`[[2, 4], [10, 14]]`', '`[[4, 6], [10, 12]]`', '`[[2, 7], [6, 15]]`'],
+    options: ['`4`', '`6`', '`10`', '`12`'],
     correctIndex: 2,
-    python: { stdout: '[[4, 6], [10, 12]]' },
     markScheme: {
       solution:
-        'The triple loop sets `C[i][j]` to the sum over `k` of `A[i][k] * B[k][j]`: row `i` of `A` times column `j` of `B`. That is exactly the matrix product $AB$ (indices start at 0 in Python).\n\n' +
-        '| `i` | `j` | sum over `k` | `C[i][j]` |\n' +
+        'The loop multiplies row 2 of `A` by column 1 of `B`, entry by entry, and adds the results. That is the entry in row 2, column 1 of the matrix product $AB$.\n\n' +
+        '| `k` | `A[2][k]` | `B[k][1]` | `s` |\n' +
         '|---|---|---|---|\n' +
-        '| 0 | 0 | `1*2 + 2*1` | 4 |\n' +
-        '| 0 | 1 | `1*0 + 2*3` | 6 |\n' +
-        '| 1 | 0 | `3*2 + 4*1` | 10 |\n' +
-        '| 1 | 1 | `3*0 + 4*3` | 12 |\n\n' +
-        'So the program prints `[[4, 6], [10, 12]]`.',
+        '| 1 | 3 | 2 | 6 |\n' +
+        '| 2 | 4 | 1 | 10 |\n\n' +
+        'So the program prints `10`.',
       whyWrong: [
-        'This multiplies entries in matching positions (`A[i][j] * B[i][j]`). The loop over `k` adds up a whole row times a whole column.',
-        'This is $BA$. The code uses `A[i][k] * B[k][j]`: rows of `A` with columns of `B`, so it computes $AB$.',
+        'This uses row 1 of `A` (`1*2 + 2*1`). The code reads `A[2][k]`, which is row 2.',
+        'This stops after the first pass, when `s` is 6. The loop `for k = 1 to 2` includes `k = 2`.',
         null,
-        'This uses rows of `B` instead of columns (`B[j][k]`), which gives $AB^{T}$. The code reads `B[k][j]`, walking down column `j`.',
+        'This uses column 2 of `B` (`3*0 + 4*3`). The code reads `B[k][1]`, which walks down column 1.',
       ],
-      keyIdea: '`C[i][j] = sum of A[i][k] * B[k][j]` over `k` is the definition of the matrix product $AB$.',
+      keyIdea: 'Adding `A[i][k] * B[k][j]` over `k` gives the entry in row `i`, column `j` of the product $AB$.',
+    },
+    check: {
+      optionValues: [4, 6, 10, 12],
+      compute: () => {
+        const A = [[1, 2], [3, 4]];
+        const B = [[2, 0], [1, 3]];
+        let s = 0;
+        for (let k = 1; k <= 2; k++) s += A[2 - 1][k - 1] * B[k - 1][1 - 1];
+        return s;
+      },
     },
   },
-  // ------------------------------------------------------------------ challenge
   {
     id: 'matrix-operations-017',
     subtopic: 'matrix-operations',
@@ -568,42 +580,9 @@ export const questions: StaticQuestion[] = [
     },
   },
   {
-    id: 'matrix-operations-018',
-    subtopic: 'matrix-operations',
-    difficulty: 'challenge',
-    stem: `Let $A = ${matrix([[1, 2], [0, 1]])}$. What is the top-right entry of $A^{10}$?`,
-    options: ['$1024$', '$20$', '$18$', '$10$'],
-    correctIndex: 1,
-    markScheme: {
-      solution:
-        'Work out the first few powers and look for a pattern.\n\n' +
-        `- $A^{2} = ${matrix([[1, 2], [0, 1]])}${matrix([[1, 2], [0, 1]])} = ${matrix([['1 \\times 1 + 2 \\times 0', '1 \\times 2 + 2 \\times 1'], ['0 \\times 1 + 1 \\times 0', '0 \\times 2 + 1 \\times 1']])} = ${matrix([[1, 4], [0, 1]])}$\n` +
-        `- $A^{3} = A^{2}A = ${matrix([[1, 4], [0, 1]])}${matrix([[1, 2], [0, 1]])} = ${matrix([[1, 6], [0, 1]])}$\n\n` +
-        'Each extra factor of $A$ adds 2 to the top-right entry, while the other entries stay the same. So\n\n' +
-        `$$A^{n} = ${matrix([[1, '2n'], [0, 1]])}$$\n\n` +
-        'For $n = 10$ the top-right entry is $2 \\times 10 = 20$.',
-      whyWrong: [
-        'This raises the entry to the power: $2^{10} = 1024$. Matrix powers are repeated matrix products, and here the top-right entry grows by adding 2 each time, not by doubling.',
-        null,
-        'This is an off-by-one slip in the pattern ($2(n - 1)$). Check against $A^{2}$, whose top-right entry is $4 = 2 \\times 2$, so $A^{n}$ has $2n$.',
-        'This is the pattern for $\\begin{bmatrix} 1 & 1 \\\\ 0 & 1 \\end{bmatrix}$, whose powers have top-right entry $n$. Here the entry starts at 2, so it grows by 2 each time.',
-      ],
-      keyIdea: 'Find matrix powers by multiplying out $A^{2}$ and $A^{3}$ and spotting the pattern; never raise the entries to the power.',
-    },
-    check: {
-      optionValues: [1024, 20, 18, 10],
-      compute: () => {
-        const A = [[1, 2], [0, 1]];
-        let P = identity(2);
-        for (let i = 0; i < 10; i++) P = matMul(P, A);
-        return P[0][1];
-      },
-    },
-  },
-  {
     id: 'matrix-operations-019',
     subtopic: 'matrix-operations',
-    difficulty: 'challenge',
+    difficulty: 'exam',
     stem: '$A$ is a $2 \\times 3$ matrix (with no special pattern in its entries). Which of the following is **always** a symmetric matrix?',
     options: ['$A + A^{T}$', '$A^{2}$', '$AA^{T}$', '$(A^{T})^{T}$'],
     correctIndex: 2,
@@ -623,45 +602,6 @@ export const questions: StaticQuestion[] = [
         'Transposing twice gives back $A$ itself, which is $2 \\times 3$. A non-square matrix can never be symmetric.',
       ],
       keyIdea: '$(AA^{T})^{T} = (A^{T})^{T}A^{T} = AA^{T}$, so $AA^{T}$ is symmetric for any matrix $A$.',
-    },
-  },
-  {
-    id: 'matrix-operations-020',
-    subtopic: 'matrix-operations',
-    difficulty: 'challenge',
-    stem: `Find integers $a$, $b$, $c$ such that $${matrix([[2, 'a'], ['b', 1]])}${matrix([[1, 3], [2, 'c']])} = ${matrix([[8, 18], [1, 1]])}$.`,
-    options: ['$a = 3$, $b = -1$, $c = 4$', '$a = 3$, $b = 1$, $c = 4$', '$a = 4$, $b = -1$, $c = 3$', '$a = 3$, $b = -1$, $c = 6$'],
-    correctIndex: 0,
-    markScheme: {
-      solution:
-        'Multiply out the left-hand side (row times column):\n\n' +
-        `$$${matrix([[2, 'a'], ['b', 1]])}${matrix([[1, 3], [2, 'c']])} = ${matrix([['2 + 2a', '6 + ac'], ['b + 2', '3b + c']])}$$\n\n` +
-        'Set each entry equal to the matching entry on the right:\n\n' +
-        '1. Top-left: $2 + 2a = 8$, so $2a = 6$ and $a = 3$.\n' +
-        '2. Top-right: $6 + ac = 18$, so $3c = 12$ and $c = 4$.\n' +
-        '3. Bottom-left: $b + 2 = 1$, so $b = -1$.\n' +
-        '4. Bottom-right (check): $3b + c = 3(-1) + 4 = 1$. Correct.\n\n' +
-        'So $a = 3$, $b = -1$, $c = 4$.\n\n' +
-        '**Exam shortcut:** substitute each option into the four entries; only the correct one makes all four match.',
-      whyWrong: [
-        null,
-        'This comes from a sign slip in $b + 2 = 1$ (taking $b = 2 - 1$). With $b = 1$ the bottom-left entry is $1 + 2 = 3$, not 1.',
-        'This solves $2 + 2a = 8$ as $2a = 8$ (forgetting the $2 + $), giving $a = 4$ and then $c = 3$. With these values the top-left entry is $2 + 8 = 10$, not 8.',
-        'This sets $ac = 18$, forgetting the $2 \\times 3 = 6$ part of the top-right entry. With $c = 6$ the top-right entry is $6 + 18 = 24$ and the bottom-right is $3$, not 1.',
-      ],
-      keyIdea: 'Multiply out the product, then equate entries one at a time; use the last entry to check (or plug the options in).',
-    },
-    check: {
-      optionValues: ['3,-1,4', '3,1,4', '4,-1,3', '3,-1,6'],
-      compute: () => {
-        const target = [[8, 18], [1, 1]];
-        const found: string[] = [];
-        for (let a = -10; a <= 10; a++)
-          for (let b = -10; b <= 10; b++)
-            for (let c = -10; c <= 10; c++)
-              if (J(matMul([[2, a], [b, 1]], [[1, 3], [2, c]])) === J(target)) found.push(`${a},${b},${c}`);
-        return found.join(' | ');
-      },
     },
   },
   {
@@ -696,6 +636,349 @@ export const questions: StaticQuestion[] = [
       compute: () => {
         const S = add([[1, 2], [3, 1]], [[1, -1], [2, 1]]);
         return J(matMul(S, S));
+      },
+    },
+  },
+  // ------------------------------------------------------------------ foundation: products and definitions
+  {
+    id: 'matrix-operations-022',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    stem: 'Which of the following matrix products is **not** defined?',
+    options: [
+      'a $3 \\times 4$ matrix with a $4 \\times 2$',
+      'a $2 \\times 5$ matrix with a $5 \\times 5$',
+      'a $3 \\times 2$ matrix with a $3 \\times 2$',
+      'a $1 \\times 3$ matrix with a $3 \\times 1$',
+    ],
+    correctIndex: 2,
+    markScheme: {
+      solution:
+        'Inner dimensions must match; outer dimensions give the size. The columns of the first matrix must equal the rows of the second.\n\n' +
+        '- $(3 \\times 4)(4 \\times 2)$: inner $4$ and $4$ match, giving $3 \\times 2$.\n' +
+        '- $(2 \\times 5)(5 \\times 5)$: inner $5$ and $5$ match, giving $2 \\times 5$.\n' +
+        '- $(3 \\times 2)(3 \\times 2)$: inner $2$ and $3$ do not match, so this product is **not defined**.\n' +
+        '- $(1 \\times 3)(3 \\times 1)$: inner $3$ and $3$ match, giving $1 \\times 1$.',
+      whyWrong: [
+        'This product is defined: the inner dimensions $4$ and $4$ match. The outer numbers differing does not matter; they only give the size, $3 \\times 2$.',
+        'This product is defined: the inner dimensions $5$ and $5$ match. A square second matrix causes no problem, and the result is $2 \\times 5$.',
+        null,
+        'This product is defined: the inner dimensions $3$ and $3$ match. A $1 \\times 1$ result is still a valid matrix.',
+      ],
+      keyIdea: 'Inner dimensions must match; outer dimensions give the size.',
+    },
+    check: {
+      optionValues: ['3x4,4x2', '2x5,5x5', '3x2,3x2', '1x3,3x1'],
+      compute: () => pairsWhere(false, [[[3, 4], [4, 2]], [[2, 5], [5, 5]], [[3, 2], [3, 2]], [[1, 3], [3, 1]]]),
+    },
+  },
+  {
+    id: 'matrix-operations-023',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    stem: 'Which of the following matrix products **is** defined?',
+    options: [
+      'a $2 \\times 3$ matrix times a $2 \\times 3$ matrix',
+      'a $4 \\times 2$ matrix times a $2 \\times 5$ matrix',
+      'a $2 \\times 4$ matrix times a $3 \\times 2$ matrix',
+      'a $3 \\times 5$ matrix times a $4 \\times 3$ matrix',
+    ],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'A product is defined when the columns of the left matrix equal the rows of the right matrix (the inner dimensions match).\n\n' +
+        '- $(2 \\times 3)(2 \\times 3)$: inner $3$ and $2$, not defined.\n' +
+        '- $(4 \\times 2)(2 \\times 5)$: inner $2$ and $2$ match, so it is defined and gives $4 \\times 5$.\n' +
+        '- $(2 \\times 4)(3 \\times 2)$: inner $4$ and $3$, not defined.\n' +
+        '- $(3 \\times 5)(4 \\times 3)$: inner $5$ and $4$, not defined.',
+      whyWrong: [
+        'Having the same order does not make a product defined. Same order is the condition for **adding** matrices; here the inner dimensions are $3$ and $2$.',
+        null,
+        'This order fails because the inner dimensions are $4$ and $3$. The product would only work the other way round, $(3 \\times 2)(2 \\times 4)$, and order matters.',
+        'This matches the **outer** dimensions ($3$ and $3$) instead of the inner ones. The inner dimensions are $5$ and $4$, so it is not defined.',
+      ],
+      keyIdea: 'Compare the columns of the left matrix with the rows of the right matrix; nothing else decides whether a product exists.',
+    },
+    check: {
+      optionValues: ['2x3,2x3', '4x2,2x5', '2x4,3x2', '3x5,4x3'],
+      compute: () => pairsWhere(true, [[[2, 3], [2, 3]], [[4, 2], [2, 5]], [[2, 4], [3, 2]], [[3, 5], [4, 3]]]),
+    },
+  },
+  {
+    id: 'matrix-operations-024',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    stem: 'What is the **unit matrix of order $m$**?',
+    options: [
+      'The $m \\times m$ matrix with $1$s on the main diagonal and $0$s elsewhere',
+      'The $m \\times m$ matrix with every entry equal to $1$',
+      'The $m \\times 1$ matrix with every entry equal to $1$',
+      'The $m \\times m$ matrix with every entry equal to $0$',
+    ],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The **unit matrix of order $m$**, written $I_{m}$, is another name for the $m \\times m$ identity matrix: $1$s on the main diagonal (top-left to bottom-right) and $0$s everywhere else.\n\n' +
+        `For example, $I_{2} = ${matrix([[1, 0], [0, 1]])}$. It acts like the number $1$: $AI_{m} = A$ whenever the product is defined.`,
+      whyWrong: [
+        null,
+        'This reads "unit" as "every entry is $1$". The unit matrix has $0$s off the main diagonal.',
+        '"Order $m$" describes a square $m \\times m$ matrix, not a single column of $m$ entries.',
+        'This is the zero matrix of order $m$. Multiplying by it gives zero, whereas the unit matrix leaves a matrix unchanged.',
+      ],
+      keyIdea: 'The unit matrix of order $m$, $I_{m}$, is the $m \\times m$ identity matrix.',
+    },
+  },
+  {
+    id: 'matrix-operations-025',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    stem: 'Let $A$ be a $m \\times n$ matrix and $B$ a $p \\times q$ matrix. When is the product $AB$ defined?',
+    options: ['When $n = p$', 'When $m = p$', 'When $n = q$', 'When $m = q$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '"A $m \\times n$ matrix" means $m$ rows and $n$ columns.\n\n' +
+        'Each entry of $AB$ is a row of $A$ times a column of $B$. A row of $A$ has $n$ entries and a column of $B$ has $p$ entries, so these must be equal: $n = p$.\n\n' +
+        'In $(m \\times n)(p \\times q)$ these are the inner dimensions.',
+      whyWrong: [
+        null,
+        'This compares the **rows** of $A$ with the rows of $B$. It is the columns of $A$ that must equal the rows of $B$.',
+        'This compares the **columns** of both matrices. The columns of $A$ must equal the **rows** of $B$.',
+        'This is the condition for $BA$ (columns of $B$ equal rows of $A$), not for $AB$.',
+      ],
+      keyIdea: '$AB$ is defined exactly when the number of columns of $A$ equals the number of rows of $B$.',
+    },
+  },
+  {
+    id: 'matrix-operations-026',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    stem: 'If $A$ is a $3 \\times 5$ matrix, what is the order of its transpose $A^{T}$?',
+    options: ['$5 \\times 3$', '$3 \\times 5$', '$5 \\times 5$', '$3 \\times 3$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The transpose turns rows into columns, so the two numbers of the order swap.\n\n' +
+        'An $m \\times n$ matrix has an $n \\times m$ transpose, so $A^{T}$ is $5 \\times 3$.',
+      whyWrong: [
+        null,
+        'This keeps the order unchanged. Transposing swaps rows and columns, so the order changes unless the matrix is square.',
+        'This is the order of $A^{T}A$, which is $(5 \\times 3)(3 \\times 5)$. The question asks about $A^{T}$ alone.',
+        'This is the order of $AA^{T}$, which is $(3 \\times 5)(5 \\times 3)$. The question asks about $A^{T}$ alone.',
+      ],
+      keyIdea: 'If $A$ is $m \\times n$ then $A^{T}$ is $n \\times m$.',
+    },
+    check: {
+      optionValues: ['5x3', '3x5', '5x5', '3x3'],
+      compute: () => {
+        const T5 = transpose(zeros(3, 5));
+        return `${T5.length}x${T5[0].length}`;
+      },
+    },
+  },
+  {
+    id: 'matrix-operations-027',
+    subtopic: 'matrix-operations',
+    difficulty: 'foundation',
+    stem: `What is the transpose of ${T([[1, 2, 3], [4, 5, 6]])}?`,
+    options: [T([[1, 4], [2, 5], [3, 6]]), T([[1, 2, 3], [4, 5, 6]]), T([[4, 5, 6], [1, 2, 3]]), T([[3, 2, 1], [6, 5, 4]])],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'The transpose turns each row into a column: row 1 becomes column 1, and row 2 becomes column 2.\n\n' +
+        `So the transpose of the $2 \\times 3$ matrix is the $3 \\times 2$ matrix ${T([[1, 4], [2, 5], [3, 6]])}.`,
+      whyWrong: [
+        null,
+        'This is the original matrix. A $2 \\times 3$ matrix must become $3 \\times 2$ when transposed.',
+        'This swaps the two rows with each other. Transposing turns rows into columns; it does not reorder the rows.',
+        'This reverses the entries within each row. Transposing turns rows into columns; it does not reverse them.',
+      ],
+      keyIdea: 'Row $i$ of $A$ becomes column $i$ of $A^{T}$.',
+    },
+    check: {
+      optionValues: [J([[1, 4], [2, 5], [3, 6]]), J([[1, 2, 3], [4, 5, 6]]), J([[4, 5, 6], [1, 2, 3]]), J([[3, 2, 1], [6, 5, 4]])],
+      compute: () => J(transpose([[1, 2, 3], [4, 5, 6]])),
+    },
+  },
+  // ------------------------------------------------------------------ exam: products from dimensions
+  {
+    id: 'matrix-operations-028',
+    subtopic: 'matrix-operations',
+    difficulty: 'exam',
+    stem: '$A$ is a $2 \\times 3$ matrix and $B$ is a $4 \\times 2$ matrix. Which statement is true?',
+    options: ['$AB$ is defined but $BA$ is not', '$BA$ is defined but $AB$ is not', 'Both $AB$ and $BA$ are defined', 'Neither $AB$ nor $BA$ is defined'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'Check each order separately.\n\n' +
+        '- $AB$ is $(2 \\times 3)(4 \\times 2)$: inner dimensions $3$ and $4$ do not match, so it is not defined.\n' +
+        '- $BA$ is $(4 \\times 2)(2 \\times 3)$: inner dimensions $2$ and $2$ match, so it is defined and is $4 \\times 3$.',
+      whyWrong: [
+        'This has the two orders the wrong way round. For $AB$ the inner dimensions are $3$ and $4$, which do not match.',
+        null,
+        'This assumes that if one order works the other does too. Here only $BA$ has matching inner dimensions.',
+        'This checks only $AB$ and stops. $BA$ is $(4 \\times 2)(2 \\times 3)$, whose inner dimensions match.',
+      ],
+      keyIdea: 'Matrix order matters: $BA$ can be defined when $AB$ is not.',
+    },
+    check: {
+      optionValues: ['AB', 'BA', 'both', 'neither'],
+      compute: () => {
+        const ab = productOrder([2, 3], [4, 2]) !== 'undefined';
+        const ba = productOrder([4, 2], [2, 3]) !== 'undefined';
+        return ab && ba ? 'both' : ab ? 'AB' : ba ? 'BA' : 'neither';
+      },
+    },
+  },
+  {
+    id: 'matrix-operations-029',
+    subtopic: 'matrix-operations',
+    difficulty: 'exam',
+    stem: '$A$ is a $2 \\times 3$ matrix. Which of the following is defined?',
+    options: ['$A^{T}A$', '$A^{2}$', '$A + A^{T}$', '$A^{-1}$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Here $A^{T}$ is $3 \\times 2$.\n\n' +
+        '- $A^{T}A$ is $(3 \\times 2)(2 \\times 3)$: inner dimensions match, giving $3 \\times 3$. Defined.\n' +
+        '- $A^{2} = AA$ is $(2 \\times 3)(2 \\times 3)$: inner $3$ and $2$. Not defined.\n' +
+        '- $A + A^{T}$ adds a $2 \\times 3$ matrix to a $3 \\times 2$ matrix. Addition needs the same order, so it is not defined.\n' +
+        '- $A^{-1}$: only square matrices can have an inverse, so it is not defined.',
+      whyWrong: [
+        null,
+        '$A^{2}$ needs $A$ to be square: $(2 \\times 3)(2 \\times 3)$ has inner dimensions $3$ and $2$.',
+        'Adding needs equal orders, but $A$ is $2 \\times 3$ and $A^{T}$ is $3 \\times 2$. This sum only exists for a square matrix.',
+        'Only a square matrix can have an inverse, and $A$ is $2 \\times 3$.',
+      ],
+      keyIdea: 'For a non-square $A$, the products $A^{T}A$ and $AA^{T}$ exist, but $A^{2}$, $A + A^{T}$ and $A^{-1}$ do not.',
+    },
+    check: {
+      optionValues: ['ATA', 'A2', 'A+AT', 'Ainv'],
+      compute: () => {
+        const A: Shape = [2, 3];
+        const AT: Shape = [A[1], A[0]];
+        const ok: string[] = [];
+        if (productOrder(AT, A) !== 'undefined') ok.push('ATA');
+        if (productOrder(A, A) !== 'undefined') ok.push('A2');
+        if (A[0] === AT[0] && A[1] === AT[1]) ok.push('A+AT');
+        if (A[0] === A[1]) ok.push('Ainv');
+        return ok.join(',');
+      },
+    },
+  },
+  {
+    id: 'matrix-operations-030',
+    subtopic: 'matrix-operations',
+    difficulty: 'exam',
+    stem: '$A$ is a $2 \\times 3$ matrix. Which of these is defined **and** has order $2 \\times 2$?',
+    options: ['$A^{T}A$', '$AA^{T}$', '$A^{2}$', '$A + A^{T}$'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'Here $A^{T}$ is $3 \\times 2$.\n\n' +
+        '- $AA^{T}$ is $(2 \\times 3)(3 \\times 2)$, which gives $2 \\times 2$.\n' +
+        '- $A^{T}A$ is $(3 \\times 2)(2 \\times 3)$, which gives $3 \\times 3$.\n' +
+        '- $A^{2}$ is $(2 \\times 3)(2 \\times 3)$, which is not defined.\n' +
+        '- $A + A^{T}$ adds matrices of different orders, which is not defined.',
+      whyWrong: [
+        '$A^{T}A$ is defined, but it is $3 \\times 3$. The outer dimensions of $(3 \\times 2)(2 \\times 3)$ give the size.',
+        null,
+        '$A^{2}$ is not defined: $(2 \\times 3)(2 \\times 3)$ has inner dimensions $3$ and $2$.',
+        '$A + A^{T}$ is not defined, because $2 \\times 3$ and $3 \\times 2$ are different orders.',
+      ],
+      keyIdea: 'For a $m \\times n$ matrix $A$, $AA^{T}$ is $m \\times m$ and $A^{T}A$ is $n \\times n$.',
+    },
+    check: {
+      optionValues: ['ATA', 'AAT', 'A2', 'A+AT'],
+      compute: () => {
+        const A: Shape = [2, 3];
+        const AT: Shape = [A[1], A[0]];
+        const orders: Record<string, string> = { ATA: productOrder(AT, A), AAT: productOrder(A, AT), A2: productOrder(A, A), 'A+AT': 'undefined' };
+        return Object.keys(orders).filter((k) => orders[k] === '2x2').join(',');
+      },
+    },
+  },
+  {
+    id: 'matrix-operations-031',
+    subtopic: 'matrix-operations',
+    difficulty: 'exam',
+    stem: '$A$ is a $4 \\times 3$ matrix and the product $AB$ is a $4 \\times 5$ matrix. What is the order of $B$?',
+    options: ['$3 \\times 5$', '$5 \\times 3$', '$4 \\times 5$', '$3 \\times 4$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        'Write the orders side by side: $(4 \\times 3)(r \\times c)$ gives $4 \\times 5$.\n\n' +
+        '- The inner dimensions must match, so $r = 3$.\n' +
+        '- The outer dimensions give the size, so $c = 5$.\n\n' +
+        'So $B$ is $3 \\times 5$.',
+      whyWrong: [
+        null,
+        'This has the rows and columns of $B$ the wrong way round. $(4 \\times 3)(5 \\times 3)$ is not defined.',
+        'This copies the order of $AB$. But $(4 \\times 3)(4 \\times 5)$ is not defined, because the inner dimensions are $3$ and $4$.',
+        'This reverses the order of $A$. Then $AB$ would be $(4 \\times 3)(3 \\times 4)$, which is $4 \\times 4$, not $4 \\times 5$.',
+      ],
+      keyIdea: 'Rows of $B$ = columns of $A$, and columns of $B$ = columns of $AB$.',
+    },
+    check: {
+      optionValues: ['3x5', '5x3', '4x5', '3x4'],
+      compute: () => {
+        const shapes: Shape[] = [[3, 5], [5, 3], [4, 5], [3, 4]];
+        return shapes.filter((b) => productOrder([4, 3], b) === '4x5').map((b) => `${b[0]}x${b[1]}`).join('|');
+      },
+    },
+  },
+  {
+    id: 'matrix-operations-032',
+    subtopic: 'matrix-operations',
+    difficulty: 'exam',
+    stem: 'Let $A$ be a $m \\times n$ matrix and $B$ a $n \\times p$ matrix. What is the order of $(AB)^{T}$?',
+    options: ['$p \\times m$', '$m \\times p$', '$n \\times n$', '$n \\times m$'],
+    correctIndex: 0,
+    markScheme: {
+      solution:
+        '"A $m \\times n$ matrix" means $m$ rows and $n$ columns.\n\n' +
+        '1. $AB$ is $(m \\times n)(n \\times p)$. The inner dimensions match and the outer dimensions give $m \\times p$.\n' +
+        '2. Transposing swaps the two numbers, so $(AB)^{T}$ is $p \\times m$.',
+      whyWrong: [
+        null,
+        'This is the order of $AB$ itself. The transpose then swaps rows and columns.',
+        'This uses the inner dimensions. They only have to match; the outer dimensions give the size.',
+        'This transposes $A$ alone. The transpose applies to the whole product $AB$, which is $m \\times p$.',
+      ],
+      keyIdea: 'Find the order of the product first with the inner/outer rule, then swap the two numbers for the transpose.',
+    },
+  },
+  {
+    id: 'matrix-operations-033',
+    subtopic: 'matrix-operations',
+    difficulty: 'exam',
+    stem: '$P$ is a $3 \\times 2$ matrix and $Q$ is a $2 \\times 2$ matrix. Which of the following is **not** defined?',
+    options: ['$PQ$', '$QP$', '$QP^{T}$', '$P^{T}P$'],
+    correctIndex: 1,
+    markScheme: {
+      solution:
+        'Here $P^{T}$ is $2 \\times 3$.\n\n' +
+        '- $PQ$ is $(3 \\times 2)(2 \\times 2)$, which gives $3 \\times 2$.\n' +
+        '- $QP$ is $(2 \\times 2)(3 \\times 2)$: inner $2$ and $3$ do not match, so it is **not defined**.\n' +
+        '- $QP^{T}$ is $(2 \\times 2)(2 \\times 3)$, which gives $2 \\times 3$.\n' +
+        '- $P^{T}P$ is $(2 \\times 3)(3 \\times 2)$, which gives $2 \\times 2$.',
+      whyWrong: [
+        '$PQ$ is defined: the inner dimensions $2$ and $2$ match, giving $3 \\times 2$.',
+        null,
+        '$QP^{T}$ is defined: after transposing, $P^{T}$ is $2 \\times 3$, so the inner dimensions match.',
+        '$P^{T}P$ is defined for any matrix $P$: here $(2 \\times 3)(3 \\times 2)$ gives $2 \\times 2$.',
+      ],
+      keyIdea: 'Transpose first where needed, then check the inner dimensions of each product.',
+    },
+    check: {
+      optionValues: ['PQ', 'QP', 'QPT', 'PTP'],
+      compute: () => {
+        const P: Shape = [3, 2];
+        const Q: Shape = [2, 2];
+        const PT: Shape = [P[1], P[0]];
+        const products: Record<string, Shape[]> = { PQ: [P, Q], QP: [Q, P], QPT: [Q, PT], PTP: [PT, P] };
+        return Object.keys(products).filter((k) => productOrder(...products[k]) === 'undefined').join(',');
       },
     },
   },

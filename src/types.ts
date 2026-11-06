@@ -6,10 +6,10 @@
 // All maths MUST be inside $...$ so KaTeX typesets it (never plain text like x^2).
 
 export type AreaId = 'math' | 'ctl' | 'prog' | 'data';
-export type Difficulty = 'foundation' | 'exam' | 'challenge';
+export type Difficulty = 'foundation' | 'exam';
 
 export interface CodeBlock {
-  /** 'python' is syntax-highlighted (and run by the tests if `python` is set on the question). */
+  /** 'pseudocode' is the house dialect (SPEC.md, section 1.3). 'python' is syntax-highlighted in practice and run by the tests if `python` is set. */
   lang: 'python' | 'pseudocode';
   source: string;
 }
