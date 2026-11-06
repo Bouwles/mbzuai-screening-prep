@@ -4,7 +4,7 @@
 
 **A complete revision site for the MBZUAI BSc in Artificial Intelligence screening exam.**
 
-Lessons for every topic · 1,304 hand-written questions · 181 generators that never run out · timed mock exams
+Lessons for every topic · 1,399 hand-written questions · 175 generators that never run out · timed mock exams
 
 **[Open the live site](https://bouwles.github.io/mbzuai-screening-prep/)**
 
@@ -20,12 +20,12 @@ Made by Paul Nercessian
 
 | | |
 |---|---|
-| **Learn** | 66 lessons, one per subtopic of MBZUAI's published syllabus, each in five steps you can skip between: (1) the simple version, recommended YouTube videos (Khan Academy, 3Blue1Brown, StatQuest, CS50 and others) and a step-by-step explanation; (2) worked examples revealed one step at a time, "which method when?" cues and common traps; (3) guided Foundation practice with progressive hints; (4) questions on your own, stepping up from Foundation to Exam level; (5) exam-level questions. Challenge questions are offered as optional enrichment. Plus a printable formula sheet. |
+| **Learn** | 65 lessons, one per subtopic of MBZUAI's published syllabus, each in five steps you can skip between: (1) the simple version, recommended YouTube videos (Khan Academy, 3Blue1Brown, StatQuest, CS50 and others) and a step-by-step explanation; (2) worked examples revealed one step at a time, "which method when?" cues and common traps; (3) guided Foundation practice with progressive hints; (4) questions on your own, stepping up from Foundation to Exam level; (5) exam-level questions. Plus a printable formula sheet. |
 | **Mastery** | A topic is *mastered* only from independent performance: of your last 10 answers without hints, at least 80% right and at least 3 right at Exam level. Topics you keep getting wrong are flagged *Needs work* and suggested for revisiting. Reading a lesson does not count. |
-| **Topic practice** | Pick topics, a difficulty (Build up / Foundation / Exam / Challenge / Mixed) and 10, 20, 30 or endless questions. *Build up* starts at Foundation and moves to Exam level after two hint-free right answers in a row. Progressive hints (one solution step at a time), instant feedback that starts with why your answer was wrong and how to recognise the question type, and a timer against the estimated exam pace. |
+| **Topic practice** | Pick topics, a difficulty (Build up / Foundation / Exam / Mixed) and 10, 20, 30 or endless questions. *Build up* starts at Foundation and moves to Exam level after two hint-free right answers in a row. Progressive hints (one solution step at a time), and instant feedback that starts with why your answer was wrong and how to recognise the question type. |
 | **General questions** | An endless mixed feed from the whole syllabus that leans towards your weakest topics. |
 | **Question bank** | Browse and search every question by area, topic, subtopic, difficulty and status (unseen / correct / wrong / flagged). |
-| **Mock exams** | A 60-minute full-length mock (60 minutes is the official BSc length; the question count is unpublished, so 53 is an estimate), 15 and 30 minute mocks, and a 40-question / 45-minute speed drill (MBZUAI's 2023 *graduate* format, not the BSc one). Foundation and Exam-level questions only. Countdown timer, navigator, flags, Submit only after the last question, auto-submit at zero, resumes after a reload. Results with the 75% line, breakdown by topic and a full review. |
+| **Mock exams** | A 60-minute full-length mock (60 minutes is the official BSc length; the question count is unpublished, so 53 is an estimate), 15 and 30 minute mocks, and a 40-question / 45-minute speed drill (MBZUAI's 2023 *graduate* format, not the BSc one). Foundation and Exam-level questions only, laid out like the real exam screen: numbered tab strip, mark-for-review bookmark, Reset, timer bottom-right. Submit only after the last question, auto-submit at zero, resumes after a reload. Results with the 75% line, breakdown by topic and a full review. |
 | **Mistakes** | Spaced repetition: wrong answers come back after 1, 3, 7 and 14 days. Generated questions come back with new numbers. |
 | **Dashboard** | Topics mastered, accuracy, streak, recent mock scores against the 75% line, weakest topics, and one "up next" step (due mistakes, then topics that need work, then where you left off). |
 
@@ -63,7 +63,7 @@ Areas and topics mirror MBZUAI's published list for the BSc screening exam:
 - **Programming Fundamentals**: Algorithmic Problem Solving, Basic Syntax Concepts, Functions, Basic Data Structures
 - **Data & AI Reasoning**: Data Interpretation, Basic Machine Learning Concepts
 
-These are split into 66 subtopics (see `src/syllabus.ts`). Research notes on the real exam, with sources, are in [RESEARCH_NOTES.md](RESEARCH_NOTES.md).
+These are split into 65 subtopics (see `src/syllabus.ts`). Research notes on the real exam, with sources, are in [RESEARCH_NOTES.md](RESEARCH_NOTES.md).
 
 ## Run it on your computer
 
@@ -111,7 +111,7 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 {
   id: 'quadratics-019',            // unique
   subtopic: 'quadratics',          // must match the file name
-  difficulty: 'exam',              // 'foundation' | 'exam' | 'challenge'
+  difficulty: 'exam',              // 'foundation' | 'exam'
   stem: 'Solve $x^2 - 5x + 6 = 0$.',
   options: ['$x = 2$ or $x = 3$', '$x = -2$ or $x = -3$', '$x = 1$ or $x = 6$', '$x = 5$ or $x = 6$'],
   correctIndex: 0,
@@ -126,32 +126,37 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 
 - Write maths inside `$...$` (inline) or `$$...$$` (display). In the `.ts` file, backslashes are doubled: `'\\frac{1}{2}'`.
 - Options are shuffled on screen, so explanations never mention a letter.
-- For Python "what does this print" questions add `code: { lang: 'python', source: '...' }` and `python: { stdout: '...' }`; the tests run the code for real.
+- Code is pseudocode by default: add `code: { lang: 'pseudocode', source: '...' }`, following the house dialect in [SPEC.md](SPEC.md), section 1.3. The tests run it through an interpreter and compare the output with the marked option.
+- Python is only for questions about reading basic Python: add `code: { lang: 'python', source: '...' }` and `python: { stdout: '...' }`; the tests run the code for real.
 - Generators live in `src/generators/...` and lessons in `src/lessons/...`; new files are picked up automatically.
 - Run `npm test` afterwards. It fails with a clear message if anything is off.
 
 ## How correctness is checked
 
-`npm test` runs 353 tests:
+`npm test` runs 610 tests:
 
 - Every static question: exactly 4 distinct options, a valid answer, a full mark scheme with an explanation for every wrong option, and every piece of LaTeX rendered through KaTeX in strict mode (it also rejects maths typed as plain text, `1x`, `+ -3` and similar).
 - Every question whose answer is a value is recomputed in code and must match the marked option (and no other option).
-- Every Python output question (175 of them) is run with real Python 3 and its output compared with the marked option. If Python isn't installed, the test prints the list of question ids to check by hand instead of failing.
+- Every Python output question (10 of them) is run with real Python 3 and its output compared with the marked option. If Python isn't installed, the test prints the list of question ids to check by hand instead of failing.
 - Every generator: 2,000 variants each, checking one correct option, four distinct options, no `NaN`/`undefined`, clean LaTeX, and that the worked solution ends on the correct answer.
 - Every lesson has the required sections (including the simple version and "which method when?" cues), and every subtopic has a lesson, recommended videos, at least 15 questions and at least one generator.
-- Every question yields at least one progressive hint that stops short of the full solution; mastery levels, the Build up ladder, and "no Challenge questions in mocks" are unit-tested.
+- Every pseudocode snippet must parse under the house dialect, and every snippet that can run on its own is run by a small interpreter and compared with the marked option.
+- The house style is enforced: short stems, no option that depends on a letter, Python at most 20% of Programming code questions, and at least 15 questions (6 Exam, 5 Foundation) per subtopic. `npm run report` prints the per-subtopic counts.
+- Old saved progress that refers to removed questions, generators or subtopics loads cleanly, and the exam screen's colours keep at least 4.5:1 contrast.
+- Every question yields at least one progressive hint that stops short of the full solution; mastery levels, the Build up ladder, and the mix of levels in mocks are unit-tested.
 
-On top of the automated tests, each subtopic was written and then independently re-solved by a separate reviewer, question by question.
+On top of the automated tests, every question whose answer isn't computed in code was independently re-solved by a separate reviewer.
 
 ## Design
 
-The look is based on the revision and test-prep tools students already know: Khan Academy, Brilliant, Quizlet, Duolingo and the College Board Bluebook exam app.
+The look is based on the revision tools students already know, such as Khan Academy, Brilliant, Quizlet and Duolingo, with questions always shown in the exam layout.
 
 - Light theme by default (dark theme in Settings), one blue accent, and green/red used only for right and wrong.
-- Practice runs in a focus view: exit at the top left, a thin progress bar, the question in a centred column, and **Check / Next at the bottom right**. Feedback appears in the bottom bar; the mark scheme opens below the question.
-- Mock exams copy the Bluebook layout: timer at the top centre (you can hide it), a question navigator at the bottom centre, Back / Next at the bottom right.
-- All maths is typeset with KaTeX, code is syntax-highlighted with line numbers, and charts are drawn as SVG.
-- No animations or transitions anywhere. Keyboard: `1`–`4` or `A`–`D` choose, `Enter` checks / continues, `F` flags, `←` `→` move in mock exams.
+- Every mode reads questions in the same block: a bold number at the left, the stem, grey option rows with radio circles and no letters, a rule, Reset, and a bookmark at the right.
+- Mock exams fill the screen: a "Saved" indicator at the top right, and a bottom strip of numbered tabs with Submit at the end and the timer at the right (click it to hide it). Mocks stay light whatever the theme.
+- In practice, feedback and the mark scheme open below the question, with **Check / Next** under them. The site navigation stays visible.
+- All maths is typeset with KaTeX, and charts are drawn as SVG. Pseudocode is plain Courier everywhere; Python in practice is syntax-highlighted with line numbers.
+- No animations or transitions, apart from a few small ones on the exam screen. Keyboard: `1`–`4` or `A`–`D` choose, `Enter` checks / continues, `F` marks for review, `←` `→` move in mock exams.
 
 ## Tech
 
