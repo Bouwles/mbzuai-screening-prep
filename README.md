@@ -25,11 +25,11 @@ Made by Paul Nercessian
 | **Topic practice** | Pick topics, a difficulty (Build up / Foundation / Exam / Mixed) and 10, 20, 30 or endless questions. *Build up* starts at Foundation and moves to Exam level after two hint-free right answers in a row. Progressive hints (one solution step at a time), and instant feedback that starts with why your answer was wrong and how to recognise the question type. |
 | **General questions** | An endless mixed feed from the whole syllabus that leans towards your weakest topics. |
 | **Question bank** | Browse and search every question by area, topic, subtopic, difficulty and status (unseen / correct / wrong / flagged). |
-| **Mock exams** | A 60-minute full-length mock (60 minutes is the official BSc length; the question count is unpublished, so 53 is an estimate), 15 and 30 minute mocks, and a 40-question / 45-minute speed drill (MBZUAI's 2023 *graduate* format, not the BSc one). Foundation and Exam-level questions only, laid out like the real exam screen: numbered tab strip, mark-for-review bookmark, Reset, timer bottom-right. Submit only after the last question, auto-submit at zero, resumes after a reload. Results with the 75% line, breakdown by topic and a full review. |
+| **Mock exams** | A full-length mock of 50 questions in 60 minutes (60 minutes is the official BSc length), 15 and 30 minute mocks at the same pace, and a 40-question / 45-minute speed drill (MBZUAI's 2023 *graduate* format, not the BSc one). Foundation and Exam-level questions only, laid out like the real exam screen: numbered tab strip, mark-for-review bookmark, Reset, timer bottom-right. Submit only after the last question, auto-submit at zero, resumes after a reload. Results with the 75% line, breakdown by topic and a full review. |
 | **Mistakes** | Spaced repetition: wrong answers come back after 1, 3, 7 and 14 days. Generated questions come back with new numbers. |
 | **Dashboard** | Topics mastered, accuracy, streak, recent mock scores against the 75% line, weakest topics, and one "up next" step (due mistakes, then topics that need work, then where you left off). |
 
-> **About 75%:** a score of 75% or above waives the AED 200 application fee. MBZUAI publishes no pass mark, so 75% is a useful target, not an admission cut-off. Question counts, topic weights and difficulty mixes in the mocks are estimates.
+> **About 75%:** a score of 75% or above waives the AED 200 application fee. MBZUAI publishes no pass mark, so 75% is a useful target, not an admission cut-off. Topic weights and difficulty mixes in the mocks are estimates.
 
 <table>
 <tr>
@@ -96,12 +96,12 @@ Other commands:
 Everything about the exam lives in one file: [`src/config/exam.ts`](src/config/exam.ts).
 
 - `targetPercent`: the target line (75, the fee-waiver score).
-- `mockFormats`: each mock's minutes and question count (counts are estimates).
+- `mockFormats`: each mock's minutes and question count.
 - `areaWeights`: share of each area in a mock (estimates; MBZUAI doesn't publish them).
 - Videos for each lesson live in [`src/config/videos.ts`](src/config/videos.ts).
 - `difficultyMix`, `generatedShare`, `mistakeIntervalsDays`, `streakDailyTarget`.
 
-When you read the real question count and timing in the applicant portal, change the numbers there and save. The running site updates instantly.
+If the real format changes, change the numbers there and save. The running site updates instantly.
 
 ## Adding questions
 
@@ -125,7 +125,7 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 ```
 
 - Write maths inside `$...$` (inline) or `$$...$$` (display). In the `.ts` file, backslashes are doubled: `'\\frac{1}{2}'`.
-- Options are shuffled on screen, so explanations never mention a letter.
+- Options are shuffled and shown without letters, so explanations never mention a letter.
 - Code is pseudocode by default: add `code: { lang: 'pseudocode', source: '...' }`, following the house dialect in [SPEC.md](SPEC.md), section 1.3. The tests run it through an interpreter and compare the output with the marked option.
 - Python is only for questions about reading basic Python: add `code: { lang: 'python', source: '...' }` and `python: { stdout: '...' }`; the tests run the code for real.
 - Generators live in `src/generators/...` and lessons in `src/lessons/...`; new files are picked up automatically.
@@ -133,7 +133,7 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 
 ## How correctness is checked
 
-`npm test` runs 610 tests:
+`npm test` runs 613 tests:
 
 - Every static question: exactly 4 distinct options, a valid answer, a full mark scheme with an explanation for every wrong option, and every piece of LaTeX rendered through KaTeX in strict mode (it also rejects maths typed as plain text, `1x`, `+ -3` and similar).
 - Every question whose answer is a value is recomputed in code and must match the marked option (and no other option).
