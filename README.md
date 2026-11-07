@@ -33,7 +33,7 @@ Made by Paul Nercessian
 
 <table>
 <tr>
-<td><img src="docs/screenshots/practice.png" alt="Practice with mark scheme"></td>
+<td><img src="docs/screenshots/practice.png" alt="Practice with explanation"></td>
 <td><img src="docs/screenshots/mock.png" alt="Mock exam"></td>
 </tr>
 <tr>
@@ -46,13 +46,16 @@ Made by Paul Nercessian
 </tr>
 </table>
 
-### Every question has a full mark scheme
+### Every question teaches you how to solve it
 
-1. The correct answer, stated clearly.
-2. A step-by-step worked solution (code questions are traced line by line).
-3. Why each wrong option is wrong, naming the mistake that leads to it.
-4. The key idea in one sentence.
-5. A link to the lesson.
+After you answer, the correct answer comes first, then why your answer was wrong if it was. The explanation assumes you're new to the topic and has four parts:
+
+1. **What is it asking?** The question in one simple sentence.
+2. **How to solve it.** Numbered steps that skip nothing and say why each one happens. Code is shown with line numbers and traced in small tables.
+3. **Why this is the answer.** A short link from the working to the correct option.
+4. **For similar questions.** A reusable technique for this type of question, never generic advice.
+
+You can also see why each other option is wrong, and jump to the lesson.
 
 ## Syllabus
 
@@ -133,9 +136,9 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 
 ## How correctness is checked
 
-`npm test` runs 613 tests:
+`npm test` runs 861 tests:
 
-- Every static question: exactly 4 distinct options, a valid answer, a full mark scheme with an explanation for every wrong option, and every piece of LaTeX rendered through KaTeX in strict mode (it also rejects maths typed as plain text, `1x`, `+ -3` and similar).
+- Every static question: exactly 4 distinct options, a valid answer, a full explanation, with a reason for every wrong option, and every piece of LaTeX rendered through KaTeX in strict mode (it also rejects maths typed as plain text, `1x`, `+ -3` and similar).
 - Every question whose answer is a value is recomputed in code and must match the marked option (and no other option).
 - Every Python output question (10 of them) is run with real Python 3 and its output compared with the marked option. If Python isn't installed, the test prints the list of question ids to check by hand instead of failing.
 - Every generator: 2,000 variants each, checking one correct option, four distinct options, no `NaN`/`undefined`, clean LaTeX, and that the worked solution ends on the correct answer.
@@ -143,6 +146,7 @@ Questions live in one file per subtopic: `src/questions/<area>/<topic>/<subtopic
 - Every pseudocode snippet must parse under the house dialect, and every snippet that can run on its own is run by a small interpreter and compared with the marked option.
 - The house style is enforced: short stems, no option that depends on a letter, Python at most 20% of Programming code questions, and at least 15 questions (6 Exam, 5 Foundation) per subtopic. `npm run report` prints the per-subtopic counts.
 - Old saved progress that refers to removed questions, generators or subtopics loads cleanly, and the exam screen's colours keep at least 4.5:1 contrast.
+- Every explanation has all four parts in plain, short sentences, states the marked answer, and gives a usable technique instead of generic advice. Pseudocode in explanations must parse under the dialect, and missing or broken explanation data still shows the answer without crashing.
 - Every question yields at least one progressive hint that stops short of the full solution; mastery levels, the Build up ladder, and the mix of levels in mocks are unit-tested.
 
 On top of the automated tests, every question whose answer isn't computed in code was independently re-solved by a separate reviewer.
@@ -154,8 +158,8 @@ The look is based on the revision tools students already know, such as Khan Acad
 - Light theme by default (dark theme in Settings), one blue accent, and green/red used only for right and wrong.
 - Every mode reads questions in the same block: a bold number at the left, the stem, grey option rows with radio circles and no letters, a rule, Reset, and a bookmark at the right.
 - Mock exams fill the screen: a "Saved" indicator at the top right, and a bottom strip of numbered tabs with Submit at the end and the timer at the right (click it to hide it). Mocks stay light whatever the theme.
-- In practice, feedback and the mark scheme open below the question, with **Check / Next** under them. The site navigation stays visible.
-- All maths is typeset with KaTeX, and charts are drawn as SVG. Pseudocode is plain Courier everywhere; Python in practice is syntax-highlighted with line numbers.
+- In practice, feedback and the explanation open below the question, with **Check / Next** under them. The site navigation stays visible.
+- All maths is typeset with KaTeX, and charts are drawn as SVG. Pseudocode in a question is plain Courier; code in explanations, and Python in practice, is syntax-highlighted with line numbers.
 - No animations or transitions, apart from a few small ones on the exam screen. Keyboard: `1`–`4` or `A`–`D` choose, `Enter` checks / continues, `F` marks for review, `←` `→` move in mock exams.
 
 ## Tech
