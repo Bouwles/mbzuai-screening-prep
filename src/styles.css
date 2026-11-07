@@ -164,6 +164,7 @@ pre {
 .topbar-inner {
   max-width: 1200px;
   margin: 0 auto;
+  justify-content: center;
   height: 64px;
   padding: 0 24px;
   display: flex;
@@ -229,6 +230,8 @@ pre {
 .footer-inner {
   max-width: 1200px;
   margin: 0 auto;
+  justify-content: center;
+  text-align: center;
   padding: 18px 24px;
   display: flex;
   flex-wrap: wrap;
@@ -1557,8 +1560,9 @@ input[type='checkbox'] {
 
 /* ---------------------------------------------------------------- settings */
 .settings .card,
-.settings .panel {
+.settings {
   max-width: 760px;
+  margin: 0 auto;
 }
 .danger {
   border-color: var(--bad);

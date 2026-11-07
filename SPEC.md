@@ -406,7 +406,7 @@ Create `src/components/exam/` with:
 
 ### 7.5 Question header row
 
-- **Grid:** `grid-template-columns: 64px minmax(0, 1fr) 48px;`, top margin 40px.
+- **Grid:** `grid-template-columns: 64px minmax(0, 1fr) 64px;`, top margin 40px.
 - **Number column:** question number only (no "Question" word). **Bold 18px**, `--ex-text`, top-aligned with the first line of the stem (`padding-top: 1px`).
   - In practice modes, show the session's running number.
 - **Stem column:** 17px, line-height 1.45, weight 400, `--ex-text`, max width 1100px.
@@ -417,7 +417,7 @@ Create `src/components/exam/` with:
   - It's a `<button>` with `aria-pressed`, `aria-label="Mark for review"`, a 32×32px hit area and the tooltip "Mark for review".
   - The `F` shortcut toggles it.
   - **Practice modes:** this is the existing "Flag" feature, with the same store and the same Mistakes/Bank filters, just drawn as the bookmark icon.
-- **Content column width:** the stem column plus the options are about 78% of viewport width, max 1180px, left edge about 7vw from the page edge (min 24px). Left-weighted, not centred.
+- **Content column width:** the stem column plus the options are about 78% of viewport width, max 1100px, centred on the page with at least 24px either side.
 
 ### 7.6 Options
 
@@ -560,7 +560,7 @@ Create `src/components/exam/` with:
 Practice, feed, mistakes and lesson steps use the same page background and question block as mocks, but:
 
 - **No exam top bar or bottom strip.** The site's normal top navigation stays.
-- The question block sits on an `--ex-bg` page area that is full width under the site header, with the same left-weighted column (7.5).
+- The question block sits on an `--ex-bg` page area that is full width under the site header, with the same centred column (7.5).
 - **Below Reset, 28px gap, then the practice panel** in the site's normal styles (Inter font, theme colours):
   - **Before Check:** a row with `Question N of M` (muted, left), the Hint button, and the **Check** button (primary, right). The existing `action-bar` can stay as a sticky bottom bar on small screens.
   - **After Check:** feedback line ("Correct" / "Not quite — the answer is: ‹option text›"), then the existing mark scheme (solution, why each wrong option is wrong, key idea, lesson link), then **Next**.

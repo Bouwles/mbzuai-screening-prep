@@ -25,8 +25,9 @@
   --ex-ok-bg: #cfe8d4;
   --ex-bad: #b3261e;
   --ex-bad-bg: #f1d0d0;
-  /* Left edge of the number column. The stem then starts about 7vw from the page edge. */
-  --ex-left: max(24px, calc(7vw - 64px));
+  /* The question column, centred on the page: 64px for the number, up to 1100px of content, 64px for the bookmark. */
+  --ex-gutter: 24px;
+  --ex-width: min(calc(78vw + 128px), 1228px, calc(100% - 2 * var(--ex-gutter)));
 
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -127,10 +128,10 @@
 /* ---------------------------------------------------------------- question block */
 .ex .ex-q {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 48px;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
   grid-template-areas: 'num body mark';
-  margin: 40px 0 0 var(--ex-left);
-  width: min(calc(78vw + 112px), 1292px, calc(100% - var(--ex-left) - 16px));
+  margin: 40px auto 0;
+  width: var(--ex-width);
 }
 .ex .ex-num {
   grid-area: num;
@@ -562,8 +563,8 @@
 }
 /* The panel under the question is in the site's normal style, in the question's column. */
 .ex .ex-panel {
-  margin: 28px 0 0 calc(var(--ex-left) + 64px);
-  width: min(78vw, 1100px, calc(100% - var(--ex-left) - 88px));
+  margin: 28px auto 0;
+  width: calc(var(--ex-width) - 128px);
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--text);
 }
@@ -584,8 +585,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 16px 0 0 calc(var(--ex-left) + 64px);
-  width: min(78vw, 1100px, calc(100% - var(--ex-left) - 88px));
+  margin: 16px auto 0;
+  width: calc(var(--ex-width) - 128px);
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 .ex .ex-actions-meta {
@@ -599,7 +600,8 @@
   margin-left: auto;
 }
 .ex .ex-keys {
-  margin: 14px 0 0 calc(var(--ex-left) + 64px);
+  margin: 14px auto 0;
+  width: calc(var(--ex-width) - 128px);
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--muted);
   font-size: 0.85rem;
@@ -608,7 +610,7 @@
 /* A question inside a narrower column: a lesson step, or the review after a mock. */
 .is-inline > .ex.ex-practice,
 .ex.ex-review {
-  --ex-left: 16px;
+  --ex-gutter: 16px;
 }
 .ex.ex-review {
   display: flow-root;
