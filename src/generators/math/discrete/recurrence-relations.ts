@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps as stepsOf, table as tbl } from '../../../lib/explanation';
 import { m, num, paren, signed, sum } from '../../../lib/tex';
 
 type Cand = { v: number; why: string };
@@ -77,9 +78,9 @@ export const generators: Generator[] = [
           [p, 'a_{n-1}'],
           [q, ''],
         ]);
-        const lines = [];
+        const rows: string[][] = [];
         for (let i = 1; i <= steps; i++) {
-          lines.push(`- ${m(`a_{${start + i}} = ${p} \\times ${paren(t[i - 1])}${signed(q)} = ${num(t[i])}`)}`);
+          rows.push([m(`a_{${start + i}}`), m(`${p} \\times ${paren(t[i - 1])}${signed(q)}`), m(num(t[i]))]);
         }
         const ans = m(num(answer));
         return {
@@ -87,12 +88,14 @@ export const generators: Generator[] = [
           answer: ans,
           answerValue: answer,
           distractors: distractors.map((d) => ({ text: m(num(d.v)), value: d.v, why: d.why })),
-          solution:
-            `Start from ${m(`a_{${start}} = ${a}`)}. At each step multiply the previous term by ${p}, then ${opWord}. ` +
-            `Going from ${m(`a_{${start}}`)} to ${m(`a_{${k}}`)} takes ${steps} steps.\n\n` +
-            lines.join('\n') +
-            `\n\nAnswer: ${ans}`,
-          keyIdea: 'Apply the recurrence one step at a time in the order written (multiply, then add), counting steps from the first given term.',
+          asking: `What is ${m(`a_{${k}}`)} if we start at ${a}, then multiply by ${p} and ${opWord} each time?`,
+          solution: stepsOf(
+            `$a_n$ means the term in position $n$, and $a_{n-1}$ means the term just before it. So the rule says: multiply the previous term by ${p}, then ${opWord}. Multiply first, as in ordinary maths.`,
+            `This sequence starts at position ${start}, with ${m(`a_{${start}} = ${a}`)}. So reaching ${m(`a_{${k}}`)} takes ${steps} steps.`,
+            `Apply the rule once per step:\n\n${tbl(['Term', 'Working', 'Value'], rows)}`,
+          ),
+          conclusion: `${steps === 2 ? 'Two' : 'Three'} uses of the rule, starting from ${a}, give ${ans}.`,
+          keyIdea: 'For a recurrence, make a table with one row per term, starting from the given value. Multiply before adding or subtracting. Steps needed $=$ target position $-$ starting position.',
         };
       }
     },
@@ -154,13 +157,13 @@ export const generators: Generator[] = [
           [p, 'a_{n-1}'],
           [q, 'a_{n-2}'],
         ]);
-        const lines: string[] = [];
+        const rows: string[][] = [];
         for (let n = 3; n <= target; n++) {
           const sym = sum([
             [p, `a_{${n - 1}}`],
             [q, `a_{${n - 2}}`],
           ]);
-          lines.push(`- ${m(`a_{${n}} = ${sym} = ${prod(p, seq[n - 1])} + ${prod(q, seq[n - 2])} = ${num(seq[n])}`)}`);
+          rows.push([m(`a_{${n}}`), m(sym), m(`${prod(p, seq[n - 1])} + ${prod(q, seq[n - 2])}`), m(num(seq[n]))]);
         }
         const ans = m(num(answer));
         return {
@@ -168,11 +171,13 @@ export const generators: Generator[] = [
           answer: ans,
           answerValue: answer,
           distractors: distractors.map((d) => ({ text: m(num(d.v)), value: d.v, why: d.why })),
-          solution:
-            `Each new term uses the **two** terms before it: ${p === 1 ? 'the previous term' : `${p} times the previous term`} plus ${q === 1 ? 'the term before that' : `${q} times the term before that`}.\n\n` +
-            lines.join('\n') +
-            `\n\nAnswer: ${ans}`,
-          keyIdea: 'In a two-term recurrence, each coefficient goes with a specific earlier term; build the terms one at a time from the two starting values.',
+          asking: `Using the two starting terms and the rule, what is ${m(`a_{${target}}`)}?`,
+          solution: stepsOf(
+            `$a_{n-1}$ is the term just before $a_n$, and $a_{n-2}$ is the one two places back. So the rule says: take ${p === 1 ? 'the previous term' : `${p} times the previous term`} and add ${q === 1 ? 'the term before that' : `${q} times the term before that`}.`,
+            `We are given ${m(`a_1 = ${x}`)} and ${m(`a_2 = ${y}`)}. Build the rest one at a time:\n\n${tbl(['Term', 'Rule at this position', 'Working', 'Value'], rows)}`,
+          ),
+          conclusion: `Building up from the two starting terms gives ${seq.slice(3, target).join(', ')}, and then ${ans}.`,
+          keyIdea: 'For a rule looking back two terms, write the rule with the actual positions in each row (such as $a_4 = a_3 + 2a_2$) before substituting. This keeps each multiplier on the correct term.',
         };
       }
     },

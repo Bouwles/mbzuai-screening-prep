@@ -1,4 +1,5 @@
 import type { Generator, GeneratedCore } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { round } from '../../../lib/mathx';
 import { m, num } from '../../../lib/tex';
@@ -21,6 +22,8 @@ function pickDistinct(answer: Cand, pool: Cand[]): Cand[] {
 /** Value rounded to 2 d.p. and shown with exactly 2 decimal places (e.g. 0.60, -1.25). */
 const dp2 = (v: number): number => round(v, 2);
 const show2 = (v: number): string => m(dp2(v).toFixed(2));
+/** " To 2 decimal places, that is 0.60.", unless the working already shows it in that form. */
+const toTwoPlaces = (v: number): string => (num(v) === dp2(v).toFixed(2) ? '' : ` To 2 decimal places, that is ${show2(v)}.`);
 
 // ---------------------------------------------------------------- feature scaling contexts
 interface ScaleCtx {
@@ -72,22 +75,25 @@ function minMaxCore(rng: Rng): GeneratedCore {
       : `A feature has a training minimum of ${m(String(lo))} and a maximum of ${m(String(hi))}. Using **min-max scaling** to the range ${m('[0, 1]')}, what is the scaled value of ${m(String(x))}, to 2 decimal places?`;
     const showFrac = Math.abs(exact.n) === Math.abs(x - lo) && exact.d === r ? '' : ` = ${exact.tex()}`;
     const numer = x - lo < 0 ? `-\\frac{${lo - x}}{${r}}` : `\\frac{${x - lo}}{${r}}`;
-    const note = outside
-      ? `\n\nThe value ${m(String(x))} lies ${j > 20 ? 'above the training maximum' : 'below the training minimum'}, so its scaled value is ${j > 20 ? `above ${m('1')}` : `below ${m('0')}`}. That is normal: the scaler always uses the numbers learned from the training data.`
-      : `\n\nSanity check: ${m(String(lo))} maps to ${m('0')} and ${m(String(hi))} maps to ${m('1')}, and the answer lies between them.`;
+    const above = j > 20;
     return {
       stem,
       answer: ans.text,
       answerValue: ans.value,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-      solution:
-        `Min-max scaling subtracts the minimum and divides by the **range** (max minus min):` +
-        `\n\n$$x' = \\frac{x - x_{\\min}}{x_{\\max} - x_{\\min}}$$\n\n` +
-        `The range is ${m(`${hi} - ${lo} = ${r}`)}.` +
-        `\n\n$$x' = \\frac{${x} - ${lo}}{${r}} = ${numer}${showFrac} = ${num(exact.value())}$$` +
-        note +
-        `\n\nAnswer: ${ans.text}`,
-      keyIdea: 'Min-max scaling: subtract the training minimum, then divide by the training range (max minus min).',
+      asking: `Where does ${m(String(x))} land on the scale where the ${outside ? 'training ' : ''}minimum is ${m('0')} and the maximum is ${m('1')}?`,
+      solution: steps(
+        `**Min-max scaling** puts values on a ${m('0')} to ${m('1')} scale, so the minimum becomes ${m('0')} and the maximum becomes ${m('1')}. The formula is $x' = \\frac{x - x_{\\min}}{x_{\\max} - x_{\\min}}$, where $x$ is the value and $x'$ is its scaled value.`,
+        outside &&
+          `The scaler keeps the training minimum ${m(String(lo))} and maximum ${m(String(hi))}, even though ${m(String(x))} is ${above ? 'above' : 'below'} that range. Changing them would let test data affect the scaler.`,
+        `The top of the fraction asks how far the value is from the minimum: ${m(`${x} - ${lo} = ${x - lo}`)}.`,
+        `The bottom is the **range**, the distance from minimum to maximum: ${m(`${hi} - ${lo} = ${r}`)}.`,
+        `Divide: ${m(`${numer}${showFrac} = ${num(exact.value())}`)}.${toTwoPlaces(exact.value())}`,
+      ),
+      conclusion: outside
+        ? `${m(String(x))} is ${above ? 'above the training maximum' : 'below the training minimum'}, so its scaled value lands ${above ? `above ${m('1')}` : `below ${m('0')}`}, at ${ans.text}.`
+        : `${m(String(x))} is ${x - lo} of the way along a range of ${r}, so its scaled value is ${ans.text}.`,
+      keyIdea: 'Min-max scaling is $\\frac{\\text{value} - \\text{min}}{\\text{max} - \\text{min}}$, using the training minimum and maximum. The minimum must give 0 and the maximum must give 1. Test values outside the training range land outside 0 to 1, which is normal.',
     };
   }
 }
@@ -125,7 +131,6 @@ function zScoreCore(rng: Rng): GeneratedCore {
     const spread = givesVar
       ? `mean ${m(String(mu))} and variance ${m(String(v2))}`
       : `mean ${m(String(mu))} and standard deviation ${m(String(sigma))}`;
-    const sdStep = givesVar ? `The standard deviation is the square root of the variance: ${m(`\\sigma = \\sqrt{${v2}} = ${sigma}`)}.\n\n` : '';
     // z = d / sigma, written with the minus sign outside the fraction; show the reduced
     // fraction only when it differs, and the decimal only when z is not a whole number.
     const zFracRaw = d < 0 ? `-\\frac{${-d}}{${sigma}}` : `\\frac{${d}}{${sigma}}`;
@@ -137,14 +142,16 @@ function zScoreCore(rng: Rng): GeneratedCore {
       answer: ans.text,
       answerValue: ans.value,
       distractors: ds.map((c) => ({ text: c.text, value: c.value, why: c.why })),
-      solution:
-        `Standardisation: ${m('z = \\frac{x - \\mu}{\\sigma}')}, where ${m('\\mu')} is the mean and ${m('\\sigma')} the standard deviation.\n\n` +
-        sdStep +
-        `Subtract the mean: ${m(`${x} - ${mu} = ${d}`)}.\n\n` +
-        `Divide by the standard deviation: ${m(`z = ${zFracRaw}${zReduced}${zDecimal}`)}.\n\n` +
-        `So ${m(String(x))} is ${m(num(absZ))} standard deviation${absZ === 1 ? '' : 's'} ${d > 0 ? 'above' : 'below'} the mean.\n\n` +
-        `Answer: ${ans.text}`,
-      keyIdea: 'A z-score is (value minus mean) divided by the standard deviation; values below the mean get negative z-scores.',
+      asking: `How many standard deviations is ${m(String(x))} from the mean, and on which side?`,
+      solution: steps(
+        `**Standardising** a value means asking how many standard deviations it is from the mean. The formula is ${m('z = \\frac{x - \\mu}{\\sigma}')}, where ${m('x')} is the value, ${m('\\mu')} is the mean and ${m('\\sigma')} is the standard deviation (the typical distance from the mean).`,
+        givesVar &&
+          `The question gives the **variance**, which is the standard deviation squared. To undo the squaring, take the square root: ${m(`\\sigma = \\sqrt{${v2}} = ${sigma}`)}.`,
+        `Subtract the mean to see how far the value is from it: ${m(`${x} - ${mu} = ${d}`)}. ${d > 0 ? 'It is positive, so the value is above the mean.' : 'The minus sign shows the value is below the mean.'}`,
+        `Divide by the standard deviation to count how many standard deviations that is: ${m(`z = ${zFracRaw}${zReduced}${zDecimal}`)}.${toTwoPlaces(z.value())}`,
+      ),
+      conclusion: `${m(String(x))} is ${m(num(absZ))} standard deviation${absZ === 1 ? '' : 's'} ${d > 0 ? 'above' : 'below'} the mean, so its z-score is ${ans.text}.`,
+      keyIdea: 'A z-score is (value minus mean) divided by the standard deviation. If you are given the variance, take its square root first. Values below the mean get negative z-scores, so the sign must match the side.',
     };
   }
 }
@@ -171,13 +178,15 @@ function kfoldTrainCore(rng: Rng): GeneratedCore {
       answer: ans.text,
       answerValue: answer,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-      solution:
-        `In ${m('k')}-fold cross-validation the data is cut into ${m('k')} equal folds. Each round, **one** fold is held out for validation and the other ${m('k - 1')} folds are used for training.\n\n` +
-        `- Fold size: ${m(`\\frac{${N}}{${k}} = ${f}`)} examples.\n` +
-        `- Training folds per round: ${m(`${k} - 1 = ${k - 1}`)}.\n` +
-        `- Training examples per round: ${m(`${k - 1} \\times ${f} = ${answer}`)}.\n\n` +
-        `Answer: ${ans.text}`,
-      keyIdea: 'Each round of $k$-fold cross-validation trains on $k - 1$ folds and validates on the one remaining fold.',
+      asking: `In one round, how many of the ${m(String(N))} examples does the model train on?`,
+      solution: steps(
+        `In **${k}-fold cross-validation**, the data is cut into ${m(String(k))} equal parts called **folds**. Each round, one fold is kept aside to check the model, and the rest are used for training.`,
+        `Find the size of one fold: ${m(`\\frac{${N}}{${k}} = ${f}`)} examples.`,
+        `One fold is kept aside, which leaves ${m(`${k} - 1 = ${k - 1}`)} folds for training.`,
+        `Multiply to get the training examples: ${m(`${k - 1} \\times ${f} = ${answer}`)}.`,
+      ),
+      conclusion: `${m(String(k - 1))} folds of ${m(String(f))} examples each gives ${ans.text} training examples per round.`,
+      keyIdea: 'In $k$-fold cross-validation, each round trains on $k - 1$ folds and checks on the other one. So one fold is the total divided by $k$, and training size is $k - 1$ times that.',
     };
   }
 }
@@ -204,13 +213,15 @@ function modelCountCore(rng: Rng): GeneratedCore {
       answer: ans.text,
       answerValue: answer,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-      solution:
-        `**Step 1: one setting.** ${k}-fold cross-validation trains one model per fold: ${m(String(k))} models.\n\n` +
-        `**Step 2: all settings.** Each of the ${m(String(h))} settings needs its own full cross-validation: ${m(`${h} \\times ${k} = ${h * k}`)} models.\n\n` +
-        `**Step 3: the final model.** One more model is trained on all the data with the best setting: ${m(`${h * k} + 1 = ${answer}`)}.\n\n` +
-        `The number of examples (${m(String(N))}) does not change the count; it only decides the fold size (${m(String(N / k))}).\n\n` +
-        `Answer: ${ans.text}`,
-      keyIdea: 'Tuning $h$ settings with $k$-fold cross-validation trains $h \\times k$ models, plus one final model on all the data.',
+      asking: 'How many training runs does this whole process take in total?',
+      solution: steps(
+        `In **${k}-fold cross-validation**, the data is cut into ${m(String(k))} equal parts called **folds**. Each fold takes one turn as the part held back, so testing one setting trains a model ${m(String(k))} times.`,
+        `There are ${m(String(h))} settings to compare, and each needs its own full cross-validation. So multiply: ${m(`${h} \\times ${k} = ${h * k}`)} training runs.`,
+        `The ${m(String(N))} examples only decide the size of each fold, which is ${m(`\\frac{${N}}{${k}} = ${N / k}`)}. They don't change how many times a model is trained.`,
+        `The question adds one final model on all the data, which is one more run: ${m(`${h * k} + 1 = ${answer}`)}.`,
+      ),
+      conclusion: `${m(String(h * k))} runs to compare the settings, plus ${m('1')} final model, gives ${ans.text} training runs.`,
+      keyIdea: 'To count training runs: settings $\\times$ folds, plus 1 if a final model is trained on all the data. The number of examples changes the fold size only, not the number of runs.',
     };
   }
 }
@@ -251,12 +262,13 @@ function splitCore(rng: Rng): GeneratedCore {
       answer: ans.text,
       answerValue: answer,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-      solution:
-        `The ${SET_NAMES[which]} set is ${m(`${p[which]}\\%`)} of the data:` +
-        `\n\n$$${num(p[which] / 100)} \\times ${N} = ${answer}$$\n\n` +
-        `Check that the three parts add up: ${m(`${size(0)} + ${size(1)} + ${size(2)} = ${N}`)}.\n\n` +
-        `Answer: ${ans.text}`,
-      keyIdea: 'Each split size is its percentage times the total, and the three parts must add back to the total.',
+      asking: `How many of the ${m(String(N))} examples go into the ${SET_NAMES[which]} set?`,
+      solution: steps(
+        `The question says the ${SET_NAMES[which]} set is ${m(`${p[which]}\\%`)} of the data, so we need ${m(`${p[which]}\\%`)} of ${m(String(N))}.`,
+        `To find a percentage of a number, write it as a decimal by dividing by 100: ${m(`${p[which]} \\div 100 = ${num(p[which] / 100)}`)}. Then multiply: ${m(`${num(p[which] / 100)} \\times ${N} = ${answer}`)}.`,
+      ),
+      conclusion: `${m(`${p[which]}\\%`)} of ${m(String(N))} gives ${ans.text} examples in the ${SET_NAMES[which]} set.`,
+      keyIdea: 'Size of a split $=$ its percentage as a decimal $\\times$ the total. Match each set to its percentage in the order stated. The three sizes must add back to the total.',
     };
   }
 }
@@ -312,16 +324,19 @@ function regLossCore(rng: Rng): GeneratedCore {
       answer: ans.text,
       answerValue: ans.value,
       distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-      solution:
-        `Regularised loss ${m('=')} MSE ${m('+')} penalty, with penalty ${m(penTex)}.\n\n` +
-        `**Step 1: ${isL2 ? 'square' : 'take the absolute value of'} each weight and add.** ${m(`${terms} = ${vals} = ${pen}`)}` +
-        (isL2 ? ' (a negative number squared is positive).' : ' (absolute values are never negative).') +
-        `\n\n**Step 2: multiply by ${m('\\lambda')}.** ${m(`${L} \\times ${pen} = ${num(lam.mul(pen).value())}`)}.\n\n` +
-        `**Step 3: add to the MSE.** ${m(`${num(mse.value())} + ${num(lam.mul(pen).value())} = ${num(J.value())}`)}.\n\n` +
-        `Answer: ${ans.text}`,
+      asking: `What is the total loss once the ${isL2 ? 'L2' : 'L1'} penalty for large weights is added?`,
+      solution: steps(
+        `**Regularisation** adds a penalty when a model's weights (the numbers it learns) get large, to discourage an over-complicated model. So regularised loss ${m('=')} mean squared error (MSE) ${m('+')} penalty.`,
+        isL2
+          ? `In the penalty ${m(penTex)}, the symbol ${m('\\sum')} means "add up" and ${m('w_i')} is each weight. So square each weight, then add: ${m(`${terms} = ${vals} = ${pen}`)}. A negative number squared is positive.`
+          : `In the penalty ${m(penTex)}, the symbol ${m('\\sum')} means "add up" and ${m('|w_i|')} is each weight's absolute value (its size, ignoring any minus sign). So add those up: ${m(`${terms} = ${vals} = ${pen}`)}.`,
+        `Next, ${m('\\lambda')} (lambda) sets how strong the penalty is, so multiply by it: ${m(`${L} \\times ${pen} = ${num(lam.mul(pen).value())}`)}.`,
+        `Add the penalty to the MSE: ${m(`${num(mse.value())} + ${num(lam.mul(pen).value())} = ${num(J.value())}`)}.`,
+      ),
+      conclusion: `The MSE of ${m(num(mse.value()))} plus the penalty of ${m(num(lam.mul(pen).value()))} gives a regularised loss of ${ans.text}.`,
       keyIdea: isL2
-        ? 'L2 regularisation adds lambda times the sum of the squared weights to the loss, which punishes large weights.'
-        : 'L1 regularisation adds lambda times the sum of the absolute weights to the loss, which pushes weights towards zero.',
+        ? 'L2 regularised loss $=$ MSE $+ \\lambda \\times$ (sum of the squared weights). Square each weight, add, multiply by $\\lambda$, then add the MSE. A negative weight squared is positive.'
+        : 'L1 regularised loss $=$ MSE $+ \\lambda \\times$ (sum of the absolute weights). Drop any minus signs, add, multiply by $\\lambda$, then add the MSE. L1 never squares the weights.',
     };
   }
 }

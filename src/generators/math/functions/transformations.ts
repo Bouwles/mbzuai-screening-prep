@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { m, num, paren, poly, signed } from '../../../lib/tex';
 
 type Pt = [number, number];
@@ -74,22 +75,23 @@ export const generators: Generator[] = [
       );
       const ds = pickDistinct(ptKey(ans), answer, pool);
 
-      const solution =
-        `Write the new graph as ${m(gTex)} and treat the two coordinates separately.\n\n` +
-        `**${m('x')}-coordinate (inside the bracket, do the opposite):** the new graph uses the same output ${m(`f(${num(p)}) = ${num(q)}`)} when the input to ${m('f')} is ${m(num(p))}:` +
-        `\n\n$$${inner} = ${num(p)} \\Rightarrow x = ${p === 0 ? num(ans[0]) : `${num(p)}${signed(-c)} = ${num(ans[0])}`}$$\n\n` +
-        `This is a translation of ${Math.abs(c)} unit${Math.abs(c) === 1 ? '' : 's'} to the ${hDir}.\n\n` +
-        `**${m('y')}-coordinate (outside, do what you see):** multiply by ${m(num(a))} first, then ${d > 0 ? 'add' : 'subtract'} ${num(Math.abs(d))}:` +
-        `\n\n$$${paren(a)} \\times ${paren(q)}${signed(d)} = ${num(a * q)}${signed(d)} = ${num(ans[1])}$$\n\n` +
-        `So ${ptTex([p, q])} moves to ${answer}.\n\nAnswer: ${answer}`;
+      const units = (n: number) => `${Math.abs(n)} unit${Math.abs(n) === 1 ? '' : 's'}`;
+      const solution = steps(
+        `${ptTex([p, q])} on ${m('y = f(x)')} means ${m(`f(${num(p)}) = ${num(q)}`)}: when the input to ${m('f')} is ${m(num(p))}, the output is ${m(num(q))}. We can follow this one value through the new equation, handling ${m('x')} and ${m('y')} separately.`,
+        `Find the new ${m('x')}. To use that same value of ${m('f')}, the bracket must equal ${m(num(p))}: ${m(`${inner} = ${num(p)}`)}. ${c > 0 ? 'Subtract' : 'Add'} ${m(num(Math.abs(c)))} ${c > 0 ? 'from' : 'to'} both sides: ${m(`x = ${num(p)}${signed(-c)} = ${num(ans[0])}`)}.`,
+        `Find the new ${m('y')}. The equation multiplies the output of ${m('f')} by ${m(num(a))}, then ${d > 0 ? 'adds' : 'subtracts'} ${m(num(Math.abs(d)))}. Multiply first: ${m(`${paren(a)} \\times ${paren(q)} = ${num(a * q)}`)}.`,
+        `Then ${d > 0 ? 'add' : 'subtract'}: ${m(`${num(a * q)}${signed(d)} = ${num(ans[1])}`)}. So the new point has ${m(`x = ${num(ans[0])}`)} and ${m(`y = ${num(ans[1])}`)}.`,
+      );
 
       return {
         stem: `The point ${ptTex([p, q])} lies on the graph of ${m('y = f(x)')}. Which point must lie on the graph of ${m(gTex)}?`,
         answer,
         answerValue: ptKey(ans),
         distractors: ds.map((x) => ({ text: x.text, value: x.value, why: x.why })),
+        asking: `Where does the point ${ptTex([p, q])} end up on the new graph?`,
         solution,
-        keyIdea: `Under ${m('y = af(x + c) + d')} a point ${m('(p, q)')} moves to ${m('(p - c, aq + d)')}: inside acts on ${m('x')} (opposite way), outside acts on ${m('y')} (multiply, then add).`,
+        conclusion: `The bracket moves the point ${units(c)} to the ${hDir}, and the numbers outside set its new height, so the point is ${answer}.`,
+        keyIdea: `For ${m('y = af(x + c) + d')}, set the bracket equal to the old ${m('x')}-coordinate and solve for the new ${m('x')}. Then multiply the old ${m('y')} by ${m('a')} and add ${m('d')}, in that order. So ${m('(p, q)')} moves to ${m('(p - c, aq + d)')}.`,
       };
     },
   },
@@ -138,24 +140,28 @@ export const generators: Generator[] = [
       const ds = pickDistinct(ptKey(ans), answer, pool);
 
       const half = -h; // p / 2
-      const squareStep =
-        `${fx} = (x${signed(half)})^2 - ${num(h * h)}${r !== 0 ? signed(r) : ''} = (x${signed(-h)})^2${k !== 0 ? signed(k) : ''}`;
-      const solution =
-        `**Step 1: find the vertex of ${m('f')}** by completing the square. Half of ${m(num(p))} is ${m(num(half))}:` +
-        `\n\n$$${squareStep}$$\n\n` +
-        `So the vertex of ${m('y = f(x)')} is ${ptTex([h, k])}.\n\n` +
-        `**Step 2: apply the translation** ${m(gTex)}.\n\n` +
-        `- Inside: ${m(inner)} moves the graph ${Math.abs(c)} unit${Math.abs(c) === 1 ? '' : 's'} ${c > 0 ? 'left' : 'right'}: ${m(`${num(h)}${signed(-c)} = ${num(ans[0])}`)}\n` +
-        `- Outside: ${m(signed(d).trim())} moves it ${Math.abs(d)} unit${Math.abs(d) === 1 ? '' : 's'} ${d > 0 ? 'up' : 'down'}: ${m(`${num(k)}${signed(d)} = ${num(ans[1])}`)}\n\n` +
-        `Answer: ${answer}`;
+      const units = (n: number) => `${Math.abs(n)} unit${Math.abs(n) === 1 ? '' : 's'}`;
+      const vertexForm = `(x${signed(half)})^2${k !== 0 ? signed(k) : ''}`;
+      const solution = steps(
+        `The **vertex** is the turning point of the curve. A translation slides every point the same way without changing the shape. So find the vertex of ${m('f')}, then slide it.`,
+        `Find the vertex by completing the square. Halve the number in front of ${m('x')}: ${m(`${num(p)} \\div 2 = ${num(half)}`)}. So use the bracket ${m(`(x${signed(half)})^2`)}, which expands to ${m(`x^{2}${signed(p)}x + ${num(h * h)}`)}.`,
+        k === 0
+          ? `The number on the end of ${m('f(x)')} is also ${m(num(h * h))}, so nothing needs adding: ${m(`f(x) = ${vertexForm}`)}.`
+          : `The number on the end of ${m('f(x)')} is ${m(num(r))}, not ${m(num(h * h))}. To fix that, put the difference after the bracket: ${m(`${num(r)} - ${num(h * h)} = ${num(k)}`)}. So ${m(`f(x) = ${vertexForm}`)}.`,
+        `A square is never negative, so ${m(`(x${signed(half)})^2`)} is smallest, at 0, when ${m(`x = ${num(h)}`)}. At that point ${m(`y = ${num(k)}`)}. So the vertex of ${m('f')} is ${ptTex([h, k])}.`,
+        `Slide it sideways. Inside the bracket the effect is opposite to the sign, so ${m(inner)} moves the graph ${units(c)} ${c > 0 ? 'left' : 'right'}. The new ${m('x')} is ${m(`${num(h)}${signed(-c)} = ${num(ans[0])}`)}.`,
+        `Slide it vertically. Outside the bracket the sign means what it says, so ${m(signed(d).trim())} moves the graph ${units(d)} ${d > 0 ? 'up' : 'down'}. The new ${m('y')} is ${m(`${num(k)}${signed(d)} = ${num(ans[1])}`)}.`,
+      );
 
       return {
         stem: `Let ${m(`f(x) = ${fx}`)}. What are the coordinates of the vertex of the graph of ${m(gTex)}?`,
         answer,
         answerValue: ptKey(ans),
         distractors: ds.map((x) => ({ text: x.text, value: x.key, why: x.why })),
+        asking: `Where is the turning point of ${m('f')} after the graph is moved?`,
         solution,
-        keyIdea: 'Complete the square to find the vertex of the original graph, then move the vertex exactly as the translation moves every point.',
+        conclusion: `Starting at ${ptTex([h, k])} and moving ${units(c)} ${c > 0 ? 'left' : 'right'} and ${units(d)} ${d > 0 ? 'up' : 'down'}, the new vertex is ${answer}.`,
+        keyIdea: 'Complete the square to find the vertex of the original graph. Then move that point: $f(x + c)$ shifts it left by $c$, and adding $d$ outside shifts it up by $d$. No new equation is needed.',
       };
     },
   },
@@ -204,24 +210,26 @@ export const generators: Generator[] = [
 
       const stretch =
         a === 1
-          ? ''
+          ? false
           : a === -1
-            ? `- The minus sign in front reflects the graph in the ${m('x')}-axis. A horizontal asymptote ${m('y = 0')} stays at ${m('y = 0')} under a reflection, so this does not move any asymptote.\n`
-            : `- The numerator ${m(num(a))} is a vertical stretch${a < 0 ? ' with a reflection in the $x$-axis' : ''}. Stretching ${m('y = 0')} keeps it at ${m('y = 0')}, so this does not move any asymptote.\n`;
-      const solution =
-        `Start from ${m('y = \\frac{1}{x}')}, which has asymptotes ${m('x = 0')} and ${m('y = 0')}, and follow how each part of ${m(gTex)} moves them.\n\n` +
-        stretch +
-        `- The denominator ${m(den)}: you cannot divide by zero, so the vertical asymptote is where ${m(`${den} = 0`)}, i.e. ${m(`x = ${num(-c)}`)} (a shift ${Math.abs(c)} ${c > 0 ? 'left' : 'right'}).\n` +
-        `- The ${m(signed(d).trim())} outside: as ${m('x')} gets very large the fraction gets close to 0, so ${m('y')} gets close to ${m(num(d))}. The horizontal asymptote is ${m(`y = ${num(d)}`)}.\n\n` +
-        `Answer: ${answer}`;
+            ? `The minus sign in front turns the graph upside down, but it moves neither line. A fraction near 0 is still near 0 after changing its sign.`
+            : `The ${a < 0 ? `${m(num(a))} in front of the fraction stretches the graph and turns it upside down` : `${m(num(a))} on top stretches the graph vertically`}, but it moves neither line. A number near 0 is still near 0 after multiplying by ${m(num(a))}.`;
+      const solution = steps(
+        `An **asymptote** is a line that a graph gets closer and closer to but never reaches. A vertical one sits where the function breaks. A horizontal one is the height the graph settles at for huge ${m('x')}.`,
+        `Vertical asymptote: the fraction breaks when its bottom is 0, since we can't divide by 0. Solve ${m(`${den} = 0`)} by ${c > 0 ? 'subtracting' : 'adding'} ${m(num(Math.abs(c)))}: ${m(`x = ${num(-c)}`)}.`,
+        stretch,
+        `Horizontal asymptote: when ${m('x')} is huge, the bottom of the fraction is huge, so the fraction is almost 0. That leaves only the number on the end, so the graph settles at ${m(`y = ${num(d)}`)}.`,
+      );
 
       return {
         stem: `What are the asymptotes of the graph of ${m(gTex)}?`,
         answer,
         answerValue: ptKey(ans),
         distractors: ds.map((x) => ({ text: x.text, value: x.key, why: x.why })),
+        asking: 'Which vertical and horizontal lines does this graph approach but never touch?',
         solution,
-        keyIdea: `${m('y = \\frac{a}{x - h} + k')} is ${m('y = \\frac{1}{x}')} stretched by ${m('a')} and moved by ${m('h')} right and ${m('k')} up, so its asymptotes are ${m('x = h')} and ${m('y = k')}.`,
+        conclusion: `The bottom is 0 at ${m(`x = ${num(-c)}`)} and the graph settles at height ${m(num(d))}, so the asymptotes are ${answer}.`,
+        keyIdea: `For ${m('y = \\frac{a}{x - h} + k')}, the vertical asymptote is where the bottom is 0, ${m('x = h')}. The horizontal asymptote is the number added on the end, ${m('y = k')}. The number ${m('a')} on top moves neither.`,
       };
     },
   },

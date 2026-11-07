@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps as stepsOf, table as tbl } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { gcd, lcm } from '../../../lib/frac';
 import { m, power } from '../../../lib/tex';
@@ -180,42 +181,66 @@ const powerCycle: Generator = {
       });
     const ds = pickDistinct(answer, pool);
 
-    const header = Array.from({ length: L }, (_, k) => ordinal(k + 1));
-    let solution: string;
+    const ans = m(String(answer));
+    const q = Math.floor(n / L);
+    const dividePower = `Divide the power by the cycle length to find the place in the cycle: ${m(r === 0 ? `${n} = ${L} \\times ${q}` : `${n} = ${L} \\times ${q} + ${r}`)}, so the remainder is ${r}.`;
+    const readCycle =
+      r === 0
+        ? `Remainder 0 means a whole number of cycles, so we land on the last place of the cycle. The ${ordinal(L)} place holds ${answer}.`
+        : `Remainder ${r} means the ${ordinal(pos)} place in the cycle ${cycle.join(', ')}, which is ${answer}.`;
+
     let stem: string;
+    let asking: string;
+    let solution: string;
+    let conclusion: string;
     if (c.mode === 'digit') {
       const d = base % 10;
       stem = `What is the last digit of ${m(powTex)}?`;
-      solution =
-        (base !== d ? `Only the last digit of the base matters, so ${m(powTex)} ends in the same digit as ${m(`${d}^{${n}}`)}.\n\n` : '') +
-        `The last digits of the powers of ${d} repeat in a cycle:\n\n` +
-        `| Power | ${header.join(' | ')} |\n| --- | ${header.map(() => '---').join(' | ')} |\n| Last digit | ${cycle.join(' | ')} |\n\n` +
-        `The cycle has length ${L}.\n\n`;
+      asking = `What digit does ${m(powTex)} end in?`;
+      // one row per power, plus one more to show the first digit coming back
+      const rows = [[ordinal(1), m(String(d)), d] as (string | number)[]];
+      for (let k = 2; k <= L + 1; k++) {
+        const prev = cycle[k - 2];
+        rows.push([ordinal(k), m(`${prev} \\times ${d} = ${prev * d}`), (prev * d) % 10]);
+      }
+      solution = stepsOf(
+        `We can't work out this huge number, so we look for a pattern. The last digit of a product depends only on the last digits of the numbers being multiplied.${base !== d ? ` So ${m(powTex)} ends in the same digit as ${m(`${d}^{${n}}`)}.` : ''}`,
+        `Work out the powers of ${d}. For each one, multiply the last digit so far by ${d} and keep only the last digit:\n\n${tbl([`Power of ${d}`, 'Working', 'Last digit'], rows)}`,
+        `The last digit repeats in a cycle of length ${L}: ${cycle.join(', ')}, then ${cycle[0]} again.`,
+        dividePower,
+        readCycle,
+      );
+      conclusion = `The power ${n} lands on the ${ordinal(pos)} place of the cycle, so ${m(powTex)} ends in ${ans}.`;
     } else {
       stem = `What is the remainder when ${m(powTex)} is divided by ${modulus}?`;
-      solution =
-        `Work out the remainders of the powers of ${base} when divided by ${modulus}, until the remainder 1 appears:\n\n` +
-        `| Power of ${base} | ${header.join(' | ')} |\n| --- | ${header.map(() => '---').join(' | ')} |\n| Remainder | ${cycle.join(' | ')} |\n\n` +
-        `Since ${m(`${power(String(base), L)} \\equiv 1 \\pmod{${modulus}}`)}, the remainders repeat every ${L} powers.\n\n`;
+      asking = `What is left over when ${m(powTex)} is divided by ${modulus}?`;
+      const rows = [[ordinal(1), m(String(base)), cycle[0]] as (string | number)[]];
+      for (let k = 2; k <= L + 1; k++) {
+        const prev = cycle[k - 2];
+        rows.push([ordinal(k), m(`${prev} \\times ${base} = ${prev * base}`), (prev * base) % modulus]);
+      }
+      solution = stepsOf(
+        `We can't work out this huge number directly, so we look for a pattern in the remainders of small powers of ${base}. A remainder is what is left over after dividing.`,
+        `For each power, multiply the last remainder by ${base}, then divide by ${modulus} and keep the remainder:\n\n${tbl([`Power of ${base}`, 'Working', `Remainder after dividing by ${modulus}`], rows)}`,
+        `The remainders repeat in a cycle of length ${L}: ${cycle.join(', ')}, then ${cycle[0]} again.`,
+        dividePower,
+        readCycle,
+      );
+      conclusion = `The power ${n} lands on the ${ordinal(pos)} place of the cycle, so the remainder is ${ans}.`;
     }
-    const q = Math.floor(n / L);
-    solution +=
-      `Divide the exponent by the cycle length: ${m(r === 0 ? `${n} = ${L} \\times ${q}` : `${n} = ${L} \\times ${q} + ${r}`)}, remainder ${r}.\n\n` +
-      (r === 0
-        ? `Remainder 0 means a whole number of cycles, so we are at the **end** of a cycle: the ${ordinal(L)} entry, which is ${answer}.\n\n`
-        : `Remainder ${r} means the ${ordinal(pos)} entry of the cycle, which is ${answer}.\n\n`) +
-      `Answer: ${m(String(answer))}`;
 
     return {
       stem,
-      answer: m(String(answer)),
+      answer: ans,
       answerValue: answer,
       distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
+      asking,
       solution,
+      conclusion,
       keyIdea:
         c.mode === 'digit'
-          ? 'Last digits of powers repeat in a cycle: reduce the exponent by the cycle length (remainder 0 means the last entry of the cycle).'
-          : 'If $a^k \\equiv 1 \\pmod{m}$, the remainders of powers of $a$ repeat every $k$ steps, so reduce the exponent modulo $k$.',
+          ? 'For the last digit of a big power, list the first few last digits until they repeat, then divide the power by the cycle length. The remainder gives the place in the cycle, and remainder 0 means the last place.'
+          : 'For the remainder of a huge power, list the remainders of small powers until they repeat. Then find the place in the cycle by dividing the power by the cycle length. Remainder 0 means the last place.',
     };
   },
 };
@@ -314,38 +339,54 @@ const hcfLcm: Generator = {
           ? `What is the lowest common multiple (LCM) of ${m(String(a))} and ${m(String(b))}?`
           : ctx!.stem(a, b);
 
-    const lines = primes.map((p) => {
+    const ans = m(String(answer));
+    const primeRows = primes.map((p) => {
       const ea = ex(fa, p);
       const eb = ex(fb, p);
       const use = isH ? Math.min(ea, eb) : Math.max(ea, eb);
-      return `- prime ${p}: power ${ea} in ${a}, power ${eb} in ${b}, so use ${use === 0 ? 'none' : m(power(String(p), use))}`;
+      return [p, ea, eb, use === 0 ? 'none' : m(power(String(p), use))];
     });
-    const why =
-      kind === 'lcm-word'
-        ? `The events coincide after a number of ${ctx!.unit} that is a multiple of both ${a} and ${b}; the **first** such time is the LCM.\n\n`
-        : kind === 'hcf-word'
-          ? `The answer must divide both ${a} and ${b} exactly, and we want the **largest** such number: the HCF.\n\n`
-          : '';
-    const solution =
-      why +
-      `Write both numbers as products of primes:\n\n` +
-      `- ${m(`${a} = ${factorTex(fa)}`)}\n- ${m(`${b} = ${factorTex(fb)}`)}\n\n` +
-      (isH ? 'For the HCF take each prime with the **lower** power (a prime missing from one number is left out):\n\n' : 'For the LCM take every prime with the **higher** power:\n\n') +
-      lines.join('\n') +
-      '\n\n' +
-      `${m(`${isH ? '\\gcd' : '\\operatorname{lcm}'}(${a}, ${b}) = ${factorTex(isH ? fg : fl)} = ${answer}`)}\n\n` +
-      `Check: ${m(`\\gcd \\times \\operatorname{lcm} = ${g} \\times ${l} = ${g * l}`)} and ${m(`${a} \\times ${b} = ${a * b}`)}, which agree.\n\n` +
-      `Answer: ${m(String(answer))}`;
+    const chosen = isH ? fg : fl;
+    const chain = [factorTex(chosen), chosen.map(([p, e]) => p ** e).join(' \\times '), String(answer)].filter((x, i, all) => i === 0 || x !== all[i - 1]);
+    const intro: Record<GLKind, string> = {
+      hcf: 'The **highest common factor** (HCF) is the biggest number that divides both numbers exactly.',
+      lcm: 'The **lowest common multiple** (LCM) is the smallest number that both numbers divide into exactly.',
+      'lcm-word': `The first light flashes at multiples of ${a} seconds, and the second at multiples of ${b}. They flash together at a multiple of both, and the next such time is the **lowest common multiple** (LCM).`,
+      'hcf-word': `The number of packs must divide both ${a} and ${b} exactly, so that nothing is left over. The largest such number is the **highest common factor** (HCF).`,
+    };
+    const solution = stepsOf(
+      intro[kind],
+      `Write each number as a product of primes (numbers divisible only by 1 and themselves): ${m(`${a} = ${factorTex(fa)}`)} and ${m(`${b} = ${factorTex(fb)}`)}.`,
+      (isH
+        ? 'For the HCF, take each prime with its **lower** power, because that is all both numbers share. A prime missing from one number has power 0, so it is left out:'
+        : 'For the LCM, take each prime with its **higher** power, so that the result contains everything from both numbers:') +
+        `\n\n${tbl(['Prime', `Power in ${a}`, `Power in ${b}`, 'Use'], primeRows)}`,
+      chain.length > 1 ? `Multiply the chosen powers: ${m(chain.join(' = '))}.` : `Only one prime is chosen, so the result is ${m(chain[0])}.`,
+    );
+    const finalWords: Record<GLKind, string> = {
+      hcf: `so the HCF is ${ans}`,
+      lcm: `so the LCM is ${ans}`,
+      'lcm-word': `so they next flash together after ${ans} seconds`,
+      'hcf-word': `so the largest number of packs is ${ans}`,
+    };
+    const asking: Record<GLKind, string> = {
+      hcf: `What is the biggest number that divides both ${a} and ${b} exactly?`,
+      lcm: `What is the smallest number that both ${a} and ${b} divide into exactly?`,
+      'lcm-word': `What is the first time that is a multiple of both ${a} and ${b}?`,
+      'hcf-word': `What is the biggest number that divides both ${a} and ${b} exactly?`,
+    };
 
     return {
       stem,
       answer: m(String(answer)),
       answerValue: answer,
       distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
+      asking: asking[kind],
       solution,
+      conclusion: `Check: ${isH ? `the **lowest common multiple** (LCM), the smallest number both divide into, is ${l}` : `the **highest common factor** (HCF), the biggest number dividing both, is ${g}`}. HCF $\\times$ LCM ${m(`= ${g} \\times ${l} = ${g * l}`)}, the same as ${m(`${a} \\times ${b}`)}, ${finalWords[kind]}.`,
       keyIdea: isH
-        ? 'HCF = product of the shared primes with the LOWER power; "largest that divides both" is an HCF question.'
-        : 'LCM = product of every prime with the HIGHER power; "when do they next coincide" is an LCM question.',
+        ? 'For the HCF, write both numbers as primes and multiply what they share, using the lower power of each prime. "Largest that divides both" signals an HCF question.'
+        : 'For the LCM, write both numbers as primes and multiply every prime, using the higher power of each. "When do they next happen together" signals an LCM question.',
     };
   },
 };
@@ -402,22 +443,29 @@ const countDivisorsGen: Generator = {
     const ds = pickDistinct(answer, pool);
 
     const ftex = factorTex(fs);
-    const choiceList = fs.map(([p, e]) => `- power of ${p}: from 0 to ${e}, which is ${e + 1} choices`).join('\n');
-    const prodTex = exps.map((e) => `(${e} + 1)`).join('');
-    let solution =
-      `First write ${m(String(n))} as a product of primes: ${m(`${n} = ${ftex}`)}.\n\n` +
-      `Every divisor is made by choosing a power of each prime, from 0 up to the power in ${n}:\n\n${choiceList}\n\n` +
-      `Total number of divisors: ${m(`${prodTex} = ${exps.map((e) => e + 1).join(' \\times ')} = ${total}`)}.\n\n`;
-    if (evenMode) {
-      const rest = fs.slice(1);
-      solution +=
-        `A divisor is **odd** when the power of 2 is 0. Then only the other primes are chosen: ${m(rest.map(([, e]) => `(${e} + 1)`).join('') + ` = ${oddCount}`)} odd divisors.\n\n` +
-        `Even divisors: ${m(`${total} - ${oddCount} = ${evenCount}`)}.\n\n` +
-        (e2 === 1
-          ? `(Directly: the power of 2 must be exactly 1, which is 1 choice, so there are as many even divisors as odd ones: ${evenCount}.)\n\n`
-          : `(Directly: the power of 2 must be from 1 to ${e2}, which is ${e2} choices, so ${m(`${e2} \\times ${oddCount} = ${evenCount}`)}.)\n\n`);
-    }
-    solution += `Answer: ${m(String(answer))}`;
+    const ans = m(String(answer));
+    // the division table behind the factorisation
+    const divRows: (string | number)[][] = [];
+    let left = n;
+    for (const [p, e] of fs)
+      for (let i = 0; i < e; i++) {
+        divRows.push([left, p, left / p]);
+        left /= p;
+      }
+    const powersAllowed = (p: number, e: number) => {
+      const low = evenMode && p === 2 ? 1 : 0;
+      return e === low ? String(e) : `${low} to ${e}`;
+    };
+    const choices = fs.map(([p, e]) => (evenMode && p === 2 ? e : e + 1));
+    const multiply = m(`${choices.join(' \\times ')} = ${answer}`);
+    const solution = stepsOf(
+      `Start with the prime factorisation, which writes ${n} as a product of primes (numbers divisible only by 1 and themselves). Keep dividing by the smallest prime that works:\n\n${tbl(['Number', 'Divide by', 'Result'], divRows)}`,
+      `Count how many times each prime was used. That gives ${m(`${n} = ${ftex}`)}.`,
+      `Any divisor of ${n} is made from these primes, using each one up to the power shown. ${
+        evenMode ? 'An **even** divisor must contain at least one 2, so the power of 2 cannot be 0. The other primes may be left out:' : 'Leaving a prime out (power 0) is allowed:'
+      }\n\n${tbl(['Prime', 'Powers allowed', 'Choices'], fs.map(([p, e], i) => [p, powersAllowed(p, e), choices[i]]))}`,
+      `Each set of choices builds a different divisor, so multiply: ${multiply}.`,
+    );
 
     return {
       stem: evenMode
@@ -426,10 +474,14 @@ const countDivisorsGen: Generator = {
       answer: m(String(answer)),
       answerValue: answer,
       distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
+      asking: evenMode ? `How many divisors of ${n} are even?` : `How many whole numbers divide ${n} exactly?`,
       solution,
+      conclusion: evenMode
+        ? `The power of 2 has ${e2} ${e2 === 1 ? 'choice' : 'choices'} and the other primes give ${oddCount} combinations, so ${ans} divisors are even.`
+        : `Every divisor comes from exactly one set of choices, so ${n} has ${ans} divisors.`,
       keyIdea: evenMode
-        ? 'Count divisors by choosing a power of each prime; for even divisors the power of 2 must be at least 1.'
-        : 'If $n = p^a q^b \\cdots$, then $n$ has $(a + 1)(b + 1) \\cdots$ positive divisors.',
+        ? 'Count divisors by choosing a power of each prime. For even divisors the power of 2 must be at least 1, so it has one choice fewer. Multiply that by the choices for the other primes.'
+        : 'Write $N = p^a \\times q^b$ using primes. The number of divisors is then $(a + 1)(b + 1)$. Add 1 to each power because using none of that prime is allowed.',
     };
   },
 };

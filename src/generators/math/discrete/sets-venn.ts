@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps as stepsOf } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m } from '../../../lib/tex';
 
@@ -131,11 +132,7 @@ function twoSet(rng: Rng) {
     const b = bOnly + both;
     const union = a + b - both;
     const { LA, LB } = ctx;
-    const nA = `n(${LA})`;
-    const nB = `n(${LB})`;
-    const nAB = `n(${LA} \\cap ${LB})`;
     const nU = `n(${LA} \\cup ${LB})`;
-    const check = `Check with the four Venn regions: ${cap(ctx.nameA)} only $= ${aOnly}$, both $= ${both}$, ${ctx.nameB} only $= ${bOnly}$, neither $= ${neither}$, and $${aOnly} + ${both} + ${bOnly} + ${neither} = ${N}$.`;
 
     if (ask === 'probNeither') {
       const ans = new Frac(neither, N);
@@ -159,78 +156,98 @@ function twoSet(rng: Rng) {
         answer,
         answerValue: ans.value(),
         distractors: d.map((x) => ({ text: x.text, value: x.v, why: x.why })),
-        solution:
-          `1. Inclusion-exclusion: ${m(`${nU} = ${nA} + ${nB} - ${nAB} = ${a} + ${b} - ${both} = ${union}`)}. These ${ctx.group} are in at least one group.\n` +
-          `2. Neither: ${m(`${N} - ${union} = ${neither}`)}.\n` +
-          `3. Probability: ${m(`\\frac{${neither}}{${N}}${ans.d === N ? '' : ` = ${ans.tex()}`}`)}.\n\n` +
-          `${check}\n\nAnswer: ${answer}`,
-        keyIdea: 'Find the "neither" region with inclusion-exclusion, then divide by the total.',
+        asking: `What fraction of the ${N} ${ctx.group} ${ctx.neither}?`,
+        solution: stepsOf(
+          `The probability is the number who ${ctx.neither}, divided by the total of ${N}. So first we need that number.`,
+          `Adding the two groups gives ${m(`${a} + ${b} = ${a + b}`)}, but the ${both} who ${ctx.bothShort} were counted twice. Take off one copy: ${m(`${a} + ${b} - ${both} = ${union}`)}. So ${union} ${ctx.group} are in at least one group.`,
+          `The rest are in neither group: ${m(`${N} - ${union} = ${neither}`)}.`,
+          ans.d === N
+            ? `The probability is ${m(`\\frac{${neither}}{${N}}`)}. The top and bottom share no common factor, so this can't be simplified.`
+            : `The probability is ${m(`\\frac{${neither}}{${N}}`)}. Divide the top and bottom by ${N / ans.d} to simplify it: ${m(`\\frac{${neither}}{${N}} = ${ans.tex()}`)}.`,
+        ),
+        conclusion: `${neither} out of ${N} ${ctx.group} are in neither group, so the probability is ${answer}.`,
+        keyIdea: 'For a Venn probability, find the count for the region you want, then divide by the total. Here neither $=$ total $-$ (first $+$ second $-$ both).',
       };
     }
 
     let ansV: number;
     let stem: string;
-    let steps: string;
+    let asking: string;
+    let solution: string;
+    let conclusion: string;
     let pool: Cand[];
     let keyIdea: string;
     if (ask === 'both') {
       ansV = both;
       stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${neither} ${ctx.neither}. How many ${ctx.bothShort}?`;
-      steps =
-        `1. In at least one group: ${m(`${N} - ${neither} = ${union}`)}.\n` +
-        `2. Inclusion-exclusion: ${m(`${nU} = ${nA} + ${nB} - ${nAB}`)}, so ${m(`${union} = ${a} + ${b} - ${nAB} = ${a + b} - ${nAB}`)}.\n` +
-        `3. Rearrange: ${m(`${nAB} = ${a + b} - ${union} = ${both}`)}.`;
+      asking = `How many ${ctx.group} are in the overlap, in both groups?`;
+      solution = stepsOf(
+        `Picture two overlapping circles: those who ${ctx.a} and those who ${ctx.b}. The ${neither} who ${ctx.neither} sit outside both circles.`,
+        `So the number inside the circles is ${m(`${N} - ${neither} = ${union}`)}. These ${union} are in at least one group.`,
+        `Now add the two circle totals: ${m(`${a} + ${b} = ${a + b}`)}. That is more than ${union}, because anyone in both groups was counted once in each circle.`,
+        `The extra above ${union} must be exactly those who were counted twice: ${m(`${a + b} - ${union} = ${both}`)}.`,
+      );
+      conclusion = `Only ${union} are inside the circles but the totals add up to ${a + b}, so the overlap is ${m(String(both))}.`;
       pool = [
         intCand(a + b - N, `This is ${m(`${a} + ${b} - ${N}`)}: it forgets that ${neither} ${ctx.group} are outside both circles, so only ${union} are inside the circles.`),
         intCand(union, `This is ${m(`${N} - ${neither}`)}, the number in **at least one** group, not the number in both.`),
         intCand(aOnly, `This is the number who ${ctx.aOnly} (${m(`${a} - ${both}`)}), one step too far: the question asks for the overlap itself.`),
         intCand(bOnly, `This is the ${ctx.nameB}-only region (${m(`${b} - ${both}`)}), not the overlap.`),
       ];
-      keyIdea = 'Remove the "neither" group first, then the overlap is $n(A) + n(B) - n(A \\cup B)$.';
+      keyIdea = 'Remove the "neither" group from the total first. Then overlap $=$ first group $+$ second group $-$ number inside the circles.';
     } else if (ask === 'exactlyOne') {
       ansV = aOnly + bOnly;
       stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.bothShort}. How many ${ctx.exactlyOne}?`;
-      steps =
-        `Fill the Venn diagram from the middle outwards.\n\n` +
-        `1. Both: ${m(String(both))}.\n` +
-        `2. ${cap(ctx.nameA)} only: ${m(`${a} - ${both} = ${aOnly}`)}.\n` +
-        `3. ${cap(ctx.nameB)} only: ${m(`${b} - ${both} = ${bOnly}`)}.\n` +
-        `4. Exactly one: ${m(`${aOnly} + ${bOnly} = ${aOnly + bOnly}`)}.\n\n` +
-        `(Shortcut: ${m(`${nA} + ${nB} - 2\\,${nAB} = ${a} + ${b} - ${2 * both} = ${aOnly + bOnly}`)}.)`;
+      asking = `How many ${ctx.group} are in one group but not the other?`;
+      solution = stepsOf(
+        `"Exactly one" means those only in the first group plus those only in the second. The ${both} who ${ctx.bothShort} do not count.`,
+        `The ${a} who ${ctx.a} include the ${both} who ${ctx.bothShort}. So ${ctx.nameA} only is ${m(`${a} - ${both} = ${aOnly}`)}.`,
+        `The same goes for the second group. ${cap(ctx.nameB)} only is ${m(`${b} - ${both} = ${bOnly}`)}.`,
+        `Add the two "only" groups: ${m(`${aOnly} + ${bOnly} = ${aOnly + bOnly}`)}.`,
+      );
+      conclusion = `${cap(ctx.nameA)} only is ${aOnly} and ${ctx.nameB} only is ${bOnly}, so ${m(String(aOnly + bOnly))} are in exactly one group.`;
       pool = [
         intCand(union, `This is ${m(`${a} + ${b} - ${both} = ${nU}`)}, the number in **at least one** group. It still includes the ${both} who ${ctx.both}.`),
         intCand(a + b, `This is ${m(`${a} + ${b}`)}, which counts the ${both} ${ctx.group} in both groups twice instead of removing them.`),
         intCand(aOnly, `This is only the ${ctx.nameA}-only region. It forgets to add the ${bOnly} in the ${ctx.nameB}-only region.`),
         intCand(bOnly, `This is only the ${ctx.nameB}-only region. It forgets to add the ${aOnly} in the ${ctx.nameA}-only region.`),
       ];
-      keyIdea = '"Exactly one" means the two "only" regions: $n(A) + n(B) - 2\\,n(A \\cap B)$.';
+      keyIdea = 'Fill a Venn diagram from the middle out: write the overlap first, then subtract it from each total to get the "only" regions. "Exactly one" is the sum of the "only" regions.';
     } else if (ask === 'neither') {
       ansV = neither;
       stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${both} ${ctx.bothShort}. How many ${ctx.neither}?`;
-      steps =
-        `1. Inclusion-exclusion: ${m(`${nU} = ${nA} + ${nB} - ${nAB} = ${a} + ${b} - ${both} = ${union}`)}.\n` +
-        `2. Neither: ${m(`${N} - ${union} = ${neither}`)}.`;
+      asking = `How many of the ${N} ${ctx.group} are in neither group?`;
+      solution = stepsOf(
+        `Picture two overlapping circles. Those who ${ctx.neither} sit outside both. So first find how many are inside.`,
+        `Adding the two groups gives ${m(`${a} + ${b} = ${a + b}`)}, but that counts the ${both} who ${ctx.bothShort} twice.`,
+        `Take off one copy of them: ${m(`${a} + ${b} - ${both} = ${union}`)}. So ${union} are in at least one group.`,
+        `The rest are in neither: ${m(`${N} - ${union} = ${neither}`)}.`,
+      );
+      conclusion = `${union} of the ${N} ${ctx.group} are inside the circles, so ${m(String(neither))} are outside both.`;
       pool = [
         intCand(N - a - b, `This is ${m(`${N} - ${a} - ${b}`)}: it forgets that the ${both} ${ctx.group} in both groups were counted twice, so they get subtracted twice.`),
         intCand(union, `This is ${m(`${nU} = ${union}`)}, the number in **at least one** group. The question asks for the region outside both circles.`),
         intCand(neither + both, `This subtracts the overlap twice: ${m(`${a} + ${b} - 2 \\times ${both} = ${aOnly + bOnly}`)}, then ${m(`${N} - ${aOnly + bOnly} = ${neither + both}`)}. The overlap was only counted one extra time.`),
         intCand(N - a, `This is ${m(`${N} - ${a}`)}: it removes only the ${a} who ${ctx.a} and forgets the ${bOnly} who are only in the other group.`),
       ];
-      keyIdea = 'Neither $= n(U) - n(A \\cup B)$, with $n(A \\cup B) = n(A) + n(B) - n(A \\cap B)$.';
+      keyIdea = 'Neither $=$ total $-$ (first $+$ second $-$ both). The overlap must be taken off once, because adding the two groups counts it twice.';
     } else {
       ansV = aOnly;
       stem = `${ctx.intro(N)} ${a} ${ctx.a}, ${b} ${ctx.b} and ${neither} ${ctx.neither}. How many ${ctx.aOnly}?`;
-      steps =
-        `1. In at least one group: ${m(`${N} - ${neither} = ${union}`)}.\n` +
-        `2. Everyone in the union who is **not** in the ${ctx.nameB} group is in the ${ctx.nameA}-only region: ${m(`${union} - ${b} = ${aOnly}`)}.\n\n` +
-        `(Equivalently: both $= ${a} + ${b} - ${union} = ${both}$, and ${ctx.nameA} only $= ${a} - ${both} = ${aOnly}$.)`;
+      asking = `How many ${ctx.group} ${ctx.aOnly}?`;
+      solution = stepsOf(
+        `Picture two overlapping circles. The ${neither} who ${ctx.neither} sit outside both. So the number inside the circles is ${m(`${N} - ${neither} = ${union}`)}.`,
+        `Those ${union} split into two parts: the ${b} who ${ctx.b}, and the rest, who ${ctx.aOnly}.`,
+        `So take the ${b} away: ${m(`${union} - ${b} = ${aOnly}`)}.`,
+      );
+      conclusion = `${union} are inside the circles and ${b} of them ${ctx.b}, which leaves ${m(String(aOnly))} who ${ctx.aOnly}.`;
       pool = [
         intCand(N - b, `This is ${m(`${N} - ${b}`)}: it forgets to remove the ${neither} ${ctx.group} who ${ctx.neither}.`),
         intCand(both, `This is the number who ${ctx.both} (the overlap), not the ${ctx.nameA}-only region.`),
         intCand(bOnly, `This is the ${ctx.nameB}-only region (${m(`${union} - ${a}`)}), the wrong crescent of the diagram.`),
         intCand(a, `This is all ${a} who ${ctx.a}, including the ${both} who are also in the other group.`),
       ];
-      keyIdea = 'Find $n(A \\cup B)$ from the "neither" count, then $A$ only $= n(A \\cup B) - n(B)$.';
+      keyIdea = 'Find the number inside the circles from the "neither" count. Then $A$ only $=$ number inside $-$ $n(B)$, because everyone inside who is not in $B$ must be in $A$ only.';
     }
     const answer = m(String(ansV));
     const d = pickDistinct(ansV, answer, pool);
@@ -240,7 +257,9 @@ function twoSet(rng: Rng) {
       answer,
       answerValue: ansV,
       distractors: d.map((x) => ({ text: x.text, value: x.v, why: x.why })),
-      solution: `${steps}\n\n${check}\n\nAnswer: ${answer}`,
+      asking,
+      solution,
+      conclusion,
       keyIdea,
     };
   }
@@ -269,7 +288,6 @@ type ThreeAsk = 'none' | 'onlyFirst';
 function threeSet(rng: Rng) {
   const ctx = rng.pick(THREE_CTX);
   const ask = rng.pick<ThreeAsk>(['none', 'onlyFirst']);
-  const [A, B, C] = ctx.letters;
   const iA = ctx.items[0];
   const [sA, sB, sC] = ctx.short;
   const [cA, cB, cC] = ctx.short.map(cap);
@@ -307,47 +325,51 @@ function threeSet(rng: Rng) {
         ['All three', x],
       ] as (string | number)[][],
     };
-    const ieFormula = `n(${A} \\cup ${B} \\cup ${C}) = n(${A}) + n(${B}) + n(${C}) - n(${A} \\cap ${B}) - n(${A} \\cap ${C}) - n(${B} \\cap ${C}) + n(${A} \\cap ${B} \\cap ${C})`;
 
     let ansV: number;
     let stem: string;
-    let steps: string;
+    let asking: string;
+    let solution: string;
+    let conclusion: string;
     let pool: Cand[];
     let keyIdea: string;
     if (ask === 'none') {
       ansV = neither;
       stem = `${data} How many ${ctx.group} ${ctx.verb} **none** of the three?`;
-      steps =
-        `Use inclusion-exclusion for three sets:\n\n$$${ieFormula}$$\n\n` +
-        `1. Add the singles: ${m(`${nA} + ${nB} + ${nC} = ${S1}`)}.\n` +
-        `2. Subtract the pairs: ${m(`${nAB} + ${nAC} + ${nBC} = ${S2}`)}, so ${m(`${S1} - ${S2} = ${S1 - S2}`)}.\n` +
-        `3. Add back the triple: ${m(`${S1 - S2} + ${x} = ${union}`)} ${ctx.verb} at least one.\n` +
-        `4. None: ${m(`${N} - ${union} = ${neither}`)}.\n\n` +
-        `Why add back the ${x}? They were added 3 times in step 1 and subtracted 3 times in step 2, so after step 2 they were not counted at all.`;
+      asking = `How many of the ${N} ${ctx.group} are outside all three groups?`;
+      solution = stepsOf(
+        `Use **inclusion-exclusion**: a way to count overlapping groups without counting anyone twice. We first find how many are in at least one group, then take that from ${N}.`,
+        `Add the three single totals: ${m(`${nA} + ${nB} + ${nC} = ${S1}`)}. This is too many, because anyone in two groups has been counted twice.`,
+        `Take off the three pair totals: ${m(`${nAB} + ${nAC} + ${nBC} = ${S2}`)}, and ${m(`${S1} - ${S2} = ${S1 - S2}`)}.`,
+        `Now think about the ${x} in all three. They were added 3 times in the singles and taken off 3 times in the pairs, so they are not counted at all. Add them back: ${m(`${S1 - S2} + ${x} = ${union}`)}.`,
+        `So ${union} ${ctx.group} are in at least one group. The rest are in none: ${m(`${N} - ${union} = ${neither}`)}.`,
+      );
+      conclusion = `${union} of the ${N} ${ctx.group} are in at least one group, so ${m(String(neither))} are in none of the three.`;
       pool = [
         intCand(neither - x, `This forgets to add back the ${x} who ${ctx.verb} all three: ${m(`${N} - ${S1 - S2} = ${neither - x}`)}.`),
         intCand(neither + x, `This subtracts the triple instead of adding it back: ${m(`${S1} - ${S2} - ${x} = ${S1 - S2 - x}`)}, then ${m(`${N} - ${S1 - S2 - x} = ${neither + x}`)}.`),
         intCand(union, `This is the number who ${ctx.verb} **at least one** of the three. The question asks for the ${ctx.group} outside all three circles.`),
         intCand(S1 - S2, `This is ${m(`${S1} - ${S2}`)}: it forgets to add back the triple and also stops before subtracting from ${N}.`),
       ];
-      keyIdea = 'Three-set inclusion-exclusion: add the singles, subtract the pairs, add back the triple; then subtract from the total.';
+      keyIdea = 'For three overlapping groups: add the singles, subtract the pairs, add back the triple. That gives the number in at least one group. Subtract it from the total to get "none".';
     } else {
       ansV = oA;
       stem = `${data} How many ${ctx.group} ${ctx.verb} ${iA} **only**?`;
-      steps =
-        `Fill the ${sA} circle from the centre outwards.\n\n` +
-        `1. All three: ${m(String(x))}.\n` +
-        `2. ${cA} and ${sB} only: ${m(`${nAB} - ${x} = ${ab}`)}.\n` +
-        `3. ${cA} and ${sC} only: ${m(`${nAC} - ${x} = ${ac}`)}.\n` +
-        `4. ${cA} only: ${m(`${nA} - ${ab} - ${ac} - ${x} = ${oA}`)}.\n\n` +
-        `(Equivalent shortcut: ${m(`n(${A}) - n(${A} \\cap ${B}) - n(${A} \\cap ${C}) + n(${A} \\cap ${B} \\cap ${C}) = ${nA} - ${nAB} - ${nAC} + ${x} = ${oA}`)}.)`;
+      asking = `How many ${ctx.group} ${ctx.verb} ${iA} and neither of the other two?`;
+      solution = stepsOf(
+        `Picture three overlapping circles and fill the ${sA} circle from the centre outwards. Its total of ${nA} splits into four parts: ${sA} only, ${sA} and ${sB} only, ${sA} and ${sC} only, and all three.`,
+        `The centre is the ${x} in all three.`,
+        `The pair totals in the table include that centre, so take it off. ${cA} and ${sB} only is ${m(`${nAB} - ${x} = ${ab}`)}. ${cA} and ${sC} only is ${m(`${nAC} - ${x} = ${ac}`)}.`,
+        `Take those three parts away from the total of ${nA} to leave ${sA} only: ${m(`${nA} - ${ab} - ${ac} - ${x} = ${oA}`)}.`,
+      );
+      conclusion = `The other three parts of the circle hold ${ab}, ${ac} and ${x}, which leaves ${m(String(oA))} in ${sA} only.`;
       pool = [
         intCand(oA - x, `This is ${m(`${nA} - ${nAB} - ${nAC}`)}: the ${x} in the centre belong to both pair totals, so they are subtracted twice and one ${x} must be added back.`),
         intCand(oA + x, `This subtracts the "two only" regions (${ab} and ${ac}) but forgets to subtract the ${x} in the centre.`),
         intCand(nA - x, `This only removes the ${x} who ${ctx.verb} all three, forgetting the ${ab + ac} who ${ctx.verb} ${iA} and exactly one other.`),
         intCand(nA - nAB, `This removes the ${sA}-and-${sB} overlap but forgets the ${sA}-and-${sC} overlap.`),
       ];
-      keyIdea = 'For "A only", remove both pair overlaps from $n(A)$ and add back the triple, which was removed twice.';
+      keyIdea = 'For "only in A": write the centre first, subtract it from each pair total, then subtract those parts and the centre from $n(A)$. Working from the centre out stops the centre being removed twice.';
     }
     const answer = m(String(ansV));
     const d = pickDistinct(ansV, answer, pool);
@@ -358,7 +380,9 @@ function threeSet(rng: Rng) {
       answer,
       answerValue: ansV,
       distractors: d.map((v) => ({ text: v.text, value: v.v, why: v.why })),
-      solution: `${steps}\n\nAnswer: ${answer}`,
+      asking,
+      solution,
+      conclusion,
       keyIdea,
     };
   }
@@ -375,17 +399,24 @@ function subsetCount(rng: Rng) {
   const P = 2 ** n;
   let ansV: number;
   let stem: string;
-  let steps: string;
+  let asking: string;
+  let solution: string;
+  let conclusion: string;
   let pool: Cand[];
   let keyIdea: string;
+  const twos = (k: number) => `${Array(k).fill('2').join(' \\times ')} = 2^{${k}}`;
   if (ask === 'all') {
     const els = LETTERS.slice(0, n);
     ansV = P;
     stem = `How many subsets does the set ${m(`\\{${els.join(', ')}\\}`)} have? (Include the empty set and the set itself.)`;
-    steps =
-      `The set has ${n} elements. For each element there are 2 choices: **in** the subset or **out**.\n\n` +
-      `Multiply: ${m(`${Array(n).fill('2').join(' \\times ')} = 2^{${n}} = ${P}`)}.\n\n` +
-      `All "out" gives ${m('\\varnothing')}, all "in" gives the whole set; both are counted.`;
+    asking = `How many different selections can be made from these ${n} letters, including no letters and all of them?`;
+    solution = stepsOf(
+      `A **subset** is any selection of items from a set. It can use all of them, some of them or none of them. For example, ${m('\\{a, c\\}')} is one subset.`,
+      `Build a subset by making one decision per letter: is it in, or is it out? So each of the ${n} letters has 2 choices.`,
+      'Each pattern of in and out gives a different subset. All out gives the empty set, and all in gives the whole set, so both get counted.',
+      `The decisions are separate, so multiply the choices: ${m(`${twos(n)} = ${P}`)}.`,
+    );
+    conclusion = `${n} letters with 2 choices each give ${m(`2^{${n}}`)} subsets, so the answer is ${m(String(P))}.`;
     pool = [
       intCand(P - 1, `This is ${m(`2^{${n}} - 1`)}: it leaves out the empty set (or the whole set), but the question includes both.`),
       intCand(n * n, `This is ${m(`${n}^{2}`)}: the base and the power are swapped. The number of subsets is ${m('2^{n}')}, not ${m('n^{2}')}.`),
@@ -393,54 +424,65 @@ function subsetCount(rng: Rng) {
       intCand(P / 2, `This is ${m(`2^{${n - 1}}`)}: the power should be the number of elements, ${n}.`),
       intCand(P - 2, `This is ${m(`2^{${n}} - 2`)}: it removes both the empty set and the set itself, but the question says to include them.`),
     ];
-    keyIdea = 'A set with $n$ elements has $2^{n}$ subsets.';
+    keyIdea = 'A set with $n$ elements has $2^{n}$ subsets, because each element is either in or out. Start from this whenever a question asks how many subsets, then remove any the question excludes.';
   } else if (ask === 'nonEmptyProper') {
     ansV = P - 2;
     stem = `A set $S$ has ${n} elements. How many **non-empty proper** subsets does $S$ have (subsets that are neither ${m('\\varnothing')} nor $S$ itself)?`;
-    steps =
-      `1. All subsets: ${m(`2^{${n}} = ${P}`)}.\n` +
-      `2. "Proper" removes $S$ itself: ${m(`${P} - 1 = ${P - 1}`)}.\n` +
-      `3. "Non-empty" removes ${m('\\varnothing')}: ${m(`${P - 1} - 1 = ${P - 2}`)}.`;
+    asking = 'How many subsets are left once we rule out the empty set and the whole set?';
+    solution = stepsOf(
+      `Each of the ${n} elements is either in a subset or out of it, which is 2 choices per element. So the total number of subsets is ${m(`${twos(n)} = ${P}`)}.`,
+      `"Non-empty" rules out ${m('\\varnothing')}, the empty set, which is the subset with nothing in it. That is 1 subset.`,
+      '"Proper" rules out $S$ itself, the subset with everything in it. That is 1 more subset.',
+      `Take both away: ${m(`${P} - 1 - 1 = ${P - 2}`)}.`,
+    );
+    conclusion = `There are ${P} subsets in all and 2 of them are excluded, so the answer is ${m(String(P - 2))}.`;
     pool = [
       intCand(P, `This is ${m(`2^{${n}}`)}, the number of **all** subsets. It still includes ${m('\\varnothing')} and $S$.`),
       intCand(P - 1, `This is ${m(`2^{${n}} - 1`)}: it removes only one of the two excluded subsets, but both ${m('\\varnothing')} and $S$ must go.`),
       intCand(n * n - 2, `This is ${m(`${n}^{2} - 2`)}: the base and the power are swapped. The number of subsets is ${m('2^{n}')}.`),
       intCand(2 * n - 2, `This is ${m(`2 \\times ${n} - 2`)}: it multiplies by 2 instead of raising 2 to the power ${n}.`),
     ];
-    keyIdea = 'Start from $2^{n}$ and subtract 1 for each of $\\varnothing$ and the whole set that is excluded.';
+    keyIdea = 'Start from $2^{n}$ subsets, then subtract 1 for each special subset the question excludes. "Non-empty" removes $\\varnothing$, and "proper" removes the whole set.';
   } else if (ask === 'withWithout') {
     const els = LETTERS.slice(0, n);
     const [p, q] = rng.sample(els, 2);
     ansV = P / 4;
     stem = `How many subsets of ${m(`\\{${els.join(', ')}\\}`)} contain ${m(p)} but do **not** contain ${m(q)}?`;
-    steps =
-      `1. The element ${m(p)} is forced **in** and ${m(q)} is forced **out**: 1 choice each.\n` +
-      `2. Each of the other ${m(`${n} - 2 = ${n - 2}`)} elements is free: in or out, 2 choices each.\n` +
-      `3. Number of subsets: ${m(`2^{${n - 2}} = ${P / 4}`)}.`;
+    asking = `How many subsets include ${m(p)} and leave out ${m(q)}?`;
+    solution = stepsOf(
+      'A subset is built by deciding, for each element, whether it is in or out. Normally that is 2 choices per element.',
+      `Here two decisions are already made: ${m(p)} must be in and ${m(q)} must be out. So each of those has only 1 choice.`,
+      `That leaves the other ${m(`${n} - 2 = ${n - 2}`)} elements free, with 2 choices each.`,
+      `Multiply the choices of the free elements: ${m(`${twos(n - 2)} = ${P / 4}`)}.`,
+    );
+    conclusion = `Only the ${n - 2} free elements have a choice, so there are ${m(String(P / 4))} such subsets.`;
     pool = [
       intCand(P / 2, `This is ${m(`2^{${n - 1}}`)}: it applies only one of the two conditions (fixing ${m(p)}) and lets ${m(q)} be free.`),
       intCand(P / 4 - 1, `This subtracts 1 as if the empty set had to be removed. No subset counted here is empty (each one contains ${m(p)}); even ${m(`\\{${p}\\}`)}, with every free element left out, is a valid subset.`),
       intCand(P, `This is ${m(`2^{${n}}`)}, the number of all subsets: it ignores both conditions.`),
       intCand(2 * (n - 2), `This is ${m(`2 \\times ${n - 2}`)}: it multiplies by 2 instead of raising 2 to the power ${n - 2}.`),
     ];
-    keyIdea = 'Forced elements have 1 choice and free elements have 2, so the count is $2^{\\text{number of free elements}}$.';
+    keyIdea = 'Forced elements have 1 choice and free elements have 2, so the count is $2^{\\text{number of free elements}}$. Count how many elements the question leaves free, then raise 2 to that power.';
   } else {
     const ev = Math.floor(n / 2);
     const od = n - ev;
     ansV = P - 2 ** od;
     stem = `How many subsets of ${m(`\\{1, 2, \\dots, ${n}\\}`)} contain **at least one** even number?`;
-    steps =
-      `Use the complement: count the subsets with **no** even number and subtract from the total.\n\n` +
-      `1. All subsets: ${m(`2^{${n}} = ${P}`)}.\n` +
-      `2. There are ${ev} even numbers and ${od} odd numbers. Subsets with no even number use only the ${od} odd numbers: ${m(`2^{${od}} = ${2 ** od}`)} (this includes ${m('\\varnothing')}).\n` +
-      `3. At least one even: ${m(`${P} - ${2 ** od} = ${ansV}`)}.`;
+    asking = `Out of all the subsets of 1 to ${n}, how many include an even number?`;
+    solution = stepsOf(
+      '"At least one" has many cases: one even number, two even numbers, and so on. It is quicker to count the opposite, subsets with **no** even number, and subtract.',
+      `The set has ${n} numbers, each in or out, so there are ${m(`2^{${n}} = ${P}`)} subsets in all.`,
+      `There are ${ev} even numbers, so the other ${od} are odd. A subset with no even number can only use those ${od} odd numbers, each in or out, which gives ${m(`2^{${od}} = ${2 ** od}`)} subsets. This includes the empty set, which has no even number either.`,
+      `Subtract: ${m(`${P} - ${2 ** od} = ${ansV}`)}.`,
+    );
+    conclusion = `Of the ${P} subsets, ${2 ** od} have no even number, so ${m(String(ansV))} have at least one.`;
     pool = [
       intCand(P - 1, `This is ${m(`2^{${n}} - 1`)}: it removes only the empty set, but non-empty subsets made only of odd numbers also contain no even number.`),
       intCand(2 ** od, `This is ${m(`2^{${od}}`)}, the number of subsets with **no** even number. It must be subtracted from ${P}.`),
       intCand(2 ** ev - 1, `This is ${m(`2^{${ev}} - 1`)}, the non-empty subsets of the even numbers alone. It forgets that any odd numbers can be added freely.`),
       intCand(P - 2 ** ev, `This subtracts ${m(`2^{${ev}}`)} (subsets of the **even** numbers) instead of ${m(`2^{${od}}`)} (subsets with no even number).`),
     ];
-    keyIdea = '"At least one" is easiest by complement: total subsets minus the subsets with none.';
+    keyIdea = '"At least one" usually means total minus none. Count all subsets as $2^{n}$, count the subsets using only the other items, then subtract.';
   }
   const answer = m(String(ansV));
   const d = pickDistinct(ansV, answer, pool);
@@ -452,7 +494,9 @@ function subsetCount(rng: Rng) {
     answer,
     answerValue: ansV,
     distractors: d.map((v) => ({ text: v.text, value: v.v, why: v.why })),
-    solution: `${steps}\n\nAnswer: ${answer}`,
+    asking,
+    solution,
+    conclusion,
     keyIdea,
   };
 }

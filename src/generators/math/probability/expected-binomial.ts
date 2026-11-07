@@ -1,5 +1,6 @@
 import type { Generator, GeneratedCore } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { nCr } from '../../../lib/mathx';
 import { m, num } from '../../../lib/tex';
@@ -83,16 +84,17 @@ export const generators: Generator[] = [
 
         const probCells = ts.map((t, i) => (i === unk ? '$k$' : m(tenths(t))));
         const knownList = ts.filter((_, i) => i !== unk).map(tenths);
-        const products = xs.map((x, i) => `${x}(${tenths(ts[i])})`).join(' + ');
         const productVals = xs.map((x, i) => num((x * ts[i]) / 10)).join(' + ');
-        const solution =
-          `**Step 1: find ${m('k')}.** The probabilities add up to 1:` +
-          `\n\n$$${knownList.join(' + ')} + k = 1$$\n\n` +
-          `so ${m(`k = 1 - ${tenths(knownSum)} = ${tenths(ts[unk])}`)}.\n\n` +
-          `**Step 2: expected value.** Multiply each value by its probability and add:` +
-          `\n\n$$E(X) = ${products}$$\n\n` +
-          `$$= ${productVals} = ${num(ans)}$$\n\n` +
-          `Answer: ${answerText}`;
+        const solution = steps(
+          `The table lists every possible value of ${m('X')}, and one of them must happen. So all the probabilities must add up to 1:\n\n$$${knownList.join(' + ')} + k = 1$$`,
+          `Add the known probabilities: ${m(`${knownList.join(' + ')} = ${tenths(knownSum)}`)}. Take that from 1 to get ${m('k')} alone: ${m(`k = 1 - ${tenths(knownSum)} = ${tenths(ts[unk])}`)}.`,
+          `The **expected value** ${m('E(X)')} is the long-run average. More likely values count for more, so multiply each ${m('x')} by its probability:\n\n` +
+            table(
+              ['$x$', '$P(X = x)$', '$x \\times P(X = x)$'],
+              xs.map((x, i) => [m(String(x)), m(tenths(ts[i])), m(num((x * ts[i]) / 10))]),
+            ),
+          `Add the last column: ${m(`${productVals} = ${num(ans)}`)}.`,
+        );
         return {
           stem: `The discrete random variable ${m('X')} has the probability distribution shown in the table, where ${m('k')} is a constant. Find ${m('E(X)')}.`,
           table: {
@@ -102,8 +104,10 @@ export const generators: Generator[] = [
           answer: answerText,
           answerValue: ans,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: `What is the expected value of ${m('X')}, once we have found ${m('k')}?`,
           solution,
-          keyIdea: 'Use "probabilities sum to 1" to find $k$, then $E(X) = \\sum x \\, P(X = x)$.',
+          conclusion: `With ${m(`k = ${tenths(ts[unk])}`)}, multiplying each value by its probability and adding gives the answer, ${answerText}.`,
+          keyIdea: 'First use "the probabilities add up to 1" to find $k$. Then multiply each value by its probability and add: $E(X) = \\sum x \\, P(X = x)$, where $\\sum$ means add up. Don\'t divide at the end.',
         };
       }
     },
@@ -183,23 +187,28 @@ export const generators: Generator[] = [
 
         const exact = exactInt / den;
         const exactTex = num(exact, n);
-        const isExact4 = Math.abs(exact - ansV) < 1e-12;
-        const solution =
-          `Let ${m('X')} be the number of ${ctx.noun}. There are ${m(`n = ${n}`)} independent trials, each a success with probability ${m(`p = ${pTex}`)}, so ${m(`X \\sim \\text{B}(${n}, ${pTex})`)}.\n\n` +
-          `Use ${m('P(X = r) = \\binom{n}{r} p^r (1-p)^{n-r}')} with ${m(`r = ${r}`)}:\n\n` +
-          `- Number of orders: ${m(`\\binom{${n}}{${r}} = ${C}`)}\n` +
-          `- ${r} success${r === 1 ? '' : 'es'}: ${m(`${pw(pTex, r)}`)}\n` +
-          `- ${n - r} failure${n - r === 1 ? '' : 's'}: ${m(`${pw(qTex, n - r)}`)}\n\n` +
-          `$$P(X = ${r}) = ${C} \\times ${pw(pTex, r)} \\times ${pw(qTex, n - r)} = ${exactTex}$$\n\n` +
-          (isExact4 ? '' : `To 4 decimal places this is ${m(fmt4(ansV))}.\n\n`) +
-          `Answer: ${ansText}`;
+        const succWord = `${r} success${r === 1 ? '' : 'es'}`;
+        const failWord = `${n - r} failure${n - r === 1 ? '' : 's'}`;
+        const oneOrder = (a ** r * b ** (n - r)) / den;
+        const countDown = Array.from({ length: r }, (_, i) => n - i).join(' \\times ');
+        const rFact = Array.from({ length: r }, (_, i) => r - i).join(' \\times ');
+        const ordersWork = r === 1 ? `\\binom{${n}}{${r}} = ${C}` : `\\binom{${n}}{${r}} = \\frac{${countDown}}{${rFact}} = ${C}`;
+        const solution = steps(
+          `Let ${m('X')} be the number of ${ctx.noun}. A **success** here is one that ${ctx.succ}. There are ${m(`n = ${n}`)} independent trials, and each is a success with probability ${m(`p = ${pTex}`)}. Counting successes like this is called a **binomial** model.`,
+          `Each failure has probability ${m(`1 - p = ${qTex}`)}. Exactly ${succWord} out of ${n} trials means ${failWord}.`,
+          `Take one particular order, with all the successes first. Multiply the chance of each trial: ${m(`${pw(pTex, r)} \\times ${pw(qTex, n - r)} = ${num(a ** r / 10 ** r, r)} \\times ${num(b ** (n - r) / 10 ** (n - r), n - r)} = ${num(oneOrder, n)}`)}.`,
+          `The successes can fall in different places. The number of orders is the number of ways to pick ${r} trial${r === 1 ? '' : 's'} from ${n}: ${m(ordersWork)}.`,
+          `Every order has the same probability, so multiply: ${m(`${C} \\times ${num(oneOrder, n)} = ${exactTex}`)}.${exactTex === fmt4(ansV) ? '' : ` To 4 decimal places, that is ${m(fmt4(ansV))}.`}`,
+        );
         return {
           stem: `${ctx.trial} and ${ctx.succ} with probability ${m(pTex)}, independently of the others. ${n} ${ctx.many}. What is the probability that **exactly** ${r} of them ${r === 1 ? ctx.succ : ctx.succ.replace(/^is /, 'are ').replace(/^says /, 'say ').replace(/^germinates/, 'germinate')}? Give your answer to 4 decimal places.`,
           answer: ansText,
           answerValue: ansV,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: `What is the chance that the number of ${ctx.noun} is exactly ${r}, out of ${n}?`,
           solution,
-          keyIdea: '$P(X = r) = \\binom{n}{r} p^r (1-p)^{n-r}$: count the orders, then multiply the success and failure probabilities.',
+          conclusion: `${C} order${C === 1 ? '' : 's'}, each with probability ${m(num(oneOrder, n))}, give the answer, ${ansText}.`,
+          keyIdea: 'Use $P(X = r) = \\binom{n}{r} p^r (1-p)^{n-r}$. That is: count the orders, times the chance of $r$ successes, times the chance of the $n - r$ failures.',
         };
       }
     },
@@ -245,22 +254,30 @@ export const generators: Generator[] = [
         const ds = pickDistractors(answerText, answerValue, pool);
         if (ds.length < 3) continue;
         const what = askVar ? `the variance ${m('\\text{Var}(X)')}` : `the mean ${m('E(X)')}`;
+        const means = `${m(`X \\sim \\text{B}(${n}, ${pTex})`)} means ${m('X')} counts successes in ${m(`n = ${n}`)} trials, where each trial succeeds with probability ${m(`p = ${pTex}`)}.`;
         const solution = askVar
-          ? `For ${m('X \\sim \\text{B}(n, p)')} the variance is ${m('\\text{Var}(X) = np(1-p)')}.\n\n` +
-            `Here ${m(`n = ${n}`)}, ${m(`p = ${pTex}`)} and ${m(`1 - p = ${qTex}`)}.\n\n` +
-            `$$\\text{Var}(X) = ${n} \\times ${pTex} \\times ${qTex} = ${num(mean)} \\times ${qTex} = ${num(v)}$$\n\n` +
-            `Answer: ${answerText}`
-          : `For ${m('X \\sim \\text{B}(n, p)')} the mean is ${m('E(X) = np')}.\n\n` +
-            `Here ${m(`n = ${n}`)} and ${m(`p = ${pTex}`)}.\n\n` +
-            `$$E(X) = ${n} \\times ${pTex} = ${num(mean)}$$\n\n` +
-            `Answer: ${answerText}`;
+          ? steps(
+              means,
+              `**Variance** measures how spread out the results are. For a binomial, ${m('\\text{Var}(X) = np(1-p)')}, where ${m('1 - p')} is the chance of failure.`,
+              `Find the chance of failure: ${m(`1 - p = 1 - ${pTex} = ${qTex}`)}.`,
+              `Substitute and multiply in two stages: ${m(`${n} \\times ${pTex} = ${num(mean)}`)}, then ${m(`${num(mean)} \\times ${qTex} = ${num(v)}`)}.`,
+            )
+          : steps(
+              means,
+              `If each trial succeeds ${m(pTex)} of the time, then ${n} trials give ${m(`${n} \\times ${pTex}`)} successes on average. That is the rule for the mean: ${m('E(X) = np')}.`,
+              `Work it out: ${m(`E(X) = ${n} \\times ${pTex} = ${num(mean)}`)}.`,
+            );
         return {
           stem: `The random variable ${m('X')} follows a binomial distribution, ${m(`X \\sim \\text{B}(${n}, ${pTex})`)}. Find ${what}.`,
           answer: answerText,
           answerValue,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: askVar ? `How spread out is the number of successes, measured by the variance?` : `On average, how many successes does this binomial give?`,
           solution,
-          keyIdea: 'For $\\text{B}(n, p)$: mean $np$, variance $np(1-p)$, standard deviation $\\sqrt{np(1-p)}$.',
+          conclusion: askVar
+            ? `The mean ${m(num(mean))} times the failure chance ${m(qTex)} gives the answer, ${answerText}.`
+            : `${n} trials at a success chance of ${m(pTex)} give the answer, ${answerText}, on average.`,
+          keyIdea: 'In $\\text{B}(n, p)$, the first number is $n$ and the second is $p$. Mean $= np$, variance $= np(1-p)$, and standard deviation $= \\sqrt{np(1-p)}$.',
         };
       }
     },

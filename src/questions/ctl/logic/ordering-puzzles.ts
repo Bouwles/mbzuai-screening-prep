@@ -35,20 +35,19 @@ export const questions: StaticQuestion[] = [
     options: ['Dana', 'Amal', 'Bilal', 'Chen'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Put the four friends in height order. Who is second from the top?',
       solution:
-        'Write every clue in the same direction, using ">" to mean "is taller than":\n\n' +
-        '- Amal > Bilal\n' +
-        '- "Chen is shorter than Bilal" means Bilal > Chen\n' +
-        '- Dana > Amal\n\n' +
-        'Chain them together: Dana > Amal > Bilal > Chen.\n\n' +
-        'So from tallest to shortest the order is Dana, Amal, Bilal, Chen, and the second tallest is **Amal**.',
+        'Turn every clue into the same form, using $>$ to mean "is taller than". "Chen is shorter than Bilal" is the same fact as Bilal $>$ Chen.\n\n- Amal $>$ Bilal\n- Bilal $>$ Chen\n- Dana $>$ Amal\n\n' +
+        'Join the clues at the people who appear twice. Dana is above Amal, Amal is above Bilal, and Bilal is above Chen. That makes one line: Dana $>$ Amal $>$ Bilal $>$ Chen.\n\n' +
+        'Count from the tallest end. Dana is first, and the next person along is Amal.',
+      conclusion: 'Only one order fits all three clues, and the second tallest in it is Amal.',
       whyWrong: [
         'Dana is the **tallest**, not the second tallest. Read the question carefully: it asks for position 2 from the top.',
         null,
         'Bilal is second from the **bottom**. This comes from counting from the shortest end instead of the tallest end.',
         'This comes from reading "Chen is shorter than Bilal" backwards, as if Chen were taller than Bilal; then Chen could slot in above Bilal, even in second place. In fact Chen is below Bilal, so Chen is the shortest of all.',
       ],
-      keyIdea: 'Rewrite every comparison in the same direction (all "taller than"), then chain them into one ordered line.',
+      keyIdea: 'Rewrite all comparison clues in one direction using $>$, then link them into one line. Count positions from the end the question names: "second tallest" counts from the tall end.',
     },
     check: {
       optionValues: ['Dana', 'Amal', 'Bilal', 'Chen'],
@@ -74,21 +73,19 @@ export const questions: StaticQuestion[] = [
     options: ['Raya', 'Tom', 'Sam', 'Cannot be determined'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Put the four runners in finishing order. Who is in third place?',
       solution:
-        'Turn every clue into "X before Y" (earlier finisher on the left):\n\n' +
-        '- Raya before Sam\n' +
-        '- "Tom finished after Sam" means Sam before Tom\n' +
-        '- Uma before Raya\n\n' +
-        'Chain them: Uma, Raya, Sam, Tom. Every runner is linked into one chain, so the order is completely fixed.\n\n' +
-        '| Place | 1st | 2nd | 3rd | 4th |\n| --- | --- | --- | --- | --- |\n| Runner | Uma | Raya | Sam | Tom |\n\n' +
-        'Third place: **Sam**.',
+        'Rewrite the clues using "before", with $\\to$ meaning "finished before". "Tom finished after Sam" is the same fact as Sam $\\to$ Tom.\n\n- Raya $\\to$ Sam\n- Sam $\\to$ Tom\n- Uma $\\to$ Raya\n\n' +
+        'Join the clues at the shared names: Uma $\\to$ Raya $\\to$ Sam $\\to$ Tom.\n\n' +
+        'Count along the line: Uma is 1st, Raya is 2nd, Sam is 3rd and Tom is 4th.',
+      conclusion: 'The clues allow only one order, and third in that order is Sam.',
       whyWrong: [
         'Raya is third only if you count from the **last** runner backwards. Raya finished second.',
         'This comes from misreading "Tom finished after Sam" as "before Sam", which lets Tom move up the order. Tom is after Sam, so Tom is last.',
         null,
         'The three clues join all four runners into one chain (Uma, Raya, Sam, Tom), so there is only one possible order and the answer can be determined.',
       ],
-      keyIdea: 'When the clues link everyone into one chain, the order is fully determined: just read off the position you need.',
+      keyIdea: 'Rewrite "after" clues as "before" clues, link the names that appear in two clues, and number the positions. If the clues form one unbroken chain, there is only one possible order.',
     },
     check: {
       optionValues: ['Raya', 'Tom', 'Sam', 'ambiguous'],
@@ -108,20 +105,19 @@ export const questions: StaticQuestion[] = [
     options: ['$10$', '$12$', '$256$', '$24$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many different full finishing orders can four runners have?',
       solution:
-        'Fill the places one at a time:\n\n' +
-        '- 1st place: any of the 4 runners, so 4 choices.\n' +
-        '- 2nd place: one runner is used, so 3 choices.\n' +
-        '- 3rd place: 2 choices. 4th place: 1 choice.\n\n' +
-        'Multiply the choices (the counting principle):\n\n' +
-        '$$4 \\times 3 \\times 2 \\times 1 = 4! = 24$$',
+        'Fill the places one at a time. Any of the 4 runners can come 1st, so there are 4 choices.\n\n' +
+        'One runner has now been used, so there are 3 choices for 2nd place. Then there are 2 choices for 3rd, and 1 runner is left for 4th.\n\n' +
+        'Each choice can be paired with every later choice, so we multiply rather than add: $4 \\times 3 \\times 2 \\times 1 = 24$.',
+      conclusion: 'Multiplying the choices for each place gives $24$ different finishing orders.',
       whyWrong: [
         'This is $4 + 3 + 2 + 1$: the choices were **added**. Each choice for 1st place can be combined with every choice for 2nd place, so you must **multiply**.',
         'This is $4 \\times 3$, the number of ways to fill only the first **two** places. The question asks for the complete finishing order, so keep multiplying down to 1.',
         'This is $4^4$: it allows the same runner to fill more than one place. Once a runner has finished they cannot finish again, so the choices go down by one each time.',
         null,
       ],
-      keyIdea: 'The number of ways to arrange $n$ different things in a line is $n! = n \\times (n - 1) \\times \\dots \\times 1$.',
+      keyIdea: 'To arrange $n$ different things in a line, multiply the choices for each place: $n \\times (n-1) \\times \\dots \\times 1$. This is written $n!$ and read "$n$ factorial". For example, $4! = 24$.',
     },
     check: {
       optionValues: [10, 12, 256, 24],
@@ -140,20 +136,18 @@ export const questions: StaticQuestion[] = [
     options: ['Badr', 'Cara', 'Cannot be determined', 'Ali'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Match each person to a pet. Who has the fish?',
       solution:
-        'Use a grid: people down the side, pets across the top. Tick what is known, cross what is impossible.\n\n' +
-        '| | Cat | Dog | Fish |\n| --- | --- | --- | --- |\n| Ali | no | no | **yes** |\n| Badr | no | **yes** | no |\n| Cara | **yes** | no | no |\n\n' +
-        '1. Badr owns the dog, so nobody else owns the dog and Badr owns nothing else.\n' +
-        '2. Ali does not own the cat and cannot own the dog, so Ali must own the **fish**.\n' +
-        '3. Cara gets the only pet left: the cat.\n\n' +
-        'So **Ali** owns the fish.',
+        'Start with the fixed fact. Badr owns the dog, so Ali and Cara must share the cat and the fish.\n\n' +
+        'Ali does not own the cat. Out of the cat and the fish, that leaves the fish for Ali, and the cat goes to Cara.',
+      conclusion: 'Badr has the dog and Ali cannot have the cat, so the fish belongs to Ali.',
       whyWrong: [
         'Badr owns the dog, and each person owns exactly one pet, so Badr cannot also own the fish.',
         'Cara would own the fish only if Ali owned the cat, but the second clue says Ali does not own the cat.',
         'It can be determined: once the dog is given to Badr, Ali has only the cat and the fish left, and the cat is ruled out. Remember that each pet goes to exactly one person.',
         null,
       ],
-      keyIdea: 'In a matching grid, each row and each column has exactly one "yes": a tick in one cell crosses out the rest of its row and column.',
+      keyIdea: 'In matching puzzles, draw a grid of people and items. Fill in each fixed fact, cross that item out for everyone else, then look for a person with only one item left.',
     },
     check: {
       optionValues: ['Badr', 'Cara', 'ambiguous', 'Ali'],
@@ -175,21 +169,20 @@ export const questions: StaticQuestion[] = [
     options: ['Seat 1', 'Seat 2', 'Seat 4', 'Cannot be determined'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Use the seat clues to find which seat Dev is in.',
       solution:
-        'Place the fixed people first.\n\n' +
-        '1. Chloe is in seat 3.\n' +
-        '2. Immediately to the left of seat 3 is seat 2, so Arif is in seat 2.\n' +
-        '3. Seats left: 1 and 4. Seat 4 is next to Chloe, so Bea cannot be there. Bea is in seat 1.\n' +
-        '4. Dev takes the last seat.\n\n' +
-        '| Seat | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Person | Bea | Arif | Chloe | Dev |\n\n' +
-        'Dev is in **Seat 4**.',
+        'Draw four seats, numbered 1 to 4 from the left. The first clue puts Chloe in seat 3:\n\n| Seat 1 | Seat 2 | Seat 3 | Seat 4 |\n|---|---|---|---|\n|  |  | Chloe |  |\n\n' +
+        '"Immediately left of" means the very next seat on the left. That is seat 2, so Arif goes in seat 2.\n\n' +
+        'The seats next to Chloe are 2 and 4. Bea cannot be in either of them, so Bea goes in seat 1.\n\n' +
+        'Dev is the only person left, and only seat 4 is still empty. So Dev sits in seat 4.',
+      conclusion: 'The seats read Bea, Arif, Chloe, Dev from the left, which puts Dev in Seat 4.',
       whyWrong: [
         'This reads "not next to" as "next to". Bea would then take seat 4 and leave seat 1 for Dev.',
         'This puts Arif to the **right** of Chloe, in seat 4, which leaves seat 2 for Dev. With seats numbered left to right, "immediately left of seat 3" is seat 2.',
         null,
         'Every clue is needed, but together they fix all four seats, so there is only one arrangement.',
       ],
-      keyIdea: 'Place the people with fixed seats first, then use "not next to" clues to narrow down the remaining seats.',
+      keyIdea: 'Draw the numbered seats first and place the fixed clues. Then use the "immediately left" or "next to" clues, then the "not" clues. Anyone left over goes in the empty seat.',
     },
     check: {
       optionValues: [1, 2, 4, 'ambiguous'],
@@ -215,25 +208,20 @@ export const questions: StaticQuestion[] = [
     options: ['Priya has the highest score.', 'Sara scored more than Quinn.', 'Ravi has the lowest score.', 'Quinn has the second highest score.'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which statement stays true in every order that fits the clues?',
       solution:
-        'Write the clues with ">" meaning "scored more than": Priya > Quinn, Quinn > Ravi, Sara > Ravi.\n\n' +
-        'So Priya > Quinn > Ravi is a chain, and Sara is only known to be above Ravi. Sara can slot in anywhere above Ravi. All orders from highest to lowest:\n\n' +
-        '1. Sara, Priya, Quinn, Ravi\n' +
-        '2. Priya, Sara, Quinn, Ravi\n' +
-        '3. Priya, Quinn, Sara, Ravi\n\n' +
-        'Test each statement against **all three** orders:\n\n' +
-        '- "Priya highest": false in order 1.\n' +
-        '- "Sara above Quinn": false in order 3.\n' +
-        '- "Ravi lowest": true in all three, because Ravi is below Quinn, Priya (since Priya is above Quinn) and Sara.\n' +
-        '- "Quinn second": false in orders 1 and 2.\n\n' +
-        'Only **Ravi has the lowest score** must be true.',
+        'Use $>$ to mean "scored more than". The clues say Priya $>$ Quinn, Quinn $>$ Ravi ("Ravi scored less than Quinn" is the same fact), and Sara $>$ Ravi.\n\n' +
+        'Link the first two: Priya $>$ Quinn $>$ Ravi. Sara is only known to be above Ravi, so she could fit in anywhere above him.\n\n' +
+        'That leaves three possible orders:\n\n| Highest | 2nd | 3rd | Lowest |\n|---|---|---|---|\n| Sara | Priya | Quinn | Ravi |\n| Priya | Sara | Quinn | Ravi |\n| Priya | Quinn | Sara | Ravi |\n\n' +
+        'Test each statement against all three rows. Priya is not always top, Sara is not always above Quinn, and Quinn is not always second. But Ravi is lowest in all three rows.',
+      conclusion: '"Must be true" means true in all three orders, and only this one is: Ravi has the lowest score.',
       whyWrong: [
         'This is only *possible*, not certain: Sara is only known to beat Ravi, so Sara could also beat Priya (order Sara, Priya, Quinn, Ravi).',
         'This could be true but need not be: the order Priya, Quinn, Sara, Ravi fits every clue and has Sara below Quinn.',
         null,
         'This is one possibility (Priya, Quinn, Sara, Ravi), but Sara could also sit above Quinn, pushing Quinn to third. "Must be true" means true in **every** possible order.',
       ],
-      keyIdea: 'For a "must be true" question, list every order that fits the clues; the answer is the statement that holds in all of them.',
+      keyIdea: 'For "must be true" questions, list every order that fits the clues in a small table. Cross out any statement that fails in even one row. A person is certain to be last only if everyone else is above them, directly or through a chain of clues.',
     },
     check: {
       optionValues: ['priya-top', 'sara-above-quinn', 'ravi-bottom', 'quinn-second'],
@@ -260,19 +248,20 @@ export const questions: StaticQuestion[] = [
     options: ['$6$', '$12$', '$24$', '$3$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many seatings keep Xavier and Yusuf side by side?',
       solution:
-        'Use the **block method**.\n\n' +
-        '1. Glue Xavier and Yusuf together into one block. Now there are 3 "units" to arrange: the block and the other 2 people.\n' +
-        '2. Arrange 3 units in a row: $3! = 6$ ways.\n' +
-        '3. Inside the block they can sit as Xavier-Yusuf or Yusuf-Xavier: 2 ways.\n' +
-        '4. Multiply: $2 \\times 3! = 2 \\times 6 = 12$.',
+        'Treat Xavier and Yusuf as one block, because they must stay together. Now we are arranging 3 things: the block and the two other people.\n\n' +
+        'Three things can go in a row in $3 \\times 2 \\times 1 = 6$ ways.\n\n' +
+        'Inside the block, the pair can sit in two orders: Xavier then Yusuf, or Yusuf then Xavier.\n\n' +
+        'Each of the 6 arrangements can use either order inside the block, so we multiply: $6 \\times 2 = 12$.',
+      conclusion: 'Arranging the block and then the pair inside it gives $6 \\times 2$, so the answer is $12$.',
       whyWrong: [
         'This is $3!$: it arranges the block but forgets that Xavier and Yusuf can swap places inside it, which doubles the count.',
         null,
         'This is $4!$, every possible seating. It ignores the condition that the two must be together.',
         'This counts only the 3 pairs of neighbouring chairs. It forgets that the pair can swap and that the other two people can swap.',
       ],
-      keyIdea: '"Must be together": treat them as one block, arrange the units, then multiply by the number of orders inside the block.',
+      keyIdea: 'For "must sit together", glue the pair into one block, arrange the block with the others, then multiply by 2 for the two orders inside. With $n$ people this gives $2 \\times (n-1)!$, where $!$ means multiply down to 1.',
     },
     check: {
       optionValues: [6, 12, 24, 3],
@@ -287,17 +276,20 @@ export const questions: StaticQuestion[] = [
     options: ['$12$', '$24$', '$6$', '$2$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'In how many finishing orders is Hamad somewhere ahead of Isaac?',
       solution:
-        'There are $4! = 24$ finishing orders altogether.\n\n' +
-        'Pair each order with the order you get by **swapping** Hamad and Isaac (everyone else stays put). In exactly one of each pair Hamad is ahead. So exactly half of all orders have Hamad before Isaac:\n\n' +
-        '$$\\frac{4!}{2} = \\frac{24}{2} = 12$$',
+        'Start with all finishing orders, with no condition: $4 \\times 3 \\times 2 \\times 1 = 24$.\n\n' +
+        'Take any order and swap Hamad and Isaac. For example, with two other runners Pat and Tia, the order Hamad, Pat, Isaac, Tia becomes Isaac, Pat, Hamad, Tia. This pairs every order with exactly one other order.\n\n' +
+        'In each pair, Hamad is ahead in exactly one of the two orders. So Hamad is ahead in exactly half of all orders.\n\n' +
+        'Half of 24 is $24 \\div 2 = 12$.',
+      conclusion: 'Hamad is ahead in exactly half of the orders, which gives $12$.',
       whyWrong: [
         null,
         'This is $4!$, all orders. It ignores the condition; in half of these orders Isaac beats Hamad.',
         'This is $3!$, the number of orders where Hamad finishes **immediately** before Isaac (glued together in that order). "Before" allows other runners in between.',
         'This fixes Hamad first and Isaac second, which is only one of the ways for Hamad to beat Isaac.',
       ],
-      keyIdea: 'By symmetry, "A before B" holds in exactly half of all orders: $\\frac{n!}{2}$.',
+      keyIdea: 'When one person must be somewhere before another, with gaps allowed, use symmetry: each person is ahead in exactly half of all orders. So the answer is $n! \\div 2$, where $n$ is the number of people and $n!$ means $n \\times (n-1) \\times \\dots \\times 1$. Use a block only if the word "immediately" appears.',
     },
     check: {
       optionValues: [12, 24, 6, 2],
@@ -317,21 +309,19 @@ export const questions: StaticQuestion[] = [
     options: ['Jae: juice', 'Hana: tea', 'Kofi: water', 'Kofi: juice'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Match each person to a drink. Which pairing is right?',
       solution:
-        'Fill in a grid, crossing out impossible cells.\n\n' +
-        '1. Imran has coffee, so cross out coffee for everyone else.\n' +
-        '2. Hana: not tea, not juice, not coffee, so Hana has **water**.\n' +
-        '3. Kofi: not tea, not coffee, not water (Hana has it), so Kofi has **juice**.\n' +
-        '4. Jae gets the drink that is left: tea.\n\n' +
-        '| | Tea | Coffee | Juice | Water |\n| --- | --- | --- | --- | --- |\n| Hana | no | no | no | yes |\n| Imran | no | yes | no | no |\n| Jae | yes | no | no | no |\n| Kofi | no | no | yes | no |\n\n' +
-        'The correct pairing is **Kofi: juice**.',
+        'Start with the fixed fact. Imran has coffee, so nobody else has it.\n\n' +
+        'Hana cannot have tea or juice, and coffee is taken. That leaves only water for Hana.\n\n' +
+        'Tea and juice are left for Jae and Kofi. Kofi does not order tea, so Jae has the tea and Kofi has the juice.',
+      conclusion: 'Every drink is now placed: Imran coffee, Hana water, Jae tea, and the pairing that matches is Kofi: juice.',
       whyWrong: [
         'If Jae had juice, Kofi would be left with tea or water. Hana must have water, so Kofi would have tea, which breaks the third clue.',
         'This breaks the second clue: Hana orders neither tea nor juice.',
         'Water is forced for Hana first (she cannot have tea, juice or coffee). This comes from filling in Kofi\'s row before using Hana\'s clue.',
         null,
       ],
-      keyIdea: 'Look for a row or column with only one cell left open: that cell must be a "yes", and it crosses out the rest of its row and column.',
+      keyIdea: 'In matching puzzles, make a grid of people and items. Place definite facts first, and cross that item out everywhere else. Then look for a person or an item with only one choice left, and repeat.',
     },
     check: {
       optionValues: ['jae-juice', 'hana-tea', 'kofi-water', 'kofi-juice'],
@@ -356,21 +346,19 @@ export const questions: StaticQuestion[] = [
     options: ['Bassam', 'Dina', 'Carla', 'Ahmed'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Put the four friends in height order. Who is second from the shortest end?',
       solution:
-        'Measure everyone relative to Bassam: call Bassam\'s height $0$ (in cm above Bassam).\n\n' +
-        '- Ahmed: $0 + 20 = 20$\n' +
-        '- Carla: $20 - 10 = 10$\n' +
-        '- Dina: $0 + 5 = 5$\n' +
-        '- Bassam: $0$\n\n' +
-        'From shortest to tallest: Bassam $(0)$, Dina $(5)$, Carla $(10)$, Ahmed $(20)$.\n\n' +
-        'The second shortest is **Dina**.',
+        'These clues give amounts, so measure everyone from one person. Bassam is a good choice because two clues use him. Write each height as centimetres above Bassam:\n\n| Person | Working | cm above Bassam |\n|---|---|---|\n| Bassam | starting point | 0 |\n| Ahmed | 20 taller than Bassam | 20 |\n| Carla | 10 shorter than Ahmed: $20 - 10$ | 10 |\n| Dina | 5 taller than Bassam | 5 |\n\n' +
+        'Sort the numbers from smallest to largest: 0, 5, 10, 20.\n\n' +
+        'Match them back to people. The smallest, 0, is Bassam, so he is the shortest. The next, 5, is Dina.',
+      conclusion: 'From shortest to tallest the order is Bassam, Dina, Carla, Ahmed, so the second shortest is Dina.',
       whyWrong: [
         'Bassam is the **shortest**. You get Bassam in second place by measuring Carla from Bassam instead of from Ahmed, which makes her $-10$.',
         null,
         'Carla is the second **tallest**. This counts from the wrong end of the order.',
         'Ahmed is the tallest, at the opposite end of the order from the one asked about.',
       ],
-      keyIdea: 'When clues give amounts ("20 cm taller"), choose one person as zero and give everyone a number; then just sort the numbers.',
+      keyIdea: 'When clues give amounts, pick one person as the zero point and write everyone as a number above or below them. Sort the numbers, then count from the end the question names.',
     },
     check: {
       optionValues: ['Bassam', 'Dina', 'Carla', 'Ahmed'],
@@ -396,21 +384,19 @@ export const questions: StaticQuestion[] = [
     options: ['Wafa is taller than Yara.', 'Xin is taller than Zaid.', 'Zaid is taller than Wafa.', 'Yara is taller than Wafa.'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which one extra clue leaves only one possible height order?',
       solution:
-        'Using ">" for "taller than", the clues are: Wafa > Xin, Yara > Xin, Yara > Zaid. So Yara is above Xin and Zaid, and Wafa is above Xin; nothing compares Wafa with Yara or Zaid, or Zaid with Xin.\n\n' +
-        'Test each extra clue:\n\n' +
-        '- "Wafa > Yara": then Wafa > Yara > Xin and Yara > Zaid, but Xin and Zaid are still not compared. Two orders remain.\n' +
-        '- "Xin > Zaid": then Yara > Xin > Zaid and Wafa > Xin, but Wafa and Yara are not compared. Two orders remain.\n' +
-        '- "Zaid > Wafa": then Yara > Zaid > Wafa > Xin. This is a single chain through all four people, so the order is **certain**.\n' +
-        '- "Yara > Wafa": then Yara > Wafa > Xin and Yara > Zaid, but Zaid could be in any of three places below Yara. Three orders remain.\n\n' +
-        'The clue that fixes the order is **Zaid is taller than Wafa**.',
+        'Use $>$ for "is taller than". The clues say Wafa $>$ Xin, Yara $>$ Xin and Yara $>$ Zaid. They leave some pairs not compared, such as Wafa and Zaid.\n\n' +
+        'The order is certain only when one line joins all four people. Test each clue that does not do this:\n\n| Extra clue | What we get | Still unknown |\n|---|---|---|\n| Wafa $>$ Yara | Wafa $>$ Yara $>$ Xin, and Yara $>$ Zaid | Xin and Zaid |\n| Xin $>$ Zaid | Yara $>$ Xin $>$ Zaid, and Wafa $>$ Xin | Wafa and Yara |\n| Yara $>$ Wafa | Yara $>$ Wafa $>$ Xin, and Yara $>$ Zaid | Where Zaid goes |\n\n' +
+        'Now try Zaid $>$ Wafa. Join it to the others: Yara $>$ Zaid, then Zaid $>$ Wafa, then Wafa $>$ Xin. That is one line with nothing left unknown: Yara, Zaid, Wafa, Xin.',
+      conclusion: 'Only this clue joins all four into a single line, so the clue we need is: Zaid is taller than Wafa.',
       whyWrong: [
         'This puts Wafa at the top, but Xin and Zaid are still not compared, so Wafa, Yara, Xin, Zaid and Wafa, Yara, Zaid, Xin both fit.',
         'This orders Yara, Xin, Zaid, but Wafa could be above or below Yara (Wafa only has to beat Xin), so the order is not certain.',
         null,
         'This puts Yara at the top and Wafa above Xin, but Zaid is only known to be shorter than Yara, so Zaid could be second, third or last.',
       ],
-      keyIdea: 'The order is certain only when the clues link all the people into one unbroken chain from tallest to shortest.',
+      keyIdea: 'Draw the clues as arrows. The order is certain only if the arrows form one unbroken line through everyone. Test each extra clue: if two people are still not compared, directly or through others, the order is not certain.',
     },
     check: {
       optionValues: ['w-gt-y', 'x-gt-z', 'z-gt-w', 'y-gt-w'],
@@ -435,20 +421,20 @@ export const questions: StaticQuestion[] = [
     options: ['Farah', 'Hiro', 'Jon', 'Gus'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Place the people in seats 1 to 4. Who is in seat 3?',
       solution:
-        'The first clue means Hiro is in the middle of a block of three: Farah, Hiro, Jon in some order with Hiro in the centre. Farah is to the right of Jon, so the block reads **Jon, Hiro, Farah** from left to right.\n\n' +
-        'The block can start in seat 1 or seat 2:\n\n' +
-        '- Start in seat 1: Jon is in seat 1, an end seat. This breaks the last clue.\n' +
-        '- Start in seat 2: Jon 2, Hiro 3, Farah 4, and Gus takes seat 1. All clues hold.\n\n' +
-        '| Seat | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Person | Gus | Jon | Hiro | Farah |\n\n' +
-        'Seat 3: **Hiro**.',
+        'Hiro is next to Farah and also next to Jon, so Hiro sits between them. Those three form a block.\n\n' +
+        'Farah is to the right of Jon, so the block reads Jon, Hiro, Farah from left to right.\n\n' +
+        'The fourth person, Gus, takes the seat outside the block. A block of three fits four seats in only two ways:\n\n| Seat 1 | Seat 2 | Seat 3 | Seat 4 |\n|---|---|---|---|\n| Jon | Hiro | Farah | Gus |\n| Gus | Jon | Hiro | Farah |\n\n' +
+        '"Jon is not at an end" rules out the first row, where Jon is in seat 1. In the second row, seat 3 holds Hiro.',
+      conclusion: 'Only the order Gus, Jon, Hiro, Farah fits all the clues, so seat 3 holds Hiro.',
       whyWrong: [
         'This ignores the last clue: Jon, Hiro, Farah, Gus fits the first two clues and puts Farah in seat 3, but it has Jon in an end seat.',
         null,
         'This reads the second clue backwards (Farah left of Jon), which gives Farah, Hiro, Jon, Gus with Jon in seat 3.',
         'Gus has to sit outside the block of three, so he can only be in seat 1 or seat 4.',
       ],
-      keyIdea: 'Combine clues into a fixed block first, then slide the block along the row and reject positions that break a clue.',
+      keyIdea: 'Join "next to" clues into a block first, then fix its direction with any left or right clue. List the places the block can slide to, and use the remaining clues to rule places out.',
     },
     check: {
       optionValues: ['Farah', 'Hiro', 'Jon', 'Gus'],
@@ -469,18 +455,20 @@ export const questions: StaticQuestion[] = [
     options: ['$12$', '$9$', '$18$', '$3$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Count the orders of A, B, C, D where A comes before B and C is not first.',
       solution:
-        'There are $4! = 24$ orderings in total.\n\n' +
-        'Step 1: orderings with A before B. By symmetry this is half of 24, so $12$.\n\n' +
-        'Step 2: remove those that start with C. If C is first, the letters A, B, D fill 3 places in $3! = 6$ ways, and A is before B in half of them: $3$.\n\n' +
-        'Step 3: $12 - 3 = 9$.',
+        'Start with all orders of 4 letters: $4 \\times 3 \\times 2 \\times 1 = 24$.\n\n' +
+        'A comes before B in exactly half of them, because swapping A and B turns each order into one with those two the other way round. So $24 \\div 2 = 12$ orders have A before B.\n\n' +
+        'Some of those 12 start with C, and we must remove them. With C first and A before B, the only orders are CABD, CADB and CDAB. That is 3 orders.\n\n' +
+        'Take them away: $12 - 3 = 9$.',
+      conclusion: 'There are 12 orders with A before B, and 3 of those start with C, which leaves $9$.',
       whyWrong: [
         'This is $\\frac{24}{2}$: it uses only the first condition and forgets that the first letter cannot be C.',
         null,
         'This is $24 - 6$: it uses only the second condition (first letter is not C) and forgets that A must come before B.',
         'This is the number of orderings that start with C and have A before B, which are exactly the ones to **exclude**.',
       ],
-      keyIdea: 'Counting with two conditions: count those meeting the first condition, then subtract those that meet it but break the second.',
+      keyIdea: 'With two conditions, handle them one at a time. Count the orders meeting the first condition, then subtract those that meet it but break the second. Use "half" for a before-or-after condition, and multiply down for free places.',
     },
     check: {
       optionValues: [12, 9, 18, 3],
@@ -495,14 +483,18 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$6$', '$9$', '$27$'],
     correctIndex: 1,
     markScheme: {
-      solution: 'There are 3 choices for the first place, 2 for the second and 1 for the third:\n\n$$3 \\times 2 \\times 1 = 3! = 6$$',
+      asking: 'How many different line-ups can 3 people make?',
+      solution:
+        'Fill the line one place at a time. Any of the 3 people can stand first. Then 2 people are left for the second place, and 1 for the last place.\n\n' +
+        'Each choice pairs with every later choice, so multiply: $3 \\times 2 \\times 1 = 6$. With people called X, Y and Z, these are XYZ, XZY, YXZ, YZX, ZXY and ZYX.',
+      conclusion: 'Multiplying the choices for each place gives $6$ different orders.',
       whyWrong: [
         'This counts the people, not the orders. Each person can stand in several different places.',
         null,
         'This is $3 \\times 3$: it multiplies people by places, which is not a counting rule.',
         'This is $3^3$: it lets the same person stand in more than one place.',
       ],
-      keyIdea: '$n$ different things can be put in a line in $n!$ ways.',
+      keyIdea: 'To count line-ups of $n$ different people, multiply $n \\times (n-1) \\times \\dots \\times 1$, which is written $n!$. For small $n$, list them to confirm the count.',
     },
     check: { optionValues: [3, 6, 9, 27], compute: () => perms(['A', 'B', 'C']).length },
   },
@@ -514,14 +506,18 @@ export const questions: StaticQuestion[] = [
     options: ["Ann is in the seat next to Bo, on Bo's left", 'Ann is somewhere to the left of Bo', 'Ann is next to Bo, on either side', 'Ann is in the leftmost seat'],
     correctIndex: 0,
     markScheme: {
-      solution: '"Immediately" means the very next seat, and "left of" fixes the side. So Ann is in the seat next to Bo, on Bo\'s left, and nobody sits between them.',
+      asking: 'What does "immediately to the left" tell us about Ann\'s seat?',
+      solution:
+        'Break the phrase into two parts. "To the left of Bo" fixes the side: Ann is on Bo\'s left, not his right.\n\n' +
+        '"Immediately" means with nobody in between. So Ann is in the very next seat to Bo, on his left.',
+      conclusion: 'Both parts together mean: Ann is in the seat next to Bo, on Bo\'s left.',
       whyWrong: [
         null,
         'This is "somewhere to the left of", which allows people in between. "Immediately" does not.',
         'This is "next to", which does not say which side. "To the left of" fixes the side.',
         'Ann could be anywhere in the row as long as Bo is in the very next seat on her right.',
       ],
-      keyIdea: '"Immediately left of" means the very next seat on that side; "left of" alone allows a gap.',
+      keyIdea: 'Know these three phrases. "Next to" means neighbouring seats, on either side. "To the left of" means that side, with gaps allowed. "Immediately to the left of" means both: the neighbouring seat on that side.',
     },
   },
   {
@@ -532,14 +528,18 @@ export const questions: StaticQuestion[] = [
     options: ['Ann is taller than Cy', 'Cy is taller than Ann', 'Bo is the tallest', 'Ann and Cy are the same height'],
     correctIndex: 0,
     markScheme: {
-      solution: 'Write the clues in one chain, with ">" for "is taller than": Ann > Bo > Cy. Reading along the chain, **Ann is taller than Cy**.',
+      asking: 'What must be true when we compare Ann with Cy?',
+      solution:
+        'Write the clues as one line, with $>$ meaning "is taller than": Ann $>$ Bo $>$ Cy.\n\n' +
+        'Going down that line you meet Ann first, then Bo, then Cy. So Cy is below Bo, and Bo is below Ann, which puts Ann above Cy.',
+      conclusion: 'Height comparisons pass along the chain, so what must be true is: Ann is taller than Cy.',
       whyWrong: [
         null,
         'This reverses the chain. Cy is at the bottom, below both of the others.',
         'Bo is in the middle: Ann is taller than Bo.',
         'Ann is above Bo and Cy is below Bo, so they cannot be the same height.',
       ],
-      keyIdea: 'Comparisons chain together: if A > B and B > C, then A > C.',
+      keyIdea: '"Taller than" passes along a chain: if $A > B$ and $B > C$, then $A > C$. Whenever comparisons share a person, join them into one line and read any comparison from it.',
     },
     check: {
       optionValues: ['a>c', 'c>a', 'b top', 'same'],
@@ -562,14 +562,19 @@ export const questions: StaticQuestion[] = [
     options: ['third tallest', 'second tallest', 'tallest', 'fourth tallest'],
     correctIndex: 0,
     markScheme: {
-      solution: 'With $n$ people, position $k$ from the bottom is position $n + 1 - k$ from the top. Here that is $4 + 1 - 2 = 3$, so the second shortest is the **third tallest**.',
+      asking: 'Counting from the tall end, what position is the second shortest person in?',
+      solution:
+        'Line the four people up from tallest to shortest and number them 1, 2, 3, 4. Position 1 is the tallest and position 4 is the shortest.\n\n' +
+        'Second shortest means one step up from the bottom. One step up from position 4 is position 3.\n\n' +
+        'Position 3 from the top means exactly two people are taller, so this person is third in the height order.',
+      conclusion: 'Position 3 counted from the top is the same person, so the second shortest is also the third tallest.',
       whyWrong: [
         null,
         'This keeps the number 2 when changing ends. The second tallest is a different person from the second shortest.',
         'The tallest is at the opposite end, and is the fourth shortest.',
         'The fourth tallest is the shortest, not the second shortest.',
       ],
-      keyIdea: 'Position $k$ from one end of $n$ people is position $n + 1 - k$ from the other end.',
+      keyIdea: 'To switch ends, use: position from one end $=$ total $+ 1 -$ position from the other end. Here that is $4 + 1 - 2 = 3$.',
     },
     check: { optionValues: [3, 2, 1, 4], compute: () => 4 + 1 - 2 },
   },
@@ -581,18 +586,20 @@ export const questions: StaticQuestion[] = [
     options: ['Bo', 'Cy', 'Di', 'Cannot be determined'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Using the clues, who came in first place?',
       solution:
-        'Exactly one runner finished ahead of Ann.\n\n' +
-        '- It is not Bo, who finished after Ann.\n' +
-        '- It is not Di, because then Cy would have to be even further ahead, and only one place is free.\n\n' +
-        'So **Cy** finished first. Bo and Di take the last two places in either order, but that does not change the winner.',
+        'Write down the fixed fact: Ann is 2nd. So Ann is not 1st, and the places left are 1st, 3rd and 4th.\n\n' +
+        'Bo finished after Ann, so Bo is 3rd or 4th. Bo cannot be 1st.\n\n' +
+        'Cy finished before Di, so someone is ahead of Di. Di cannot be 1st.\n\n' +
+        'That rules out Ann, Bo and Di, which leaves only Cy for 1st place. Bo and Di take 3rd and 4th. We do not know which way round, but the question does not need that.',
+      conclusion: 'Everyone else is ruled out of first place, so the person who finished first is Cy.',
       whyWrong: [
         'This reads "Bo finished after Ann" as "before". Bo is behind Ann, so Bo cannot be first.',
         null,
         'This reads "Cy finished before Di" backwards. Di has Cy ahead of them, so Di cannot be first.',
         'The last two places can swap, but the question asks about first place, which is fixed.',
       ],
-      keyIdea: 'An order can be only partly fixed: check whether the position you are asked about is the same in every arrangement.',
+      keyIdea: 'To find who is first, cross out anyone with someone known to be ahead of them. The person left must be first. You can often answer even when other places are undecided, so do not stop just because the whole order is not fixed.',
     },
     check: {
       optionValues: ['Bo', 'Cy', 'Di', 'ambiguous'],
@@ -610,21 +617,18 @@ export const questions: StaticQuestion[] = [
     options: ['Pam, Quo, Rae, Sid', 'Rae, Pam, Sid, Quo', 'Pam, Rae, Sid, Quo', 'Quo, Sid, Pam, Rae'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which ranking breaks the clues?',
       solution:
-        'Test each order against both clues: Pam must be above Quo, and Rae must be above Sid.\n\n' +
-        '| Order | Pam above Quo? | Rae above Sid? |\n| --- | --- | --- |\n' +
-        '| Pam, Quo, Rae, Sid | yes | yes |\n' +
-        '| Rae, Pam, Sid, Quo | yes | yes |\n' +
-        '| Pam, Rae, Sid, Quo | yes | yes |\n' +
-        '| Quo, Sid, Pam, Rae | **no** | **no** |\n\n' +
-        'Only **Quo, Sid, Pam, Rae** breaks the clues.',
+        'We have two rules: Pam must be above Quo, and Rae must be above Sid. Nothing else is required, so the two pairs can mix in any way.\n\n' +
+        'Test each order against both rules. Only the last order fails, and it fails both:\n\n| Order, highest first | Pam above Quo? | Rae above Sid? |\n|---|---|---|\n| Pam, Quo, Rae, Sid | Yes | Yes |\n| Rae, Pam, Sid, Quo | Yes | Yes |\n| Pam, Rae, Sid, Quo | Yes | Yes |\n| Quo, Sid, Pam, Rae | No | No |',
+      conclusion: 'An impossible order breaks at least one clue, and this one breaks both: Quo, Sid, Pam, Rae.',
       whyWrong: [
         'This order fits both clues. The two pairs do not have to mix: nothing links them to each other.',
         'This order fits both clues. Pam and Quo may have other people between them, because "more than" does not mean "next to".',
         'This order fits both clues. Pam is above Quo and Rae is above Sid, even with the pairs overlapping.',
         null,
       ],
-      keyIdea: 'To rule out an order, one broken clue is enough; to allow an order, every clue must hold.',
+      keyIdea: 'To find an impossible order, test each option against each clue in a small table of yes and no. "More than" only fixes who is higher, not whether they are next to each other, so gaps and mixing are allowed.',
     },
     check: {
       optionValues: ['Pam,Quo,Rae,Sid', 'Rae,Pam,Sid,Quo', 'Pam,Rae,Sid,Quo', 'Quo,Sid,Pam,Rae'],
@@ -645,18 +649,19 @@ export const questions: StaticQuestion[] = [
     options: ['Ben', 'Cal', 'Dot', 'Amy'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Place the people in seats 1 to 4. Who is in seat 2?',
       solution:
-        '1. Cal is in seat 4, so the end seat left for Amy is seat 1.\n' +
-        '2. Exactly one person between Amy and Ben means their seat numbers differ by 2, so Ben is in seat 3.\n' +
-        '3. Dot takes the last seat, seat 2.\n\n' +
-        '| Seat | 1 | 2 | 3 | 4 |\n| --- | --- | --- | --- | --- |\n| Person | Amy | Dot | Ben | Cal |',
+        'Cal is in seat 4, which is one of the two end seats. Amy must be in an end seat too, so Amy is in seat 1.\n\n' +
+        '"Exactly one person between Amy and Ben" means Ben is two seats away from Amy. Two seats along from seat 1 is seat 3.\n\n' +
+        'Amy, Ben and Cal now fill seats 1, 3 and 4, so only seat 2 is empty. The fourth person, Dot, is the only one not placed, so Dot sits in seat 2.',
+      conclusion: 'The seats read Amy, Dot, Ben, Cal, so seat 2 holds Dot.',
       whyWrong: [
         'This reads "exactly one person between" as "next to". One person between means the seat numbers differ by 2.',
         'Cal is fixed in seat 4 by the last clue.',
         null,
         'Seat 2 is not an end seat, and Amy must be in an end seat.',
       ],
-      keyIdea: 'Exactly $k$ people between two people means their seat numbers differ by $k + 1$.',
+      keyIdea: 'Draw numbered seats and place the fixed person first. "End seat" leaves only seat 1 or seat 4. "Exactly one between" means the seat numbers differ by 2. Whoever is left takes the empty seat.',
     },
     check: {
       optionValues: ['Ben', 'Cal', 'Dot', 'Amy'],
@@ -677,18 +682,19 @@ export const questions: StaticQuestion[] = [
     options: ['$18$', '$6$', '$24$', '$12$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many line-ups of four have someone other than Ann at the front?',
       solution:
-        'Count everything, then subtract what is not allowed.\n\n' +
-        '- All orders: $4! = 24$.\n' +
-        '- Ann first: the other 3 people fill the remaining places in $3! = 6$ ways.\n\n' +
-        'Ann not first: $24 - 6 = 18$.',
+        'Count everything first. Four people in a line make $4 \\times 3 \\times 2 \\times 1 = 24$ orders.\n\n' +
+        'Now count the orders we do not want: Ann first. With Ann fixed at the front, the other 3 people fill the other 3 places: $3 \\times 2 \\times 1 = 6$.\n\n' +
+        'Take the unwanted orders away from the total: $24 - 6 = 18$.',
+      conclusion: 'Out of 24 orders, 6 have Ann first, which leaves $18$ orders where she is not.',
       whyWrong: [
         null,
         'This is the number of orders where Ann **is** first. It still has to be subtracted from the total.',
         'This is $4!$, every order. It ignores the condition.',
         'This assumes Ann is first in half of all orders. She is first in only 1 of every 4, since there are 4 places.',
       ],
-      keyIdea: '"Not" conditions are often easiest as the total minus the cases you do not want.',
+      keyIdea: 'For a "not" condition, count the opposite and subtract: wanted = all orders $-$ unwanted orders. This is usually quicker than counting the wanted orders directly.',
     },
     check: {
       optionValues: [18, 6, 24, 12],

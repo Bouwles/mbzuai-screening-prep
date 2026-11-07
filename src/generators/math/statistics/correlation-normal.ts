@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num } from '../../../lib/tex';
 
@@ -61,7 +62,11 @@ function zScoreQuestion(rng: Rng) {
     : `standard deviation ${m(num(sigma))}`;
   const findX = rng.bool(0.45);
   const u = ctx.unit;
-  const varStep = useVar ? `The variance is ${m(`\\sigma^2 = ${sigma * sigma}`)}, so the standard deviation is ${m(`\\sigma = \\sqrt{${sigma * sigma}} = ${sigma}`)}.\n\n` : '';
+  const varStep = useVar && `The question gives the **variance**, which is the standard deviation squared. So take the square root to get the standard deviation: ${m(`\\sqrt{${sigma * sigma}} = ${sigma}`)}.`;
+  const zAbs = z.value() < 0 ? z.neg() : z;
+  const sds = `${show(zAbs)}`;
+  const sdWords = `standard deviation${Math.abs(z.value()) === 1 ? '' : 's'}`;
+  const side = diff > 0 ? 'above' : 'below';
 
   if (!findX) {
     const ans: Cand = { text: m(show(z)), value: z.value(), why: '' };
@@ -85,14 +90,15 @@ function zScoreQuestion(rng: Rng) {
       answer: ans.text,
       answerValue: ans.value,
       distractors,
-      solution:
-        varStep +
-        `Use ${m('z = \\frac{x - \\mu}{\\sigma}')} with ${m(`x = ${x}`)}, ${m(`\\mu = ${mu}`)} and ${m(`\\sigma = ${sigma}`)}.\n\n` +
-        `1. Distance from the mean: ${m(`${x} - ${mu} = ${num(diff)}`)}.\n` +
-        `2. Divide by the standard deviation: ${m(`\\frac{${num(diff)}}{${sigma}} = ${show(z)}`)}.\n\n` +
-        `So the value is ${m(show(z.value() < 0 ? z.neg() : z))} standard deviation${Math.abs(z.value()) === 1 ? '' : 's'} ${diff > 0 ? 'above' : 'below'} the mean.\n\n` +
-        `Answer: ${ans.text}`,
-      keyIdea: 'The $z$-score $z = \\frac{x - \\mu}{\\sigma}$ counts how many standard deviations a value is above (positive) or below (negative) the mean.',
+      asking: `How many standard deviations from the mean is ${m(num(x))}${u}?`,
+      solution: steps(
+        `A ${m('z')}-score says how many standard deviations a value is from the mean. The formula is ${m('z = \\frac{x - \\mu}{\\sigma}')}, where ${m('x')} is the value, ${m('\\mu')} (mu) is the mean and ${m('\\sigma')} (sigma) is the standard deviation.`,
+        varStep,
+        `Find the distance from the mean: ${m(`${x} - ${mu} = ${num(diff)}`)}. ${diff > 0 ? 'It is positive because the value is above the mean.' : 'The minus sign shows that the value is below the mean.'}`,
+        `Divide by the standard deviation to count how many of them fit: ${m(`\\frac{${num(diff)}}{${sigma}} = ${show(z)}`)}.`,
+      ),
+      conclusion: `The value is ${m(sds)} ${sdWords} ${side} the mean, so the answer is ${ans.text}.`,
+      keyIdea: 'Use $z = \\frac{x - \\mu}{\\sigma}$: distance from the mean divided by the standard deviation. Above the mean gives a positive $z$, below gives a negative one. If you are given the variance, take its square root first.',
     };
   }
 
@@ -119,14 +125,15 @@ function zScoreQuestion(rng: Rng) {
     answer: ans.text,
     answerValue: ans.value,
     distractors,
-    solution:
-      varStep +
-      `Rearrange ${m('z = \\frac{x - \\mu}{\\sigma}')} to get ${m('x = \\mu + z\\sigma')}.\n\n` +
-      `1. Distance from the mean: ${m(`z\\sigma = ${zs < 0 ? `\\left(${show(z)}\\right)` : show(z)} \\times ${sigma} = ${num(zs * sigma)}`)}.\n` +
-      `2. Add it to the mean: ${m(`x = ${mu} ${zs < 0 ? '-' : '+'} ${num(Math.abs(zs * sigma))} = ${num(x)}`)}.\n\n` +
-      `Check: ${m(`\\frac{${num(x)} - ${mu}}{${sigma}} = ${show(z)}`)}.\n\n` +
-      `Answer: ${ans.text}`,
-    keyIdea: 'To turn a $z$-score back into a value use $x = \\mu + z\\sigma$; a negative $z$ means below the mean.',
+    asking: `What value is ${m(sds)} ${sdWords} ${side} the mean?`,
+    solution: steps(
+      `A ${m('z')}-score says how many standard deviations a value is from the mean. A ${zs > 0 ? 'positive' : 'negative'} ${m('z')} means ${side} the mean, so this value is ${m(sds)} ${sdWords} ${side} ${m(num(mu))}.`,
+      varStep,
+      `Find that distance, by multiplying the number of standard deviations by the size of one: ${m(`${sds} \\times ${sigma} = ${num(Math.abs(zs * sigma))}`)}.`,
+      `Go ${zs > 0 ? 'up' : 'down'} from the mean by that distance: ${m(`${mu} ${zs < 0 ? '-' : '+'} ${num(Math.abs(zs * sigma))} = ${num(x)}`)}.`,
+    ),
+    conclusion: `Moving ${m(num(Math.abs(zs * sigma)))} ${zs > 0 ? 'up' : 'down'} from the mean of ${m(num(mu))} gives the answer, ${ans.text}.`,
+    keyIdea: 'To get a value from a $z$-score, use $x = \\mu + z\\sigma$, where $\\mu$ is the mean and $\\sigma$ is the standard deviation. A negative $z$ automatically subtracts. If you are given the variance, take its square root first.',
   };
 }
 
@@ -193,7 +200,6 @@ function empiricalRuleQuestion(rng: Rng) {
   else region = `${ctx.pre} less than ${m(num(val(b)))} ${ctx.unit}`;
 
   // ---- step-by-step solution: list the bands that make up the region
-  const steps: string[] = [];
   const boundaryLines: string[] = [];
   const boundary = (k: number) =>
     k === 0
@@ -202,26 +208,34 @@ function empiricalRuleQuestion(rng: Rng) {
   if (a > -4) boundaryLines.push(boundary(a));
   if (b < 4) boundaryLines.push(boundary(b));
   // split at the mean using symmetry
-  const parts: { label: string; h: number }[] = [];
+  const parts: { label: string; h: number; work: string }[] = [];
+  const pct = (h: number) => `${num(h / 100)}\\%`;
+  // Each piece says where its size comes from. Sizes are in hundredths of a percent.
+  const wholeSide = (label: string) => parts.push({ label, h: 5000, work: `half of the whole curve, ${m(pct(5000))}` });
+  const halfOf = (label: string, w: number) => parts.push({ label, h: w / 2, work: `half of ${num(w / 100)}%, ${m(`${pct(w)} \\div 2 = ${pct(w / 2)}`)}` });
+  const beyond = (label: string, w: number) =>
+    parts.push({ label, h: (10000 - w) / 2, work: `${num(w / 100)}% is inside, so the rest is shared by the two ends, ${m(`(100\\% - ${pct(w)}) \\div 2 = ${pct((10000 - w) / 2)}`)}` });
+  const between = (label: string, outer: number, inner: number) =>
+    parts.push({ label, h: (outer - inner) / 2, work: `the gap between the two figures, on one side only, ${m(`(${pct(outer)} - ${pct(inner)}) \\div 2 = ${pct((outer - inner) / 2)}`)}` });
   const addSide = (lo: number, hi: number) => {
     // lo < hi, both on the same side of 0 (lo >= 0 or hi <= 0), +-4 = infinity
     if (lo >= 0) {
-      if (hi === 4) parts.push({ label: lo === 0 ? 'above the mean' : `beyond ${sdWord(lo)}`, h: lo === 0 ? 5000 : (10000 - WITHIN[lo]) / 2 });
-      else if (lo === 0) parts.push({ label: `from the mean up to ${sdWord(hi)}`, h: WITHIN[hi] / 2 });
-      else parts.push({ label: `from ${sdWord(lo)} to ${sdWord(hi)}`, h: (WITHIN[hi] - WITHIN[lo]) / 2 });
+      if (hi === 4 && lo === 0) wholeSide('above the mean');
+      else if (hi === 4) beyond(`beyond ${sdWord(lo)}`, WITHIN[lo]);
+      else if (lo === 0) halfOf(`from the mean up to ${sdWord(hi)}`, WITHIN[hi]);
+      else between(`from ${sdWord(lo)} to ${sdWord(hi)}`, WITHIN[hi], WITHIN[lo]);
     } else {
-      if (lo === -4) parts.push({ label: hi === 0 ? 'below the mean' : `beyond ${sdWord(hi)}`, h: hi === 0 ? 5000 : (10000 - WITHIN[-hi]) / 2 });
-      else if (hi === 0) parts.push({ label: `from ${sdWord(lo)} up to the mean`, h: WITHIN[-lo] / 2 });
-      else parts.push({ label: `from ${sdWord(lo)} to ${sdWord(hi)}`, h: (WITHIN[-lo] - WITHIN[-hi]) / 2 });
+      if (lo === -4 && hi === 0) wholeSide('below the mean');
+      else if (lo === -4) beyond(`beyond ${sdWord(hi)}`, WITHIN[-hi]);
+      else if (hi === 0) halfOf(`from ${sdWord(lo)} up to the mean`, WITHIN[-lo]);
+      else between(`from ${sdWord(lo)} to ${sdWord(hi)}`, WITHIN[-lo], WITHIN[-hi]);
     }
   };
   if (a < 0 && b > 0) {
     addSide(a, 0);
     addSide(0, b);
   } else addSide(a, b);
-  parts.forEach((p) => {
-    steps.push(`- ${p.label.charAt(0).toUpperCase() + p.label.slice(1)}: ${num(p.h / 100)}%`);
-  });
+  const bandLines = parts.map((p) => `- ${p.label.charAt(0).toUpperCase() + p.label.slice(1)}: ${p.work}`);
   const total = parts.reduce((s, p) => s + p.h, 0);
   if (total !== ans) throw new Error('band bookkeeping mismatch');
 
@@ -285,14 +299,16 @@ function empiricalRuleQuestion(rng: Rng) {
     answer: answerText,
     answerValue: answerC.value,
     distractors,
-    solution:
-      `**Step 1: count standard deviations from the mean.**\n\n${boundaryLines.join('\n')}\n\n` +
-      `**Step 2: use the rule and symmetry.** Within 1, 2 and 3 SDs of the mean lie 68%, 95% and 99.7%; each half of the curve holds 50%, and each side of the mean gets half of each figure.\n\n` +
-      `${steps.join('\n')}\n\n` +
-      (parts.length > 1 ? `Add the pieces: ${parts.map((p) => `${num(p.h / 100)}%`).join(' + ')} = ${num(ans / 100)}%.\n\n` : `So the percentage is ${num(ans / 100)}%.\n\n`) +
-      (counting ? `**Step 3: convert to a number.** ${m(`${num(ans / 100)}\\% \\times ${N} = ${num(ans / 10000)} \\times ${N} = ${num((ans * N) / 10000)}`)}.\n\n` : '') +
-      `Answer: ${answerText}`,
-    keyIdea: 'Mark the boundaries in SDs from the mean, then build the area from 68-95-99.7 using symmetry (each side of the mean gets half).',
+    asking: counting ? `How many of the ${m(num(N))} ${ctx.things} ${region}?` : `What percentage of the ${ctx.things} ${region}?`,
+    solution: steps(
+      `The **68-95-99.7 rule** is for normal data. About 68% of values lie within 1 **standard deviation** (SD) of the mean, 95% within 2 SDs, and 99.7% within 3 SDs.`,
+      `See how many SDs each boundary is from the mean. The mean is ${m(num(mu))} and one SD is ${m(num(sd))}:\n\n${boundaryLines.join('\n')}`,
+      `The curve is symmetrical, so each side of the mean gets half of each figure. ${parts.length > 1 ? 'Split the region into two pieces at the mean' : 'The region is one piece on one side of the mean'}:\n\n${bandLines.join('\n')}`,
+      parts.length > 1 && `Add the pieces: ${m(`${parts.map((p) => pct(p.h)).join(' + ')} = ${pct(ans)}`)}.`,
+      counting && `Turn the percentage into a number of ${ctx.things}: ${m(`${num(ans / 100)}\\% \\times ${N} = ${num(ans / 10000)} \\times ${N} = ${num((ans * N) / 10000)}`)}.`,
+    ),
+    conclusion: counting ? `${num(ans / 100)}% of the ${m(num(N))} ${ctx.things} is ${answerText}, so that is the answer.` : `The region asked about holds ${answerText} of the curve.`,
+    keyIdea: 'Turn each boundary into SDs from the mean. Then build the region from pieces: half of 68% is 34%, half of 95% is 47.5%, and each whole side of the mean is 50%.',
   };
 }
 
@@ -332,21 +348,24 @@ function bestFitQuestion(rng: Rng) {
     { text: m(num(grad * x0 + ybar + grad * xbar)), value: grad * x0 + ybar + grad * xbar, why: `This makes a sign error finding the intercept: from ${m(`${ybar} = ${num(grad)} \\times ${xbar} + c`)} you subtract, giving ${m(`c = ${num(c)}`)}.` },
   ];
   const distractors = pickDistinct(answerC, pool);
-  const gTimesX = grad < 0 ? `\\left(${num(grad)}\\right) \\times` : `${num(grad)} \\times`;
+  const dy = grad * d0;
+  const bracket = (v: number) => (v < 0 ? `\\left(${num(v)}\\right)` : num(v));
   return {
     stem: `The scatter plot shows 7 data points. Their line of best fit has gradient ${m(num(grad))} and passes through the mean point ${m(`(\\bar{x}, \\bar{y}) = (${xbar}, ${ybar})`)}. Use the line to predict ${m('y')} when ${m(`x = ${num(x0)}`)}.`,
     chart: { kind: 'scatter' as const, title: 'Data and line of best fit', xLabel: 'x', yLabel: 'y', points, line: { slope: grad, intercept: c } },
     answer: answerC.text,
     answerValue: ans,
     distractors,
-    solution:
-      `The line of best fit always passes through the mean point ${m('(\\bar{x}, \\bar{y})')}.\n\n` +
-      `1. Write the line as ${m(`y = ${num(grad)}x + c`)}.\n` +
-      `2. Substitute ${m(`(${xbar}, ${ybar})`)}: ${m(`${ybar} = ${gTimesX} ${xbar} + c = ${num(grad * xbar)} + c`)}, so ${m(`c = ${ybar} ${grad * xbar < 0 ? '+' : '-'} ${num(Math.abs(grad * xbar))} = ${num(c)}`)}.\n` +
-      `3. At ${m(`x = ${num(x0)}`)}: ${m(`y = ${gTimesX} ${num(x0)} ${c < 0 ? '-' : '+'} ${num(Math.abs(c))} = ${num(grad * x0)} ${c < 0 ? '-' : '+'} ${num(Math.abs(c))} = ${num(ans)}`)}.\n\n` +
-      `Quick check: ${m('x')} changes by ${m(num(d0))} from the mean point, so ${m('y')} changes by ${m(`${num(grad)} \\times ${d0 < 0 ? `\\left(${num(d0)}\\right)` : num(d0)} = ${num(grad * d0)}`)}, giving ${m(`${ybar} ${grad * d0 < 0 ? '-' : '+'} ${num(Math.abs(grad * d0))} = ${num(ans)}`)}.\n\n` +
-      `Answer: ${answerC.text}`,
-    keyIdea: 'A line of best fit passes through $(\\bar{x}, \\bar{y})$; use it with the gradient to find the intercept, then substitute the new $x$.',
+    asking: `What ${m('y')} does the line give at ${m(`x = ${num(x0)}`)}?`,
+    solution: steps(
+      `The **gradient** is how much ${m('y')} changes when ${m('x')} goes up by 1. Here it is ${m(num(grad))}${grad < 0 ? ', so ' + m('y') + ' goes down as ' + m('x') + ' goes up' : ''}.`,
+      `The mean point ${m('(\\bar{x}, \\bar{y})')} pairs the mean of the ${m('x')}-values with the mean of the ${m('y')}-values. The question says the line passes through it, so start there: ${m(`(${xbar}, ${ybar})`)}.`,
+      `Find the change in ${m('x')}, from ${m(`x = ${xbar}`)} to ${m(`x = ${num(x0)}`)}: ${m(`${num(x0)} - ${xbar} = ${num(d0)}`)}.`,
+      `The change in ${m('y')} is the gradient times the change in ${m('x')}: ${m(`${bracket(grad)} \\times ${bracket(d0)} = ${num(dy)}`)}.`,
+      `Apply that change to the ${m('y')} we started from: ${m(`${ybar} ${dy < 0 ? '-' : '+'} ${num(Math.abs(dy))} = ${num(ans)}`)}.`,
+    ),
+    conclusion: `Starting at ${m(`y = ${ybar}`)} and changing it by ${m(num(dy))} gives the answer, ${answerC.text}.`,
+    keyIdea: 'Given a gradient $m$ and a point $(\\bar{x}, \\bar{y})$, use $y = \\bar{y} + m(x - \\bar{x})$. That is: start at the known point, then add gradient times the change in $x$.',
   };
 }
 

@@ -1,4 +1,5 @@
 import type { Generator, GeneratedCore } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 
 type Cand = { text: string; why: string };
@@ -29,6 +30,19 @@ const OPS: { op: OpId; tex: string; name: string; meaning: string }[] = [
   { op: 'diff', tex: 'A \\setminus B', name: 'difference', meaning: 'the values in $A$ that are not in $B$' },
   { op: 'sym', tex: '(A \\cup B) \\setminus (A \\cap B)', name: 'symmetric difference', meaning: 'the values in exactly one of $A$ and $B$ (not in both)' },
 ];
+
+const ASKING: Record<OpId, string> = {
+  union: 'Which values are in $A$ or $B$ or both?',
+  inter: 'Which values are in both $A$ and $B$?',
+  diff: 'Which values are in $A$ but not in $B$?',
+  sym: 'Which values are in exactly one of $A$ and $B$?',
+};
+const USE_GROUPS: Record<OpId, string> = {
+  union: '$A \\cup B$ is the **union**: everything in $A$ or $B$ or both. So take all three groups and write each value once, because a set never holds repeats.',
+  inter: '$A \\cap B$ is the **intersection**: only the values in both sets. So keep the "in both" group and drop the rest.',
+  diff: '$A \\setminus B$ is the **difference**, and $\\setminus$ means "take away". So start with $A$ and remove anything also in $B$, which leaves the "only in $A$" group.',
+  sym: '$A \\cup B$ is all three groups, and $A \\cap B$ is the "in both" group. $\\setminus$ means "take away". So removing the second from the first leaves the two "only in" groups.',
+};
 
 function applyOp(op: OpId, A: number[], B: number[]): number[] {
   const sa = new Set(A);
@@ -78,17 +92,25 @@ function genSetOps(rng: Rng): GeneratedCore {
     const ds = pickDistinct(answer, cands);
     if (ds.length < 3) continue;
 
-    const solution =
-      `1. Values in both sets: ${setLit(sortNum(common))}. Only in $A$: ${setLit(sortNum(onlyA))}. Only in $B$: ${setLit(sortNum(onlyB))}.\n` +
-      `2. $${tex}$ is the ${name}: ${meaning}.\n\n` +
-      `Answer: ${answer}`;
+    const solution = steps(
+      'Sort the values into three groups:',
+      table(['Group', 'Values'], [
+        ['In both $A$ and $B$', sortNum(common).join(', ')],
+        ['Only in $A$', sortNum(onlyA).join(', ')],
+        ['Only in $B$', sortNum(onlyB).join(', ')],
+      ]),
+      USE_GROUPS[op],
+      `Written as a set, in order, the result is $${tex} = ${setTex(ans)}$.`,
+    );
     return {
       stem: `Let $A = ${setTex(A)}$ and $B = ${setTex(B)}$. Find $${tex}$.`,
       answer,
       answerValue: ans.join(','),
       distractors: ds.map((d) => ({ text: d.text, value: d.text, why: d.why })),
+      asking: ASKING[op],
       solution,
-      keyIdea: 'Union is either, intersection is both, difference is one-way (order matters) and symmetric difference is exactly one; sets never hold duplicates.',
+      conclusion: `The ${name} gives ${meaning}, so the answer is ${answer}.`,
+      keyIdea: 'Sort the values into three groups first: only in $A$, in both, only in $B$. Union is all three, intersection is the middle group, $A \\setminus B$ is the first group, and the symmetric difference is the two outer groups.',
     };
   }
 }
@@ -121,25 +143,27 @@ function genCounting(rng: Rng): GeneratedCore {
     const zeros = `[${values.map(() => 0).join(', ')}]`;
     const lines = [`A = [${items.join(', ')}]`, `C = ${zeros}`, 'for i = 1 to length(A)', '   C[A[i]] = C[A[i]] + 1', 'end for', `print(C[${t}])`];
     const running = values.map(() => 0);
-    const rows = items
-      .map((x, i) => {
-        running[x - 1]++;
-        return `| ${i + 1} | ${x} | \`[${running.join(', ')}]\` |`;
-      })
-      .join('\n');
-    const solution =
-      'Each element of `A` is used as an index into `C`, and that count goes up by 1.\n\n' +
-      `| i | A[i] | \`C\` afterwards |\n|---|---|---|\n${rows}\n\n` +
-      `So \`C[${t}]\` is ${c}, because ${t} appears ${c} times in \`A\`.\n\n` +
-      `Answer: ${answer}`;
+    const rows = items.map((x, i) => {
+      running[x - 1]++;
+      return [i + 1, x, `\`C[${x}] = C[${x}] + 1\``, ...running];
+    });
+    const solution = steps(
+      `\`C\` has ${k} positions, all starting at 0. \`C[1]\` counts how many 1s there are in \`A\`, \`C[2]\` counts the 2s, and so on.`,
+      `Line 4 looks complicated, so read it from the inside. \`A[i]\` is the current value, and \`C[A[i]]\` is the counter for that value. If \`A[i]\` is ${items[0]}, line 4 becomes \`C[${items[0]}] = C[${items[0]}] + 1\`, which adds 1 to that count.`,
+      'Trace every pass:',
+      table(['`i`', '`A[i]`', 'Line 4 becomes', ...values.map((v) => `\`C[${v}]\``)], rows),
+      `Line 6 prints only \`C[${t}]\`. Look in the \`C[${t}]\` column of the last row: it holds ${c}.`,
+    );
     return {
       stem: 'Arrays are indexed from 1. `C` counts how often each value appears in `A`. What does this pseudocode print?',
       code: { lang: 'pseudocode', source: lines.join('\n') },
       answer,
       answerValue: c,
       distractors: ds.map((x) => ({ text: x.text, value: Number(x.text), why: x.why })),
+      asking: `How many times does the value ${t} appear in \`A\`?`,
       solution,
-      keyIdea: 'A counting array uses each value as an index, just as a map counts by key.',
+      conclusion: `The value ${t} appears ${c} times in \`A\`, so \`C[${t}]\` holds the answer, ${answer}.`,
+      keyIdea: 'In a **counting array**, `C[v]` holds how many times `v` has appeared. Read `C[A[i]]` from the inside out. For a quick check, count how often the value appears in `A`.',
     };
   }
 }

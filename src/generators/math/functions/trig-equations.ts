@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, paren } from '../../../lib/tex';
 
@@ -17,6 +18,8 @@ function angTex(d: number, unit: Unit): string {
 }
 
 const QUAD_NAME = ['', 'first', 'second', 'third', 'fourth'];
+/** How the angle in each quadrant is built from the reference angle. */
+const QUAD_RULE = ['', 'the reference angle itself', 'a half turn minus the reference angle', 'a half turn plus the reference angle', 'a full turn minus the reference angle'];
 /** Quadrants where each function is positive (CAST). */
 const POS: Record<Fn, [number, number]> = { sin: [1, 2], cos: [1, 4], tan: [1, 3] };
 const NEG: Record<Fn, [number, number]> = { sin: [3, 4], cos: [2, 3], tan: [2, 4] };
@@ -102,7 +105,7 @@ export const generators: Generator[] = [
           ? `This ignores the minus sign: these angles solve ${m(`${F} = ${val.vTex}`)}, but here ${m(`${F} = ${kTex}`)}, so ${m(`\\${fn} x`)} must be **negative**.`
           : form === 'zero'
             ? `A sign slip when rearranging: these angles solve ${m(`${F} = -${val.vTex}`)}. Moving ${m(`-${val.b}`)} across the equals sign makes it positive.`
-            : `These are the angles in the quadrants where ${m(`\\${fn} x`)} is **negative**, but here ${m(`${F} = ${kTex}`)}, which is positive (check the CAST diagram).`,
+            : `These are the angles in the quadrants where ${m(`\\${fn} x`)} is **negative**, but here ${m(`${F} = ${kTex}`)}, which is positive.`,
       });
       pool.push({
         sols: [calc],
@@ -136,32 +139,35 @@ export const generators: Generator[] = [
         distractors.push({ text, value, why: d.why });
       }
 
-      const refFact =
-        fn === 'tan'
-          ? `${m(`\\tan ${angTex(ref, unit)} = ${val.vTex}`)}`
-          : `${m(`\\${fn} ${angTex(ref, unit)} = ${val.vTex}`)}`;
-      const steps: string[] = [];
-      if (form === 'zero' || val.a !== '') {
-        if (form === 'zero') steps.push(`Rearrange: ${m(`${lhs} = ${neg ? '-' : ''}${val.b}`)}.`);
-        if (val.a !== '') steps.push(`Divide by ${m(val.a)}: ${m(`${F} = ${kTex}`)}.`);
-      }
-      steps.push(`Reference (acute) angle: ${refFact}, so the reference angle is ${m(angTex(ref, unit))}.`);
-      steps.push(
-        `${m(`\\${fn} x`)} is **${sgnWord}**, so ${m('x')} lies in the ${QUAD_NAME[quads[0]]} and ${QUAD_NAME[quads[1]]} quadrants (CAST diagram).`,
+      const cap = (w: string) => w[0].toUpperCase() + w.slice(1);
+      const circle =
+        fn === 'sin'
+          ? `Sine is the height of a point on the unit circle (a circle of radius 1), so it is ${sgnWord} ${neg ? 'in the bottom half' : 'in the top half'}.`
+          : fn === 'cos'
+            ? `Cosine is the ${m('x')}-coordinate of a point on the unit circle (a circle of radius 1), so it is ${sgnWord} on the ${neg ? 'left' : 'right'} side.`
+            : `Tangent is sine divided by cosine, so it is ${sgnWord} where those two have ${neg ? 'different signs' : 'the same sign'}.`;
+      const inDegrees = unit === 'rad' ? ` (that is ${m(`\\${fn} ${ref}^\\circ`)})` : '';
+      const solution = steps(
+        form === 'zero' &&
+          `Get the ${m(`\\${fn} x`)} term alone. ${neg ? 'Subtract' : 'Add'} ${m(val.b)} ${neg ? 'from' : 'to'} both sides: ${m(`${lhs} = ${neg ? '-' : ''}${val.b}`)}.`,
+        val.a !== '' && `Divide both sides by ${m(val.a)} to get ${m(`\\${fn} x`)} alone: ${m(`${F} = ${kTex}`)}.`,
+        `${neg ? 'Ignore the minus for a moment and find' : 'Find'} the **reference angle**, the acute angle with the right size. ${m(`\\${fn} ${angTex(ref, unit)} = ${val.vTex}`)}${inDegrees}, so the reference angle is ${m(angTex(ref, unit))}.`,
+        `Now the sign. ${circle} That means the ${QUAD_NAME[quads[0]]} and ${QUAD_NAME[quads[1]]} quadrants.`,
+        `${cap(QUAD_NAME[quads[0]])} quadrant (${QUAD_RULE[quads[0]]}): ${quadWork(quads[0], ref, unit)}.`,
+        `${cap(QUAD_NAME[quads[1]])} quadrant (${QUAD_RULE[quads[1]]}): ${quadWork(quads[1], ref, unit)}.`,
       );
-      steps.push(`${QUAD_NAME[quads[0]][0].toUpperCase()}${QUAD_NAME[quads[0]].slice(1)} quadrant: ${quadWork(quads[0], ref, unit)}.`);
-      steps.push(`${QUAD_NAME[quads[1]][0].toUpperCase()}${QUAD_NAME[quads[1]].slice(1)} quadrant: ${quadWork(quads[1], ref, unit)}.`);
-      steps.push(`Both are inside ${interval}, and adding a full turn would take them outside it.`);
       return {
         stem: `Solve ${m(eqTex)} for ${interval}.`,
         answer,
         answerValue: ansVal,
         distractors,
-        solution:
-          `Get ${m(`\\${fn} x`)} on its own, find the reference angle, then use the sign of ${m(`\\${fn} x`)} (CAST) to decide which two quadrants the solutions are in.\n\n` +
-          steps.map((s, i) => `${i + 1}. ${s}`).join('\n') +
-          `\n\nAnswer: ${answer}`,
-        keyIdea: `Find the reference angle, then use the sign of ${m(`\\${fn} x`)} (CAST) to place the solutions in the right two quadrants.`,
+        asking: `Which angles in one full turn make this equation true?`,
+        solution,
+        conclusion: `Both angles are in the interval, and another full turn would leave it, so the answer is ${answer}.`,
+        keyIdea:
+          unit === 'deg'
+            ? `Get the function alone, find the reference angle ${m('\\alpha')} from the size, then use the sign to pick two quadrants. The angles are: first ${m('\\alpha')}, second ${m('180^\\circ - \\alpha')}, third ${m('180^\\circ + \\alpha')}, fourth ${m('360^\\circ - \\alpha')}.`
+            : `Get the function alone, find the reference angle ${m('\\alpha')} from the size, then use the sign to pick two quadrants. The angles are: first ${m('\\alpha')}, second ${m('\\pi - \\alpha')}, third ${m('\\pi + \\alpha')}, fourth ${m('2\\pi - \\alpha')}.`,
       };
     },
   },
@@ -227,23 +233,33 @@ export const generators: Generator[] = [
       }
 
       const sq = (f: Frac) => `\\left(${f.tex()}\\right)^{2}`;
-      const lines: string[] = [];
-      lines.push(
-        `Find ${m(`\\${other}\\theta`)} with ${m('\\sin^2\\theta + \\cos^2\\theta = 1')}: ${m(`\\${other}^2\\theta = 1 - ${sq(gV)} = 1 - ${gV.mul(gV).tex()} = ${oSq.tex()}`)}, so ${m(`\\${other}\\theta = \\pm ${oAbs.tex()}`)}.`,
-      );
-      lines.push(`In the ${QUAD_NAME[q]} quadrant (${m(QUAD_RANGE[q])}) ${m(`\\${other}\\theta`)} is ${oSignWord}, so ${m(`\\${other}\\theta = ${oV.tex()}`)}.`);
-      if (ask === 'tan') lines.push(`${m(`\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta} = ${sinV.tex()} \\div ${paren(cosV)} = ${tanV.tex()}`)}.`);
+      const gSq = gV.mul(gV);
+      const whole = hyp * hyp;
+      const signReason =
+        other === 'sin'
+          ? `Sine is the height on the unit circle (a circle of radius 1), and the point is ${sSign > 0 ? 'above' : 'below'} the ${m('x')}-axis there`
+          : `Cosine is the ${m('x')}-coordinate on the unit circle (a circle of radius 1), and the point is ${cSign > 0 ? 'to the right of' : 'to the left of'} the ${m('y')}-axis there`;
       const answer = m(ans.tex());
+      const solution = steps(
+        ask === 'tan'
+          ? `We need both sine and cosine, because ${m('\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta}')}. We are given ${m(`\\${given}\\theta`)}, so find ${m(`\\${other}\\theta`)} with the identity ${m('\\sin^2\\theta + \\cos^2\\theta = 1')}. Here ${m('\\sin^2\\theta')} means ${m('\\sin\\theta')} multiplied by itself.`
+          : `The link between sine and cosine is the identity ${m('\\sin^2\\theta + \\cos^2\\theta = 1')}, which is true for every angle. Here ${m('\\sin^2\\theta')} means ${m('\\sin\\theta')} multiplied by itself.`,
+        `Substitute the known value: ${m(given === 'sin' ? `${sq(gV)} + \\cos^2\\theta = 1` : `\\sin^2\\theta + ${sq(gV)} = 1`)}. Squaring gives ${m(gSq.tex())}.`,
+        `Subtract ${m(gSq.tex())} from both sides, writing 1 as a fraction: ${m(`\\${other}^2\\theta = \\frac{${whole}}{${whole}} - ${gSq.tex()} = ${oSq.tex()}`)}.`,
+        `Take the square root of both sides. Both signs are possible for now: ${m(`\\${other}\\theta = \\pm ${oAbs.tex()}`)}.`,
+        `Choose the sign from the quadrant. ${m(QUAD_RANGE[q])} is the ${QUAD_NAME[q]} quadrant. ${signReason}. So ${m(`\\${other}\\theta = ${oV.tex()}`)}.`,
+        ask === 'tan' &&
+          `Divide: ${m(`\\tan\\theta = ${sinV.tex()} \\div ${paren(cosV)}`)}. Both fractions have ${m(String(hyp))} on the bottom, so these cancel, which leaves ${m(tanV.tex())}.`,
+      );
       return {
         stem: `Given that ${m(`\\${given}\\theta = ${gV.tex()}`)} and ${m(QUAD_RANGE[q])}, find the exact value of ${m(askTex)}.`,
         answer,
         answerValue: ans.value(),
         distractors,
-        solution:
-          `Start by finding the missing ratio ${m(`\\${other}\\theta`)} from ${m('\\sin^2\\theta + \\cos^2\\theta = 1')}, and choose its sign from the quadrant.\n\n` +
-          lines.map((s, i) => `${i + 1}. ${s}`).join('\n') +
-          `\n\nAnswer: ${answer}`,
-        keyIdea: 'Get the missing ratio from $\\sin^2\\theta + \\cos^2\\theta = 1$, choose its sign from the quadrant, then apply the identity you need.',
+        asking: `We know ${m(`\\${given}\\theta`)} and which quadrant ${m('\\theta')} is in. What is ${m(askTex)}?`,
+        solution,
+        conclusion: `The identity gives the size and the ${QUAD_NAME[q]} quadrant gives the sign, so the answer is ${answer}.`,
+        keyIdea: 'Given one ratio and the quadrant, find the other ratio with $\\sin^2\\theta + \\cos^2\\theta = 1$, choose its sign from the quadrant, then use $\\tan\\theta = \\frac{\\sin\\theta}{\\cos\\theta}$ if the question needs it.',
       };
     },
   },

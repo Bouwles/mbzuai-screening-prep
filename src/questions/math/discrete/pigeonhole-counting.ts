@@ -38,17 +38,19 @@ export const questions: StaticQuestion[] = [
     options: ['$13$', '$72$', '$24$', '$286$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many ways can you pick one starter, one main and one dessert?',
       solution:
-        'You choose a starter **and** a main **and** a dessert, so use the **product rule**: multiply the number of choices at each stage.\n\n' +
-        '$$4 \\times 6 \\times 3 = 72$$\n\n' +
-        'Each of the 4 starters can be paired with each of the 6 mains ($4 \\times 6 = 24$ pairs), and each pair can be finished with any of the 3 desserts ($24 \\times 3 = 72$).',
+        'A meal needs a starter **and** a main **and** a dessert. These are separate decisions made one after another.\n\n' +
+        'Each of the 4 starters can go with any of the 6 mains, which makes $4 \\times 6 = 24$ starter-main pairs.\n\n' +
+        'Each of these 24 pairs can go with any of the 3 desserts: $24 \\times 3 = 72$.',
+      conclusion: 'Three separate choices multiply, and $4 \\times 6 \\times 3$ is $72$.',
       whyWrong: [
         'This is $4 + 6 + 3$: adding is the sum rule, which is for choosing **one** dish from any category ("or"). A meal needs a starter **and** a main **and** a dessert, so you multiply.',
         null,
         'This is $4 \\times 6$: it counts starter-main pairs but forgets to multiply by the 3 choices of dessert.',
         'This is $\\binom{13}{3}$, choosing any 3 dishes out of all 13. That would allow meals such as three desserts, and it ignores the one-from-each-course structure.',
       ],
-      keyIdea: 'For a choice made in stages ("this AND that"), multiply the number of options at each stage.',
+      keyIdea: 'Use the **product rule** for choices made in stages, joined by "and": multiply the number of options at each stage. If the words say "or" (one choice from several groups), add instead.',
     },
     check: {
       optionValues: [13, 72, 24, 286],
@@ -67,16 +69,19 @@ export const questions: StaticQuestion[] = [
     options: ['$105$', '$3$', '$455$', '$15$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many books could be the single book you pick?',
       solution:
-        'You pick **one** book, which is a novel **or** a comic **or** a textbook. The three groups do not overlap, so use the **sum rule**: add.\n\n' +
-        '$$5 + 7 + 3 = 15$$',
+        'You are taking just one book. So you are choosing a novel **or** a comic **or** a textbook, not one of each.\n\n' +
+        'The groups don\'t overlap and all the books are different, so each book is one possible choice. We just count the books. This is the **sum rule**.\n\n' +
+        'Add the groups: $5 + 7 + 3 = 15$.',
+      conclusion: 'Each of the 15 books is one possible choice, so there are $15$ ways.',
       whyWrong: [
         'This is $5 \\times 7 \\times 3$: the product rule counts choosing one novel **and** one comic **and** one textbook (three books). You may only take one book, so you add.',
         'This counts the 3 **categories**, not the books. Each category contains several different books, and each book is a separate choice.',
         'This is $\\binom{15}{3}$, the number of ways to choose **three** books from 15. Only one book is allowed.',
         null,
       ],
-      keyIdea: 'For a single choice from separate groups ("this OR that"), add the sizes of the groups.',
+      keyIdea: 'Use the **sum rule** for one choice from separate groups ("or"): add the group sizes. Use the product rule when you pick from every group ("and").',
     },
     check: { optionValues: [105, 3, 455, 15], compute: () => sumOf([5, 7, 3]) },
   },
@@ -88,18 +93,19 @@ export const questions: StaticQuestion[] = [
     options: ['$13$', '$12$', '$24$', '$7$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many people do you need before two must share a birth month?',
       solution:
-        'Think of the 12 months as 12 **boxes** (pigeonholes) and the people as **objects** (pigeons).\n\n' +
-        '- With 12 people it is still possible that every person has a different month (one per box), so 12 is **not** enough.\n' +
-        '- With 13 people, the 12 boxes cannot each hold at most one person ($12 < 13$), so some month must contain at least two people.\n\n' +
-        'Pigeonhole principle: $12 + 1 = 13$.',
+        'The word "guarantee" means we look at the worst case: people being as different as possible. There are 12 months.\n\n' +
+        'In the worst case, 12 people could all be born in different months, one per month. So 12 people aren\'t enough to be sure.\n\n' +
+        'Now add one more person. Their month must be one that is already taken, so two people share a month. That makes $12 + 1 = 13$ people.',
+      conclusion: '12 people might all differ, but one more forces a match, so the smallest number is $13$.',
       whyWrong: [
         null,
         'With 12 people, each could be born in a different month, so a shared month is not guaranteed. You need one more person than there are months.',
         'This is $2 \\times 12$. 24 people would certainly include two with the same month, but so would 13, so 24 is not the **smallest** number.',
         'This halves the 12 months and adds 1. There is no reason to halve: 7 people can easily all have different months.',
       ],
-      keyIdea: 'Pigeonhole principle: with $n$ boxes, $n + 1$ objects force at least one box to hold two.',
+      keyIdea: 'This is the **pigeonhole principle**: with $n$ boxes, you need $n + 1$ objects to force two into the same box. For a guarantee, build the worst case first, then add one.',
     },
     check: { optionValues: [13, 12, 24, 7], compute: () => minToForce(12, 2) },
   },
@@ -111,18 +117,19 @@ export const questions: StaticQuestion[] = [
     options: ['$90$', '$100$', '$45$', '$9$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many different pairs can be made from 10 people?',
       solution:
-        'A handshake is a **pair** of people, and the order does not matter (Ali shaking Bea is the same as Bea shaking Ali).\n\n' +
-        '- Each of the 10 people shakes 9 hands: $10 \\times 9 = 90$.\n' +
-        '- But this counts every handshake **twice** (once for each person in it), so divide by 2.\n\n' +
-        '$$\\binom{10}{2} = \\frac{10 \\times 9}{2} = 45$$',
+        'Each handshake involves one pair of people, so we want the number of pairs.\n\n' +
+        'Each of the 10 people shakes hands with the other 9. Counting from each person\'s point of view gives $10 \\times 9 = 90$.\n\n' +
+        'But Ali shaking Bea\'s hand is the same handshake as Bea shaking Ali\'s, so every handshake was counted twice. Halve the total: $90 \\div 2 = 45$.',
+      conclusion: 'Counting from each person gives 90, and every handshake is counted twice, so there are $45$ handshakes.',
       whyWrong: [
         'This is $10 \\times 9$: it counts every handshake twice, once from each person\'s point of view. Divide by 2.',
         'This is $10^2$: it lets people shake their own hand and also counts each handshake twice.',
         null,
         'This is the number of handshakes made by **one** person, not the total for the whole group.',
       ],
-      keyIdea: 'The number of pairs from $n$ people is $\\binom{n}{2} = \\frac{n(n-1)}{2}$; divide by 2 because each pair is counted from both ends.',
+      keyIdea: 'Whenever each pair from a group appears once (handshakes, matches, lines between points), use $\\frac{n(n-1)}{2}$, where $n$ is the size of the group. This is also written $\\binom{n}{2}$.',
     },
     check: {
       optionValues: [90, 100, 45, 9],
@@ -141,17 +148,19 @@ export const questions: StaticQuestion[] = [
     options: ['$5040$', '$6561$', '$40$', '$10\\,000$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many 4-digit codes can be made when digits may repeat?',
       solution:
-        'There are 4 positions and each one can be any of the 10 digits, independently of the others. By the product rule:\n\n' +
-        '$$10 \\times 10 \\times 10 \\times 10 = 10^4 = 10\\,000$$\n\n' +
-        '(Check: the PINs are exactly 0000, 0001, ..., 9999, which is 10 000 codes.)',
+        'There are 10 possible digits, 0 to 9, and 0 counts too. A PIN has 4 positions to fill, one after another.\n\n' +
+        'Digits may repeat, so each position still has all 10 choices, whatever was picked before.\n\n' +
+        'The positions are separate decisions, so multiply: $10 \\times 10 \\times 10 \\times 10 = 10^4 = 10\\,000$.',
+      conclusion: 'Four positions with 10 choices each give $10\\,000$ PINs.',
       whyWrong: [
         'This is $10 \\times 9 \\times 8 \\times 7$, which forbids repeated digits. The question says digits may repeat.',
         'This is $9^4$: it forgets that 0 is a digit too, so there are 10 choices per position, not 9.',
         'This is $10 \\times 4$: it multiplies the number of digits by the number of positions. Each position multiplies the count by 10, so you need $10^4$.',
         null,
       ],
-      keyIdea: 'With repetition allowed, $k$ positions each with $n$ choices give $n^k$ codes.',
+      keyIdea: 'For codes with repeats allowed, the count is $c^k$, where $c$ is the choices per position and $k$ is the number of positions. Without repeats, the choices drop by one each time, as in $10 \\times 9 \\times 8 \\times 7$.',
     },
     check: {
       optionValues: [5040, 6561, 40, 10000],
@@ -171,18 +180,20 @@ export const questions: StaticQuestion[] = [
     options: ['$15\\,600\\,000$', '$17\\,576\\,000$', '$11\\,232\\,000$', '$2\\,600\\,000$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many plates have 3 different letters, followed by any 3 digits?',
       solution:
-        'Fill the six positions one at a time and multiply (product rule).\n\n' +
-        '- Letters, no repeats: $26 \\times 25 \\times 24 = 15\\,600$ (each letter used leaves one fewer).\n' +
-        '- Digits, repeats allowed: $10 \\times 10 \\times 10 = 1000$.\n\n' +
-        '$$15\\,600 \\times 1000 = 15\\,600\\,000$$',
+        'A plate is filled one position at a time, so we multiply the choices at each position. This is the **product rule**.\n\n' +
+        'The letters must all be different, so the choices fall by 1 each time: 26 for the first letter, 25 for the second, 24 for the third. $26 \\times 25 \\times 24 = 15\\,600$.\n\n' +
+        'The digits may repeat, so each of the three digits has 10 choices: $10 \\times 10 \\times 10 = 1000$.\n\n' +
+        'Each block of letters can pair with each block of digits, so multiply: $15\\,600 \\times 1000 = 15\\,600\\,000$.',
+      conclusion: 'Three different letters then any three digits gives $15\\,600 \\times 1000$, which is $15\\,600\\,000$ plates.',
       whyWrong: [
         null,
         'This is $26^3 \\times 1000$: it allows repeated letters such as AAB. The letters must all be different, so the choices drop to 25 and then 24.',
         'This is $15\\,600 \\times 10 \\times 9 \\times 8$: it also forbids repeated digits, but the question allows the digits to repeat.',
         'This is $\\binom{26}{3} \\times 1000$: choosing the letters as a **set** treats ABC and CBA as the same plate. On a plate the order matters, so use $26 \\times 25 \\times 24$.',
       ],
-      keyIdea: 'Multiply position by position: "no repeats" makes the choices shrink by one each time, "repeats allowed" keeps them the same.',
+      keyIdea: 'Fill the positions one at a time and write the choices above each. Repeats allowed: the same number each time. No repeats: reduce by one each time. Then multiply them all.',
     },
     check: { optionValues: [15600000, 17576000, 11232000, 2600000], compute: () => nPr(26, 3) * 10 ** 3 },
   },
@@ -194,19 +205,20 @@ export const questions: StaticQuestion[] = [
     options: ['$50$', '$40$', '$45$', '$80$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many numbers from 1 to 120 are multiples of 4 or 6?',
       solution:
-        'Use **inclusion-exclusion**: $|A \\cup B| = |A| + |B| - |A \\cap B|$.\n\n' +
-        '- Multiples of 4 up to 120: $\\frac{120}{4} = 30$.\n' +
-        '- Multiples of 6 up to 120: $\\frac{120}{6} = 20$.\n' +
-        '- Divisible by **both** 4 and 6 means divisible by $\\text{lcm}(4, 6) = 12$: $\\frac{120}{12} = 10$. These were counted twice above.\n\n' +
-        '$$30 + 20 - 10 = 40$$',
+        'Count the multiples of each number by dividing. Multiples of 4: $120 \\div 4 = 30$. Multiples of 6: $120 \\div 6 = 20$.\n\n' +
+        'Numbers such as 12, 24 and 36 are multiples of both, so they have been counted twice. A number divisible by both 4 and 6 is a multiple of their lowest common multiple, or LCM (the smallest number both divide into), which is 12.\n\n' +
+        'Multiples of 12: $120 \\div 12 = 10$.\n\n' +
+        'This is **inclusion-exclusion**: add the two groups, then take off the overlap once. $30 + 20 - 10 = 40$.',
+      conclusion: 'The overlap of 10 was counted twice, so removing one copy from 50 gives $40$.',
       whyWrong: [
         'This is $30 + 20$: numbers such as 12, 24 and 36 are multiples of both 4 and 6, so they are counted twice. Subtract the 10 multiples of 12 once.',
         null,
         'This is $30 + 20 - 5$, using $4 \\times 6 = 24$ for "divisible by both". But 12 is divisible by both 4 and 6 and is not a multiple of 24: "both" means a multiple of the **lowest common multiple**, 12.',
         'This is $120 - 40$, the count of numbers divisible by **neither** 4 nor 6.',
       ],
-      keyIdea: 'Inclusion-exclusion: add the two counts, then subtract the overlap (multiples of the LCM) once.',
+      keyIdea: 'For "divisible by $a$ or $b$": count the multiples of $a$, add the multiples of $b$, then subtract the multiples of their LCM. Count multiples by dividing the limit and rounding down.',
     },
     check: { optionValues: [50, 40, 45, 80], compute: () => countUpTo(120, (x) => x % 4 === 0 || x % 6 === 0) },
   },
@@ -218,18 +230,20 @@ export const questions: StaticQuestion[] = [
     options: ['$4000$', '$6561$', '$2916$', '$3439$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many 4-digit codes contain a 7 somewhere?',
       solution:
-        '"At least one" is easiest by **complementary counting**: count everything, then subtract the codes with **no** 7.\n\n' +
-        '- All codes: $10^4 = 10\\,000$.\n' +
-        '- Codes with no 7: each position has 9 choices, so $9^4 = 6561$.\n\n' +
-        '$$10\\,000 - 6561 = 3439$$',
+        '"At least one 7" covers many cases: one 7, two 7s, and so on. It is easier to count the opposite, codes with **no** 7, and subtract from the total. This is called **complementary counting**.\n\n' +
+        'Total codes: 4 positions with 10 choices each, so $10^4 = 10\\,000$.\n\n' +
+        'Codes with no 7: each position can use any digit except 7, which is 9 choices. So $9 \\times 9 \\times 9 \\times 9 = 9^4 = 6561$.\n\n' +
+        'Every code either has no 7 or at least one 7. So subtract: $10\\,000 - 6561 = 3439$.',
+      conclusion: 'Of the $10\\,000$ codes, 6561 avoid 7, which leaves $3439$ with at least one.',
       whyWrong: [
         'This is $4 \\times 1000$: it puts a 7 in one chosen position and lets the other three be anything. A code such as 7707 then gets counted several times (once for each 7), so the total is too big.',
         'This is $9^4$, the number of codes with **no** 7 at all. You still need to subtract it from the 10 000 total.',
         'This is $4 \\times 9^3$, the codes with **exactly one** 7. It misses codes with two or more 7s, such as 7717.',
         null,
       ],
-      keyIdea: 'At least one = total minus none.',
+      keyIdea: 'When you spot "at least one", use total $-$ none. Count the total and the codes avoiding the item, then subtract. Counting a 7 in each position and adding double counts codes with two or more 7s.',
     },
     check: {
       optionValues: [4000, 6561, 2916, 3439],
@@ -248,17 +262,20 @@ export const questions: StaticQuestion[] = [
     options: ['$15$', '$256$', '$56$', '$336$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many ways can you order 5 right moves and 3 up moves?',
       solution:
-        'Every shortest route uses exactly 5 right steps (R) and 3 up steps (U): 8 steps in total, for example RRURRURU.\n\n' +
-        'A route is decided completely by **which 3 of the 8 steps are U**. So the number of routes is\n\n' +
-        '$$\\binom{8}{3} = \\frac{8 \\times 7 \\times 6}{3 \\times 2 \\times 1} = \\frac{336}{6} = 56$$',
+        'Going from $(0, 0)$ to $(5, 3)$ takes exactly 5 right moves (R) and 3 up moves (U). Any shortest route has exactly these, which makes 8 moves in total.\n\n' +
+        'So a route is just a word such as RRURRUUR, made of 5 Rs and 3 Us. Different orders are different routes.\n\n' +
+        'To write such a word, choose which 3 of the 8 positions hold a U. The other positions must be R. So we want the number of ways to choose 3 from 8.\n\n' +
+        '$\\binom{8}{3}$ means the number of ways to choose 3 items from 8 when order doesn\'t matter. $\\binom{8}{3} = \\frac{8 \\times 7 \\times 6}{3 \\times 2 \\times 1} = \\frac{336}{6} = 56$.',
+      conclusion: 'Choosing where the 3 up moves go among the 8 moves gives $56$ routes.',
       whyWrong: [
         'This is $5 \\times 3$: multiplying the side lengths of the grid does not count routes.',
         'This is $2^8$: it treats every step as a free choice of R or U. But a shortest route must contain **exactly** 5 R and 3 U, so most of those $2^8$ sequences miss the target.',
         null,
         'This is $8 \\times 7 \\times 6$: it treats the three U steps as different from each other. They are identical, so divide by $3! = 6$.',
       ],
-      keyIdea: 'Shortest grid routes with $m$ rights and $n$ ups: choose the positions of the ups, $\\binom{m+n}{n}$.',
+      keyIdea: 'For grid routes moving only right and up: total moves $=$ right $+$ up, then routes $= \\binom{\\text{total}}{\\text{up}}$. You choose which moves are up, and the rest are right.',
     },
     check: { optionValues: [15, 256, 56, 336], compute: () => gridRoutes(0, 0, 5, 3) },
   },
@@ -270,19 +287,19 @@ export const questions: StaticQuestion[] = [
     options: ['$7$', '$2$', '$43$', '$8$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is the biggest group size that must share a weekday among 50 students?',
       solution:
-        'Boxes: the 7 days of the week. Objects: 50 students. Spread them as evenly as possible to keep every day small.\n\n' +
-        '- 7 students on each day uses $7 \\times 7 = 49$ students.\n' +
-        '- The 50th student must go on a day that already has 7, making 8.\n\n' +
-        'So some day **must** have at least 8. We cannot guarantee 9, because the spread 8, 7, 7, 7, 7, 7, 7 (total 50) has no day with 9.\n\n' +
-        'Generalised pigeonhole principle: $\\left\\lceil \\frac{50}{7} \\right\\rceil = \\lceil 7.14\\ldots \\rceil = 8$.',
+        'There are 7 days and 50 students to place into them. To find what **must** happen, spread the students as evenly as possible. That is the worst case, with no day getting more than necessary.\n\n' +
+        'Give each day 7 students. That uses $7 \\times 7 = 49$ students, with one student left over.\n\n' +
+        'The 50th student must join some day, making $7 + 1 = 8$ on that day. In this even spread no day has more than 8, so 9 can\'t be guaranteed.',
+      conclusion: 'An even spread still forces 8 on one day and never forces 9, so the largest $n$ is $8$.',
       whyWrong: [
         'This rounds $\\frac{50}{7} \\approx 7.14$ **down**. Seven per day only accounts for 49 students; the 50th forces an eighth on some day, so round **up**.',
         'Two students sharing a day is certainly true, but it is not the **largest** number we can guarantee.',
         'This is $50 - 7$. Subtracting the number of days from the number of students has no meaning here.',
         null,
       ],
-      keyIdea: 'Generalised pigeonhole: $N$ objects in $k$ boxes force some box to hold at least $\\left\\lceil \\frac{N}{k} \\right\\rceil$.',
+      keyIdea: 'General pigeonhole: with $N$ objects in $k$ boxes, some box has at least $\\frac{N}{k}$ rounded **up**. Here $\\frac{50}{7} \\approx 7.14$, which rounds up to 8.',
     },
     check: {
       optionValues: [7, 2, 43, 8],
@@ -303,18 +320,19 @@ export const questions: StaticQuestion[] = [
     options: ['$15$', '$10$', '$11$', '$6$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many socks guarantee three of one colour?',
       solution:
-        'Imagine the **worst case**: you are as unlucky as possible and avoid three of a colour for as long as you can.\n\n' +
-        '- You can take 2 socks of every colour without having 3 of any: $5 \\times 2 = 10$ socks.\n' +
-        '- The next sock (the 11th) must match one of the colours you already hold twice, making 3.\n\n' +
-        '$$5 \\times (3 - 1) + 1 = 11$$',
+        '"Certain" means we look at the worst case: taking as many socks as possible without getting three of a colour.\n\n' +
+        'The most you can have without three of a colour is 2 of each colour. With 5 colours, that is $2 \\times 5 = 10$ socks.\n\n' +
+        'The next sock must be one of those 5 colours, and that colour already has 2. So it makes three. That is $10 + 1 = 11$ socks.',
+      conclusion: '10 socks can still avoid three of a colour, but the next sock can\'t, so the minimum is $11$.',
       whyWrong: [
         'This is $5 \\times 3$. 15 socks do guarantee three of a colour, but fewer are enough: the worst case only holds 2 of each colour (10 socks) before the next sock completes a set of three.',
         'Ten socks could be exactly 2 of each of the 5 colours, with no three the same. This is the worst case itself; you need one more sock.',
         null,
         'This is $5 + 1$, which guarantees a **pair** (two of a colour), not three.',
       ],
-      keyIdea: 'To force $r$ objects in one of $k$ boxes, take $k(r-1) + 1$: fill every box to $r - 1$, then add one more.',
+      keyIdea: 'To guarantee $r$ of one kind with $k$ kinds, the worst case holds $r - 1$ of each, so take $k(r - 1) + 1$. Spot it from "minimum" together with "certain" or "guarantee".',
     },
     check: { optionValues: [15, 10, 11, 6], compute: () => minToForce(5, 3) },
   },
@@ -326,18 +344,20 @@ export const questions: StaticQuestion[] = [
     options: ['$7$', '$0$', '$33$', '$14$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many of the 40 students study neither subject?',
       solution:
-        'First count the students who study **at least one** subject, using inclusion-exclusion:\n\n' +
-        '$$22 + 18 - 7 = 33$$\n\n' +
-        '(The 7 who study both are inside the 22 **and** inside the 18, so they were counted twice; subtract them once.)\n\n' +
-        'Neither $= 40 - 33 = 7$.',
+        'Picture two overlapping circles, Physics and Chemistry. The students who study neither sit outside both. So first find how many are inside.\n\n' +
+        'Adding the subjects gives $22 + 18 = 40$, but that counts the 7 who study both twice.\n\n' +
+        'Take one copy of them off: $22 + 18 - 7 = 33$. So 33 students study at least one subject.\n\n' +
+        'The rest study neither: $40 - 33 = 7$.',
+      conclusion: '33 of the 40 students are inside the circles, so $7$ study neither.',
       whyWrong: [
         null,
         'This is $40 - 22 - 18$: it forgets that the 7 students who study both were counted in both the 22 and the 18, so it subtracts them twice.',
         'This is the number who study **at least one** of the subjects. The question asks for neither, so subtract it from 40.',
         'This is $40 - 26$, where $26 = 15 + 11$ is the number who study **exactly one** subject. It wrongly lumps the 7 students who study both in with the "neither" group.',
       ],
-      keyIdea: 'Neither $= \\text{total} - (|A| + |B| - |A \\cap B|)$.',
+      keyIdea: 'Neither $=$ total $-$ (first $+$ second $-$ both). Don\'t be fooled when the first two numbers add up to the total, because the overlap has been counted twice.',
     },
     check: {
       optionValues: [7, 0, 33, 14],
@@ -359,20 +379,20 @@ export const questions: StaticQuestion[] = [
     options: ['$45$', '$35$', '$70$', '$25$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many lines join two corners of a 10-sided shape without being a side?',
       solution:
-        'A **diagonal** joins two vertices that are not next to each other.\n\n' +
-        'Any two of the 10 vertices can be joined by a line segment, and the order of the two vertices does not matter:\n\n' +
-        '$$\\binom{10}{2} = \\frac{10 \\times 9}{2} = 45 \\text{ segments}$$\n\n' +
-        'Of these, 10 are the **sides** of the decagon (adjacent vertices), not diagonals.\n\n' +
-        'Diagonals $= 45 - 10 = 35$.\n\n' +
-        'Check with the other method: each vertex joins to $10 - 3 = 7$ others by a diagonal (not itself, not its 2 neighbours), giving $\\frac{10 \\times 7}{2} = 35$.',
+        'A **diagonal** joins two corners of a polygon that aren\'t next to each other. A side isn\'t a diagonal.\n\n' +
+        'Stand at one corner. There are 9 other corners, and 2 of them are neighbours joined by sides. That leaves $9 - 2 = 7$ corners you can draw a diagonal to.\n\n' +
+        'Do this from all 10 corners: $10 \\times 7 = 70$.\n\n' +
+        'Each diagonal has two ends, so it was counted twice. Halve the count: $70 \\div 2 = 35$.',
+      conclusion: 'Each of the 10 corners has 7 diagonals, and each diagonal is shared by two corners, so there are $35$.',
       whyWrong: [
         'This is $\\binom{10}{2}$, every segment between two vertices. It includes the 10 sides, which are not diagonals.',
         null,
         'This is $10 \\times 7$: each diagonal has two ends, so it is counted twice. Divide by 2.',
         'This is $45 - 20$: it subtracts each side twice. There are only 10 sides, so subtract 10.',
       ],
-      keyIdea: 'Count all pairs of vertices with $\\binom{n}{2}$, then remove the $n$ sides.',
+      keyIdea: 'A polygon with $n$ sides has $\\frac{n(n-3)}{2}$ diagonals: each corner has $n - 3$ diagonals, then halve for double counting. Another way: all pairs of corners minus the sides, $\\frac{n(n-1)}{2} - n$.',
     },
     check: {
       optionValues: [45, 35, 70, 25],
@@ -396,18 +416,20 @@ export const questions: StaticQuestion[] = [
     options: ['$750$', '$625$', '$78\\,125$', '$180$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many codes are there of length 3 or length 4?',
       solution:
-        'Split into the two separate cases, count each with the product rule, then **add** (a code has 3 symbols **or** 4 symbols, never both).\n\n' +
-        '- 3 symbols: $5^3 = 125$\n' +
-        '- 4 symbols: $5^4 = 625$\n\n' +
-        '$$125 + 625 = 750$$',
+        'A code has length 3 **or** length 4, never both. So count each length separately and add. This is the **sum rule**.\n\n' +
+        'Length 3: each of the 3 positions has 5 choices, since symbols may repeat. $5 \\times 5 \\times 5 = 5^3 = 125$.\n\n' +
+        'Length 4: each of the 4 positions has 5 choices. $5 \\times 5 \\times 5 \\times 5 = 5^4 = 625$.\n\n' +
+        'Add the two cases: $125 + 625 = 750$.',
+      conclusion: '125 shorter codes and 625 longer codes make $750$ altogether.',
       whyWrong: [
         null,
         'This is $5^4$: it only counts the codes of length 4 and forgets the 125 codes of length 3.',
         'This is $125 \\times 625$: the product rule is for doing one thing **and then** another. A code has length 3 **or** length 4, so the cases are added.',
         'This is $5 \\times 4 \\times 3 + 5 \\times 4 \\times 3 \\times 2 = 60 + 120$: it forbids using a symbol twice, but repeats are allowed.',
       ],
-      keyIdea: 'Split into non-overlapping cases, count each with the product rule, and add the cases.',
+      keyIdea: 'Split the problem into cases when the words say "or", such as different lengths. Use the product rule inside each case, then add the cases.',
     },
     check: {
       optionValues: [750, 625, 78125, 180],
@@ -427,18 +449,20 @@ export const questions: StaticQuestion[] = [
     options: ['$11$', '$33$', '$9$', '$12$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many people produce exactly 66 handshakes?',
       solution:
-        'With $n$ people the number of handshakes is $\\binom{n}{2} = \\frac{n(n-1)}{2}$. Set this equal to 66:\n\n' +
-        '$$\\frac{n(n-1)}{2} = 66 \\quad\\Rightarrow\\quad n(n-1) = 132 \\quad\\Rightarrow\\quad n^2 - n - 132 = 0$$\n\n' +
-        'Factorise: $(n - 12)(n + 11) = 0$, so $n = 12$ (a number of people cannot be negative).\n\n' +
-        'Check: $\\frac{12 \\times 11}{2} = 66$. Quicker in the exam: try the options in $\\frac{n(n-1)}{2}$.',
+        'Let $n$ be the number of people. Each person shakes $n - 1$ hands, because you don\'t shake your own. So counting person by person gives $n(n-1)$.\n\n' +
+        'Each handshake was counted twice, once for each person, so the real total is $\\frac{n(n-1)}{2}$.\n\n' +
+        'Set this equal to 66: $\\frac{n(n-1)}{2} = 66$. Multiply both sides by 2: $n(n-1) = 132$.\n\n' +
+        'Find two whole numbers in a row that multiply to 132. Since $11^2 = 121$ is close, try 11 and 12: $12 \\times 11 = 132$. So $n$ is the larger number, 12.',
+      conclusion: 'Check: $\\frac{12 \\times 11}{2} = 66$ handshakes, so there were $12$ people.',
       whyWrong: [
         'This solves $\\frac{n(n+1)}{2} = 66$. With $n$ people, the first person shakes $n - 1$ hands, the next $n - 2$ new hands, and so on, so the total is $\\frac{n(n-1)}{2}$, not $\\frac{n(n+1)}{2}$. Check: 11 people give only $\\frac{11 \\times 10}{2} = 55$ handshakes.',
         'This is $66 \\div 2$. The number of handshakes grows like $n^2$, not in proportion to $n$, so you cannot just halve: 33 people would make 528 handshakes.',
         'This comes from $n(n-1) = 66$, forgetting to divide by 2; that gives $n \\approx 8.6$, rounded to 9. A non-whole answer is a sign the equation is wrong. 9 people make only 36 handshakes.',
         null,
       ],
-      keyIdea: 'Handshakes among $n$ people: $\\frac{n(n-1)}{2}$; to work backwards, solve the quadratic or test the options.',
+      keyIdea: 'To reverse a handshake count, double it and find two neighbouring whole numbers with that product. The larger is $n$. Start from a number whose square is close to the doubled count.',
     },
     check: {
       optionValues: [11, 33, 9, 12],
@@ -458,19 +482,20 @@ export const questions: StaticQuestion[] = [
     options: ['$210$', '$21$', '$90$', '$120$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many shortest routes from $A$ to $B$ go through $C$?',
       solution:
-        'Split the journey at $C$ and use the **product rule** (first leg **and then** second leg).\n\n' +
-        '- $A \\to C$: 2 rights and 2 ups, 4 steps: $\\binom{4}{2} = 6$ routes.\n' +
-        '- $C \\to B$: $6 - 2 = 4$ rights and $4 - 2 = 2$ ups, 6 steps: $\\binom{6}{2} = 15$ routes.\n\n' +
-        'Each of the 6 first halves can be followed by any of the 15 second halves:\n\n' +
-        '$$6 \\times 15 = 90$$',
+        'A route through $C$ has two legs: $A$ to $C$, **and then** $C$ to $B$. Any first leg can join any second leg, so we count each leg and multiply.\n\n' +
+        'Leg 1, from $(0, 0)$ to $(2, 2)$: 2 right and 2 up, which is 4 moves. Any order of those moves is a route, so choose which 2 of the 4 are up. $\\binom{n}{r}$ means the number of ways to choose $r$ items from $n$, so this is $\\binom{4}{2} = \\frac{4 \\times 3}{2 \\times 1} = 6$.\n\n' +
+        'Leg 2, from $(2, 2)$ to $(6, 4)$: $6 - 2 = 4$ right and $4 - 2 = 2$ up, which is 6 moves. Choose which 2 are up: $\\binom{6}{2} = \\frac{6 \\times 5}{2 \\times 1} = 15$.\n\n' +
+        'Multiply the two legs: $6 \\times 15 = 90$.',
+      conclusion: '6 ways to reach $C$ and 15 ways from there to $B$ give $90$ routes.',
       whyWrong: [
         'This is $\\binom{10}{4}$, the number of **all** shortest routes from A to B. It ignores the condition that the route must pass through C.',
         'This is $6 + 15$: the two legs are done one after the other ("and then"), so the counts are multiplied, not added.',
         null,
         'This is $210 - 90$, the number of routes that **avoid** C.',
       ],
-      keyIdea: 'Routes through a point = (routes to the point) times (routes from the point onwards).',
+      keyIdea: 'For routes through a point, split at that point: count each leg with $\\binom{\\text{moves}}{\\text{up}}$, then multiply. To count routes that avoid the point, subtract this from the total number of routes.',
     },
     check: {
       optionValues: [210, 21, 90, 120],
@@ -503,16 +528,18 @@ export const questions: StaticQuestion[] = [
     options: ['some box holds at least 2 objects', 'every box holds at least 2 objects', 'every box holds at least 1 object', 'exactly one box is empty'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What must happen when there is one more object than there are boxes?',
       solution:
-        'If every box held at most 1 object, the $n$ boxes could hold at most $n$ objects. There are $n + 1$ objects, so some box must hold at least 2.\n\n' +
-        'The principle says nothing about the other boxes, and some of them may be empty.',
+        'Try to avoid having two objects in a box. The best you can do is put one object in each box, which uses up $n$ objects.\n\n' +
+        'There is one object left, and it has to go in some box. That box then holds 2. For example, 4 letters going into 3 pigeonholes.',
+      conclusion: 'You can\'t give every object its own box, so some box holds at least 2 objects.',
       whyWrong: [
         null,
         'That would need at least $2n$ objects. Only one box is forced to hold 2.',
         'All the objects could go in one box, leaving the other boxes empty.',
         'Nothing forces a box to be empty, and if some are empty there could be several.',
       ],
-      keyIdea: 'Pigeonhole principle: more objects than boxes means some box holds at least 2.',
+      keyIdea: 'The pigeonhole principle only says **some** box is forced, not which one, and not every one. Look for objects and boxes in a question, such as people and months, then find the worst case.',
     },
   },
   {
@@ -523,16 +550,18 @@ export const questions: StaticQuestion[] = [
     options: ['Sum rule', 'Product rule', 'Pigeonhole principle', 'Inclusion-exclusion'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which rule counts a single pick from groups that don\'t overlap?',
       solution:
-        'For one choice from separate groups ("this **or** that"), you add the sizes of the groups. This is the **sum rule**.\n\n' +
-        'For example, one book from 5 novels or 7 comics gives $5 + 7 = 12$ choices.',
+        'You make **one** choice, and it comes from one of several separate groups. For example, pick one fruit from 3 apples or 4 pears.\n\n' +
+        'Every item is one possible choice and no item is in two groups, so add the group sizes: $3 + 4 = 7$. Adding like this is called the **sum rule**.',
+      conclusion: 'One choice from separate groups means adding, which is the Sum rule.',
       whyWrong: [
         null,
         'The product rule is for choices made in stages ("this **and then** that").',
         'The pigeonhole principle shows that something must happen. It does not count choices.',
         'Inclusion-exclusion is for groups that **do** overlap. With no overlap there is nothing to subtract.',
       ],
-      keyIdea: '"Or" from separate groups adds; "and then" multiplies.',
+      keyIdea: 'Ask what the choice looks like. One pick from separate groups: add, using the sum rule. Picks made in stages: multiply, using the product rule. Overlapping groups: use inclusion-exclusion, which adds the groups then subtracts the overlap.',
     },
   },
   {
@@ -543,16 +572,18 @@ export const questions: StaticQuestion[] = [
     options: ['Product rule', 'Sum rule', 'Complementary counting', 'Pigeonhole principle'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which rule counts choices made one after another?',
       solution:
-        'When a choice is made in stages ("this **and then** that"), multiply the number of options at each stage. This is the **product rule**.\n\n' +
-        'For example, a starter from 4 and then a main from 6 gives $4 \\times 6 = 24$ meals.',
+        'In stages means you decide one thing and then another. For example, pick a shirt from 3 and then trousers from 2.\n\n' +
+        'Each of the 3 shirts can go with each of the 2 trousers, so there are $3 \\times 2 = 6$ outfits. Multiplying like this is called the **product rule**.',
+      conclusion: 'Choices made in stages multiply, which is the Product rule.',
       whyWrong: [
         null,
         'The sum rule is for **one** choice from separate groups.',
         'Complementary counting means total minus the opposite case, as in "at least one" questions.',
         'The pigeonhole principle shows that something must happen. It does not count choices.',
       ],
-      keyIdea: 'Choices in stages multiply.',
+      keyIdea: '"And then" means multiply: the product rule. "Or" from separate groups means add: the sum rule. "At least one" often means total minus none: complementary counting.',
     },
   },
   {
@@ -563,16 +594,18 @@ export const questions: StaticQuestion[] = [
     options: ['Unordered pairs from $n$ items', 'Ordered pairs from $n$ items', 'All subsets of $n$ items', 'Arrangements of $n$ items'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does the symbol $\\binom{n}{2}$ stand for?',
       solution:
-        '$\\binom{n}{2}$ is read "$n$ choose 2". It counts the ways to choose 2 items from $n$ when the order does not matter:\n\n' +
-        '$$\\binom{n}{2} = \\frac{n(n-1)}{2}$$',
+        '$\\binom{n}{2}$ is read "$n$ choose 2". It counts the ways to choose 2 items from $n$, when order doesn\'t matter.\n\n' +
+        'A tiny example: from A, B and C the pairs are AB, AC and BC, so $\\binom{3}{2} = 3$. AB and BA count as the same pair, so we call them **unordered**.',
+      conclusion: 'Choosing 2 with order ignored is exactly what it counts: Unordered pairs from $n$ items.',
       whyWrong: [
         null,
         'Ordered pairs number $n(n-1)$. Dividing by 2 removes the order, since each pair is counted twice.',
         'All the subsets number $2^n$. Here only subsets of size 2 are counted.',
         'Arrangements of all $n$ items number $n!$.',
       ],
-      keyIdea: '$\\binom{n}{2} = \\frac{n(n-1)}{2}$ counts unordered pairs, such as handshakes.',
+      keyIdea: 'Use $\\binom{n}{2} = \\frac{n(n-1)}{2}$ whenever each pair of things counts once: handshakes, matches, edges of a complete graph. If order matters, use $n(n-1)$ instead.',
     },
   },
 ];

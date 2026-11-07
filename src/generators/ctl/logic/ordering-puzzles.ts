@@ -1,6 +1,7 @@
 import type { GeneratedCore, Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
 import { factorial } from '../../../lib/mathx';
+import { steps } from '../../../lib/explanation';
 import { m } from '../../../lib/tex';
 
 const NAMES = [
@@ -115,26 +116,28 @@ function rankGenerate(rng: Rng): GeneratedCore {
     .slice(0, -1)
     .map((a, i) => `- ${a} ${ctx.sym} ${order[i + 1]}`)
     .join('\n');
-  const table =
+  const line =
     `| Position from the ${ctx.topWord} end | ${order.map((_, i) => String(i + 1)).join(' | ')} |\n` +
     `| --- | ${order.map(() => '---').join(' | ')} |\n` +
     `| Person | ${order.join(' | ')} |`;
-  const solution =
-    `Rewrite every clue in the **same direction**, as "X ${ctx.sym} Y" (a "${ctx.below('Y', 'X').replace(/\.$/, '')}" clue is the same fact as "X ${ctx.sym} Y"):\n\n` +
-    `${rewritten}\n\n` +
-    `Each person links to the next, so they join into one chain:\n\n${table}\n\n` +
-    (fromTop
-      ? `The ${ord(k)} from the ${ctx.topWord} end is position ${k} in the table: **${answer}**.`
-      : `The table counts from the ${ctx.topWord} end. There are ${n} people, so ${ord(k)} from the ${ctx.bottomWord} end is position ${m(`${n} + 1 - ${k} = ${pos}`)} from the ${ctx.topWord} end: **${answer}**.`) +
-    `\n\nAnswer: ${answer}`;
+  const endWord = fromTop ? ctx.topWord : ctx.bottomWord;
+  const solution = steps(
+    `The clues are worded in different ways, so rewrite them all in one direction, as "X ${ctx.sym} Y". A clue saying "${ctx.below('Y', 'X').replace(/\.$/, '')}" is the same fact as "X ${ctx.sym} Y":\n\n${rewritten}`,
+    `Each person links to the next, so the clues join at the shared names into one line, from the ${ctx.topWord} to the ${ctx.bottomWord}: ${order.join(', ')}.`,
+    fromTop
+      ? `Number the line from the ${ctx.topWord} end. We want position ${k}, and that is ${answer}:\n\n${line}`
+      : `Number the line from the ${ctx.topWord} end. With ${n} people, ${ord(k)} from the ${ctx.bottomWord} end is position ${m(`${n} + 1 - ${k} = ${pos}`)} from the ${ctx.topWord} end, and that is ${answer}:\n\n${line}`,
+  );
 
   return {
     stem,
     answer,
     answerValue: answer,
     distractors,
+    asking: `Once the ${NUM_WORD[n].toLowerCase()} people are in order, who is ${ord(k)} counting from the ${endWord} end?`,
     solution,
-    keyIdea: 'Rewrite all comparisons in one direction, chain them into a single line, then count carefully from the correct end.',
+    conclusion: `The clues allow only one order, and ${ord(k)} counting from the ${endWord} end is ${answer}.`,
+    keyIdea: 'Rewrite every comparison in the same direction, then join them at shared names into one line and number it. To count from the other end, use: position = number of people $+ 1 -$ position from that end.',
   };
 }
 
@@ -145,6 +148,8 @@ const COUNT_KINDS: CountKind[] = ['row', 'rowTogether', 'rowApart', 'rowBefore',
 
 const f = factorial;
 const fx = (k: number) => `${k}!`;
+/** "3 \\times 2 \\times 1" */
+const prod = (k: number) => Array.from({ length: k }, (_, i) => k - i).join(' \\times ');
 
 function countGenerate(rng: Rng): GeneratedCore {
   const kind = rng.pick(COUNT_KINDS);
@@ -154,16 +159,24 @@ function countGenerate(rng: Rng): GeneratedCore {
 
   let stem = '';
   let ans = 0;
-  let steps = '';
+  let solution = '';
+  let asking = '';
+  let keyIdea = '';
+  let conclusionFor: (answer: string) => string = (a) => a;
   const pool: { v: number; why: string }[] = [];
 
   switch (kind) {
     case 'row': {
       stem = `In how many different ways can ${n} different people stand in a line?`;
       ans = f(n);
-      steps =
-        `Fill the places one at a time: ${n} choices for the first place, ${n - 1} for the second, and so on down to 1.\n\n` +
-        m(`${Array.from({ length: n }, (_, i) => n - i).join(' \\times ')} = ${n}! = ${ans}`);
+      asking = `How many different line-ups can ${n} people make?`;
+      solution = steps(
+        `Fill the line one place at a time. Any of the ${n} people can stand first, so there are ${n} choices.`,
+        `One person has now been used, so there are ${n - 1} choices for the second place. The choices keep dropping by 1, down to 1 for the last place.`,
+        `Each choice pairs with every later choice, so we multiply: ${m(`${prod(n)} = ${ans}`)}.`,
+      );
+      conclusionFor = (a) => `Multiplying the choices for each place gives ${a}.`;
+      keyIdea = 'To count line-ups of $n$ different people, multiply $n \\times (n-1) \\times \\dots \\times 1$. This product is written $n!$ and read "$n$ factorial". For example, $3! = 6$.';
       pool.push(
         { v: (n * (n + 1)) / 2, why: `This is ${m(Array.from({ length: n }, (_, i) => n - i).join(' + '))}: the choices were added instead of multiplied.` },
         { v: n ** n, why: `This is ${m(`${n}^{${n}}`)}: it lets the same person fill more than one place.` },
@@ -175,10 +188,15 @@ function countGenerate(rng: Rng): GeneratedCore {
     case 'rowTogether': {
       stem = `${people} sit in a row of ${n} chairs. In how many ways can they sit if ${a} and ${b} **must sit next to each other**?`;
       ans = 2 * f(n - 1);
-      steps =
-        `Glue ${a} and ${b} into one block. There are now ${n - 1} units to arrange in a row: ${m(`${fx(n - 1)} = ${f(n - 1)}`)}.\n\n` +
-        `Inside the block they can be in 2 orders (${a} then ${b}, or ${b} then ${a}).\n\n` +
-        m(`2 \\times ${fx(n - 1)} = 2 \\times ${f(n - 1)} = ${ans}`);
+      asking = `How many seatings keep ${a} and ${b} side by side?`;
+      solution = steps(
+        `${a} and ${b} must stay together, so treat them as one block. Now there are ${n - 1} things to arrange: the block and the other ${n - 2 === 1 ? 'person' : `${n - 2} people`}.`,
+        `Arrange those ${n - 1} things in a row by multiplying the choices for each place: ${m(`${prod(n - 1)} = ${f(n - 1)}`)}.`,
+        `Inside the block, the two can sit in 2 orders: ${a} then ${b}, or ${b} then ${a}.`,
+        `Each arrangement can use either order, so we multiply: ${m(`${f(n - 1)} \\times 2 = ${ans}`)}.`,
+      );
+      conclusionFor = (x) => `There are ${f(n - 1)} arrangements of the block, and the pair can swap inside it, so the total is ${x}.`;
+      keyIdea = 'For "must sit together", glue the pair into one block, arrange the block with the others, then multiply by 2 for the two orders inside. With $n$ people that is $2 \\times (n-1)!$, where $!$ means multiply down to 1.';
       pool.push(
         { v: f(n - 1), why: `This is ${m(fx(n - 1))}: it forgets that ${a} and ${b} can swap places inside their block.` },
         { v: f(n), why: `This is ${m(fx(n))}, every seating, ignoring the condition.` },
@@ -191,10 +209,15 @@ function countGenerate(rng: Rng): GeneratedCore {
       stem = `${people} sit in a row of ${n} chairs. In how many ways can they sit if ${a} and ${b} must **not** sit next to each other?`;
       const tog = 2 * f(n - 1);
       ans = f(n) - tog;
-      steps =
-        `All seatings: ${m(`${fx(n)} = ${f(n)}`)}.\n\n` +
-        `Seatings with ${a} and ${b} together (block method): ${m(`2 \\times ${fx(n - 1)} = ${tog}`)}.\n\n` +
-        `Not together ${m(`= ${f(n)} - ${tog} = ${ans}`)}.`;
+      asking = `How many seatings keep ${a} and ${b} apart?`;
+      solution = steps(
+        `Counting "apart" directly is awkward, so count the opposite and subtract. First, all seatings with no condition: ${m(`${prod(n)} = ${f(n)}`)}.`,
+        `Now the seatings where they **are** together. Treat ${a} and ${b} as one block, which leaves ${n - 1} things to arrange: ${m(`${prod(n - 1)} = ${f(n - 1)}`)}.`,
+        `The pair can sit in 2 orders inside the block, so the together seatings total ${m(`${f(n - 1)} \\times 2 = ${tog}`)}.`,
+        `Take the together seatings away from the total: ${m(`${f(n)} - ${tog} = ${ans}`)}.`,
+      );
+      conclusionFor = (x) => `Out of ${f(n)} seatings, ${tog} have them together, which leaves ${x}.`;
+      keyIdea = 'For "must not be together", count all the orders, count the orders where they are together using a block, then subtract. In short: wanted = total $-$ unwanted.';
       pool.push(
         { v: tog, why: `This is ${m(`2 \\times ${fx(n - 1)}`)}, the number of seatings where they **are** together. It still has to be subtracted from the total.` },
         { v: f(n) - f(n - 1), why: `This is ${m(`${fx(n)} - ${fx(n - 1)}`)}: it forgot that the "together" block can be in 2 orders, so only half of the together cases were removed.` },
@@ -206,10 +229,15 @@ function countGenerate(rng: Rng): GeneratedCore {
     case 'rowBefore': {
       stem = `${NUM_WORD[n]} runners, including ${a} and ${b}, finish a race with no ties. In how many finishing orders does ${a} finish **before** ${b} (not necessarily immediately before)?`;
       ans = f(n) / 2;
-      steps =
-        `All finishing orders: ${m(`${fx(n)} = ${f(n)}`)}.\n\n` +
-        `Swapping ${a} and ${b} pairs every order with another one, and in exactly one of each pair ${a} is ahead. So exactly half the orders work:\n\n` +
-        m(`\\frac{${fx(n)}}{2} = \\frac{${f(n)}}{2} = ${ans}`);
+      asking = `In how many finishing orders is ${a} somewhere ahead of ${b}?`;
+      solution = steps(
+        `First count all finishing orders, with no condition: ${m(`${prod(n)} = ${f(n)}`)}.`,
+        `Take any order and swap ${a} and ${b}. This pairs each order with exactly one other order, the same except for those two.`,
+        `In each pair, ${a} is ahead in exactly one of the two orders. So ${a} is ahead in exactly half of all orders.`,
+        `Half of the total: ${m(`${f(n)} \\div 2 = ${ans}`)}.`,
+      );
+      conclusionFor = (x) => `${a} is ahead in exactly half of the ${f(n)} orders, which gives ${x}.`;
+      keyIdea = 'When one person must be somewhere before another, with gaps allowed, use symmetry: each is ahead in exactly half of the orders. So the answer is $n! \\div 2$, where $n!$ means $n \\times (n-1) \\times \\dots \\times 1$.';
       pool.push(
         { v: f(n), why: `This is ${m(fx(n))}, all orders. In half of them ${b} is ahead of ${a}.` },
         { v: f(n - 1), why: `This is ${m(fx(n - 1))}, the number of orders where ${a} finishes **immediately** before ${b}. "Before" allows runners in between.` },
@@ -221,10 +249,14 @@ function countGenerate(rng: Rng): GeneratedCore {
     case 'rowEnd': {
       stem = `${people} stand in a line. In how many ways can they stand if ${a} must be at one of the two **ends** of the line?`;
       ans = 2 * f(n - 1);
-      steps =
-        `${a} has 2 choices of position (left end or right end).\n\n` +
-        `The other ${n - 1} people fill the remaining ${n - 1} places in ${m(`${fx(n - 1)} = ${f(n - 1)}`)} ways.\n\n` +
-        m(`2 \\times ${fx(n - 1)} = 2 \\times ${f(n - 1)} = ${ans}`);
+      asking = `How many line-ups have ${a} at one of the two ends?`;
+      solution = steps(
+        `Place ${a} first, because ${a} is the one with a restriction. There are 2 ends, so ${a} has 2 choices.`,
+        `The other ${n - 1} people then fill the ${n - 1} places left, with no restrictions: ${m(`${prod(n - 1)} = ${f(n - 1)}`)} ways.`,
+        `Each of the 2 choices goes with each of those arrangements, so we multiply: ${m(`2 \\times ${f(n - 1)} = ${ans}`)}.`,
+      );
+      conclusionFor = (x) => `${a} has 2 choices of end and the others can be arranged in ${f(n - 1)} ways, which gives ${x}.`;
+      keyIdea = 'Place the restricted person first and count their choices. Then arrange everyone else in the places left, and multiply the two counts. For an end seat that is 2 choices, then $(n-1)!$ orders for the others.';
       pool.push(
         { v: f(n - 1), why: `This is ${m(fx(n - 1))}: it puts ${a} at one particular end only. There are two ends.` },
         { v: f(n), why: `This is ${m(fx(n))}, every line-up, ignoring the condition.` },
@@ -238,10 +270,14 @@ function countGenerate(rng: Rng): GeneratedCore {
     case 'rowNotFirst': {
       stem = `${people} stand in a line. In how many orders is ${a} **not** first?`;
       ans = f(n) - f(n - 1);
-      steps =
-        `All orders: ${m(`${fx(n)} = ${f(n)}`)}.\n\n` +
-        `Orders with ${a} first: the other ${n - 1} people fill the remaining places in ${m(`${fx(n - 1)} = ${f(n - 1)}`)} ways.\n\n` +
-        `${a} not first ${m(`= ${f(n)} - ${f(n - 1)} = ${ans}`)}.`;
+      asking = `How many line-ups have someone other than ${a} at the front?`;
+      solution = steps(
+        `Count everything first. All orders of ${n} people: ${m(`${prod(n)} = ${f(n)}`)}.`,
+        `Now count the orders we do not want: ${a} first. With ${a} fixed at the front, the other ${n - 1} people fill the remaining places: ${m(`${prod(n - 1)} = ${f(n - 1)}`)}.`,
+        `Take the unwanted orders away from the total: ${m(`${f(n)} - ${f(n - 1)} = ${ans}`)}.`,
+      );
+      conclusionFor = (x) => `Out of ${f(n)} orders, ${f(n - 1)} have ${a} first, which leaves ${x}.`;
+      keyIdea = 'For a "not" condition, count the opposite and subtract: wanted = all orders $-$ unwanted orders. With one person barred from one place, that is $n! - (n-1)!$, where $!$ means multiply down to 1.';
       pool.push(
         { v: f(n - 1), why: `This is ${m(fx(n - 1))}, the number of orders where ${a} **is** first. It still has to be subtracted from the total.` },
         { v: f(n), why: `This is ${m(fx(n))}, every order, ignoring the condition.` },
@@ -278,8 +314,10 @@ function countGenerate(rng: Rng): GeneratedCore {
     answer,
     answerValue: ans,
     distractors,
-    solution: `${steps}\n\nAnswer: ${answer}`,
-    keyIdea: 'In a row, $n$ people give $n!$ orders; glue "together" pairs into a block (times 2), and get "not" conditions by subtracting from the total.',
+    asking,
+    solution,
+    conclusion: conclusionFor(answer),
+    keyIdea,
   };
 }
 

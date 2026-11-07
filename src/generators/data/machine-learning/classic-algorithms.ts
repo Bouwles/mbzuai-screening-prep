@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num } from '../../../lib/tex';
 
@@ -57,19 +58,17 @@ function knnVote(rng: Rng) {
     const countX = named.filter((o) => o.label === X).length;
     const nearest = byRank[0];
 
-    const distCell = (d2: number) => {
-      const r = Math.sqrt(d2);
-      return Number.isInteger(r) ? m(String(r)) : m(`\\sqrt{${d2}} \\approx ${num(r, 2)}`);
-    };
-
-    const solution =
-      `Work out the distance from $Q = (${q[0]}, ${q[1]})$ to every training point. Comparing **squared** distances gives the same order, so square roots are optional.\n\n` +
-      '| Point | $d^2$ | $d$ | Class |\n|---|---|---|---|\n' +
-      byRank.map((o) => `| ${o.name} $(${o.p[0]}, ${o.p[1]})$ | ${m(sqWorking(o.p, q))} | ${distCell(o.d2)} | ${o.label} |`).join('\n') +
-      '\n\n' +
-      `The 3 nearest points are ${byRank[0].name} (${byRank[0].label}), ${byRank[1].name} (${byRank[1].label}) and ${byRank[2].name} (${byRank[2].label}).\n\n` +
-      `Vote: ${X} 2, ${Y} 1, so k-NN predicts ${X}.\n\n` +
-      `Answer: ${X}`;
+    const solution = steps(
+      '**k-NN** (k nearest neighbours) classifies a new point by taking a majority vote among its $k$ closest training points. Here $k = 3$, so we need the distance from $Q$ to every point.',
+      '**Euclidean distance** is the straight-line distance: square the gap in $x_1$, square the gap in $x_2$, add them, then take the square root. To compare distances we can skip the root, because a bigger $d^2$ always means a bigger $d$.',
+      `Work out $d^2$ from $Q = (${q[0]}, ${q[1]})$ to each point. They are listed here from nearest to farthest:\n\n` +
+        table(
+          ['Point', '$d^2$', 'Class'],
+          byRank.map((o) => [`${o.name} $(${o.p[0]}, ${o.p[1]})$`, m(sqWorking(o.p, q)), o.label]),
+        ),
+      `The 3 smallest values of $d^2$ belong to ${byRank[0].name}, ${byRank[1].name} and ${byRank[2].name}, so only those three get a vote.`,
+      `Their classes are ${byRank[0].label}, ${byRank[1].label} and ${byRank[2].label}. That is 2 votes for ${X} and 1 for ${Y}, so ${X} wins.`,
+    );
 
     return {
       stem: `The table shows ${n} labelled training points. A new point $Q = (${q[0]}, ${q[1]})$ is classified by **k-NN with $k = 3$**, using Euclidean distance. Which class is predicted for $Q$?`,
@@ -96,8 +95,10 @@ function knnVote(rng: Rng) {
           why: `A tie (one ${Y}, one ${X}) happens with only the 2 nearest neighbours. With $k = 3$ the third neighbour, ${byRank[2].name}, is ${X} and breaks the tie.`,
         },
       ],
+      asking: 'Which class wins a vote among the 3 training points closest to $Q$?',
       solution,
-      keyIdea: 'k-NN: find the distance to every training point, keep the k nearest, and take a majority vote of their labels.',
+      conclusion: `Two of the 3 nearest points are ${X} and the other is ${Y}, so k-NN predicts ${X}.`,
+      keyIdea: 'For k-NN: list the squared distance to every point, sort, keep the $k$ smallest, then count classes among only those. How common a class is across the whole table does not matter.',
     };
   }
 }
@@ -198,19 +199,19 @@ function kmeansUpdate(rng: Rng) {
     if (chosen.length < 3) continue;
 
     const answer = m(`\\mu_${t + 1} = ${ptTex(ans)}`);
-    const rows = pts
-      .map((p, i) => `| ${NAMES[i]} $(${p[0]}, ${p[1]})$ | ${m(sqWorking(p, mu[0]))} | ${m(sqWorking(p, mu[1]))} | $\\mu_${cl[i] + 1}$ |`)
-      .join('\n');
     const members = pts.map((_, i) => i).filter((i) => cl[i] === t).map((i) => NAMES[i]);
-    const solution =
-      '**Assignment step.** Give each point to the nearer centroid (compare squared distances).\n\n' +
-      `| Point | $d^2$ to $\\mu_1 = (${mu[0][0]}, ${mu[0][1]})$ | $d^2$ to $\\mu_2 = (${mu[1][0]}, ${mu[1][1]})$ | nearest |\n|---|---|---|---|\n` +
-      rows +
-      '\n\n' +
-      `So $\\mu_${t + 1}$ gets ${members.length} points: ${members.join(', ')}.\n\n` +
-      `**Update step.** Move $\\mu_${t + 1}$ to the mean of its points:\n\n` +
-      `$$\\bar{x} = \\frac{${sumTex(xs)}}{${g.length}} = ${meanTex(ans[0])}, \\qquad \\bar{y} = \\frac{${sumTex(ys)}}{${g.length}} = ${meanTex(ans[1])}$$\n\n` +
-      `Answer: ${answer}`;
+    const solution = steps(
+      '**k-means** groups points around centres called **centroids**, written here as $\\mu_1$ and $\\mu_2$. One round has two stages: give each point to its nearest centroid (assignment), then move each centroid to the mean of its points (update).',
+      'Start with the assignment. **Euclidean distance** is the straight-line distance. To compare distances we can use $d^2$, the squared distance, and skip the square root, because a bigger $d^2$ always means a bigger $d$.',
+      'Each point goes to the centroid with the smaller $d^2$:\n\n' +
+        table(
+          ['Point', `$d^2$ to $\\mu_1 = (${mu[0][0]}, ${mu[0][1]})$`, `$d^2$ to $\\mu_2 = (${mu[1][0]}, ${mu[1][1]})$`, 'Nearest'],
+          pts.map((p, i) => [`${NAMES[i]} $(${p[0]}, ${p[1]})$`, m(sqWorking(p, mu[0])), m(sqWorking(p, mu[1])), `$\\mu_${cl[i] + 1}$`]),
+        ),
+      `So $\\mu_${t + 1}$ gets ${members.length} points: ${members.join(', ')}. Only these count towards its new position.`,
+      `Now the update. Average the $x$ values of those points by adding them and dividing by ${g.length}: $\\frac{${sumTex(xs)}}{${g.length}} = ${meanTex(ans[0])}$.`,
+      `Do the same for the $y$ values: $\\frac{${sumTex(ys)}}{${g.length}} = ${meanTex(ans[1])}$. Those two averages are the new position: ${answer}.`,
+    );
 
     return {
       stem:
@@ -223,8 +224,10 @@ function kmeansUpdate(rng: Rng) {
       answer,
       answerValue: ptVal(ans),
       distractors: chosen.map((c) => ({ text: m(`\\mu_${t + 1} = ${ptTex(c.p)}`), value: ptVal(c.p), why: c.why })),
+      asking: `Where does the centroid $\\mu_${t + 1}$ end up after one round of assigning points and moving it?`,
       solution,
-      keyIdea: 'k-means: assign each point to its nearest centroid, then move each centroid to the mean of the points assigned to it.',
+      conclusion: `The mean of the ${g.length} points assigned to it gives its new position, so the answer is ${answer}.`,
+      keyIdea: 'For one k-means round: make a table of $d^2$ to each centroid and give each point to the smaller value. Then move each centroid to the mean of its own points, averaging $x$ and $y$ separately.',
     };
   }
 }

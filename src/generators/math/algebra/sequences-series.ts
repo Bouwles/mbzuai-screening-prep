@@ -1,6 +1,7 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
-import { frac, m, num, paren, signed } from '../../../lib/tex';
+import { m, num, paren, signed } from '../../../lib/tex';
 
 type Cand = { value: number; text: string; why: string };
 
@@ -51,21 +52,22 @@ export const generators: Generator[] = [
       ];
       const ds = pickDistractors(S, answer, pool);
       const seq = `${a}, ${a + d}, ${a + 2 * d}, \\dots`;
-      const solution =
-        `Here ${m(`a = ${a}`)}, ${m(`d = ${a + d} - ${paren(a)} = ${d}`)} and ${m(`n = ${n}`)}.\n\n` +
-        `Use ${m(`S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)`)}:` +
-        `\n\n$$S_{${n}} = \\frac{${n}}{2}\\left(2 \\times ${paren(a)} + ${n - 1} \\times ${paren(d)}\\right)$$\n\n` +
-        `The bracket is ${m(`${2 * a}${signed((n - 1) * d)} = ${inner}`)}, so\n\n` +
-        `$$S_{${n}} = ${frac(n, 2)} \\times ${paren(inner)} = ${num(S)}$$\n\n` +
-        `Check with ${m('S_n = \\frac{n}{2}(a + l)')}: the last term is ${m(`l = ${a}${signed((n - 1) * d)} = ${last}`)}, and first plus last is ${last === 0 ? m(`a + l = ${a}`) : m(`${a}${signed(last)} = ${a + last}`)}, the same as the bracket above, so the sum is confirmed.\n\n` +
-        `Answer: ${answer}`;
+      const solution = steps(
+        `This is an **arithmetic sequence**: it changes by the same amount each time. The first term is ${m(`a = ${a}`)}, and the **common difference** is ${m(`d = ${a + d} - ${paren(a)} = ${d}`)}. We want ${m(`n = ${n}`)} terms.`,
+        `Adding ${n} terms by hand is slow, so use the sum formula: ${m('S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)')}. It is the number of terms times the average of the first and last terms.`,
+        `Substitute: ${m(`S_{${n}} = \\frac{${n}}{2}\\left(2 \\times ${paren(a)} + ${n - 1} \\times ${paren(d)}\\right)`)}.`,
+        `Work out the bracket: ${m(`2 \\times ${paren(a)} = ${2 * a}`)} and ${m(`${n - 1} \\times ${paren(d)} = ${(n - 1) * d}`)}, so the bracket is ${m(`${2 * a}${signed((n - 1) * d)} = ${inner}`)}.`,
+        `Finish: ${m(`\\frac{${n}}{2} \\times ${paren(inner)} = ${num(S)}`)}.`,
+      );
       return {
         stem: `Find the sum of the first ${n} terms of the arithmetic sequence ${m(seq)}`,
         answer,
         answerValue: S,
         distractors: ds.map((c) => ({ text: c.text, value: c.value, why: c.why })),
+        asking: `What do the first ${n} numbers in this list add up to?`,
         solution,
-        keyIdea: 'The sum of an arithmetic series is $S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)$: the number of terms times the average of the first and last terms.',
+        conclusion: `The bracket is ${m(num(inner))}, and multiplying it by half of ${n} gives the total. So the answer is ${answer}.`,
+        keyIdea: 'To add up an arithmetic sequence, find $a$, $d$ and $n$, then use $S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)$. If you know the last term $l$, use $S_n = \\frac{n}{2}(a + l)$.',
       };
     },
   },
@@ -101,20 +103,21 @@ export const generators: Generator[] = [
       const series = `${a}${signed(t2)}${signed(t3)} + \\dots`;
       const absR = new Frac(Math.abs(rn), rd);
       const recip = new Frac(oneMinus.d, oneMinus.n);
-      const solution =
-        `The first term is ${m(`a = ${a}`)}.\n\n` +
-        `The common ratio is each term divided by the one before: ${m(`r = \\frac{${t2}}{${a}} = ${r.tex()}`)}.\n\n` +
-        `Since ${m(`|r| = ${absR.tex()} < 1`)}, the sum to infinity exists.\n\n` +
-        `$$S_\\infty = \\frac{a}{1 - r} = \\frac{${a}}{1 - ${paren(r)}} = \\frac{${a}}{${oneMinus.tex()}}$$\n\n` +
-        `Dividing by ${m(oneMinus.tex())} is the same as multiplying by ${m(recip.tex())}: ${m(`${a} \\times ${recip.tex()} = ${S.tex()}`)}.\n\n` +
-        `Answer: ${answer}`;
+      const solution = steps(
+        `This is a **geometric series**: each term is the last one multiplied by the same number, the **common ratio** ${m('r')}. Divide the second term by the first: ${m(`${t2} \\div ${a} = ${r.tex()}`)}. So ${m(`r = ${r.tex()}`)}, and the first term is ${m(`a = ${a}`)}.`,
+        `The size of ${m('r')}, ignoring its sign, is ${m(absR.tex())}, which is less than 1. So the terms shrink towards 0, and the total settles at a fixed value called the **sum to infinity**.`,
+        `The formula is ${m('S_\\infty = \\frac{a}{1 - r}')}. First work out the bottom: ${m(`1 - ${paren(r)} = ${oneMinus.tex()}`)}. So ${m(`S_\\infty = \\frac{${a}}{${oneMinus.tex()}}`)}.`,
+        `Dividing by a fraction is the same as multiplying by that fraction flipped, which is ${m(recip.tex())}: ${m(`${a} \\times ${recip.tex()} = ${S.tex()}`)}.`,
+      );
       return {
         stem: `Find the sum to infinity of the geometric series ${m(series)}`,
         answer,
         answerValue: S.value(),
         distractors: ds.map((c) => ({ text: c.text, value: c.value, why: c.why })),
+        asking: 'What total do these endlessly shrinking terms settle towards?',
         solution,
-        keyIdea: 'If $|r| < 1$, the sum to infinity of a geometric series is $S_\\infty = \\frac{a}{1-r}$.',
+        conclusion: `Adding more and more terms gets closer and closer to this total, so the answer is ${answer}.`,
+        keyIdea: 'To spot this type, look for a geometric series with shrinking terms. Find $a$ and $r$, make sure $r$ is between $-1$ and 1, then use $S_\\infty = \\frac{a}{1 - r}$.',
       };
     },
   },
@@ -157,22 +160,23 @@ export const generators: Generator[] = [
       pool.push({ value: (k - 1) * d, text: m(num((k - 1) * d)), why: `This is ${m(`(${k} - 1)d`)} on its own: the first term ${m(`a = ${a}`)} was never added.` });
       pool.push({ value: term(k + 1), text: m(num(term(k + 1))), why: `This is the ${ordinal(k + 1)} term, one step too far.` });
       const ds = pickDistractors(Uk, answer, pool);
-      const solution =
-        `Write both facts using ${m('u_n = a + (n-1)d')}:\n\n` +
-        `- ${m(`u_{${p}} = a + ${p - 1}d = ${Up}`)}\n` +
-        `- ${m(`u_{${q}} = a + ${q - 1}d = ${Uq}`)}\n\n` +
-        `Subtract the first from the second (there are ${m(`${q} - ${p} = ${q - p}`)} gaps between these terms):\n\n` +
-        `$$${q - p}d = ${Uq} - ${paren(Up)} = ${diff} \\quad\\Rightarrow\\quad d = \\frac{${diff}}{${q - p}} = ${d}$$\n\n` +
-        `Find the first term: ${m(`a = ${Up} - ${p - 1} \\times ${paren(d)} = ${a}`)}.\n\n` +
-        `Now the ${ordinal(k)} term: ${m(`u_{${k}} = ${a} + ${k - 1} \\times ${paren(d)} = ${num(Uk)}`)}.\n\n` +
-        `Answer: ${answer}`;
+      const solution = steps(
+        `An arithmetic sequence has ${m('n')}th term ${m('u_n = a + (n-1)d')}, where ${m('a')} is the first term and ${m('d')} is the **common difference**, the amount added each time. Write both facts this way.`,
+        `The ${ordinal(p)} term gives ${m(`a + ${p - 1}d = ${Up}`)}. The ${ordinal(q)} term gives ${m(`a + ${q - 1}d = ${Uq}`)}.`,
+        `Subtract the first equation from the second to remove ${m('a')}. There are ${m(`${q} - ${p} = ${q - p}`)} gaps between these terms, so ${m(`${q - p}d = ${Uq} - ${paren(Up)} = ${diff}`)}.`,
+        `Divide both sides by ${q - p}: ${m(`d = ${diff} \\div ${q - p} = ${d}`)}.`,
+        `Find the first term by rearranging the first equation: ${m(`a = ${Up} - ${p - 1} \\times ${paren(d)} = ${a}`)}.`,
+        `Now use the formula for the ${ordinal(k)} term: ${m(`u_{${k}} = ${a} + ${k - 1} \\times ${paren(d)} = ${a}${signed((k - 1) * d)} = ${num(Uk)}`)}.`,
+      );
       return {
         stem: `In an arithmetic sequence, the ${ordinal(p)} term is ${m(String(Up))} and the ${ordinal(q)} term is ${m(String(Uq))}. Find the ${ordinal(k)} term.`,
         answer,
         answerValue: Uk,
         distractors: ds.map((c) => ({ text: c.text, value: c.value, why: c.why })),
+        asking: `What is the ${ordinal(k)} term of this sequence?`,
         solution,
-        keyIdea: 'Turn each given term into $a + (n-1)d = \\text{value}$, subtract to find $d$ (divide by the number of gaps), then find $a$ and the term you need.',
+        conclusion: `With first term ${m(String(a))} and common difference ${m(String(d))}, the ${ordinal(k)} term is ${answer}.`,
+        keyIdea: 'Given two terms of an arithmetic sequence, write each as $a + (n-1)d$ and subtract to remove $a$. Divide by the number of gaps to find $d$, then find $a$ and the term you need.',
       };
     },
   },

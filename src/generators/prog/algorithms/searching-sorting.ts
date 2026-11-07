@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { pyList } from '../../../lib/tex';
 
 // ---------------------------------------------------------------- helpers
@@ -17,11 +18,15 @@ const ALG_SHORT: Record<Alg, string> = {
   insertion: 'each inserting the next item into the sorted front part, starting with the second item',
 };
 const ALG_RULE: Record<Alg, string> = {
-  bubble: 'In one pass of bubble sort, each pair of neighbouring items is compared from left to right and swapped if the left one is bigger.',
-  selection:
-    'In one pass of selection sort, the smallest item in the unsorted part is found and swapped with the first item of the unsorted part (a pass still counts if no swap is needed).',
-  insertion:
-    'In one pass of insertion sort, the next unsorted item is inserted into its correct place in the sorted part at the front (the first pass inserts the second item).',
+  bubble: 'One pass of bubble sort compares each pair of neighbours from left to right and swaps them if the left one is bigger.',
+  selection: 'One pass of selection sort swaps the smallest unsorted item with the first unsorted item (a pass still counts if no swap is needed).',
+  insertion: 'One pass of insertion sort puts the next unsorted item into its place in the sorted front part (the first pass inserts the second item).',
+};
+/** The first step of the working: what one pass does, for someone who has not met this sort. */
+const ALG_TEACH: Record<Alg, string> = {
+  bubble: 'One **pass** of bubble sort walks through the list from left to right. At each position it compares two neighbours and swaps them if the left one is bigger.',
+  selection: 'One **pass** of selection sort finds the smallest item in the unsorted part, then swaps it with the first unsorted item. The sorted part grows at the front of the list.',
+  insertion: 'Insertion sort keeps a sorted part at the front, like sorted cards in your hand. It starts as just the first item. One **pass** takes the next item and slides it left until it fits.',
 };
 
 /** Runs k passes and returns the list after each pass plus a description of each pass. */
@@ -32,25 +37,29 @@ function runPasses(alg: Alg, src: number[], k: number): { states: number[][]; no
   const n = a.length;
   for (let p = 0; p < k; p++) {
     if (alg === 'bubble') {
-      const parts: string[] = [];
+      const rows: string[][] = [];
       for (let i = 0; i < n - 1 - p; i++) {
-        if (a[i] > a[i + 1]) {
-          parts.push(`${a[i]} and ${a[i + 1]}: swap`);
-          [a[i], a[i + 1]] = [a[i + 1], a[i]];
-        } else parts.push(`${a[i]} and ${a[i + 1]}: no swap`);
+        const [x, y] = [a[i], a[i + 1]];
+        if (x > y) [a[i], a[i + 1]] = [y, x];
+        rows.push([`${x} and ${y}`, x > y ? 'yes, swap' : 'no', show(a)]);
       }
-      notes.push(parts.join('; '));
+      const settled = p === 0 ? '' : ` The last ${p === 1 ? 'item is' : `${p} items are`} already in place, so stop before ${p === 1 ? 'it' : 'them'}.`;
+      notes.push(steps(`**Pass ${p + 1}.** Compare the pairs, always using the list as it stands after the last swap.${settled}`, table(['Compare', 'Left bigger?', 'List after'], rows)));
     } else if (alg === 'selection') {
       let mi = p;
       for (let i = p + 1; i < n; i++) if (a[i] < a[mi]) mi = i;
-      const part = pyList(a.slice(p));
-      if (mi === p) notes.push(`unsorted part \`${part}\`, smallest is ${a[p]}, already first, so no swap`);
-      else notes.push(`unsorted part \`${part}\`, smallest is ${a[mi]}, swap it with ${a[p]}`);
+      const part = show(a.slice(p));
+      const [small, first] = [a[mi], a[p]];
       [a[p], a[mi]] = [a[mi], a[p]];
+      notes.push(
+        mi === p
+          ? `**Pass ${p + 1}.** The unsorted part is ${part}. The smallest item is ${small}, and it is already first, so nothing moves. This still counts as a pass. The list stays ${show(a)}.`
+          : `**Pass ${p + 1}.** The unsorted part is ${part}. The smallest item is ${small}. Swap it with ${first}, the first unsorted item, giving ${show(a)}.`,
+      );
     } else {
       const idx = p + 1;
       const v = a[idx];
-      const sortedBefore = pyList(a.slice(0, idx));
+      const sortedBefore = show(a.slice(0, idx));
       let j = idx - 1;
       const shifted: number[] = [];
       while (j >= 0 && a[j] > v) {
@@ -61,8 +70,8 @@ function runPasses(alg: Alg, src: number[], k: number): { states: number[][]; no
       a[j + 1] = v;
       notes.push(
         shifted.length === 0
-          ? `insert ${v} into the sorted part \`${sortedBefore}\`: it is already bigger than ${a[idx - 1]}, so it stays`
-          : `insert ${v} into the sorted part \`${sortedBefore}\`: shift ${shifted.join(', ')} one place right and put ${v} in the gap`,
+          ? `**Pass ${p + 1}.** Take the next item, ${v}. The sorted part is ${sortedBefore}. Its largest item, ${a[idx - 1]}, is smaller than ${v}, so ${v} stays where it is. The list stays ${show(a)}.`
+          : `**Pass ${p + 1}.** Take the next item, ${v}. The sorted part is ${sortedBefore}. ${shifted.length === 1 ? `${shifted[0]} is` : `${shifted.join(' and ')} are`} bigger than ${v}, so ${shifted.length === 1 ? 'it shifts' : 'they shift'} one place right and ${v} goes in the gap, giving ${show(a)}.`,
       );
     }
     states.push(a.slice());
@@ -179,22 +188,20 @@ export const generators: Generator[] = [
             : alg === 'selection'
               ? `After ${passWord(k)} of selection sort, the ${k === 1 ? 'smallest item is' : `${k} smallest items are`} at the front.`
               : `After ${passWord(k)} of insertion sort, the first ${k + 1} items are in order and the rest have not been touched.`;
-        const solution =
-          `${ALG_RULE[alg]}\n\nStart: ${show(list)}\n\n` +
-          states.map((s, i) => `- **Pass ${i + 1}:** ${notes[i]}. List: ${show(s)}`).join('\n') +
-          `\n\n${what}\n\nAnswer: ${answer}`;
         return {
           stem: `${passWord(k).charAt(0).toUpperCase() + passWord(k).slice(1)} of **${ALG_NAME[alg]}**, ${ALG_SHORT[alg]}, ${k === 1 ? 'is' : 'are'} applied to ${show(list)}. What is the list afterwards?`,
           answer,
           answerValue: ans.join(','),
           distractors: picked.map((c) => ({ text: c.text, value: c.v, why: c.why })),
-          solution,
+          asking: `What does the list look like after ${passWord(k)} of ${ALG_NAME[alg]}?`,
+          solution: steps(ALG_TEACH[alg], `The list starts as ${show(list)}.`, ...notes),
+          conclusion: `${what} The list is ${answer}.`,
           keyIdea:
             alg === 'bubble'
-              ? 'Each pass of bubble sort carries the largest remaining item to the end of the list.'
+              ? 'For bubble sort, write one row for each neighbouring pair and start each pass from the list the last one left. After $k$ passes the $k$ largest items are in place at the end.'
               : alg === 'selection'
-                ? 'Each pass of selection sort swaps the smallest remaining item into the next position at the front.'
-                : 'Each pass of insertion sort grows the sorted part at the front by one item.',
+                ? 'For selection sort, write the unsorted part on each pass, find its smallest item, and swap it with the first unsorted item. After $k$ passes the $k$ smallest items are at the front.'
+                : 'For insertion sort, split the list into a sorted part and an untouched part. Each pass moves one item across. After $k$ passes the first $k + 1$ items are sorted and the rest have not moved.',
         };
       }
     },
@@ -269,9 +276,10 @@ export const generators: Generator[] = [
         // trace table
         let lo = 1;
         let hi = n;
-        const rows: string[] = [];
+        const rows: (string | number)[][] = [];
         let step = 0;
         let found = false;
+        let lastCheck = '';
         while (lo <= hi) {
           step++;
           const mid = Math.floor((lo + hi) / 2);
@@ -281,29 +289,38 @@ export const generators: Generator[] = [
           if (value === target) {
             act = 'found';
             found = true;
-          } else if (value < target) act = `$${value} < ${target}$, so low = ${mid + 1}`;
-          else act = `$${value} > ${target}$, so high = ${mid - 1}`;
-          rows.push(`| ${step} | ${lo} | ${hi} | ${half} | ${value} | ${act} |`);
+          } else if (value < target) act = `$${value} < ${target}$, so \`low\` = ${mid + 1}`;
+          else act = `$${value} > ${target}$, so \`high\` = ${mid - 1}`;
+          rows.push([step, lo, hi, half, value, act]);
+          lastCheck = `Check ${step}: \`low\` is ${lo} and \`high\` is ${hi}, so \`mid\` comes from ${half}, and \`A[${mid}]\` is ${value}.`;
           if (found) break;
           if (value < target) lo = mid + 1;
           else hi = mid - 1;
         }
+        const lastValue = seq[seq.length - 1];
         const ending = found
-          ? `${target} is found after ${step} comparison${step === 1 ? '' : 's'}.`
-          : `Now low = ${lo} is bigger than high = ${hi}, so the loop stops and the search reports that ${target} is not in the list.`;
-        const solution =
-          `The array has ${n} items, so low = 1 and high = ${n} at the start. \`div\` rounds down.\n\n` +
-          '| Step | low | high | mid | A[mid] | Decision |\n| --- | --- | --- | --- | --- | --- |\n' +
-          rows.join('\n') +
-          `\n\n${ending}\n\nAnswer: ${answer}`;
+          ? `That is the target, so line 7 returns and the search stops.`
+          : `Since ${lastValue < target ? `$${lastValue} < ${target}$, \`low\` becomes ${lo}` : `$${lastValue} > ${target}$, \`high\` becomes ${hi}`}. Now \`low\` is bigger than \`high\`, so the loop on line 4 ends and ${target} is not in the list.`;
+        const solution = steps(
+          'Binary search only works on a sorted list. It checks the middle item, then throws away the half that cannot contain the target.',
+          '`low` and `high` (lines 2 and 3) are the first and last indexes still being searched. Line 5 finds the middle index, `mid`, and `A[mid]` is the value at that index. `div` divides and rounds down, so `div(7, 2)` is 3.',
+          'Line 9 decides which half to keep. If `A[mid]` is too small, the target must be further right, so line 10 moves `low`. If it is too big, line 12 moves `high`.',
+          'Write each index beside its value:',
+          table(['Index', ...a.map((_, i) => i + 1)], [['Value', ...a]]),
+          rows.length > 1 && 'Trace the search one check at a time:',
+          rows.length > 1 && table(['Check', '`low`', '`high`', '`mid`, from `low + high`', '`A[mid]`', 'Decision'], rows.slice(0, -1)),
+          `${lastCheck} ${ending}`,
+        );
         return {
           stem: `This binary search looks for **${target}** in the sorted array ${show(a)}. Arrays are indexed from 1. Which values are compared with ${target}, in order?`,
           code: { lang: 'pseudocode', source: BS_CODE },
           answer,
           answerValue: answer,
           distractors: picked.map((c) => ({ text: c.text, value: c.v, why: c.why })),
+          asking: `Which array values does the search check, in order, while looking for ${target}?`,
           solution,
-          keyIdea: 'Trace binary search with a table of low, high and mid, rounding mid down and excluding mid after each comparison.',
+          conclusion: `Reading the \`A[mid]\` values in the order they were checked gives ${answer}.`,
+          keyIdea: 'Trace binary search with columns for `low`, `high`, `mid` and `A[mid]`. Round `mid` down. If `A[mid]` is too small, `low` becomes `mid + 1`. If too big, `high` becomes `mid - 1`. Stop when found or when `low` passes `high`.',
         };
       }
     },
@@ -324,11 +341,11 @@ export const generators: Generator[] = [
       const y = vals.slice(m).sort((p, q) => p - q);
       let i = 0;
       let j = 0;
-      const rows: string[] = [];
+      const rows: (string | number)[][] = [];
       const out: number[] = [];
       while (i < m && j < n) {
         const take = x[i] <= y[j] ? x[i] : y[j];
-        rows.push(`| ${x[i]} and ${y[j]} | ${take} | \`${pyList([...out, take])}\` |`);
+        rows.push([`${x[i]} and ${y[j]}`, take, show([...out, take])]);
         out.push(take);
         if (x[i] <= y[j]) i++;
         else j++;
@@ -364,19 +381,23 @@ export const generators: Generator[] = [
       for (let extra = c + 1; picked.length < 3; extra++)
         if (!picked.some((p) => p.v === extra) && extra !== c)
           picked.push({ v: extra, text: String(extra), why: 'This miscounts the rows of the merge: count one comparison for each item moved before a list becomes empty.' });
-      const solution =
-        'Compare the front items, move the smaller one to the output, and repeat:\n\n' +
-        '| Compare | Smaller (moved) | Output so far |\n| --- | --- | --- |\n' +
-        rows.join('\n') +
-        `\n\nNow the ${emptied} list is empty, so ${restList.join(', ')} ${restList.length === 1 ? 'is' : 'are'} copied across with no more comparisons, giving \`${pyList([...out, ...restList])}\`.\n\n` +
-        `Counting the rows of the table gives the number of comparisons.\n\nAnswer: ${answer}`;
+      const solution = steps(
+        '**Merging** joins two sorted lists into one sorted list. Each list is already in order, so its smallest remaining item is always at its front.',
+        'So only the two front items ever need comparing. Each comparison moves the smaller one to the output, which means one comparison moves exactly one item.',
+        'Here is every comparison:',
+        table(['Compare', 'Smaller (moved)', 'Output so far'], rows),
+        `Now the ${emptied} list is empty, so ${restList.join(' and ')} ${restList.length === 1 ? 'is' : 'are'} copied across with nothing left to compare against. The output is ${show([...out, ...restList])}.`,
+        `Each row of the table was one comparison, and there ${c === 1 ? 'is 1 row' : `are ${c} rows`}.`,
+      );
       return {
         stem: `When merging ${show(x)} and ${show(y)}, each comparison moves the smaller front item to the output, and leftovers are copied without comparing. How many comparisons are made?`,
         answer,
         answerValue: c,
         distractors: picked.map((p) => ({ text: p.text, value: p.v, why: p.why })),
+        asking: 'How many front-item comparisons happen before one list runs out?',
         solution,
-        keyIdea: 'Each comparison in a merge places exactly one item; once one list is empty the rest is copied without comparing.',
+        conclusion: `Comparisons stop as soon as the ${emptied} list runs out, which takes ${c === 1 ? '1 row' : `${c} rows`}, so the answer is ${answer}.`,
+        keyIdea: 'For merge counts, make one row per comparison of the two front items. Each row moves one item. Stop when either list is empty, because the leftovers cost no comparisons.',
       };
     },
   },

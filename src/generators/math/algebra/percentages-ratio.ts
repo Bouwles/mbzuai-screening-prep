@@ -1,7 +1,8 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { gcd } from '../../../lib/frac';
-import { dm, m, num } from '../../../lib/tex';
+import { m, num } from '../../../lib/tex';
 
 /** Money as plain text: whole numbers stay whole, anything else gets exactly 2 decimal places. */
 const money = (x: number): string => {
@@ -108,23 +109,22 @@ const genReverse: Generator = {
     ];
     const distractors = pickDistractors(answer, pool);
 
-    const changeWord = up ? 'increase' : 'decrease';
-    const solution =
-      `This is a **reverse percentage**: we know the price *after* the ${changeWord} and want the original.\n\n` +
-      `Step 1: after a ${p}% ${changeWord} the price is ${up ? `${m(`100\\% + ${p}\\% = ${newPct}\\%`)}` : `${m(`100\\% - ${p}\\% = ${newPct}\\%`)}`} of the original, so the multiplier is ${m(multTex)}:` +
-      dm(`\\text{original} \\times ${multTex} = ${final}`) +
-      `Step 2: undo the multiplication by dividing:` +
-      dm(`\\text{original} = ${final} \\div ${multTex} = ${original}`) +
-      `Check: ${m(`${original} \\times ${multTex} = ${final}`)} ✓\n\n` +
-      `Answer: ${answer.text}`;
+    const change = (original * p) / 100;
+    const solution = steps(
+      `Start from what the change does. The original price counts as 100%. ${up ? `Adding ${p}% gives ${m(`100\\% + ${p}\\% = ${newPct}\\%`)}` : `Taking off ${p}% leaves ${m(`100\\% - ${p}\\% = ${newPct}\\%`)}`}, so ${final} is ${newPct}% of the original.`,
+      `As a multiplier, ${newPct}% is ${m(multTex)}, because ${m(`${newPct} \\div 100 = ${multTex}`)}. So ${m(`\\text{original} \\times ${multTex} = ${final}`)}.`,
+      `To undo multiplying by ${m(multTex)}, divide by it: ${m(`\\text{original} = ${final} \\div ${multTex} = ${original}`)}.`,
+    );
 
     return {
       stem,
       answer: answer.text,
       answerValue: original,
       distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+      asking: `What was the price before the ${p}% ${up ? 'increase' : 'reduction'}?`,
       solution,
-      keyIdea: 'Reverse percentages: original $\\times$ multiplier $=$ new value, so DIVIDE the new value by the multiplier.',
+      conclusion: `${p}% of ${original} is ${change}, and ${m(`${original} ${up ? '+' : '-'} ${change} = ${final}`)}, which matches. So the answer is ${answer.text}.`,
+      keyIdea: 'When you know the price after a percentage change and want the original: original $=$ new $\\div$ multiplier. Never take the percentage of the new price, because the percentage was of the original.',
     };
   },
 };
@@ -148,10 +148,12 @@ const genCompound: Generator = {
 
     const answer: Cand = { value: A, text: money2(A), why: '' };
     let stem: string;
+    let asking: string;
     let pool: Cand[];
     if (growth) {
       const who = rng.pick(['Aisha', 'Omar', 'Lina', 'Yusuf', 'Maya', 'Khalid'] as const);
       stem = `${who} invests AED ${P} at ${rate}% per year **compound** interest, compounded annually. What is the total value of the investment after ${n} years? Give your answer to 2 decimal places.`;
+      asking = `How much is the investment worth in total after ${n} years of compound interest?`;
       const simple = P * (1 + (rate * n) / 100);
       const plus1 = compoundCents(P, M, n + 1);
       const minus1 = compoundCents(P, M, n - 1);
@@ -180,6 +182,7 @@ const genCompound: Generator = {
     } else {
       const thing = rng.pick(['car', 'motorbike', 'laptop', 'machine', 'boat'] as const);
       stem = `A ${thing} costs AED ${P} when new. Its value **depreciates** by ${rate}% each year. What is its value after ${n} years? Give your answer to 2 decimal places.`;
+      asking = `What is the ${thing} worth after losing ${rate}% of its value each year for ${n} years?`;
       const simple = P * (1 - (rate * n) / 100);
       const wrongDir = compoundCents(P, 1000 + R, n);
       const plus1 = compoundCents(P, M, n + 1);
@@ -217,31 +220,33 @@ const genCompound: Generator = {
     // "=" when the value after y years is exact to the cent, "\approx" when it has been rounded
     const eq = (y: number): string =>
       (BigInt(P) * 100n * BigInt(M) ** BigInt(y)) % 1000n ** BigInt(y) === 0n ? '=' : '\\approx';
-    const steps: string[] = [];
+    const rows: string[][] = [];
     for (let y = 1; y <= n; y++) {
       const val = compoundCents(P, M, y);
-      const lhs = y === 1 ? `${P} \\times ${multTex}` : `${P} \\times ${multTex}^{${y}}`;
-      steps.push(`- After ${y} year${y === 1 ? '' : 's'}: ${m(`${lhs} ${eq(y)} ${val.toFixed(2)}`)}`);
+      rows.push([String(y), m(y === 1 ? `${P} \\times ${multTex}` : `${P} \\times ${multTex}^{${y}}`), `${eq(y) === '=' ? '' : 'about '}${val.toFixed(2)}`]);
     }
-    const V = growth ? 'A' : 'V';
-    const solution =
-      (growth
-        ? `With compound interest the value is multiplied by ${m(`1 + \\frac{${rate}}{100} = ${multTex}`)} every year.`
-        : `Depreciation of ${rate}% means the item keeps ${m(`100\\% - ${rate}\\% = ${num(100 - rate)}\\%`)} of its value each year, so the yearly multiplier is ${m(multTex)}.`) +
-      dm(`${V} = P \\times ${multTex}^{n} = ${P} \\times ${multTex}^{${n}} ${eq(n)} ${A.toFixed(2)}`) +
-      `Year by year, the power goes up by one each year (use the full calculator value and round to 2 decimal places only at the end):\n\n` +
-      steps.join('\n') +
-      `\n\nAnswer: ${answer.text}`;
+    const solution = steps(
+      growth
+        ? '**Compound** interest means each year\'s interest joins the balance, and the next year\'s interest is worked out on the new balance.'
+        : `**Depreciates** means the value falls. Each year the item keeps ${m(`100\\% - ${rate}\\% = ${num(100 - rate)}\\%`)} of its value.`,
+      growth
+        ? `Each year, ${rate}% is added, so the balance becomes ${num(100 + rate)}% of what it was. That is a multiplier of ${m(multTex)}.`
+        : `As a multiplier, ${num(100 - rate)}% is ${m(multTex)}. The ${rate}% comes off the current value each year, not the original, so we multiply once for every year.`,
+      `The power of the multiplier goes up by one each year. Keep all the digits and round only at the end:`,
+      table(['Year', 'Working', 'Value'], rows),
+    );
 
     return {
       stem,
       answer: answer.text,
       answerValue: A,
       distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+      asking,
       solution,
+      conclusion: `${n} years means ${n} lots of the multiplier, which is ${m(`${P} \\times ${multTex}^{${n}}`)}. So the answer is ${answer.text}.`,
       keyIdea: growth
-        ? 'Compound interest: $A = P\\left(1 + \\frac{r}{100}\\right)^{n}$, the multiplier is applied once per year.'
-        : 'Depreciation: $V = P\\left(1 - \\frac{r}{100}\\right)^{n}$, the value is multiplied by the same number every year.',
+        ? 'For compound growth: value $= P \\times m^{n}$, where $P$ is the start, $m$ is 1 plus the rate as a decimal, and $n$ is the number of years. Round only at the end.'
+        : 'For depreciation: value $= P \\times m^{n}$, where $P$ is the start, $m$ is 1 minus the rate as a decimal, and $n$ is the number of years. Never multiply the percentage by the years.',
     };
   },
 };
@@ -276,8 +281,15 @@ const genRatio: Generator = {
     let stem: string;
     let answer: Cand;
     let pool: Cand[];
+    let asking: string;
     let solution: string;
+    let conclusion: string;
     let keyIdea: string;
+    const partWord = (q: number) => `${q} part${q === 1 ? '' : 's'}`;
+    const whoGetsWhat = names.map((nm, i) => `${nm} gets ${partWord(parts[i])}`);
+    const whoSentence = people === 2 ? `${whoGetsWhat[0]} and ${whoGetsWhat[1]}` : `${whoGetsWhat[0]}, ${whoGetsWhat[1]} and ${whoGetsWhat[2]}`;
+    const shareList = parts.map((q) => `${q * u}`);
+    const shares = `${shareList.slice(0, -1).join(', ')} and ${shareList[shareList.length - 1]}`;
 
     if (mode === 'total') {
       const t = rng.int(0, people - 1);
@@ -329,13 +341,15 @@ const genRatio: Generator = {
           why: 'This shares the money equally and ignores the ratio.',
         },
       ];
-      solution =
-        `Step 1: add the parts of the ratio: ${m(`${parts.join(' + ')} = ${S}`)} parts.\n\n` +
-        `Step 2: find one part: ${m(`${T} \\div ${S} = ${u}`)}, so one part is AED ${u}.\n\n` +
-        `Step 3: ${names[t]} has ${rt} part${rt === 1 ? '' : 's'}: ${m(`${rt} \\times ${u} = ${ans}`)}.\n\n` +
-        `Check: the shares are ${parts.map((q) => `AED ${q * u}`).join(', ')}, which add up to AED ${T}. ✓\n\n` +
-        `Answer: ${answer.text}`;
-      keyIdea = 'To share in a ratio: add the parts, divide the total by that sum to get one part, then multiply.';
+      asking = `How much money does ${names[t]} get?`;
+      solution = steps(
+        `The ratio ${ratioTex} means the money is cut into equal parts. ${whoSentence}.`,
+        `Count the parts in total: ${m(`${parts.join(' + ')} = ${S}`)}.`,
+        `Find the value of one part: ${m(`${T} \\div ${S} = ${u}`)}, so one part is AED ${u}.`,
+        `${names[t]} has ${partWord(rt)}: ${m(`${rt} \\times ${u} = ${ans}`)}.`,
+      );
+      conclusion = `The shares ${shares} add up to ${T}, so ${names[t]} receives ${answer.text}.`;
+      keyIdea = 'To share in a ratio: add the ratio numbers to get the total parts, divide the amount by that total to get one part, then multiply by the number of parts you want.';
     } else {
       // X gets more than Y
       const order = parts.map((_, i) => i).sort((a, b) => parts[a] - parts[b]);
@@ -381,13 +395,15 @@ const genRatio: Generator = {
           why: 'This is the value of one part, not the total amount shared.',
         },
       ];
-      solution =
-        `Step 1: the difference between ${names[xIdx]} and ${names[yIdx]} is ${m(`${parts[xIdx]} - ${parts[yIdx]} = ${diffParts}`)} part${diffParts === 1 ? '' : 's'}.\n\n` +
-        `Step 2: ${diffParts === 1 ? 'that part is' : `those ${diffParts} parts are`} worth AED ${D}, so one part is ${m(`${D} \\div ${diffParts} = ${u}`)}.\n\n` +
-        `Step 3: the total is ${m(`${parts.join(' + ')} = ${S}`)} parts, so the total is ${m(`${S} \\times ${u} = ${T}`)}.\n\n` +
-        `Check: the shares are ${parts.map((q) => `AED ${q * u}`).join(', ')}, and ${m(`${parts[xIdx] * u} - ${parts[yIdx] * u} = ${D}`)}. ✓\n\n` +
-        `Answer: ${answer.text}`;
-      keyIdea = 'Match the given difference to the difference in ratio parts to find one part, then scale up to the whole.';
+      asking = `How much money is shared in total, given how much more ${names[xIdx]} gets than ${names[yIdx]}?`;
+      solution = steps(
+        `The ratio ${ratioTex} means the money is cut into equal parts. ${whoSentence}.`,
+        `${names[xIdx]} has ${m(`${parts[xIdx]} - ${parts[yIdx]} = ${diffParts}`)} more part${diffParts === 1 ? '' : 's'} than ${names[yIdx]}. We are told ${names[xIdx]} gets AED ${D} more, so ${diffParts === 1 ? 'that part is' : `those ${diffParts} parts are`} worth AED ${D}.`,
+        `Find the value of one part: ${m(`${D} \\div ${diffParts} = ${u}`)}.`,
+        `The whole amount is ${m(`${parts.join(' + ')} = ${S}`)} parts, so the total is ${m(`${S} \\times ${u} = ${T}`)}.`,
+      );
+      conclusion = `The shares are ${shares}, and ${m(`${parts[xIdx] * u} - ${parts[yIdx] * u} = ${D}`)} matches the difference given. So the answer is ${answer.text}.`;
+      keyIdea = 'When you are given a difference and a ratio: subtract the ratio numbers to see how many parts the difference covers. Divide to get one part, then multiply by the total number of parts.';
     }
 
     const distractors = pickDistractors(answer, pool);
@@ -405,7 +421,9 @@ const genRatio: Generator = {
       answer: answer.text,
       answerValue: answer.value,
       distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+      asking,
       solution,
+      conclusion,
       keyIdea,
     };
   },

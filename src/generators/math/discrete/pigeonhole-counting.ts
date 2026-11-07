@@ -1,4 +1,5 @@
 import type { Generator } from "../../../types";
+import { steps as stepsOf } from "../../../lib/explanation";
 import { lcm } from "../../../lib/frac";
 import { nCr, nPr } from "../../../lib/mathx";
 import { m, num } from "../../../lib/tex";
@@ -27,8 +28,20 @@ function pickDistinct(answer: number, pool: Cand[]): Cand[] {
 
 const fl = (N: number, a: number) => Math.floor(N / a);
 const nums = (n: number) => (n === 1 ? '1 number' : `${n} numbers`);
-const floorTex = (N: number, a: number) =>
-  `\\left\\lfloor \\frac{${N}}{${a}} \\right\\rfloor`;
+/** "$N \\div a = q$" or "$N \\div a \\approx 16.67$, which rounds down to 16". */
+const countMultiples = (N: number, a: number) =>
+  N % a === 0
+    ? m(`${N} \\div ${a} = ${fl(N, a)}`)
+    : `${m(`${N} \\div ${a} \\approx ${num(N / a, 2)}`)}, which rounds down to ${fl(N, a)}`;
+
+/** The working for "choose r from n": "\\binom{6}{2} = \\frac{6 \\times 5}{2 \\times 1} = 15". */
+function chooseTex(n: number, r: number): string {
+  const head = `\\binom{${n}}{${r}}`;
+  if (r === 1) return `${head} = ${n}`;
+  const top = Array.from({ length: r }, (_, i) => n - i);
+  const bottom = Array.from({ length: r }, (_, i) => r - i);
+  return `${head} = \\frac{${top.join(" \\times ")}}{${bottom.join(" \\times ")}} = \\frac{${big(nPr(n, r))}}{${big(nPr(r, r))}} = ${big(nCr(n, r))}`;
+}
 
 // ---------------------------------------------------------------- pigeonhole contexts
 interface PigeonCtx {
@@ -171,15 +184,15 @@ export const generators: Generator[] = [
             value: d.v,
             why: d.why,
           })),
-          solution:
-            `Boxes: the ${k} ${ctx.boxes}. Objects: the ${N} ${ctx.items}. To keep every box as small as possible, spread the objects as evenly as you can.\n\n` +
-            `- ${m(`${N} \\div ${k} = ${q}`)} remainder ${s}, so giving ${q} to every box uses ${m(`${k} \\times ${q} = ${q * k}`)} objects.\n` +
-            `- There ${s === 1 ? 'is' : 'are'} still ${m(`${N} - ${q * k} = ${s}`)} left over, and ${s === 1 ? 'it' : 'each'} must go into a box that already has ${q}. So some box has at least ${ans}.\n` +
-            `- More than ${ans} is not guaranteed: put ${ans} in ${s} box${s === 1 ? "" : "es"} and ${q} in the others; that uses all ${N} and no box has ${ans + 1}.\n\n` +
-            `$$n = \\left\\lceil \\frac{${N}}{${k}} \\right\\rceil = ${ans}$$\n\n` +
-            `Answer: ${m(String(ans))}`,
+          asking: `With ${N} ${ctx.items} and ${k} ${ctx.boxes}, what is the largest number that must share one of them?`,
+          solution: stepsOf(
+            `Treat the ${k} ${ctx.boxes} as boxes and the ${N} ${ctx.items} as objects going into them. To find what **must** happen, spread the objects as evenly as possible. That is the worst case, with no box getting more than necessary.`,
+            `Divide: ${m(`${N} \\div ${k} = ${q}`)} remainder ${s} (the remainder is what is left over). So give each box ${q}, which uses ${m(`${k} \\times ${q} = ${q * k}`)} objects.`,
+            `That leaves ${m(`${N} - ${q * k} = ${s}`)} over. ${s === 1 ? 'It' : 'Each one'} must go into a box that already has ${q}, so some box must reach ${m(`${q} + 1 = ${ans}`)}. In this even spread no box goes above ${ans}, so ${ans + 1} can't be guaranteed.`,
+          ),
+          conclusion: `An even spread still forces ${ans} into one box and never forces ${ans + 1}, so the largest $n$ is ${m(String(ans))}.`,
           keyIdea:
-            "Generalised pigeonhole: $N$ objects in $k$ boxes force some box to contain at least $\\left\\lceil \\frac{N}{k} \\right\\rceil$.",
+            "General pigeonhole: with $N$ objects in $k$ boxes, some box has at least $\\frac{N}{k}$ rounded **up**. Find it by giving every box an equal share, then placing one leftover.",
         };
       }
 
@@ -219,14 +232,15 @@ export const generators: Generator[] = [
           value: d.v,
           why: d.why,
         })),
-        solution:
-          `Boxes: the ${k} ${ctx.boxes}. Imagine the **worst case**, where you avoid ${r} in any box for as long as possible.\n\n` +
-          `- You can have ${r - 1} in every box without any box reaching ${r}: ${m(`${k} \\times ${r - 1} = ${worst}`)}.\n` +
-          `- The next one must land in a box that already has ${r - 1}, making ${r}.\n\n` +
-          `$$${k}(${r} - 1) + 1 = ${worst} + 1 = ${ans}$$\n\n` +
-          `Answer: ${m(String(ans))}`,
+        asking: `How many ${ctx.items} guarantee ${r} sharing one of the ${k} ${ctx.boxes}?`,
+        solution: stepsOf(
+          `"Certain" means we look at the worst case: as many ${ctx.items} as possible, with none of the ${ctx.boxes} reaching ${r}.`,
+          `The most you can have without reaching ${r} is ${r - 1} in each of the ${k} ${ctx.boxes}. That is ${m(`${k} \\times ${r - 1} = ${worst}`)} ${ctx.items}.`,
+          `The next one has to join one of the ${ctx.boxes} that already has ${r - 1}. That makes ${r}, and the total is ${m(`${worst} + 1 = ${ans}`)}.`,
+        ),
+        conclusion: `${worst} ${ctx.items} can still avoid ${r} in any one of the ${ctx.boxes}, but one more can't, so the minimum is ${m(String(ans))}.`,
         keyIdea:
-          "To force $r$ objects into one of $k$ boxes you need $k(r-1) + 1$: fill every box to $r - 1$, then add one more.",
+          'To guarantee $r$ of one kind with $k$ kinds, the worst case holds $r - 1$ of each, so take $k(r - 1) + 1$. Spot it from "smallest" together with "certain" or "guarantee".',
       };
     },
   },
@@ -302,10 +316,6 @@ export const generators: Generator[] = [
         const stem = askNeither
           ? `How many integers from 1 to ${N} inclusive are divisible by **neither** ${a} nor ${b}?`
           : `How many integers from 1 to ${N} inclusive are divisible by ${a} **or** by ${b} (or both)?`;
-        const lcmLine =
-          l === a * b
-            ? `Divisible by **both**: multiples of ${m(`\\text{lcm}(${a}, ${b}) = ${l}`)}: ${m(`${floorTex(N, l)} = ${fab}`)}.`
-            : `Divisible by **both**: multiples of ${m(`\\text{lcm}(${a}, ${b}) = ${l}`)} (not ${m(`${a} \\times ${b}`)}): ${m(`${floorTex(N, l)} = ${fab}`)}.`;
         return {
           stem,
           answer: m(String(ans)),
@@ -315,19 +325,22 @@ export const generators: Generator[] = [
             value: d.v,
             why: d.why,
           })),
-          solution:
-            `Count multiples by dividing and rounding down (the brackets mean "round down").\n\n` +
-            `- Multiples of ${a}: ${m(`${floorTex(N, a)} = ${fa}`)}.\n` +
-            `- Multiples of ${b}: ${m(`${floorTex(N, b)} = ${fb}`)}.\n` +
-            `- ${lcmLine}\n\n` +
-            `Inclusion-exclusion (the overlap was counted twice, so subtract it once):\n\n` +
-            `$$${fa} + ${fb} - ${fab} = ${either}$$\n\n` +
-            (askNeither
-              ? `Neither: ${m(`${N} - ${either} = ${neither}`)}.\n\n`
-              : "") +
-            `Answer: ${m(String(ans))}`,
+          asking: askNeither
+            ? `How many numbers from 1 to ${N} are multiples of neither ${a} nor ${b}?`
+            : `How many numbers from 1 to ${N} are multiples of ${a} or ${b}?`,
+          solution: stepsOf(
+            `To count the multiples of a number from 1 to ${N}, divide ${N} by that number and drop anything after the decimal point.`,
+            `Multiples of ${a}: ${countMultiples(N, a)}. Multiples of ${b}: ${countMultiples(N, b)}.`,
+            `Numbers divisible by both have been counted twice. A number divisible by both ${a} and ${b} is a multiple of their lowest common multiple (LCM, the smallest number both divide into), which is ${l}.${l === a * b ? "" : ` Note that this is smaller than ${m(`${a} \\times ${b}`)}.`}`,
+            `Multiples of ${l}: ${countMultiples(N, l)}.`,
+            `This is **inclusion-exclusion**: add the two groups, then take off the overlap once. ${m(`${fa} + ${fb} - ${fab} = ${either}`)}.`,
+            askNeither && `The rest are multiples of neither: ${m(`${N} - ${either} = ${neither}`)}.`,
+          ),
+          conclusion: askNeither
+            ? `${either} of the ${N} numbers are multiples of ${a} or ${b}, so ${m(String(ans))} are multiples of neither.`
+            : `Adding ${fa} and ${fb} counts ${nums(fab)} twice, so removing one copy leaves ${m(String(ans))}.`,
           keyIdea:
-            'Inclusion-exclusion: $|A \\cup B| = |A| + |B| - |A \\cap B|$, and "divisible by both" means a multiple of the LCM.',
+            'For "divisible by $a$ or $b$": count the multiples of $a$, add the multiples of $b$, then subtract the multiples of their LCM. Count multiples by dividing the limit and rounding down. "Neither" is the total minus that result.',
         };
       }
     },
@@ -381,13 +394,16 @@ export const generators: Generator[] = [
               value: d.v,
               why: d.why,
             })),
-            solution:
-              `Every shortest route has exactly ${w} right steps (R) and ${h} up steps (U), so ${m(`${w} + ${h} = ${w + h}`)} steps in total.\n\n` +
-              `A route is fixed once you decide **which ${h} of the ${w + h} steps are U**:\n\n` +
-              `$$\\binom{${w + h}}{${h}} = \\frac{${w + h}!}{${w}! \\times ${h}!} = ${big(ans)}$$\n\n` +
-              `Answer: ${m(big(ans))}`,
+            asking: `How many ways can you order ${w} right moves and ${h} up moves?`,
+            solution: stepsOf(
+              `Going from $(0, 0)$ to $(${w}, ${h})$ takes exactly ${w} right moves (R) and ${h} up moves (U). Any shortest route has exactly these, which makes ${m(`${w} + ${h} = ${w + h}`)} moves in total.`,
+              `So a route is just a word such as ${"R".repeat(w)}${"U".repeat(h)}, made of ${w} Rs and ${h} Us. Different orders are different routes.`,
+              `To write such a word, choose which ${h} of the ${w + h} positions hold a U. The other positions must be R. So we want the number of ways to choose ${h} from ${w + h}.`,
+              `${m(`\\binom{${w + h}}{${h}}`)} means the number of ways to choose ${h} items from ${w + h} when order doesn't matter. ${m(chooseTex(w + h, h))}.`,
+            ),
+            conclusion: `Choosing where the ${h} up moves go among the ${w + h} moves gives ${m(big(ans))} routes.`,
             keyIdea:
-              "Shortest grid routes with $m$ rights and $n$ ups: $\\binom{m+n}{n}$ (choose where the ups go).",
+              "For grid routes moving only right and up: total moves $=$ right $+$ up, then routes $= \\binom{\\text{total}}{\\text{up}}$. You choose which moves are up, and the rest are right.",
           };
         }
 
@@ -430,14 +446,16 @@ export const generators: Generator[] = [
             value: d.v,
             why: d.why,
           })),
-          solution:
-            `Split the journey at ${m(`(${p}, ${q})`)} and multiply (first leg **and then** second leg).\n\n` +
-            `- Start to ${m(`(${p}, ${q})`)}: ${p} right and ${q} up, so ${m(`\\binom{${p + q}}{${q}} = ${leg1}`)} routes.\n` +
-            `- ${m(`(${p}, ${q})`)} to ${m(`(${w}, ${h})`)}: ${w - p} right and ${h - q} up, so ${m(`\\binom{${w - p + h - q}}{${h - q}} = ${leg2}`)} routes.\n\n` +
-            `$$${leg1} \\times ${leg2} = ${big(ans)}$$\n\n` +
-            `Answer: ${m(big(ans))}`,
+          asking: `How many shortest routes from $(0, 0)$ to $(${w}, ${h})$ go through $(${p}, ${q})$?`,
+          solution: stepsOf(
+            `A route through ${m(`(${p}, ${q})`)} has two legs: start to that point, **and then** that point to the end. Any first leg can join any second leg, so we count each leg and multiply.`,
+            `Leg 1, from $(0, 0)$ to ${m(`(${p}, ${q})`)}: ${p} right and ${q} up, which is ${p + q} moves. A route is fixed once you choose which moves go up. ${m(`\\binom{${p + q}}{${q}}`)} means choosing ${q} from ${p + q}, and ${m(chooseTex(p + q, q))}.`,
+            `Leg 2, from ${m(`(${p}, ${q})`)} to ${m(`(${w}, ${h})`)}: ${m(`${w} - ${p} = ${w - p}`)} right and ${m(`${h} - ${q} = ${h - q}`)} up, which is ${w - p + h - q} moves. Choosing which go up gives ${m(chooseTex(w - p + h - q, h - q))}.`,
+            `Multiply the two legs: ${m(`${leg1} \\times ${leg2} = ${big(ans)}`)}.`,
+          ),
+          conclusion: `${leg1} ways to reach ${m(`(${p}, ${q})`)} and ${leg2} ways from there to the end give ${m(big(ans))} routes.`,
           keyIdea:
-            "Routes through a point = (routes to the point) times (routes from the point to the end).",
+            "For routes through a point, split at that point: count each leg with $\\binom{\\text{moves}}{\\text{up}}$, then multiply. To count routes that avoid the point, subtract this from the total number of routes.",
         };
       }
     },

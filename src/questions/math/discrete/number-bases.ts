@@ -32,20 +32,19 @@ export const questions: StaticQuestion[] = [
     options: ['$43$', '$53$', '$106$', '$21$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What is $110101_2$ written as an ordinary number?',
       solution:
-        'In binary, each place is worth **double** the place to its right. Starting from the right, the place values are $1, 2, 4, 8, 16, 32$.\n\n' +
-        '| Place value | 32 | 16 | 8 | 4 | 2 | 1 |\n' +
-        '| --- | --- | --- | --- | --- | --- | --- |\n' +
-        '| Digit | 1 | 1 | 0 | 1 | 0 | 1 |\n\n' +
-        'Add the place values that have a 1 under them:\n\n' +
-        '$$32 + 16 + 4 + 1 = 53$$',
+        'The small 2 means base 2, also called **binary**. Each place is worth double the place to its right, starting with 1 on the far right: 1, 2, 4, 8, 16, 32.\n\n' +
+        'Write the digits under their place values:\n\n| Place value | 32 | 16 | 8 | 4 | 2 | 1 |\n|---|---|---|---|---|---|---|\n| Digit | 1 | 1 | 0 | 1 | 0 | 1 |\n\n' +
+        'A 1 means that place value counts, and a 0 means it doesn\'t. So add the place values above the 1s: $32 + 16 + 4 + 1 = 53$.',
+      conclusion: 'The places holding a 1 are worth 32, 16, 4 and 1, which add up to $53$.',
       whyWrong: [
         'This is what you get if you start the place values at the **left** end: you have really converted $101011_2 = 32 + 8 + 2 + 1 = 43$. The units (1s) place is always the rightmost digit.',
         null,
         'This is what you get if you start the place values at 2 instead of 1 (using $2, 4, 8, \\dots, 64$). The rightmost place is $2^0 = 1$, so this doubles the true answer.',
         'This is what you get if you drop the leftmost 1: $10101_2 = 16 + 4 + 1 = 21$. A 6-digit binary number has a leading place value of 32.',
       ],
-      keyIdea: 'Binary place values are powers of 2 starting from $2^0 = 1$ at the right; add the place values where there is a 1.',
+      keyIdea: 'To convert from any base to decimal, write the place values above the digits, starting with 1 on the right and multiplying by the base each time. Multiply each digit by its place value, then add.',
     },
     check: { optionValues: [43, 53, 106, 21], compute: () => fromBase('110101', 2) },
   },
@@ -57,25 +56,19 @@ export const questions: StaticQuestion[] = [
     options: ['$101001_2$', '$111_2$', '$100100_2$', '$100101_2$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How do we write 37 using only 1s and 0s?',
       solution:
-        'Divide by 2 repeatedly and write down each remainder:\n\n' +
-        '| Division | Quotient | Remainder |\n' +
-        '| --- | --- | --- |\n' +
-        '| $37 \\div 2$ | 18 | 1 |\n' +
-        '| $18 \\div 2$ | 9 | 0 |\n' +
-        '| $9 \\div 2$ | 4 | 1 |\n' +
-        '| $4 \\div 2$ | 2 | 0 |\n' +
-        '| $2 \\div 2$ | 1 | 0 |\n' +
-        '| $1 \\div 2$ | 0 | 1 |\n\n' +
-        'Read the remainders from the **bottom up**: $100101_2$.\n\n' +
-        'Check with place values: $32 + 4 + 1 = 37$. Correct.',
+        'In binary the places are worth 32, 16, 8, 4, 2 and 1, each double the next. We build 37 from these, using each place at most once.\n\n' +
+        'Go through the places from largest to smallest. If a place value fits into what is left, write 1 and subtract it. If not, write 0:\n\n| Place | Fits? | Left over | Digit |\n|---|---|---|---|\n| 32 | Yes | $37 - 32 = 5$ | 1 |\n| 16 | No | 5 | 0 |\n| 8 | No | 5 | 0 |\n| 4 | Yes | $5 - 4 = 1$ | 1 |\n| 2 | No | 1 | 0 |\n| 1 | Yes | $1 - 1 = 0$ | 1 |\n\n' +
+        'Read the Digit column from top to bottom: 100101.',
+      conclusion: '$32 + 4 + 1 = 37$, so in binary it is $100101_2$.',
       whyWrong: [
-        'This is the remainders read from the **top down** ($1, 0, 1, 0, 0, 1$). The first remainder is the units digit, so it must go on the right: read the remainders from the bottom up.',
+        'This is the right digits in reverse order. The largest place value, 32, belongs on the left, and the units digit belongs on the right.',
         'This writes a 1 for each of $32$, $4$ and $1$ but leaves out the zeros for the unused places $16$, $8$ and $2$. Without the zeros, $111_2$ is only $4 + 2 + 1 = 7$.',
         'This is $32 + 4 = 36$: the units digit has been left as 0. Since 37 is odd, its binary form must end in 1.',
         null,
       ],
-      keyIdea: 'To convert decimal to binary, divide by 2 repeatedly and read the remainders from the last one to the first.',
+      keyIdea: 'Decimal to binary: write the powers of 2 up to the number. Working from the largest, write 1 and subtract if it fits, and write 0 if it doesn\'t. Keep the zeros, since they hold the places.',
     },
     check: { optionValues: ['101001', '111', '100100', '100101'], compute: () => toBase(37, 2) },
   },
@@ -87,17 +80,19 @@ export const questions: StaticQuestion[] = [
     options: ['$64$', '$63$', '$12$', '$36$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many different patterns of 0s and 1s can six bits make?',
       solution:
-        'Each bit has 2 choices (0 or 1), and the choices are independent, so by the product rule:\n\n' +
-        '$$2 \\times 2 \\times 2 \\times 2 \\times 2 \\times 2 = 2^6 = 64$$\n\n' +
-        'These are the patterns $000000_2$ up to $111111_2$, i.e. the numbers $0$ to $63$, which is $64$ values.',
+        'A **bit** is a single binary digit: 0 or 1. So each bit has 2 choices.\n\n' +
+        'The 6 bits are chosen separately, so multiply the choices: $2 \\times 2 \\times 2 \\times 2 \\times 2 \\times 2 = 2^6$.\n\n' +
+        'Work it out by doubling: 2, 4, 8, 16, 32, 64. Each pattern stands for a different value, so that is 64 values.',
+      conclusion: 'Six bits with 2 choices each give $2^6$ patterns, which is $64$ different values.',
       whyWrong: [
         null,
         'This is the **largest** value, $2^6 - 1 = 63$. Counting from 0 to 63 gives 64 different values, because 0 counts too.',
         'This is $2 \\times 6$. The number of choices multiplies for each bit, so it is $2^6$, not $2 \\times 6$.',
         'This is $6^2$: the base and the power have been swapped. It should be $2^6$ (2 choices, 6 times).',
       ],
-      keyIdea: 'With $n$ bits there are $2^n$ different patterns, so $2^n$ different values.',
+      keyIdea: '$n$ bits give $2^n$ different values, running from 0 to $2^n - 1$ for unsigned numbers (no negatives). "How many values" asks for $2^n$, while "largest value" asks for $2^n - 1$.',
     },
     check: {
       optionValues: [64, 63, 12, 36],
@@ -116,17 +111,18 @@ export const questions: StaticQuestion[] = [
     options: ['$256$', '$128$', '$255$', '$127$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What is the biggest number that fits in 8 bits, with no negatives?',
       solution:
-        'The largest value has every bit set to 1: $11111111_2$.\n\n' +
-        '$$128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = 255$$\n\n' +
-        'Quick rule: with $n$ bits the unsigned range is $0$ to $2^n - 1$, so $2^8 - 1 = 256 - 1 = 255$.',
+        'A **bit** is a binary digit, 0 or 1. The biggest value comes from setting every bit to 1: $11111111_2$, where the small 2 means binary.\n\n' +
+        'Each place is worth double the one to its right, so the 8 places are worth 128, 64, 32, 16, 8, 4, 2 and 1. Add them all: $128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = 255$.',
+      conclusion: 'Eight 1s add up to $255$, the largest value an unsigned byte can hold.',
       whyWrong: [
         'This is $2^8 = 256$, the **number of different values** a byte can hold. Since counting starts at 0, the largest is one less: 255.',
         'This is $2^7 = 128$, the place value of the leftmost bit only. All 8 bits being 1 gives more than that.',
         null,
         'This is the largest value of a **signed** (two\'s complement) byte. The question says unsigned, so all 8 bits are used for the size of the number.',
       ],
-      keyIdea: 'An unsigned $n$-bit integer goes from $0$ up to $2^n - 1$.',
+      keyIdea: 'The largest unsigned value with $n$ bits is $2^n - 1$. There are $2^n$ values, but one of them is 0, so the top value is one less.',
     },
     check: {
       optionValues: [256, 128, 255, 127],
@@ -141,17 +137,20 @@ export const questions: StaticQuestion[] = [
     options: ['$32$', '$194$', '$14$', '$44$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is the hexadecimal number $\\mathrm{2C}$ as an ordinary number?',
       solution:
-        'Hexadecimal (base 16) uses the digits $0$ to $9$ and then $\\mathrm{A} = 10$, $\\mathrm{B} = 11$, $\\mathrm{C} = 12$, $\\mathrm{D} = 13$, $\\mathrm{E} = 14$, $\\mathrm{F} = 15$.\n\n' +
-        'The place values are $1$ (right) and $16$ (left):\n\n' +
-        '$$\\mathrm{2C}_{16} = 2 \\times 16 + 12 \\times 1 = 32 + 12 = 44$$',
+        '**Hexadecimal** is base 16. It needs 16 digits, so after 9 it uses letters: A is 10, B is 11, C is 12, D is 13, E is 14 and F is 15.\n\n' +
+        'In base 16 the rightmost place is worth 1 and the next place is worth 16. So in $\\mathrm{2C}$, the 2 is in the 16s place and the C is in the units place.\n\n' +
+        'Multiply each digit by its place value: $2 \\times 16 = 32$ and $12 \\times 1 = 12$.\n\n' +
+        'Add the two results: $32 + 12 = 44$.',
+      conclusion: 'Two 16s and twelve 1s make $44$.',
       whyWrong: [
         'This uses 10 as the place value instead of 16: $2 \\times 10 + 12 = 32$. In hexadecimal the second place is worth 16.',
         'This reads the digits in the wrong order: $12 \\times 16 + 2 = 194$. The rightmost digit is the units digit.',
         'This just adds the digit values, $2 + 12 = 14$, ignoring place value: the 2 is worth $2 \\times 16$, not 2.',
         null,
       ],
-      keyIdea: 'Each hexadecimal place is worth 16 times the place to its right, and the letters A to F stand for 10 to 15.',
+      keyIdea: 'Hexadecimal to decimal: turn letters into numbers (A is 10 up to F is 15), then multiply the left digit by 16 and add the right digit. For longer numbers the places are 1, 16, 256.',
     },
     check: { optionValues: [32, 194, 14, 44], compute: () => fromBase('2C', 16) },
   },
@@ -165,26 +164,19 @@ export const questions: StaticQuestion[] = [
     options: ['$1101_2$', '$10001_2$', '$1111_2$', '$1121_2$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What do you get by adding these two binary numbers?',
       solution:
-        'Add column by column from the right, just like decimal addition, but remember that in binary $1 + 1 = 10_2$ (write 0, carry 1) and $1 + 1 + 1 = 11_2$ (write 1, carry 1).\n\n' +
-        '| Column | 8 | 4 | 2 | 1 |\n' +
-        '| --- | --- | --- | --- | --- |\n' +
-        '| First number | 1 | 0 | 1 | 1 |\n' +
-        '| Second number | 0 | 1 | 1 | 0 |\n\n' +
-        '- 1s column: 1 and 0, total 1. Write 1, carry 0.\n' +
-        '- 2s column: 1 and 1, total 2. Write 0, carry 1.\n' +
-        '- 4s column: 0 and 1 plus the carry 1, total 2. Write 0, carry 1.\n' +
-        '- 8s column: 1 and 0 plus the carry 1, total 2. Write 0, carry 1.\n' +
-        '- The final carry 1 becomes a new 16s digit.\n\n' +
-        'Result: $10001_2$.\n\n' +
-        'Check in decimal: $1011_2 = 11$, $0110_2 = 6$, and $11 + 6 = 17 = 16 + 1 = 10001_2$.',
+        'Add column by column from the right, like ordinary addition. In binary (base 2, using only 0 and 1), $1 + 1$ is 2, which is written $10_2$: write 0 and carry 1.\n\n' +
+        'Work through the columns of 1011 and 0110:\n\n| Column | Top digit | Bottom digit | Carry in | Total | Write | Carry out |\n|---|---|---|---|---|---|---|\n| 1s | 1 | 0 | 0 | 1 | 1 | 0 |\n| 2s | 1 | 1 | 0 | 2 | 0 | 1 |\n| 4s | 0 | 1 | 1 | 2 | 0 | 1 |\n| 8s | 1 | 0 | 1 | 2 | 0 | 1 |\n\n' +
+        'The final carry of 1 becomes a new digit on the far left. Reading the Write column from bottom to top, with that carry first, gives 10001.',
+      conclusion: 'Check: $1011_2$ is 11 and $0110_2$ is 6, and $11 + 6 = 17$, which is $16 + 1$. So the sum is $10001_2$.',
       whyWrong: [
         'This writes 0 whenever a column adds to 2 but never carries the 1 to the next column. Ignoring carries gives $1101_2 = 13$, not $17$.',
         null,
         'This treats $1 + 1$ as $1$ (like the logical OR of the bits) instead of $10_2$. Its value is 15, but $11 + 6 = 17$.',
         'This adds the digits as if they were decimal, giving a digit 2. Binary only has the digits 0 and 1, so a column total of 2 must be written as 0 with a carry of 1.',
       ],
-      keyIdea: 'In binary addition $1 + 1 = 10_2$: write 0 and carry 1 into the next column.',
+      keyIdea: 'Binary addition: work right to left. Total 0 or 1: write it. Total 2: write 0 and carry 1. Total 3: write 1 and carry 1. Convert both numbers to decimal as a check.',
     },
     check: {
       optionValues: ['1101', '10001', '1111', '1121'],
@@ -199,19 +191,20 @@ export const questions: StaticQuestion[] = [
     options: ['$1010111_2$', '$01111010_2$', '$10100111_2$', '$10110111_2$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What is $\\mathrm{A7}_{16}$ written in 0s and 1s?',
       solution:
-        'Each hexadecimal digit is exactly **4 bits** (because $2^4 = 16$), so convert each digit separately and join them.\n\n' +
-        '- $\\mathrm{A} = 10 = 8 + 2 \\to 1010$\n' +
-        '- $7 = 4 + 2 + 1 \\to 0111$ (pad to 4 bits with a leading 0)\n\n' +
-        'Join them in the same order: $1010\\,0111 \\to 10100111_2$.\n\n' +
-        'Check: $\\mathrm{A7}_{16} = 10 \\times 16 + 7 = 167$ and $10100111_2 = 128 + 32 + 4 + 2 + 1 = 167$.',
+        '**Hexadecimal** is base 16, using 0 to 9, then A to F for 10 to 15. One hexadecimal digit always matches exactly 4 binary digits (0s and 1s), because 4 binary digits make $2^4 = 16$ patterns. So we can convert one digit at a time.\n\n' +
+        'A is 10, and $10 = 8 + 2$. Using the places 8, 4, 2, 1, that is $1010$.\n\n' +
+        '7 is $4 + 2 + 1$. Using the places 8, 4, 2, 1, that is $0111$. Keep the leading 0, so the group has 4 digits.\n\n' +
+        'Join the groups in the same order as the hex digits: $1010$ then $0111$ gives $10100111$.',
+      conclusion: 'A becomes $1010$ and 7 becomes $0111$, so the whole number is $10100111_2$.',
       whyWrong: [
         'This writes 7 as $111$ instead of the 4-bit group $0111$. Losing that 0 shifts the A part one place to the right: $1010111_2$ is only 87, not 167.',
         'This converts each digit correctly but puts the groups in the wrong order (7 first, then A). The groups must stay in the same order as the hex digits.',
         null,
         'This uses $1011$ for A, but $1011_2 = 11$, which is B. A is 10, so it is $1010$.',
       ],
-      keyIdea: 'Hex to binary: replace each hex digit by its 4-bit group (padding with leading zeros), keeping the order.',
+      keyIdea: 'Hex to binary: replace each hex digit by its own 4-bit group, in the same order, keeping leading zeros inside each group. Binary to hex is the reverse: group into fours from the right.',
     },
     check: {
       optionValues: ['1010111', '01111010', '10100111', '10110111'],
@@ -226,19 +219,19 @@ export const questions: StaticQuestion[] = [
     options: ['$111$', '$343$', '$489$', '$13$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is $157_8$ as an ordinary number?',
       solution:
-        'In base 8 the place values are powers of 8: $1$, $8$, $8^2 = 64$ (from right to left).\n\n' +
-        '| Place value | 64 | 8 | 1 |\n' +
-        '| --- | --- | --- | --- |\n' +
-        '| Digit | 1 | 5 | 7 |\n\n' +
-        '$$1 \\times 64 + 5 \\times 8 + 7 \\times 1 = 64 + 40 + 7 = 111$$',
+        '**Octal** is base 8. Each place is worth 8 times the place to its right: 1, then 8, then $8 \\times 8 = 64$.\n\n' +
+        'Line up the digits under those places and multiply each digit by its place value:\n\n| Place value | 64 | 8 | 1 |\n|---|---|---|---|\n| Digit | 1 | 5 | 7 |\n| Digit $\\times$ place | 64 | 40 | 7 |\n\n' +
+        'Add the bottom row: $64 + 40 + 7 = 111$.',
+      conclusion: 'One 64, five 8s and seven 1s make $111$.',
       whyWrong: [
         null,
         'This uses powers of 16 (hexadecimal place values): $1 \\times 256 + 5 \\times 16 + 7 = 343$. Octal place values are powers of 8.',
         'This reads the digits in the wrong order: $7 \\times 64 + 5 \\times 8 + 1 = 489$. The rightmost digit is the units digit.',
         'This just adds the digits, $1 + 5 + 7 = 13$, ignoring place value.',
       ],
-      keyIdea: 'In base $b$, the place values from the right are $1, b, b^2, b^3, \\dots$; multiply each digit by its place value and add.',
+      keyIdea: 'In base $b$, the places from the right are 1, $b$, $b^2$, and so on. Multiply each digit by its place value and add. Every digit must be smaller than $b$.',
     },
     check: { optionValues: [111, 343, 489, 13], compute: () => fromBase('157', 8) },
   },
@@ -250,19 +243,20 @@ export const questions: StaticQuestion[] = [
     options: ['$\\mathrm{8C}_{16}$', '$\\mathrm{C8}_{16}$', '$128_{16}$', '$\\mathrm{C5}_{16}$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What is 200 written in base 16?',
       solution:
-        'Divide by 16 and keep the remainders:\n\n' +
-        '- $200 \\div 16 = 12$ remainder $8$ (because $12 \\times 16 = 192$ and $200 - 192 = 8$)\n' +
-        '- $12 \\div 16 = 0$ remainder $12$\n\n' +
-        'Read the remainders from the bottom up: $12$ then $8$. The value 12 is the single hex digit C, so the answer is $\\mathrm{C8}_{16}$.\n\n' +
-        'Check: $12 \\times 16 + 8 = 192 + 8 = 200$.',
+        'Hexadecimal is base 16, so its places are worth 1, then 16, then 256. Since 256 is bigger than 200, we only need the 16s place and the units place.\n\n' +
+        'Find how many 16s fit into 200. $16 \\times 12 = 192$ fits, and $16 \\times 13 = 208$ is too big. So 12 sixteens fit.\n\n' +
+        'The remainder (what is left over) goes in the units place: $200 - 192 = 8$.\n\n' +
+        'In hexadecimal the value 12 is written as the single digit C. So the 16s digit is C and the units digit is 8, which gives C8.',
+      conclusion: '$12 \\times 16 + 8 = 200$, and 12 is the digit C, so the answer is $\\mathrm{C8}_{16}$.',
       whyWrong: [
-        'This writes the remainders top-down (8 first). The first remainder is the units digit and goes on the **right**.',
+        'This puts the digits the wrong way round. The number of 16s goes on the left, and the remainder 8 is the units digit, on the **right**.',
         null,
-        'This writes the quotient 12 as the two decimal digits 1 and 2. In hexadecimal, 12 must be written as the **single** digit C.',
+        'This writes the value 12 as the two decimal digits 1 and 2. In hexadecimal, 12 must be written as the **single** digit C.',
         'This uses the calculator decimal $200 \\div 16 = 12.5$ and turns the 0.5 into a digit 5. The units digit is the **remainder**, $200 - 12 \\times 16 = 8$, not the digits after the decimal point.',
       ],
-      keyIdea: 'Decimal to hex: divide by 16, use the whole-number remainders (written as 0 to F), and read them from last to first.',
+      keyIdea: 'Decimal to hex, for numbers below 256: divide by 16. The whole-number result is the left digit and the remainder is the right digit. Write values from 10 to 15 as A to F. Ignore any decimal places shown on a calculator.',
     },
     check: { optionValues: ['8C', 'C8', '128', 'C5'], compute: () => toBase(200, 16) },
   },
@@ -274,19 +268,20 @@ export const questions: StaticQuestion[] = [
     options: ['$10001101_2$', '$11110010_2$', '$11110011_2$', '$11110001_2$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What pattern of 8 bits stores $-13$ in two\'s complement?',
       solution:
-        'To make a negative number in two\'s complement: write the positive number, **flip every bit**, then **add 1**.\n\n' +
-        '1. $13 = 8 + 4 + 1$, so in 8 bits $13 = 00001101_2$.\n' +
-        '2. Flip every bit: $11110010_2$.\n' +
-        '3. Add 1: $11110010_2 + 1 = 11110011_2$.\n\n' +
-        'Check: in 8-bit two\'s complement, a pattern starting with 1 is worth its unsigned value minus 256. Here $11110011_2 = 243$ unsigned, and $243 - 256 = -13$. Correct.',
+        '**Two\'s complement** is the usual way to store negative whole numbers in bits. The recipe is: write the positive number, flip every bit, then add 1.\n\n' +
+        'Write 13 in 8 bits. $13 = 8 + 4 + 1$, so it is $00001101$.\n\n' +
+        'Flip every bit, so each 0 becomes 1 and each 1 becomes 0: $11110010$.\n\n' +
+        'Add 1. The last digit is 0, so it simply becomes 1: $11110011$.',
+      conclusion: 'Check, with the leftmost bit worth $-128$: $-128 + 64 + 32 + 16 + 2 + 1 = -13$. So the pattern is $11110011_2$.',
       whyWrong: [
         'This is **sign-and-magnitude**: a 1 for the sign followed by 13 in binary. Two\'s complement does not work like that; you must flip the bits and add 1.',
         'This is only the "flip every bit" step (the one\'s complement). You also need to add 1.',
         null,
         'This flips the bits and then **subtracts** 1 instead of adding 1.',
       ],
-      keyIdea: 'Two\'s complement of a negative number: write the positive value, invert all bits, then add 1.',
+      keyIdea: 'To negate in two\'s complement: write the positive value in the full number of bits, flip every bit, add 1. To check, treat the leftmost bit as negative (here $-128$) and add the place values.',
     },
     check: {
       optionValues: ['10001101', '11110010', '11110011', '11110001'],
@@ -305,18 +300,20 @@ export const questions: StaticQuestion[] = [
     options: ['$232$', '$-104$', '$-23$', '$-24$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What number does the bit pattern $11101000$ stand for in two\'s complement?',
       solution:
-        'The leftmost bit is 1, so the number is negative. Two methods:\n\n' +
-        '**Method 1 (flip and add 1).** Flip every bit: $00010111_2$. Add 1: $00011000_2 = 16 + 8 = 24$. So the value is $-24$.\n\n' +
-        '**Method 2 (negative top bit).** In 8-bit two\'s complement the leftmost place is worth $-128$ instead of $+128$:\n\n' +
-        '$$-128 + 64 + 32 + 8 = -24$$',
+        'In **two\'s complement**, every place has its normal value, except that the leftmost place counts as negative. In 8 bits the places are $-128, 64, 32, 16, 8, 4, 2, 1$.\n\n' +
+        'Write the bits under the places:\n\n| Place value | $-128$ | 64 | 32 | 16 | 8 | 4 | 2 | 1 |\n|---|---|---|---|---|---|---|---|---|\n| Bit | 1 | 1 | 1 | 0 | 1 | 0 | 0 | 0 |\n\n' +
+        'A 1 means that place value counts. So add the values above the 1s: $-128 + 64 + 32 + 8$.\n\n' +
+        'Do it in stages: $-128 + 64 = -64$, then $-64 + 32 = -32$, then $-32 + 8 = -24$.',
+      conclusion: 'The leftmost bit gives $-128$ and the others add back 104, so the value is $-24$.',
       whyWrong: [
         'This reads the pattern as an **unsigned** number ($128 + 64 + 32 + 8 = 232$). The question says it is signed two\'s complement, and a leading 1 means negative.',
         'This reads it as **sign-and-magnitude**: sign bit 1, then $1101000_2 = 104$. In two\'s complement the leading bit is worth $-128$.',
         'This flips the bits ($00010111_2 = 23$) but forgets to add 1 afterwards.',
         null,
       ],
-      keyIdea: 'In $n$-bit two\'s complement the leftmost bit is worth $-2^{n-1}$; all other bits keep their usual positive place values.',
+      keyIdea: 'Two\'s complement to decimal: give the leftmost bit a negative place value ($-2^{n-1}$ for $n$ bits) and add as usual. A leading 0 means a positive number, which you read as normal.',
     },
     check: { optionValues: [232, -104, -23, -24], compute: () => twos('11101000') },
   },
@@ -328,17 +325,19 @@ export const questions: StaticQuestion[] = [
     options: ['$39$', '$16$', '$104$', '$1$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What number do you get from $1101_2$ after moving its bits 3 places left?',
       solution:
-        '1. Add three zeros on the right: $1101_2$ becomes $1101000_2$.\n' +
-        '2. Convert to decimal: $64 + 32 + 8 = 104$.\n\n' +
-        'Check: each place left doubles the number, and $1101_2 = 13$, so the result is $13 \\times 2^3 = 104$.',
+        'First read $1101_2$: the places are 8, 4, 2, 1, so it is $8 + 4 + 1 = 13$.\n\n' +
+        'Shift left by 3: move every bit 3 places left and fill the gaps with 0s. So $1101$ becomes $1101000$.\n\n' +
+        'Read the new number using the places 64, 32, 16, 8, 4, 2, 1. The 1s sit under 64, 32 and 8, so the value is $64 + 32 + 8 = 104$.',
+      conclusion: 'Each left shift doubles the number, so three shifts multiply 13 by $2^3 = 8$, which gives $104$.',
       whyWrong: [
         'This multiplies 13 by the shift amount: $13 \\times 3 = 39$. Shifting by $k$ places multiplies by $2^k$, not by $k$.',
         'This adds the shift amount: $13 + 3 = 16$. A shift moves the bits, which multiplies by a power of 2.',
         null,
         'This shifts **right** by 3 places: $13 \\div 8$ rounded down is 1. A left shift makes the number bigger.',
       ],
-      keyIdea: 'A left shift by $k$ places multiplies by $2^k$; a right shift by $k$ places divides by $2^k$ and rounds down.',
+      keyIdea: 'Shifting left by $k$ places multiplies by $2^k$. So convert to decimal and multiply. Shifting right by $k$ places divides by $2^k$ and drops any remainder.',
     },
     check: { optionValues: [39, 16, 104, 1], compute: () => fromBase('1101' + '000', 2) },
   },
@@ -350,19 +349,20 @@ export const questions: StaticQuestion[] = [
     options: ['$-511$ to $511$', '$-512$ to $511$', '$0$ to $1023$', '$-1024$ to $1023$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What are the smallest and largest numbers that 10-bit two\'s complement can store?',
       solution:
-        'With $n$ bits, two\'s complement covers $-2^{n-1}$ to $2^{n-1} - 1$.\n\n' +
-        'Here $n = 10$, so $2^{n-1} = 2^9 = 512$:\n\n' +
-        '- Smallest: $-512$ (pattern $1000000000_2$)\n' +
-        '- Largest: $512 - 1 = 511$ (pattern $0111111111_2$)\n\n' +
-        'That is $512 + 511 + 1 = 1024 = 2^{10}$ values in total, as expected for 10 bits. There is one more negative value than positive, because 0 uses one of the "non-negative" patterns.',
+        'A **bit** is a single 0 or 1, so 10 bits make $2^{10} = 1024$ different patterns, so 1024 different values can be stored.\n\n' +
+        '**Two\'s complement** splits these evenly: half for negative numbers, and half for zero and the positive numbers. Half of 1024 is 512.\n\n' +
+        'The 512 negative values are $-1, -2, -3$ and so on, so the lowest one is the 512th of them.\n\n' +
+        'The other 512 values include zero. So they run from 0 up to $512 - 1 = 511$, and the negatives go down to $-512$.',
+      conclusion: 'The negatives stop 512 below zero and the positives stop at 511, because zero takes one place. So the range is $-512$ to $511$.',
       whyWrong: [
         'This is the range for **sign-and-magnitude**, which wastes a pattern on "negative zero". Two\'s complement has only one zero, so it reaches one further on the negative side: $-512$.',
         null,
         'This is the range for an **unsigned** 10-bit number ($0$ to $2^{10} - 1$). Two\'s complement uses half of the patterns for negative numbers.',
         'This uses $2^{10}$ instead of $2^{9}$. One bit effectively decides the sign, so the size goes up to $2^{n-1}$, and these 2048 values would need 11 bits.',
       ],
-      keyIdea: 'An $n$-bit two\'s complement integer ranges from $-2^{n-1}$ to $2^{n-1} - 1$.',
+      keyIdea: 'For $n$-bit two\'s complement, the range is $-2^{n-1}$ to $2^{n-1} - 1$. There is one more negative than positive, because zero takes a place among the non-negatives.',
     },
     check: {
       optionValues: ['-511..511', '-512..511', '0..1023', '-1024..1023'],
@@ -380,18 +380,18 @@ export const questions: StaticQuestion[] = [
     options: ['$8$', '$38$', '$512$', '$9$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How few bits can give 300 items a different code each?',
       solution:
-        'With $n$ bits there are $2^n$ different codes. We need $2^n \\ge 300$.\n\n' +
-        '- $2^8 = 256$, which is **less** than 300, so 8 bits are not enough (44 items would have no code).\n' +
-        '- $2^9 = 512$, which is at least 300.\n\n' +
-        'So the minimum is $9$ bits.',
+        'A **bit** is a binary digit, 0 or 1. With $n$ bits, each bit has 2 choices, so there are $2^n$ different codes. We need at least 300 of them, one per item.\n\n' +
+        'Try powers of 2 until one reaches 300:\n\n| Bits | Codes | Enough for 300? |\n|---|---|---|\n| 7 | $2^7 = 128$ | No |\n| 8 | $2^8 = 256$ | No |\n| 9 | $2^9 = 512$ | Yes |',
+      conclusion: '8 bits give only 256 codes, and 9 bits give 512, so the minimum is $9$.',
       whyWrong: [
         'This rounds $\\log_2 300 \\approx 8.2$ **down**. But 8 bits only give $2^8 = 256$ codes, fewer than 300 items; you must always round **up**.',
         'This divides 300 by 8 (as if converting bits to bytes) and rounds up. The number of codes grows as $2^n$, not $8n$.',
         'This is the number of codes available with 9 bits ($2^9 = 512$), not the number of bits.',
         null,
       ],
-      keyIdea: 'To give $N$ items different codes you need the smallest $n$ with $2^n \\ge N$.',
+      keyIdea: 'To find the bits needed for $N$ items, find the smallest $n$ with $2^n \\ge N$. List powers of 2 until you pass $N$. Always round up: spare codes are fine, but missing codes are not.',
     },
     check: {
       optionValues: [8, 38, 512, 9],
@@ -414,22 +414,19 @@ export const questions: StaticQuestion[] = [
     options: ['11', '13', '3', '26'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What value does `n` hold once the loop has used every value in `A`?',
       solution:
-        'Each pass doubles the total so far and adds the next digit, reading the digits from left to right.\n\n' +
-        '| `i` | `A[i]` | `n` |\n' +
-        '| --- | --- | --- |\n' +
-        '| 1 | 1 | 1 |\n' +
-        '| 2 | 1 | 3 |\n' +
-        '| 3 | 0 | 6 |\n' +
-        '| 4 | 1 | 13 |\n\n' +
-        'The loop ends and prints **13**. This is the value of $1101_2 = 8 + 4 + 1$.',
+        '`A` holds four values. Arrays start at 1 here, so `A[1]` is 1, `A[2]` is 1, `A[3]` is 0 and `A[4]` is 1. `length(A)` is 4, so the loop on line 3 runs with `i` = 1, 2, 3, 4.\n\n' +
+        '`n` starts at 0. Line 4 doubles `n`, then adds the next value from `A`. Here is every pass:\n\n| Pass | `i` | `A[i]` | `n * 2 + A[i]` | `n` becomes |\n|---|---|---|---|---|\n| 1 | 1 | 1 | `0 * 2 + 1` | 1 |\n| 2 | 2 | 1 | `1 * 2 + 1` | 3 |\n| 3 | 3 | 0 | `3 * 2 + 0` | 6 |\n| 4 | 4 | 1 | `6 * 2 + 1` | 13 |\n\n' +
+        'After pass 4 the loop ends. Line 6 prints `n`, which holds 13.',
+      conclusion: 'The loop reads the digits 1, 1, 0, 1 as the binary number $1101_2 = 8 + 4 + 1$, so it prints 13.',
       whyWrong: [
         'This reads the digits from right to left, which converts $1011_2 = 11$. The loop starts at `A[1]`, the leftmost digit.',
         null,
         'This only adds up the digits and forgets the `n * 2`, which gives each digit its place value.',
         'This doubles once more after the last digit. The last pass adds `A[4]` to $6 \\times 2$, and then the loop ends.',
       ],
-      keyIdea: 'The loop "multiply by the base, then add the next digit" converts a list of digits to a number.',
+      keyIdea: '`n = n * base + digit` reads a number digit by digit from the left, so this loop converts to decimal. Trace it with one row per pass, or read the array as a number in that base.',
     },
     check: {
       optionValues: [11, 13, 3, 26],
@@ -448,19 +445,19 @@ export const questions: StaticQuestion[] = [
     options: ['$4096$', '$4094$', '$2047$', '$4095$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How far is it from the smallest to the largest 12-bit two\'s complement value?',
       solution:
-        'For $n$-bit two\'s complement the range is $-2^{n-1}$ to $2^{n-1} - 1$. With $n = 12$, $2^{11} = 2048$:\n\n' +
-        '- Largest: $2048 - 1 = 2047$\n' +
-        '- Smallest: $-2048$\n\n' +
-        'Difference: $2047 - (-2048) = 2047 + 2048 = 4095$.\n\n' +
-        '(Equivalently: there are $2^{12} = 4096$ values in a row, and the gap from the first to the last of $4096$ consecutive integers is $4096 - 1 = 4095$.)',
+        'A **bit** is a single 0 or 1, so 12 bits make $2^{12} = 4096$ patterns. Two\'s complement uses half of them for negative numbers, and half of 4096 is 2048.\n\n' +
+        'So the smallest value is $-2048$. The largest is $2048 - 1 = 2047$, which is one less because zero uses up one of the non-negative patterns.\n\n' +
+        'Difference means largest minus smallest: $2047 - (-2048)$. Subtracting a negative is the same as adding: $2047 + 2048 = 4095$.',
+      conclusion: 'The gap from $-2048$ up to 2047 is $4095$.',
       whyWrong: [
         'This is the **number** of values, $2^{12} = 4096$. The difference between the first and last of 4096 consecutive integers is one less.',
         'This uses the sign-and-magnitude range $-2047$ to $2047$. Two\'s complement reaches $-2048$.',
         'This is just the largest value, 2047. The smallest value is negative, so subtracting it adds 2048 more.',
         null,
       ],
-      keyIdea: 'An $n$-bit two\'s complement integer spans $-2^{n-1}$ to $2^{n-1} - 1$, so the spread is $2^n - 1$.',
+      keyIdea: 'For $n$ bits the range is $-2^{n-1}$ to $2^{n-1} - 1$. Largest minus smallest is always $2^n - 1$, because the gap between the first and last of a list is one less than its length.',
     },
     check: {
       optionValues: [4096, 4094, 2047, 4095],
@@ -475,14 +472,18 @@ export const questions: StaticQuestion[] = [
     options: ['$8$', '$4$', '$16$', '$2$'],
     correctIndex: 0,
     markScheme: {
-      solution: 'A **bit** is one binary digit, and a **byte** is a group of $8$ bits.',
+      asking: 'How many bits make one byte?',
+      solution:
+        'A **bit** is one binary digit, either 0 or 1. It is the smallest piece of computer data.\n\n' +
+        'A **byte** is a group of bits treated as one unit, and its standard size is 8 bits. For example, $01000001$ is one byte.',
+      conclusion: 'A byte is defined as a group of eight bits, so the answer is $8$.',
       whyWrong: [
         null,
         '4 bits is half a byte, sometimes called a nibble. It is the size of one hexadecimal digit.',
         '16 bits is two bytes.',
         '2 is the number of values one bit can take (0 or 1), not the number of bits in a byte.',
       ],
-      keyIdea: 'One byte is 8 bits.',
+      keyIdea: 'Keep these sizes together: 1 byte is 8 bits, and 1 hex digit is 4 bits. A question in bytes often needs multiplying by 8 to turn it into bits, which gives $2^8 = 256$ values per byte.',
     },
   },
   {
@@ -493,16 +494,18 @@ export const questions: StaticQuestion[] = [
     options: ['$15$', '$16$', '$6$', '$14$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What number does the hexadecimal digit F stand for?',
       solution:
-        'Hexadecimal uses the digits $0$ to $9$, then the letters $\\mathrm{A} = 10$, $\\mathrm{B} = 11$, $\\mathrm{C} = 12$, $\\mathrm{D} = 13$, $\\mathrm{E} = 14$ and $\\mathrm{F} = 15$.\n\n' +
-        'So $\\mathrm{F}$ stands for $15$, the largest single hexadecimal digit.',
+        'Hexadecimal is base 16, so it has 16 digits with values from 0 to 15. After 9, letters take over.\n\n' +
+        'Count on from 9: A is 10, B is 11, C is 12, D is 13, E is 14 and F is 15.',
+      conclusion: 'F is the last hexadecimal digit, so it stands for $15$.',
       whyWrong: [
         null,
         '16 is the base itself. Digits in base 16 run from 0 up to one less than the base.',
         'This is the position of F in the alphabet. The letters start at $\\mathrm{A} = 10$.',
         'This is the value of E, the letter before F.',
       ],
-      keyIdea: 'The hexadecimal letters A to F stand for 10 to 15.',
+      keyIdea: 'Digits in base $b$ run from 0 to $b - 1$. For hexadecimal, A starts at 10, so add 9 to the letter\'s place in the alphabet: F is the 6th letter, and $6 + 9 = 15$.',
     },
     check: { optionValues: [15, 16, 6, 14], compute: () => fromBase('F', 16) },
   },
@@ -514,14 +517,18 @@ export const questions: StaticQuestion[] = [
     options: ['$4$', '$8$', '$16$', '$2$'],
     correctIndex: 0,
     markScheme: {
-      solution: 'A hexadecimal digit has 16 possible values, and $2^4 = 16$, so one hexadecimal digit corresponds to exactly $4$ bits.',
+      asking: 'How many binary digits are needed to write one hexadecimal digit?',
+      solution:
+        'One hexadecimal digit can take 16 different values, from 0 to 15.\n\n' +
+        '$n$ bits make $2^n$ patterns, so we need $2^n = 16$. Doubling gives 2, 4, 8, 16, which reaches 16 at the fourth step. So $2^4 = 16$. For example, F is $1111$.',
+      conclusion: '16 values need exactly 4 bits, since $2^4 = 16$, so the answer is $4$.',
       whyWrong: [
         null,
         '8 bits is one byte, which takes **two** hexadecimal digits.',
         '16 is the number of values one digit can take, not the number of bits. You need $2^n = 16$, so $n = 4$.',
         '2 bits give only $2^2 = 4$ values, which is not enough for 16 different digits.',
       ],
-      keyIdea: 'Because $2^4 = 16$, one hexadecimal digit is exactly 4 bits.',
+      keyIdea: 'To find the bits per digit, write the base as a power of 2. Base 16 is $2^4$, so 4 bits per digit. Base 8 is $2^3$, so 3 bits per digit.',
     },
     check: {
       optionValues: [4, 8, 16, 2],
@@ -540,16 +547,18 @@ export const questions: StaticQuestion[] = [
     options: ['$8$', '$16$', '$10$', '$2$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the base of the octal number system?',
       solution:
-        '**Radix** is another word for the base of a number system: the number of different digits it uses.\n\n' +
-        'Octal uses the digits $0$ to $7$, which is 8 digits, so its radix is $8$.',
+        '**Radix** is another word for base: how many different digits a number system uses.\n\n' +
+        '"Oct" means eight, as in octopus. Octal uses the digits 0 to 7, which is 8 digits in total.',
+      conclusion: 'Octal has eight digits, so its radix is $8$.',
       whyWrong: [
         null,
         'This is the radix of hexadecimal.',
         'This is the radix of ordinary decimal numbers.',
         'This is the radix of binary.',
       ],
-      keyIdea: 'Radix means base: binary is 2, octal is 8, decimal is 10 and hexadecimal is 16.',
+      keyIdea: 'Match the name to the base: binary is 2, octal is 8, decimal is 10 and hexadecimal is 16. The radix is always one more than the largest digit allowed.',
     },
   },
   {
@@ -560,19 +569,19 @@ export const questions: StaticQuestion[] = [
     options: ['$\\mathrm{2D}_{16}$', '$\\mathrm{B4}_{16}$', '$\\mathrm{D2}_{16}$', '$45_{16}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is $101101_2$ written in base 16?',
       solution:
-        'One hexadecimal digit is 4 bits, so split the bits into groups of 4 **starting from the right**.\n\n' +
-        '1. The groups are $10$ and $1101$. Pad the left group: $0010$ and $1101$.\n' +
-        '2. $0010_2 = 2$ and $1101_2 = 13 = \\mathrm{D}$.\n\n' +
-        'So the answer is $\\mathrm{2D}_{16}$.\n\n' +
-        'Check: $101101_2 = 32 + 8 + 4 + 1 = 45$ and $\\mathrm{2D}_{16} = 2 \\times 16 + 13 = 45$.',
+        'One hexadecimal digit equals 4 binary digits, because $2^4 = 16$. So we split the binary number into groups of 4.\n\n' +
+        'Group from the **right**, because that is where the place values start. $101101$ splits into $10$ and $1101$. The left group is short, so pad it on the left with 0s to get $0010$. This doesn\'t change its value.\n\n' +
+        'Convert each group using the places 8, 4, 2, 1. In hexadecimal, A to F stand for 10 to 15, so 13 is D:\n\n| Group | Working | Value | Hex digit |\n|---|---|---|---|\n| $0010$ | 2 | 2 | 2 |\n| $1101$ | $8 + 4 + 1$ | 13 | D |',
+      conclusion: 'The left group is 2 and the right group is D, so the number is $\\mathrm{2D}_{16}$.',
       whyWrong: [
         null,
         'This groups from the **left** ($1011$, $01$) and pads on the right, which changes the value. Groups must start from the right.',
         'This writes the two groups in the wrong order. The left group stays on the left.',
         'This finds the decimal value, 45, and writes it with a base 16 label. $45_{16}$ is worth $4 \\times 16 + 5 = 69$.',
       ],
-      keyIdea: 'Binary to hexadecimal: group the bits in 4s from the right, padding the left group with zeros.',
+      keyIdea: 'Binary to hex: group into fours from the right, pad the leftmost group with 0s, and convert each group to one digit (10 to 15 become A to F). Keep the groups in their original order.',
     },
     check: {
       optionValues: ['2D', 'B4', 'D2', '45'],

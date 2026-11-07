@@ -1,5 +1,6 @@
 import type { GeneratedCore, Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { num } from '../../../lib/tex';
 
 /** Integer division and remainder. */
@@ -7,14 +8,6 @@ const fdiv = (a: number, b: number): number => Math.floor(a / b);
 const pmod = (a: number, b: number): number => a - b * Math.floor(a / b);
 
 const m = (s: string) => `$${s}$`;
-
-/** "= 4.6" or "\approx 3.29" style description of a / b. */
-function quotientTex(a: number, b: number): string {
-  const v = a / b;
-  // Exact to 3 d.p. (e.g. 21 / 8 = 2.625) is shown exactly; recurring decimals are rounded to 2 d.p.
-  const exact = Math.abs(v * 1000 - Math.round(v * 1000)) < 1e-9;
-  return exact ? `= ${num(v, 3)}` : `\\approx ${num(v, 2)}`;
-}
 
 type Cand = { text: string; value: number | string; why: string };
 
@@ -70,13 +63,6 @@ function genDivMod(rng: Rng): GeneratedCore {
     const distractors = pickDistinct(answer, answerValue, pool);
     if (distractors.length < 3) continue;
 
-    const solution =
-      '`div(a,b)` is integer division: divide and keep only the whole-number part. `mod(a,b)` is the remainder left over, so that $a = b \\times q + r$.\n\n' +
-      `1. ${m(`${a} \\div ${b} ${quotientTex(a, b)}`)}, and the whole-number part is ${m(`${q}`)}, so \`div(a,b)\` is \`${q}\`.\n` +
-      `2. Remainder: ${m(`${a} - ${b} \\times ${q} = ${r}`)}, so \`mod(a,b)\` is \`${r}\`.\n` +
-      `3. Check: ${m(`${b} \\times ${q} + ${r} = ${a}`)}.\n\n` +
-      `Answer: ${answer}`;
-
     return {
       stem: 'What does this pseudocode print? Output lines are shown separated by a space.',
       code: {
@@ -86,8 +72,14 @@ function genDivMod(rng: Rng): GeneratedCore {
       answer,
       answerValue,
       distractors,
-      solution,
-      keyIdea: '`div(a,b)` is how many whole times b fits into a, and `mod(a,b)` is what is left over, so $a = b \\times q + r$.',
+      asking: `What are \`div(a,b)\` and \`mod(a,b)\` when \`a\` is ${a} and \`b\` is ${b}?`,
+      solution: steps(
+        '`div(a,b)` asks how many whole times `b` fits into `a`, and throws away any decimal part. `mod(a,b)` asks what is left over after that. The leftover is called the **remainder**.',
+        `Find the biggest multiple of ${b} that fits in ${a}. ${m(`${b} \\times ${q} = ${b * q}`)} fits, but ${m(`${b} \\times ${q + 1} = ${b * (q + 1)}`)} is too big. So ${b} fits ${q} whole times, and line 3 prints ${q}.`,
+        `The leftover is ${m(`${a} - ${b * q} = ${r}`)}, so line 4 prints ${r}.`,
+      ),
+      conclusion: `Line 3 prints ${q} and line 4 prints ${r}, so the output is ${answer}.`,
+      keyIdea: 'For `div(a,b)` and `mod(a,b)`, find the biggest multiple of `b` that fits in `a`. How many times `b` fits is the `div`. The gap between that multiple and `a` is the `mod`.',
     };
   }
 }
@@ -97,7 +89,10 @@ interface Built {
   stem: string;
   source: string;
   answer: number;
+  asking: string;
   steps: string[];
+  because: string;
+  keyIdea: string;
   pool: { value: number; why: string }[];
 }
 
@@ -112,11 +107,15 @@ function buildPowTemplate(rng: Rng): Built | null {
     stem: 'In this pseudocode, `^` means "to the power of". What is printed?',
     source: `print(${a} + ${b} * ${c} ^ 2)`,
     answer: ans,
+    asking: `What is ${m(`${a} + ${b} \\times ${c}^2`)} when the operations are done in the right order?`,
     steps: [
-      `Power first: \`${c} ^ 2\` is \`${c2}\`. The expression is now \`${a} + ${b} * ${c2}\`.`,
-      `Then multiply: \`${b} * ${c2}\` is \`${prod}\`.`,
+      'Operations are not simply done left to right. The order is powers first, then `*` and `/`, then `+` and `-`.',
+      `Do the power first. \`${c} ^ 2\` means ${m(`${c} \\times ${c} = ${c2}`)}. It applies only to the ${c} right next to it. Now we have ${m(`${a} + ${b} \\times ${c2}`)}.`,
+      `Next, multiply: ${m(`${b} \\times ${c2} = ${prod}`)}. Now we have ${m(`${a} + ${prod}`)}.`,
       `Add last: ${m(`${a} + ${prod} = ${ans}`)}.`,
     ],
+    because: 'Following the order power, multiply, add',
+    keyIdea: 'For a long expression, rewrite it once per operation: powers, then `*` and `/`, then `+` and `-`. Each `^` applies only to the number directly before it.',
     pool: [
       {
         value: (a + b) * c2,
@@ -150,11 +149,15 @@ function buildModTemplate(rng: Rng): Built | null {
     stem: 'What does this pseudocode print?',
     source: `print(${a} - mod(${b},${c}) * ${d}) // mod is the modulus operator`,
     answer: ans,
+    asking: `What is ${a} minus ${d} times the remainder of ${m(`${b} \\div ${c}`)}?`,
     steps: [
-      `Function calls are worked out first. \`mod(${b},${c})\`: ${m(`${b} = ${fdiv(b, c)} \\times ${c} + ${r}`)}, so the remainder is \`${r}\`.`,
-      `Multiply before subtracting: \`${r} * ${d}\` is \`${r * d}\`.`,
+      `\`mod(${b},${c})\` is the remainder, which is what is left over after dividing ${b} by ${c}. ${c} goes ${fdiv(b, c)} whole times into ${b}, using up ${c * fdiv(b, c)}, and ${m(`${b} - ${c * fdiv(b, c)} = ${r}`)}.`,
+      `Function calls are worked out first, so the expression becomes \`${a} - ${r} * ${d}\`.`,
+      `Multiplication comes before subtraction: ${m(`${r} \\times ${d} = ${r * d}`)}. That leaves ${m(`${a} - ${r * d}`)}.`,
       `Subtract last: ${m(`${a} - ${r * d} = ${ans}`)}.`,
     ],
+    because: 'Doing the `mod`, then the `*`, then the `-`',
+    keyIdea: 'The order in any expression is function calls such as `mod` and `div`, then `*` and `/`, then `+` and `-`. Rewrite the expression after each operation so nothing gets missed.',
     pool: [
       {
         value: (a - r) * d,
@@ -188,11 +191,14 @@ function buildUpdateTemplate(rng: Rng): Built | null {
     stem: 'What does this pseudocode print?',
     source: `x = ${a}\nx = x + ${b} * ${c}\nx = div(x,${d}) // div is integer division\nprint(x)`,
     answer: ans,
+    asking: 'What does `x` hold after lines 2 and 3 have changed it?',
     steps: [
-      `\`x = x + ${b} * ${c}\`: multiply first, ${m(`${b} \\times ${c} = ${b * c}`)}, then add to the current \`x\`: ${m(`${a} + ${b * c} = ${total}`)}.`,
-      `\`x = div(x,${d})\`: ${m(`${total} \\div ${d} ${quotientTex(total, d)}`)}, and the whole-number part is \`${ans}\`.`,
-      `\`print(x)\` shows \`${ans}\`.`,
+      'Each line works out its right side using the current `x`, then stores the result back in `x`. The old value is replaced.',
+      `Line 2: multiplication comes before addition, so ${m(`${b} \\times ${c} = ${b * c}`)} first. Then add the current \`x\`: ${m(`${a} + ${b * c} = ${total}`)}. So \`x\` is now ${total}.`,
+      `Line 3: \`div\` is how many whole times one number fits into another. ${m(`${d} \\times ${ans} = ${d * ans}`)} fits into ${total}, but ${m(`${d} \\times ${ans + 1} = ${d * (ans + 1)}`)} is too big. So \`x\` becomes ${ans}, and line 4 prints it.`,
     ],
+    because: 'Working through the lines in order',
+    keyIdea: 'When a variable is overwritten line after line, work out each right side with its newest value, then replace it. Multiply before adding, and `div` keeps only the whole-number part.',
     pool: [
       {
         value: fdiv((a + b) * c, d),
@@ -226,23 +232,16 @@ function genPrecedence(rng: Rng): GeneratedCore {
       .map((c) => ({ text: `\`${c.value}\``, value: c.value, why: c.why }));
     const distractors = pickDistinct(answer, answerValue, pool);
     if (distractors.length < 3) continue;
-    const solution =
-      (kind === 'update'
-        ? 'Each line works out its right-hand side using the current value of `x`, then stores the result back in `x`.\n\n'
-        : 'The order of operations is brackets and function calls, then `^`, then `*` and `/`, then `+` and `-`.\n\n') +
-      built.steps.map((s, i) => `${i + 1}. ${s}`).join('\n') +
-      `\n\nAnswer: ${answer}`;
     return {
       stem: built.stem,
       code: { lang: 'pseudocode', source: built.source },
       answer,
       answerValue,
       distractors,
-      solution,
-      keyIdea:
-        kind === 'update'
-          ? 'Work out the right-hand side first, using the current value of x, then overwrite x.'
-          : 'Precedence: powers first, then multiplication and division, then addition and subtraction.',
+      asking: built.asking,
+      solution: steps(...built.steps),
+      conclusion: `${built.because} gives ${answerValue < 0 ? m(String(answerValue)) : answerValue}, so the answer is ${answer}.`,
+      keyIdea: built.keyIdea,
     };
   }
 }

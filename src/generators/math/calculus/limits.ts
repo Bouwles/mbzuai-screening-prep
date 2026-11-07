@@ -1,6 +1,7 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
-import { m, dm, paren, poly, power, signed, sum, term } from '../../../lib/tex';
+import { m, num, paren, poly, power, signed, sum, term } from '../../../lib/tex';
 
 type Cand = { text: string; value: number | string; why: string };
 
@@ -28,6 +29,9 @@ function subst(B: number, C: number, r: number): string {
   if (C !== 0) s += signed(C);
   return s;
 }
+
+/** The value of each term of x^2 + B x + C at x = r, before adding them up: "4 - 10 + 6". */
+const substVals = (B: number, C: number, r: number): string => sum([[r * r, ''], [B * r, ''], [C, '']]);
 
 /** "(x - a)" style linear factor, with a != 0. */
 const lin = (r: number): string => `x${signed(-r)}`;
@@ -110,27 +114,26 @@ export const generators: Generator[] = [
         // Show the unsimplified fraction (e.g. \frac{-8}{-11}) before the reduced answer, except over 1.
         const raw = a - q !== 1 ? `\\frac{${a - p}}{${a - q}}` : '';
         const finalLine =
-          `\\frac{${a} - ${paren(p)}}{${a} - ${paren(q)}}` + (raw && raw !== ans.tex() ? ` = ${raw}` : '') + ` = ${ans.tex()}`;
+          `\\frac{${a}${signed(-p)}}{${a}${signed(-q)}}` + (raw && raw !== ans.tex() ? ` = ${raw}` : '') + ` = ${ans.tex()}`;
 
-        const solution =
-          `**Step 1: try substituting.** At ${m(`x = ${a}`)} the top is ${m(`${subst(-(a + p), a * p, a)} = 0`)} and the bottom is ${m(`${subst(-(a + q), a * q, a)} = 0`)}. ` +
-          `This is ${m('\\frac{0}{0}')}, so ${m(`(${lin(a)})`)} must be a factor of both.\n\n` +
-          `**Step 2: factorise.**\n\n` +
-          `- Top: ${m(`${top} = (${lin(a)})(${lin(p)})`)}\n` +
-          `- Bottom: ${m(`${bot} = (${lin(a)})(${lin(q)})`)}\n\n` +
-          `**Step 3: cancel** the common factor (allowed because ${m(`x \\ne ${a}`)} while approaching):` +
-          dm(`\\frac{(${lin(a)})(${lin(p)})}{(${lin(a)})(${lin(q)})} = \\frac{${lin(p)}}{${lin(q)}}`) +
-          `**Step 4: substitute** ${m(`x = ${a}`)}:` +
-          dm(finalLine) +
-          `Answer: ${ansText}`;
+        const solution = steps(
+          `Try putting in ${m(`x = ${a}`)} first. The top is ${m(`${subst(-(a + p), a * p, a)} = ${substVals(-(a + p), a * p, a)} = 0`)}. The bottom is ${m(`${subst(-(a + q), a * q, a)} = ${substVals(-(a + q), a * q, a)} = 0`)}.`,
+          `That gives ${m('\\frac{0}{0}')}, which is not a number, so we must simplify first. Both being 0 at ${m(`x = ${a}`)} tells us ${m(`(${lin(a)})`)} is a factor of each.`,
+          `Factorise the top. We need two numbers that multiply to ${m(num(a * p))} and add to ${m(num(-(a + p)))}. They are ${m(num(-a))} and ${m(num(-p))}, so ${m(`${top} = (${lin(a)})(${lin(p)})`)}.`,
+          `Factorise the bottom the same way. Two numbers that multiply to ${m(num(a * q))} and add to ${m(num(-(a + q)))} are ${m(num(-a))} and ${m(num(-q))}, so ${m(`${bot} = (${lin(a)})(${lin(q)})`)}.`,
+          `A limit only uses ${m('x')} near ${m(String(a))}, never ${m(String(a))} itself. So ${m(lin(a))} is not 0, and we can cancel it:\n\n$$\\frac{(${lin(a)})(${lin(p)})}{(${lin(a)})(${lin(q)})} = \\frac{${lin(p)}}{${lin(q)}}$$`,
+          `The bottom is no longer 0, so substitute ${m(`x = ${a}`)}:\n\n$$${finalLine}$$`,
+        );
 
         return {
           stem: `Find ${m(`\\lim_{x \\to ${a}} \\dfrac{${top}}{${bot}}`)}.`,
           answer: ansText,
           answerValue: ans.value(),
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: `What value does this fraction get close to when ${m('x')} gets close to ${m(String(a))}?`,
           solution,
-          keyIdea: `A ${m('\\frac{0}{0}')} result at ${m('x = a')} means ${m('(x - a)')} is a factor of top and bottom: factorise, cancel it, then substitute again.`,
+          conclusion: `After cancelling, nothing goes wrong at ${m(`x = ${a}`)}, and the fraction equals ${ansText} there.`,
+          keyIdea: `If substituting ${m('x = a')} gives ${m('\\frac{0}{0}')}, then ${m('(x - a)')} is a factor of both top and bottom. Factorise both, cancel it, then substitute again.`,
         };
       }
     },
@@ -246,36 +249,35 @@ export const generators: Generator[] = [
         const distractors = pickDistractors(ansText, ansValue, pool);
         if (distractors.length < 3) continue;
 
+        let last: string;
         let conclusion: string;
         if (kind === 'equal') {
-          conclusion =
-            `The top tends to ${m(String(a))} and the bottom to ${m(String(d))}, so the limit is` +
-            dm(ratio(a, d) + (lead.tex() === ratio(a, d) ? '' : ` = ${lead.tex()}`)) +
-            `Shortcut: equal degrees (both ${n}) means the limit is the ratio of the leading coefficients.\n\n`;
+          last = `That leaves just ${m(String(a))} on top and ${m(String(d))} on the bottom, so the limit is:\n\n$$${ratio(a, d) + (lead.tex() === ratio(a, d) ? '' : ` = ${lead.tex()}`)}$$`;
+          conclusion = `Top and bottom have the same highest power, so only the numbers in front of those powers count, giving ${ansText}.`;
         } else if (kind === 'lower') {
-          conclusion =
-            `Every term on top now has ${m('x')} in its denominator, so the top tends to 0, while the bottom tends to ${m(String(d))}. The limit is ${m(d === 1 ? '0' : `\\frac{0}{${d}} = 0`)}.\n\n` +
-            `Shortcut: the bottom has the higher degree (${n} against ${mDeg}), so the limit is 0.\n\n`;
+          last = `Every term on top still has ${m('x')} on its bottom, so the whole top tends to 0. The bottom tends to ${m(String(d))}. And 0 divided by ${m(String(d))} is 0.`;
+          conclusion = `The bottom has the higher power (${n} against ${mDeg}), so it outgrows the top and the fraction shrinks to ${ansText}.`;
         } else {
-          conclusion =
-            `The bottom tends to ${m(String(d))}, but the top still contains ${m(term(a, power('x', mDeg - n), true))}, which grows without bound (${a > 0 ? 'positive' : 'negative'} for large ${m('x')}). So the fraction tends to ${ansText}: there is no finite limit.\n\n` +
-            `Shortcut: the top has the higher degree (${mDeg} against ${n}), so the fraction blows up, with the same sign as the top's leading coefficient ${m(String(a))}.\n\n`;
+          last = `The bottom tends to ${m(String(d))}. But the top still contains ${m(term(a, power('x', mDeg - n), true))}, which grows without end and is ${a > 0 ? 'positive' : 'negative'} for large ${m('x')}. So the fraction heads to ${ansText}.`;
+          conclusion = `The top has the higher power (${mDeg} against ${n}), so the fraction grows without end. Its sign follows the top's ${m(String(a))}, so it heads to ${ansText}.`;
         }
 
-        const solution =
-          `The highest power of ${m('x')} in the denominator is ${m(power('x', n))}. Divide **every** term, top and bottom, by ${m(power('x', n))}:` +
-          dm(`\\frac{${top}}{${bot}} = \\frac{${divided(topTerms)}}{${divided(botTerms)}}`) +
-          `As ${m('x \\to \\infty')}, every term of the form ${m('\\frac{\\text{number}}{x^k}')} tends to 0.\n\n` +
-          conclusion +
-          `Answer: ${ansText}`;
+        const solution = steps(
+          `${m('x \\to \\infty')} means ${m('x')} grows without end. When ${m('x')} is huge, the highest power on each line matters most: ${m(term(a, power('x', mDeg), true))} on top and ${m(term(d, power('x', n), true))} on the bottom.${ascending ? ' Here each one is written last, so look along the whole line.' : ''}`,
+          `Divide every term, top and bottom, by ${m(power('x', n))}, the highest power on the bottom. Doing the same to top and bottom leaves the fraction's value unchanged:\n\n$$\\frac{${top}}{${bot}} = \\frac{${divided(topTerms)}}{${divided(botTerms)}}$$`,
+          `When ${m('x')} is huge, a number divided by a power of ${m('x')} is tiny. So every term with ${m('x')} on its bottom shrinks towards 0.`,
+          last,
+        );
 
         return {
           stem: `Find ${m(`\\lim_{x \\to \\infty} \\dfrac{${top}}{${bot}}`)}.`,
           answer: ansText,
           answerValue: ansValue,
           distractors: distractors.map((x) => ({ text: x.text, value: x.value, why: x.why })),
+          asking: `What does this fraction head towards as ${m('x')} grows without end?`,
           solution,
-          keyIdea: `As ${m('x \\to \\infty')}, only the highest powers matter: compare the degrees of the top and bottom.`,
+          conclusion,
+          keyIdea: `For ${m('x \\to \\infty')}, compare the highest powers on top and bottom. Same power: the limit is the ratio of the numbers in front. Bottom higher: 0. Top higher: it grows without end.`,
         };
       }
     },

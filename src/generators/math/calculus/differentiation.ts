@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { m, num, paren, poly, power, signed, sum } from '../../../lib/tex';
 
 interface Cand {
@@ -75,11 +76,12 @@ export const generators: Generator[] = [
 
         const fTex = poly(coeffs);
         const dTex = poly(dCoeffs);
-        const termLines =
-          `- ${m(sum([[a, power('x', n)]]))} becomes ${m(sum([[a * n, power('x', n - 1)]]))}\n` +
-          `- ${m(sum([[b, 'x^{2}']]))} becomes ${m(sum([[2 * b, 'x']]))}\n` +
-          `- ${m(sum([[c, 'x']]))} becomes ${m(num(c))}\n` +
-          `- ${m(num(d))} is a constant, so it becomes $0$\n\n`;
+        const termRows = [
+          [m(sum([[a, power('x', n)]])), m(`${paren(a)} \\times ${n} = ${num(a * n)}`), m(sum([[a * n, power('x', n - 1)]]))],
+          [m(sum([[b, 'x^{2}']])), m(`${paren(b)} \\times 2 = ${num(2 * b)}`), m(sum([[2 * b, 'x']]))],
+          [m(sum([[c, 'x']])), m(`${paren(c)} \\times 1 = ${num(c)}`), m(num(c))],
+          [m(num(d)), 'no $x$ in it', '$0$'],
+        ];
         const subst = subTerm(a * n, x0, n - 1, true) + subTerm(2 * b, x0, 1, false) + signed(c);
         const answer = m(num(ans));
         return {
@@ -87,14 +89,16 @@ export const generators: Generator[] = [
           answer,
           answerValue: ans,
           distractors: ds.map((x) => ({ text: m(num(x.v)), value: x.v, why: x.why })),
-          solution:
-            '**Step 1: differentiate term by term** with the power rule (multiply by the power, then reduce the power by 1):\n\n' +
-            termLines +
-            `So $f'(x) = ${dTex}$.\n\n` +
-            `**Step 2: substitute** $x = ${num(x0)}$ into $f'(x)$:\n\n` +
-            `$$f'(${num(x0)}) = ${subst} = ${num(t1)}${signed(t2)}${signed(c)} = ${num(ans)}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Differentiate first (power rule term by term), then substitute the $x$ value into $f\'(x)$.',
+          asking: `How steep is this curve at $x = ${num(x0)}$?`,
+          solution: steps(
+            `$f'(${num(x0)})$ means the gradient (steepness) of the curve at $x = ${num(x0)}$. So we first find $f'(x)$, the formula for the gradient at any $x$. Then we put in the number.`,
+            `Use the **power rule** on each term: multiply by the power, then lower the power by 1. A plain number never changes, so its derivative is 0.\n\n` +
+              table(['Term', 'Multiply by the power', 'Result'], termRows),
+            `Put the results together: $f'(x) = ${dTex}$.`,
+            `Substitute $x = ${num(x0)}$ into $f'(x)$. Work out the powers first, then multiply, then add:\n\n$$f'(${num(x0)}) = ${subst} = ${num(t1)}${signed(t2)}${signed(c)} = ${num(ans)}$$`,
+          ),
+          conclusion: `The gradient formula $f'(x) = ${dTex}$ gives ${answer} at $x = ${num(x0)}$.`,
+          keyIdea: "To find $f'(a)$: differentiate term by term with the power rule first, then substitute $x = a$ into $f'(x)$. Substituting into $f(x)$ gives the height of the curve, not its gradient.",
         };
       }
     },
@@ -161,22 +165,25 @@ export const generators: Generator[] = [
         const gpCalc = quad ? `${num(2 * p)} \\times ${paren(x0)} = ${num(gp)}` : num(gp);
         const uPow = n - 1 === 1 ? paren(u) : `${paren(u)}^{${n - 1}}`;
         const answer = m(num(ans));
+        const inFirst = quad ? sum([[p, 'x^{2}']]) : sum([[p, 'x']]);
         return {
           stem: `Given $f(x) = ${fTex}$, find the value of $f'(${num(x0)})$.`,
           answer,
           answerValue: ans,
           distractors: ds.map((x) => ({ text: m(num(x.v)), value: x.v, why: x.why })),
-          solution:
-            'This is a function inside a function, so use the **chain rule**: differentiate the outside (leaving the inside alone), then multiply by the derivative of the inside.\n\n' +
-            `- Outside: ${m(`${front}u^{${n}}`)} differentiates to ${m(`${num(kn)}u${n - 1 === 1 ? '' : `^{${n - 1}}`}`)}, which is ${m(outerTex)}\n` +
-            `- Inside: ${m(`u = ${gTex}`)}, so ${m(`\\frac{du}{dx} = ${gpTex}`)}\n\n` +
-            `$$f'(x) = ${outerTex} \\times ${quad ? gpTex : num(p)}$$\n\n` +
-            `**Substitute** $x = ${num(x0)}$. The inside is ${m(`${uCalc} = ${num(u)}`)} and the inside derivative is ${m(gpCalc)}.\n\n` +
-            `$$f'(${num(x0)}) = ${num(kn)} \\times ${uPow} \\times ${paren(gp)}` +
-            (n - 1 === 1 ? '' : ` = ${num(kn)} \\times ${paren(u ** (n - 1))} \\times ${paren(gp)}`) +
-            ` = ${num(ans)}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Chain rule: derivative of the outside (inside unchanged) times the derivative of the inside, then substitute.',
+          asking: `How steep is this curve at $x = ${num(x0)}$?`,
+          solution: steps(
+            'This is a bracket raised to a power, so it is a function inside a function. Use the **chain rule**: differentiate the outside, then multiply by the derivative of the inside.',
+            `Call the inside ${m(`u = ${gTex}`)}, so the function is ${m(`${front}u^{${n}}`)}. For the outside, multiply by the power and lower the power by 1. That gives ${m(`${num(kn)}u${n - 1 === 1 ? '' : `^{${n - 1}}`}`)}, which is ${m(outerTex)}.`,
+            `For the inside, differentiate ${m(gTex)}. The ${m(inFirst)} gives ${m(gpTex)}, and the plain number gives 0. So the derivative of the inside is ${m(gpTex)}.`,
+            `Multiply the two: ${m(`f'(x) = ${outerTex} \\times ${gpTex}`)}.`,
+            `Now put in $x = ${num(x0)}$. The inside is ${m(`${uCalc} = ${num(u)}`)}, and the derivative of the inside is ${m(gpCalc)}.`,
+            `Substitute both:\n\n$$f'(${num(x0)}) = ${num(kn)} \\times ${uPow} \\times ${paren(gp)}` +
+              (n - 1 === 1 ? '' : ` = ${num(kn)} \\times ${paren(u ** (n - 1))} \\times ${paren(gp)}`) +
+              ` = ${num(ans)}$$`,
+          ),
+          conclusion: `The outside derivative times the inside derivative, at $x = ${num(x0)}$, gives ${answer}.`,
+          keyIdea: 'For $(\\text{inside})^{n}$: bring down $n$, lower the power by 1 and keep the inside the same. Then multiply by the derivative of the inside. Substitute $x$ last.',
         };
       }
     },

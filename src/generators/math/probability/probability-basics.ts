@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num } from '../../../lib/tex';
 
@@ -51,7 +52,6 @@ const KIND_WORDS: Record<DiceKind, string> = {
   le: 'at most',
   lt: 'less than',
 };
-const KIND_TEX: Record<DiceKind, string> = { eq: '=', ge: '\\ge', gt: '>', le: '\\le', lt: '<' };
 const BOUNDARY_SWAP: Partial<Record<DiceKind, DiceKind>> = { ge: 'gt', gt: 'ge', le: 'lt', lt: 'le' };
 
 export const generators: Generator[] = [
@@ -110,9 +110,7 @@ export const generators: Generator[] = [
         const ds = pickDistractors(answer, pool);
         if (ds.length < 3) continue; // re-roll parameters (only happens for a few symmetric cases)
         const ansText = m(dec(answer));
-        const missLine = askMiss
-          ? `The probability of a ${ctx.miss} on one attempt is ${m(`1 - ${dec(p)} = ${dec(s)}`)}.\n\n`
-          : '';
+        const noneProduct = Array.from({ length: n }, () => dec(q)).join(' \\times ');
         return {
           stem:
             `${ctx.intro} with probability ${m(dec(p))}, independently each time. ${ctx.trials} ${n} ${ctx.unit}. ` +
@@ -120,14 +118,16 @@ export const generators: Generator[] = [
           answer: ansText,
           answerValue: answer.value(),
           distractors: ds.map((d) => ({ text: m(dec(d.f)), value: d.f.value(), why: d.why })),
-          solution:
-            missLine +
-            `"At least one ${event}" is the opposite of "no ${event} at all", so use the complement.\n\n` +
-            `- Probability of no ${event} on one attempt: ${m(`1 - ${dec(s)} = ${dec(q)}`)}\n` +
-            `- The attempts are independent, so multiply: ${m(`P(\\text{none}) = ${dec(q)}^{${n}} = ${dec(none)}`)}\n` +
-            `- ${m(`P(\\text{at least one}) = 1 - ${dec(none)} = ${dec(answer)}`)}\n\n` +
-            `Answer: ${ansText}`,
-          keyIdea: '$P(\\text{at least one}) = 1 - P(\\text{none})$, and for independent attempts $P(\\text{none})$ is the single-attempt "none" probability raised to the power $n$.',
+          asking: `What is the chance of at least one ${event} from the ${n} ${ctx.unit}?`,
+          solution: steps(
+            askMiss && `The question gives the chance of a ${ctx.hit}, but asks about a ${ctx.miss}. On one attempt, that chance is ${m(`1 - ${dec(p)} = ${dec(s)}`)}.`,
+            `"At least one ${event}" covers many cases. The opposite is just one case: none at all. The two chances add up to 1, so ${m('P(\\text{at least one}) = 1 - P(\\text{none})')}.`,
+            `On one attempt, the chance of it not happening is ${m(`1 - ${dec(s)} = ${dec(q)}`)}.`,
+            `**Independently** means one attempt doesn't affect the next, so multiply one chance per attempt: ${m(`P(\\text{none}) = ${noneProduct} = ${dec(none)}`)}.`,
+            `Subtract from 1: ${m(`1 - ${dec(none)} = ${dec(answer)}`)}.`,
+          ),
+          conclusion: `Getting none at all has chance ${m(dec(none))}, and everything else has at least one, so the answer is ${ansText}.`,
+          keyIdea: 'When you see "at least one", work out the chance of none and subtract from 1. For independent tries, $P(\\text{none})$ is the one-try "no" chance multiplied once per try.',
         };
       }
     },
@@ -150,13 +150,21 @@ export const generators: Generator[] = [
         const U = a + b - c;
         const values = { union: U, neither: 100 - U, aOnly: a - c, exactlyOne: a + b - 2 * c };
         const answer = H(values[ask]);
-        const unionLine = `${m(`P(A \\cup B) = P(A) + P(B) - P(A \\cap B) = ${dec(H(a))} + ${dec(H(b))} - ${dec(H(c))} = ${dec(H(U))}`)}`;
+        const ansText = m(dec(answer));
         let question = '';
-        let finalStep = '';
+        let asking = '';
+        let working: string[] = [];
+        let conclusion = '';
         let pool: Cand[] = [];
         if (ask === 'union') {
           question = `${ctx.a} **or** ${ctx.b} (or both)`;
-          finalStep = `Use the addition rule: ${unionLine}.`;
+          asking = `What is the chance that the ${ctx.who} is in $A$ or $B$ or both?`;
+          working = [
+            `${m('P(A \\cup B)')} means $A$ or $B$ or both. If we add ${m('P(A) + P(B)')}, the overlap gets counted twice, so we subtract it once:\n\n$$P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$$`,
+            `Substitute the numbers: ${m(`P(A \\cup B) = ${dec(H(a))} + ${dec(H(b))} - ${dec(H(c))}`)}.`,
+            `Work it out from left to right: ${m(`${dec(H(a))} + ${dec(H(b))} = ${dec(H(a + b))}`)}, then ${m(`${dec(H(a + b))} - ${dec(H(c))} = ${dec(H(U))}`)}.`,
+          ];
+          conclusion = `Adding the two circles and removing the overlap once gives the answer, ${ansText}.`;
           pool = [
             { f: H(a + b), why: `This is ${m(`${dec(H(a))} + ${dec(H(b))}`)}: the overlap was not subtracted, so people who do both are counted twice.` },
             { f: H(a + b - 2 * c), why: `This subtracts the overlap twice, which gives the probability of **exactly one** of the two, not "or both".` },
@@ -165,7 +173,12 @@ export const generators: Generator[] = [
           ];
         } else if (ask === 'neither') {
           question = `**neither** ${ctx.a} nor ${ctx.b}`;
-          finalStep = `First ${unionLine}.\n\nThen ${m(`P(\\text{neither}) = 1 - P(A \\cup B) = 1 - ${dec(H(U))} = ${dec(answer)}`)}.`;
+          asking = `What is the chance that the ${ctx.who} is in neither $A$ nor $B$?`;
+          working = [
+            `First find the chance of being in at least one circle, written ${m('P(A \\cup B)')}. Adding the circles counts the overlap twice, so subtract it once: ${m(`P(A \\cup B) = ${dec(H(a))} + ${dec(H(b))} - ${dec(H(c))} = ${dec(H(U))}`)}.`,
+            `"Neither" is everything outside both circles. All the chances add up to 1, so ${m(`P(\\text{neither}) = 1 - ${dec(H(U))} = ${dec(answer)}`)}.`,
+          ];
+          conclusion = `The two circles cover ${m(dec(H(U)))}, and what is left outside them is the answer, ${ansText}.`;
           pool = [
             { f: H(U), why: `This is ${m(`P(A \\cup B) = ${dec(H(U))}`)}: the final step, subtracting from $1$, was forgotten.` },
             { f: H(100 - a - b), why: `This is ${m(`1 - (${dec(H(a))} + ${dec(H(b))})`)}: the overlap was not subtracted, so the people who do both were removed twice.` },
@@ -174,7 +187,12 @@ export const generators: Generator[] = [
           ];
         } else if (ask === 'aOnly') {
           question = `${ctx.a} but does **not** ${ctx.bBase}`;
-          finalStep = `"$A$ but not $B$" is the part of circle $A$ outside the overlap:\n\n${m(`P(A \\cap B') = P(A) - P(A \\cap B) = ${dec(H(a))} - ${dec(H(c))} = ${dec(answer)}`)}.`;
+          asking = `What is the chance that the ${ctx.who} is in $A$ but not in $B$?`;
+          working = [
+            `Circle $A$ is made of two parts: the overlap, and the part outside $B$. We want the part outside $B$, so take the overlap away from $A$.`,
+            `Writing $B'$ for "not $B$", that is ${m(`P(A \\cap B') = P(A) - P(A \\cap B) = ${dec(H(a))} - ${dec(H(c))} = ${dec(answer)}`)}.`,
+          ];
+          conclusion = `Removing the overlap from circle $A$ leaves the answer, ${ansText}.`;
           pool = [
             { f: H(a), why: `This is ${m(`P(A)`)} itself, which still includes the ${ctx.who}s who also ${ctx.bBase}.` },
             { f: H(c), why: 'This is the overlap $P(A \\cap B)$, where **both** happen, not $A$ without $B$.' },
@@ -183,11 +201,14 @@ export const generators: Generator[] = [
           ];
         } else {
           question = `does **exactly one** of these two things`;
-          finalStep =
-            `Find the two "only" regions:\n\n` +
-            `- $A$ only: ${m(`${dec(H(a))} - ${dec(H(c))} = ${dec(H(a - c))}`)}\n` +
-            `- $B$ only: ${m(`${dec(H(b))} - ${dec(H(c))} = ${dec(H(b - c))}`)}\n\n` +
-            `${m(`P(\\text{exactly one}) = ${dec(H(a - c))} + ${dec(H(b - c))} = ${dec(answer)}`)}.`;
+          asking = `What is the chance that the ${ctx.who} is in just one of $A$ and $B$?`;
+          working = [
+            `"Exactly one" means in $A$ only or in $B$ only, and not in the overlap. Take the overlap out of each circle:\n\n` +
+              `- $A$ only: ${m(`${dec(H(a))} - ${dec(H(c))} = ${dec(H(a - c))}`)}\n` +
+              `- $B$ only: ${m(`${dec(H(b))} - ${dec(H(c))} = ${dec(H(b - c))}`)}`,
+            `Add the two parts: ${m(`${dec(H(a - c))} + ${dec(H(b - c))} = ${dec(answer)}`)}.`,
+          ];
+          conclusion = `The two "only" parts of the circles add up to the answer, ${ansText}.`;
           pool = [
             { f: H(U), why: `This is ${m(`P(A \\cup B) = ${dec(H(U))}`)}, which still includes the "both" region. Exactly one must leave it out.` },
             { f: H(a + b), why: `This is ${m(`${dec(H(a))} + ${dec(H(b))}`)}: it counts the "both" region twice instead of removing it.` },
@@ -197,7 +218,6 @@ export const generators: Generator[] = [
         }
         const ds = pickDistractors(answer, pool);
         if (ds.length < 3) continue;
-        const ansText = m(dec(answer));
         return {
           stem:
             `For a random ${ctx.who}, $A$ is "${ctx.a}" and $B$ is "${ctx.b}", with ` +
@@ -206,12 +226,13 @@ export const generators: Generator[] = [
           answer: ansText,
           answerValue: answer.value(),
           distractors: ds.map((d) => ({ text: m(dec(d.f)), value: d.f.value(), why: d.why })),
-          solution:
-            `Picture a Venn diagram with four regions (both, $A$ only, $B$ only, neither) that add to $1$. Start from the overlap: both $= ${dec(H(c))}$.\n\n` +
-            `${finalStep}\n\n` +
-            `Check with the full Venn diagram: both $= ${dec(H(c))}$, $A$ only $= ${dec(H(a - c))}$, $B$ only $= ${dec(H(b - c))}$, neither $= ${dec(H(100 - U))}$.\n\n` +
-            `Answer: ${ansText}`,
-          keyIdea: 'Fill the Venn diagram from the overlap outwards; the addition rule $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$ links all the regions.',
+          asking,
+          solution: steps(
+            `Picture two overlapping circles, $A$ and $B$. The overlap, written ${m('P(A \\cap B)')}, is the chance of both. Here it is ${m(dec(H(c)))}.`,
+            ...working,
+          ),
+          conclusion,
+          keyIdea: 'Draw two overlapping circles and fill in the overlap first. Then $A$ only $= P(A) - P(A \\cap B)$, $B$ only $= P(B) - P(A \\cap B)$, and neither is whatever is left of 1.',
         };
       }
     },
@@ -231,14 +252,6 @@ export const generators: Generator[] = [
         const answer = new Frac(count, 36);
         const totals = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].filter(ok).length;
         const uCount = unordered.filter(([x, y]) => ok(x + y)).length;
-        const listed = pairs
-          .filter(([x, y]) => ok(x + y))
-          .map(([x, y]) => `$(${x},${y})$`)
-          .join(', ');
-        const notListed = pairs
-          .filter(([x, y]) => !ok(x + y))
-          .map(([x, y]) => `$(${x},${y})$`)
-          .join(', ');
         const ex = pairs.find(([x, y]) => x < y && ok(x + y)) ?? [1, 2];
         const pool: Cand[] = [];
         if (kind === 'eq') {
@@ -268,20 +281,35 @@ export const generators: Generator[] = [
         if (ds.length < 3 || count === 0 || count === 36) continue;
         const ansText = m(answer.tex());
         const raw = `\\frac{${count}}{36}`;
-        const long = count > 15;
-        const countLine = long
-          ? `It is quicker to count the complement. The pairs that do **not** work are ${notListed}: that is ${36 - count} pairs, so ${m(`36 - ${36 - count} = ${count}`)} pairs do work.`
-          : `The pairs that work are ${listed}: that is ${count} pairs.`;
+        const seconds = DIE.map((first) => DIE.filter((y) => ok(first + y)));
+        const rowCounts = seconds.map((ys) => ys.length).filter((c) => c > 0);
+        const meaning =
+          kind === 'eq'
+            ? `The sum must be exactly ${s}.`
+            : kind === 'ge'
+              ? `"At least ${s}" means ${s} or more, so ${s} itself counts.`
+              : kind === 'gt'
+                ? `"Greater than ${s}" means more than ${s}, so ${s} itself does not count.`
+                : kind === 'le'
+                  ? `"At most ${s}" means ${s} or less, so ${s} itself counts.`
+                  : `"Less than ${s}" means below ${s}, so ${s} itself does not count.`;
         return {
           stem: `${wording}. What is the probability that the **sum** of the two scores is ${KIND_WORDS[kind]} $${s}$?`,
           answer: ansText,
           answerValue: answer.value(),
           distractors: ds.map((d) => ({ text: m(d.f.tex()), value: d.f.value(), why: d.why })),
-          solution:
-            `There are $6 \\times 6 = 36$ equally likely ordered outcomes $(\\text{first}, \\text{second})$.\n\n` +
-            `We need ${m(`\\text{sum} ${KIND_TEX[kind]} ${s}`)}. ${countLine}\n\n` +
-            `${m(`P = ${raw}${answer.d === 36 ? '' : ` = ${answer.tex()}`}`)}\n\nAnswer: ${ansText}`,
-          keyIdea: 'Two dice give 36 equally likely ordered pairs; count the pairs that work (or count the complement when that is shorter).',
+          asking: `How likely is it that the two scores have a total that is ${KIND_WORDS[kind]} ${s}?`,
+          solution: steps(
+            `Think of a first score and a second score. Each has 6 possible values, so there are $6 \\times 6 = 36$ equally likely ordered pairs. For example, $(2,5)$ and $(5,2)$ are different results.`,
+            `${meaning} Go through each first score and write which second scores work:\n\n` +
+              table(
+                ['First score', 'Second score can be', 'Pairs that work'],
+                DIE.map((first, i) => [first, seconds[i].length ? seconds[i].join(', ') : 'none', seconds[i].length]),
+              ),
+            `Add the last column: ${m(`${rowCounts.join(' + ')} = ${count}`)}. So ${count} of the 36 pairs work, which gives ${m(`P = ${raw}${answer.d === 36 ? '' : ` = ${answer.tex()}`}`)}.`,
+          ),
+          conclusion: `${count} of the 36 equally likely pairs work, so the answer is ${ansText}.`,
+          keyIdea: 'Two dice give 36 equally likely ordered pairs, not 11 equally likely totals. For each first score, write which second scores work, then count them and divide by 36.',
         };
       }
     },

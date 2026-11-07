@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 
 const NAMES = ['Amir', 'Bella', 'Chen', 'Dina', 'Eli', 'Farah', 'Omar', 'Lina', 'Yusuf', 'Sara', 'Zaid', 'Maya', 'Hana', 'Imran', 'Jude', 'Kira', 'Rana', 'Tariq'];
 
@@ -39,6 +40,24 @@ function caseTable(N: string[], claims: Claim[], all: W[]): string {
 function failReason(N: string[], claims: Claim[], w: W): string {
   const bad = claims.findIndex((c, s) => c.f(w) !== w[s]);
   return `${N[bad]} would be a ${typeWord(w[bad])}, but the statement "${claims[bad].text}" would be ${tf(claims[bad].f(w))}, which a ${typeWord(w[bad])} can never say.`;
+}
+
+/** Plain-words help for the harder kinds of claim in this puzzle, if there are any. */
+function claimHelp(claims: Claim[]): string | false {
+  const texts = claims.map((c) => c.text);
+  const notes: string[] = [];
+  if (texts.some((t) => t.startsWith('If I am'))) notes.push('An if-then statement is false only when the "if" part is true and the "then" part is false. Otherwise it counts as true.');
+  if (texts.some((t) => t.includes('both'))) notes.push('A "both" statement is true only when both people fit it.');
+  if (texts.some((t) => t.includes('one of us'))) notes.push('"Us" means all three people.');
+  if (texts.some((t) => t.includes('At least one'))) notes.push('"At least one" means one or more.');
+  if (texts.some((t) => t.includes('Exactly one'))) notes.push('"Exactly one" means one and no more.');
+  return notes.length > 0 && notes.join(' ');
+}
+
+/** A worked example: why one particular case is ruled out. */
+function exampleLine(N: string[], claims: Claim[], all: W[], sol: W): string {
+  const w = all.find((x) => codeOf(x) !== codeOf(sol))!;
+  return `Try one case: ${describe(N, w)}. ${failReason(N, claims, w)} So this case is ruled out.`;
 }
 
 // ---------------------------------------------------------------- two islanders
@@ -125,18 +144,21 @@ export const generators: Generator[] = [
           .filter((w) => codeOf(w) !== codeOf(sol))
           .map((w) => ({ text: describe(N, w), value: codeOf(w), why: `In this case ${failReason(N, claims, w)}` }));
         const said = claims.map((c, s) => `${N[s]} says: "${c.text}"`).join(' ');
-        const solution =
-          'A case is possible only if every **knight** says something **true** and every **knave** says something **false**.\n\n' +
-          'There are $2^2 = 4$ cases. Work out each claim and mark ✗ when it does not match its speaker:\n\n' +
-          `${caseTable(N, claims, all)}\n\n` +
-          `Only one case has no ✗.\n\nAnswer: ${answer}`;
+        const solution = steps(
+          'A case is possible only if every **knight** says something **true** and every **knave** says something **false**. With two people there are only $2 \\times 2 = 4$ cases, so we can test them all.',
+          claimHelp(claims),
+          exampleLine(N, claims, all, sol),
+          `Now test all 4 cases the same way. Each cell says whether that statement is true in that case, and ✗ marks a statement that does not fit its speaker. The only row with no ✗ is ${answer}:\n\n${caseTable(N, claims, all)}`,
+        );
         return {
           stem: `${ISLAND} ${said} What are they?`,
           answer,
           answerValue: codeOf(sol),
           distractors,
+          asking: 'What type is each person: knight or knave?',
           solution,
-          keyIdea: 'Test each of the 4 cases: a case survives only when every knight\'s statement is true and every knave\'s statement is false.',
+          conclusion: `Only this case has every statement fitting its speaker, so the answer is ${answer}.`,
+          keyIdea: 'List the 4 cases of knight and knave. In each case, work out whether each statement is true, then test it: knights need true, knaves need false. Cross out any case that fails. The case left is the answer.',
         };
       }
     },
@@ -165,18 +187,21 @@ export const generators: Generator[] = [
           w[i] = !w[i];
           return { text: describe(N, w), value: codeOf(w), why: `This gets ${N[i]}'s type wrong. In this case ${failReason(N, claims, w)}` };
         });
-        const solution =
-          'A case is possible only if every **knight** says something **true** and every **knave** says something **false**.\n\n' +
-          `Start with ${N[breaker]}, whose statement says the most, and follow the consequences. The full check of all $2^3 = 8$ cases is below, with ✗ where a claim does not match its speaker:\n\n` +
-          `${caseTable(N, claims, all)}\n\n` +
-          `Exactly one row has no ✗.\n\nAnswer: ${answer}`;
+        const solution = steps(
+          'A case is possible only if every **knight** says something **true** and every **knave** says something **false**. Each of the three people has 2 possible types, so there are $2 \\times 2 \\times 2 = 8$ cases.',
+          claimHelp(claims),
+          exampleLine(N, claims, all, sol),
+          `Now test all 8 cases the same way. Each cell says whether that statement is true in that case, and ✗ marks a statement that does not fit its speaker. The only row with no ✗ is ${answer}:\n\n${caseTable(N, claims, all)}`,
+        );
         return {
           stem: `${ISLAND}\n\n${claims.map((c, s) => `- ${N[s]}: "${c.text}"`).join('\n')}\n\nWhat type is each of them?`,
           answer,
           answerValue: codeOf(sol),
           distractors,
+          asking: 'Which of the three people are knights, and which are knaves?',
           solution,
-          keyIdea: 'Start with the statement that says the most; each "X is a knight" or "X is a knave" then fixes the next person.',
+          conclusion: `Only this case has every statement fitting its speaker, so the answer is ${answer}.`,
+          keyIdea: `A table of all 8 cases always works. For speed, start with the statement that says the most (here ${N[breaker]}'s), suppose the speaker is a knight and follow each claim to the next person. A contradiction means the speaker is a knave.`,
         };
       }
     },
@@ -219,20 +244,26 @@ export const generators: Generator[] = [
           { text: 'Cannot be determined', value: 'ambiguous', why: `Trying all three suspects leaves exactly one who gives one ${word} statement, so the culprit can be determined.` },
         ];
 
-        const header = `| Culprit | ${N.join(' | ')} | Number ${word} |`;
-        const rows = [0, 1, 2].map((c) => `| ${N[c]} | ${stmts.map((x) => tf(x.f(c))).join(' | ')} | ${c === culprit ? `**${counts[c]}**` : counts[c]} |`);
-        const solution =
-          `Try each suspect as the culprit, mark every statement true or false, and count the ${word} statements. We need exactly one.\n\n` +
-          `${header}\n|---|---|---|---|---|\n${rows.join('\n')}\n\n` +
-          `Only ${answer} as the culprit gives exactly one ${word} statement.\n\n` +
-          `Answer: ${answer}`;
+        const lying = stmts.find((x) => x.text.endsWith('is lying.'));
+        const example = [0, 1, 2].find((c) => c !== culprit)!;
+        const solution = steps(
+          'We do not know who did it, so try each person as the culprit in turn. Once the culprit is fixed, every statement is either true or false.',
+          lying && `"${lying.text}" is true exactly when that person's own statement is false. So those two statements are always opposites.`,
+          `Try one suspect: if ${N[example]} did it, ${N[0]}'s statement is ${tf(stmts[0].f(example))}, ${N[1]}'s is ${tf(stmts[1].f(example))} and ${N[2]}'s is ${tf(stmts[2].f(example))}. That makes ${counts[example]} ${word}, and we need exactly 1.`,
+          `Do the same for every suspect and count the ${word} statements. Only ${answer} gives a count of 1:\n\n${table(
+            ['If the culprit is', ...N.map((n) => `${n}'s statement`), `Number ${word}`],
+            [0, 1, 2].map((c) => [N[c], ...stmts.map((x) => tf(x.f(c))), c === culprit ? `**${counts[c]}**` : counts[c]]),
+          )}`,
+        );
         return {
           stem: `${ctx.intro} Exactly **one** statement below is **${word}**.\n\n${stmts.map((x, s) => `- ${N[s]}: "${x.text}"`).join('\n')}\n\n${ctx.question}`,
           answer,
           answerValue: answer,
           distractors,
+          asking: `If exactly one statement is ${word}, who did it?`,
           solution,
-          keyIdea: `Try each suspect in turn and count the ${word} statements; when one person says another is lying, exactly one of those two statements is true.`,
+          conclusion: `Only this suspect gives exactly one ${word} statement, so the answer is ${answer}.`,
+          keyIdea: 'Draw a table with one row per suspect and one column per statement. Mark each statement true or false in that row, then count. When one person says another is lying, those two statements are always opposites.',
         };
       }
     },

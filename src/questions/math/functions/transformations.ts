@@ -38,18 +38,19 @@ export const questions: StaticQuestion[] = [
     options: ['$(5, 5)$', '$(1, 5)$', '$(3, 7)$', '$(3, 3)$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Where does the point $(3, 5)$ move to when we add 2 to the function?',
       solution:
-        'The $+2$ is **outside** the function, so it changes the output ($y$-value) and leaves $x$ alone.\n\n' +
-        '- At $x = 3$ the original graph has height $f(3) = 5$.\n' +
-        '- The new graph has height $f(3) + 2 = 5 + 2 = 7$ at the same $x$.\n\n' +
-        'So the point moves 2 units **up**: $(3, 5) \\to (3, 7)$.',
+        '$(3, 5)$ on the graph of $y = f(x)$ means that when $x = 3$, the output is 5. So $f(3) = 5$.\n\n' +
+        '$y = f(x) + 2$ uses the same input and then adds 2 to the output. So at $x = 3$ the new output is $f(3) + 2 = 5 + 2 = 7$.\n\n' +
+        'The $x$-value hasn\'t changed, because the $+2$ is outside the bracket. So the point moves straight up by 2, to $(3, 7)$.',
+      conclusion: 'Adding 2 outside the bracket raises the height only, so the new point is $(3, 7)$.',
       whyWrong: [
         'This moves the point 2 units to the right. The $+2$ is outside the bracket, so it acts on the $y$-value, not on $x$.',
         'This moves the point 2 units to the left, treating the $+2$ as a horizontal shift. That would be $y = f(x + 2)$, with the 2 inside the bracket.',
         null,
         'This subtracts 2. Adding 2 outside the function moves the graph **up**, so the $y$-coordinate increases.',
       ],
-      keyIdea: 'A number added outside the function, $f(x) + a$, moves the graph vertically by $a$: add $a$ to every $y$-coordinate.',
+      keyIdea: 'A number added outside the bracket changes only the $y$-coordinate: $y = f(x) + k$ sends $(a, b)$ to $(a, b + k)$. So the graph moves up by $k$, or down if $k$ is negative.',
     },
     check: {
       optionValues: ['5,5', '1,5', '3,7', '3,3'],
@@ -69,18 +70,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which way, and how far, does the graph move when $x$ becomes $x - 4$ inside the bracket?',
       solution:
-        'The $-4$ is **inside** the bracket, so the change is horizontal, and inside the bracket everything works the *opposite* way to how it looks.\n\n' +
-        'Check with one point: suppose $f(0) = 7$. On the new graph we need $x - 4 = 0$, so $x = 4$, and there the height is $f(0) = 7$.\n\n' +
-        'The height that was at $x = 0$ is now at $x = 4$: the whole graph has moved **4 units to the right**.\n\n' +
-        'In vector form this is a translation by $\\begin{pmatrix} 4 \\\\ 0 \\end{pmatrix}$.',
+        'A **translation** slides a graph without changing its shape. A change inside the bracket affects the input $x$, so the graph slides sideways, not up or down.\n\n' +
+        'To see which way, follow one point. Suppose $f(0) = 7$, so the original graph has height 7 at $x = 0$.\n\n' +
+        'On $y = f(x - 4)$, the bracket must equal 0 to give that same height. Solve $x - 4 = 0$ by adding 4 to both sides: $x = 4$.\n\n' +
+        'So the height that was at $x = 0$ is now at $x = 4$. Every point has moved 4 units in the direction of increasing $x$, which is to the right.',
+      conclusion: 'Each height now appears 4 units later along the $x$-axis, so the answer is a translation of 4 units to the right.',
       whyWrong: [
         'This is the most common slip: $-4$ looks like it should mean "left", but inside the bracket the effect is reversed. $f(x - 4)$ reaches each height 4 units *later*, so the graph moves right.',
         null,
         'A change outside the bracket moves the graph vertically. Here the $-4$ is inside the bracket, so the move is horizontal.',
         'That would be $y = f(x) - 4$, where the 4 is subtracted outside the function.',
       ],
-      keyIdea: '$f(x - a)$ moves the graph $a$ units to the right: changes inside the bracket act on $x$ and do the opposite of what they look like.',
+      keyIdea: 'Inside the bracket, the sign does the opposite of what it looks like: $f(x - a)$ moves right by $a$, and $f(x + a)$ moves left by $a$. To test it, solve bracket $= 0$ to see where the old $x = 0$ goes.',
     },
   },
   {
@@ -91,18 +94,19 @@ export const questions: StaticQuestion[] = [
     options: ['$(-2, -6)$', '$(-2, 6)$', '$(-6, 2)$', '$(2, 6)$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Where does the point $(2, -6)$ move to when the whole function is made negative?',
       solution:
-        'The minus sign is **outside** the function, so it changes the sign of every output ($y$-value). The $x$-values stay the same.\n\n' +
-        '- At $x = 2$: original height $f(2) = -6$.\n' +
-        '- New height: $-f(2) = -(-6) = 6$.\n\n' +
-        'So $(2, -6) \\to (2, 6)$. This is a reflection in the $x$-axis.',
+        '$(2, -6)$ on $y = f(x)$ means $f(2) = -6$: when the input is 2, the output is $-6$.\n\n' +
+        '$y = -f(x)$ takes the same input and changes the sign of the output. The minus is outside the bracket, so $x$ is not touched.\n\n' +
+        'At $x = 2$, the new output is $-f(2) = -(-6) = 6$. So the point is $(2, 6)$.',
+      conclusion: 'The $x$-value stays at 2 and the height changes sign, so the new point is $(2, 6)$.',
       whyWrong: [
         'This changes the sign of $x$, which is a reflection in the $y$-axis: that is what $y = f(-x)$ does (minus **inside** the bracket).',
         'This changes both signs, a reflection in both axes, which is $y = -f(-x)$. Here the minus is only outside, so only $y$ changes.',
         'This swaps the coordinates, $(2, -6) \\to (-6, 2)$, which is a reflection in the line $y = x$ (the graph of the inverse function), not a reflection in the $x$-axis.',
         null,
       ],
-      keyIdea: '$y = -f(x)$ reflects the graph in the $x$-axis: $(x, y) \\to (x, -y)$.',
+      keyIdea: 'A minus outside, $-f(x)$, changes the sign of $y$ only: a reflection in the $x$-axis. A minus inside, $f(-x)$, changes the sign of $x$ only: a reflection in the $y$-axis.',
     },
     check: {
       optionValues: ['-2,-6', '-2,6', '-6,2', '2,6'],
@@ -117,17 +121,19 @@ export const questions: StaticQuestion[] = [
     options: ['Vertical stretch, scale factor $3$', 'Horizontal stretch, scale factor $3$', 'Horizontal stretch, scale factor $\\frac{1}{3}$', 'Translation of $3$ units up'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does multiplying a function by 3 do to its graph?',
       solution:
-        'The 3 multiplies the **output** of the function, so every $y$-value is multiplied by 3 while every $x$-value stays the same.\n\n' +
-        'For example, if $(1, 2)$ is on $y = f(x)$, then $(1, 6)$ is on $y = 3f(x)$.\n\n' +
-        'Points move away from the $x$-axis by a factor of 3: a **vertical stretch, scale factor 3**. Points on the $x$-axis (where $y = 0$) do not move.',
+        'In $y = 3f(x)$, the 3 is outside the bracket, so the input $x$ is unchanged. Only the outputs (the heights) change, and each one is multiplied by 3.\n\n' +
+        'Try some points: $(2, 5)$ moves to $(2, 15)$, and $(4, -1)$ moves to $(4, -3)$. Each point ends up 3 times as far from the $x$-axis as it was.\n\n' +
+        'Moving points away from the $x$-axis like this is called a **vertical stretch**. The **scale factor** is the number each height is multiplied by, which here is 3.',
+      conclusion: 'Every height is multiplied by 3 while $x$ stays put, so the answer is vertical stretch, scale factor $3$.',
       whyWrong: [
         null,
         'Multiplying outside the function changes the $y$-values. A horizontal stretch by factor 3 would be $y = f\\left(\\frac{x}{3}\\right)$, with the change inside the bracket.',
         'That is $y = f(3x)$, where the 3 multiplies $x$ inside the bracket and squashes the graph towards the $y$-axis.',
         'That would be $y = f(x) + 3$. Adding 3 shifts the graph; multiplying by 3 stretches it.',
       ],
-      keyIdea: '$y = af(x)$ is a vertical stretch with scale factor $a$: multiply every $y$-coordinate by $a$.',
+      keyIdea: 'A number multiplying outside the bracket, $af(x)$, is a vertical stretch with scale factor $a$. A number multiplying $x$ inside, $f(ax)$, is a horizontal stretch with scale factor $\\frac{1}{a}$. A number added is a translation.',
     },
   },
   {
@@ -138,17 +144,20 @@ export const questions: StaticQuestion[] = [
     options: ['$y = (x - 5)^2$', '$y = x^2 + 5$', '$y = (x + 5)^2$', '$y = x^2 - 5$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What equation do we get when the curve $y = x^2$ slides 5 units left?',
       solution:
-        'A horizontal translation changes $x$ **inside** the function. To move left by 5 we replace $x$ with $x + 5$:\n\n' +
-        '$$y = f(x + 5) = (x + 5)^2$$\n\n' +
-        'Check with the vertex: $y = x^2$ has its vertex at $(0, 0)$. For $y = (x + 5)^2$ the lowest point is where $x + 5 = 0$, i.e. $x = -5$. The vertex is now at $(-5, 0)$, which is 5 units to the left.',
+        'A **translation** slides a graph without changing its shape. Moving sideways changes the input, so the change goes inside the bracket, with $x$.\n\n' +
+        'The lowest point of $y = x^2$ is at $x = 0$, because the thing being squared is 0 there. After moving 5 to the left, the lowest point must be at $x = -5$.\n\n' +
+        'So we need a bracket that is 0 when $x = -5$. Try $x + 5$: at $x = -5$ it gives $-5 + 5 = 0$, which works.\n\n' +
+        'Square that bracket in place of $x$: $y = (x + 5)^2$.',
+      conclusion: 'The lowest point is now where $x + 5 = 0$, at $x = -5$, so the equation is $y = (x + 5)^2$.',
       whyWrong: [
         'This moves the graph 5 units to the **right**: the vertex of $y = (x - 5)^2$ is at $x = 5$. Inside the bracket the sign works the opposite way.',
         'Adding 5 outside the function moves the graph 5 units **up**, not left.',
         null,
         'Subtracting 5 outside the function moves the graph 5 units **down**, not left.',
       ],
-      keyIdea: 'To translate $a$ units left, replace $x$ by $x + a$; to translate right, replace $x$ by $x - a$.',
+      keyIdea: 'To move a graph left by $a$, replace $x$ with $(x + a)$. To move it right by $a$, replace $x$ with $(x - a)$. To test it, solve bracket $= 0$ and see where the lowest point lands.',
     },
     check: {
       // value of each option at x = 1
@@ -165,19 +174,19 @@ export const questions: StaticQuestion[] = [
     options: ['$(8, -2)$', '$(2, -2)$', '$(4, -4)$', '$(2, -4)$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Where does the point $(4, -2)$ move to when $x$ becomes $2x$ inside the bracket?',
       solution:
-        'The 2 multiplies $x$ **inside** the bracket, so only the $x$-coordinate changes.\n\n' +
-        'We want the new graph to use the same output $f(4) = -2$. That happens when the input to $f$ is 4:\n\n' +
-        '$$2x = 4 \\quad\\Rightarrow\\quad x = 2$$\n\n' +
-        'So the new graph has height $f(4) = -2$ at $x = 2$: the point is $(2, -2)$.\n\n' +
-        'This is a horizontal stretch with scale factor $\\frac{1}{2}$ (a squash towards the $y$-axis): every $x$-coordinate is halved.',
+        '$(4, -2)$ on $y = f(x)$ means that when the input to $f$ is 4, the output is $-2$. So $f(4) = -2$.\n\n' +
+        'On $y = f(2x)$, the input to $f$ is $2x$. To get the same output $-2$, that input must be 4: $2x = 4$.\n\n' +
+        'Divide both sides by 2: $x = 2$. So at $x = 2$ the new graph has height $-2$, which is the point $(2, -2)$.',
+      conclusion: 'The bracket needs $2x = 4$, which halves the $x$-coordinate and leaves the height alone, so the point is $(2, -2)$.',
       whyWrong: [
         'This multiplies the $x$-coordinate by 2. Inside the bracket the effect is the opposite: $f(2x)$ is a horizontal stretch with scale factor $\\frac{1}{2}$, so $x$ is halved.',
         null,
         'This doubles the $y$-coordinate, which is what $y = 2f(x)$ does (a vertical stretch). The 2 here is inside the bracket.',
         'This halves $x$ correctly but also doubles $y$. $f(2x)$ changes only the $x$-coordinates.',
       ],
-      keyIdea: '$y = f(ax)$ is a horizontal stretch with scale factor $\\frac{1}{a}$: divide every $x$-coordinate by $a$.',
+      keyIdea: 'For a point on $y = f(\\text{something})$, set the bracket equal to the old $x$-coordinate and solve. The height stays the same. So $f(2x)$ halves $x$-coordinates, and $f\\left(\\frac{1}{2}x\\right)$ doubles them.',
     },
     check: {
       optionValues: ['8,-2', '2,-2', '4,-4', '2,-4'],
@@ -192,19 +201,20 @@ export const questions: StaticQuestion[] = [
     options: ['$(4, 10)$', '$(2, 6)$', '$(4, 5)$', '$(4, 6)$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Where does the turning point $(3, 1)$ end up on the new graph?',
       solution:
-        'Treat the $x$- and $y$-coordinates separately.\n\n' +
-        '**$x$-coordinate (inside the bracket, do the opposite):** we need $x - 1 = 3$, so $x = 4$. The graph moves 1 unit right.\n\n' +
-        '**$y$-coordinate (outside, do what you see, in the order of operations):** first multiply by 2, then add 4:\n\n' +
-        '$$2 \\times 1 + 4 = 6$$\n\n' +
-        'The vertex moves from $(3, 1)$ to $(4, 6)$. (The stretch factor 2 is positive, so the vertex is still a minimum or maximum of the same type.)',
+        'The **vertex** is the turning point of the curve. We can track it like any other point, handling $x$ and $y$ separately. Here $f(3) = 1$.\n\n' +
+        'Find the new $x$. The value we want to use is $f(3)$, so the bracket must equal 3: $x - 1 = 3$. Add 1 to both sides: $x = 4$.\n\n' +
+        'Find the new $y$. At that $x$, the equation gives $2f(3) + 4$. Replace $f(3)$ with 1: $2 \\times 1 + 4$.\n\n' +
+        'Follow the order in the equation: multiply first, then add. $2 \\times 1 = 2$, and $2 + 4 = 6$. So the new vertex has $x = 4$ and $y = 6$.',
+      conclusion: 'Stretches and translations carry the turning point along with them, so the new vertex is $(4, 6)$.',
       whyWrong: [
         'This adds 4 before multiplying by 2: $2 \\times (1 + 4) = 10$. In $2f(x - 1) + 4$ the output is doubled first and then 4 is added.',
         'This moves the vertex 1 unit to the left. Inside the bracket the sign is reversed: $x - 1$ means a move to the **right**.',
         'This adds 4 but forgets the vertical stretch: the $y$-value must be multiplied by 2 first ($2 \\times 1 = 2$).',
         null,
       ],
-      keyIdea: 'For $y = af(x - h) + k$, a point $(p, q)$ moves to $(p + h, aq + k)$: multiply the $y$-value first, then add.',
+      keyIdea: 'Under $y = af(x - h) + k$, a point $(p, q)$ moves to $(p + h, aq + k)$. For $x$, solve bracket $= p$. For $y$, multiply by $a$ first, and then add $k$.',
     },
     check: {
       optionValues: ['4,10', '2,6', '4,5', '4,6'],
@@ -219,21 +229,21 @@ export const questions: StaticQuestion[] = [
     options: ['$(-1, -2)$', '$(5, -2)$', '$(-1, 8)$', '$(-5, -2)$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Where is the turning point of this curve after it slides left and down?',
       solution:
-        '**Step 1: find the vertex of the original graph** by completing the square. Half of $-4$ is $-2$:\n\n' +
-        '$$x^2 - 4x + 7 = (x - 2)^2 - 4 + 7 = (x - 2)^2 + 3$$\n\n' +
-        'So the original vertex is $(2, 3)$.\n\n' +
-        '**Step 2: move the vertex.**\n\n' +
-        '- 3 units left: $x$-coordinate $2 - 3 = -1$\n' +
-        '- 5 units down: $y$-coordinate $3 - 5 = -2$\n\n' +
-        'New vertex: $(-1, -2)$. (The new equation is $y = (x + 1)^2 - 2$.)',
+        'The **vertex** is the turning point of the parabola. A translation slides every point the same way, including the vertex. So find the vertex, then move it.\n\n' +
+        'Find the vertex by completing the square. Halve the $-4$ to get $-2$, so use the bracket $(x - 2)^2$, which expands to $x^2 - 4x + 4$.\n\n' +
+        'We need $+7$, not $+4$, so add 3: $x^2 - 4x + 7 = (x - 2)^2 + 3$.\n\n' +
+        'A square is never negative, so the lowest value of $(x - 2)^2$ is 0, when $x = 2$. At that point $y = 0 + 3 = 3$. So the vertex is $(2, 3)$.\n\n' +
+        'Now move it. Left 3 means subtract 3 from $x$: $2 - 3 = -1$. Down 5 means subtract 5 from $y$: $3 - 5 = -2$.',
+      conclusion: 'Starting at $(2, 3)$ and moving left 3 and down 5, the new vertex is $(-1, -2)$.',
       whyWrong: [
         null,
         'This moves the vertex 3 units to the **right** ($2 + 3 = 5$) instead of to the left.',
         'This moves the vertex 5 units **up** ($3 + 5 = 8$) instead of down.',
         'This starts from the wrong vertex $(-2, 3)$. In $(x - 2)^2 + 3$ the bracket is zero when $x = 2$, so the vertex is at $x = 2$, not $x = -2$.',
       ],
-      keyIdea: 'Find the vertex by completing the square, then a translation moves the vertex by exactly the same amounts.',
+      keyIdea: 'For a translated parabola, find the vertex by completing the square or with $x = -\\frac{b}{2a}$. Then change its coordinates directly: right adds to $x$, left subtracts, up adds to $y$, down subtracts. No new equation is needed.',
     },
     check: {
       optionValues: ['-1,-2', '5,-2', '-1,8', '-5,-2'],
@@ -255,18 +265,19 @@ export const questions: StaticQuestion[] = [
     options: ['$x = -2$ and $y = 3$', '$x = 3$ and $y = 2$', '$x = 2$ and $y = -3$', '$x = 2$ and $y = 3$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which vertical and horizontal lines does the new graph approach but never touch?',
       solution:
-        'Write the new graph as $y = f(x - 2) + 3$ with $f(x) = \\frac{1}{x}$: a translation **2 right** and **3 up**. Asymptotes move with the graph.\n\n' +
-        '- Vertical asymptote: $x = 0$ moves 2 right to $x = 2$. (Check: the denominator $x - 2$ is zero when $x = 2$, and you cannot divide by zero.)\n' +
-        '- Horizontal asymptote: $y = 0$ moves 3 up to $y = 3$. (Check: for very large $x$, $\\frac{1}{x - 2}$ is almost 0, so $y$ is almost 3.)\n\n' +
-        'Asymptotes: $x = 2$ and $y = 3$.',
+        'An **asymptote** is a line that a graph gets closer and closer to but never reaches. A vertical one sits where the function breaks. A horizontal one is the height the graph settles at for huge $x$.\n\n' +
+        'Vertical asymptote: the fraction breaks when its bottom is 0, since we can\'t divide by 0. Solve $x - 2 = 0$ by adding 2 to both sides: $x = 2$.\n\n' +
+        'Horizontal asymptote: when $x$ is huge, say 1,000,000, the fraction $\\frac{1}{x - 2}$ is almost 0. So $y$ is almost $0 + 3 = 3$. It never quite gets there, because a fraction with 1 on top is never exactly 0. So the line is $y = 3$.',
+      conclusion: 'The bottom is 0 at $x = 2$ and the graph settles at height 3, so the asymptotes are $x = 2$ and $y = 3$.',
       whyWrong: [
         'This moves the vertical asymptote the wrong way. The denominator $x - 2$ is zero when $x = 2$, which is a shift 2 to the right.',
         'This swaps the two shifts. The number with $x$ inside the denominator controls the vertical asymptote; the number added outside controls the horizontal one.',
         'The $+3$ outside moves the whole graph **up** 3, so the horizontal asymptote rises from $y = 0$ to $y = 3$.',
         null,
       ],
-      keyIdea: 'Asymptotes move exactly like the graph: $y = \\frac{1}{x - h} + k$ has asymptotes $x = h$ and $y = k$.',
+      keyIdea: 'For $y = \\frac{a}{x - h} + k$, the vertical asymptote is where the bottom is 0, $x = h$. The horizontal asymptote is the number added on the end, $y = k$. The number on top, $a$, moves neither.',
     },
     check: {
       optionValues: ['-2,3', '3,2', '2,-3', '2,3'],
@@ -292,19 +303,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 2,
     markScheme: {
+      asking: 'After the flip and the slide, where is the asymptote and where does the graph cross the $y$-axis?',
       solution:
-        'Build the equation one step at a time.\n\n' +
-        '1. Reflect in the $x$-axis: $y = -2^x$.\n' +
-        '2. Translate 3 up: $y = -2^x + 3 = 3 - 2^x$.\n\n' +
-        '**Asymptote:** $y = 2^x$ has asymptote $y = 0$. Reflecting keeps it at $y = 0$, then moving up 3 gives $y = 3$. (Check: when $x$ is very negative, $2^x$ is almost 0, so $y$ is almost 3.)\n\n' +
-        '**$y$-intercept:** put $x = 0$: $y = 3 - 2^0 = 3 - 1 = 2$, so $(0, 2)$.',
+        'Apply the changes in the order given, starting from $y = 2^x$. Its **horizontal asymptote**, the flat line the graph approaches but never reaches, is $y = 0$. That is because $2^x$ gets close to 0 for very negative $x$, but never equals it.\n\n' +
+        'Reflecting in the $x$-axis turns every output into its negative, so the equation becomes $y = -2^x$. The line $y = 0$ is the mirror itself, so the asymptote stays where it is.\n\n' +
+        'Translating up 3 adds 3 to every output: $y = -2^x + 3$. The asymptote moves up with the graph, to $y = 3$.\n\n' +
+        'The $y$-intercept is where the graph crosses the $y$-axis, so where $x = 0$. There $2^0 = 1$, so $y = -1 + 3 = 2$. That is the point $(0, 2)$.',
+      conclusion: 'The new graph is $y = -2^x + 3$, so the answer is: Horizontal asymptote $y = 3$; $y$-intercept $(0, 2)$.',
       whyWrong: [
         'The $y$-intercept is right, but the asymptote moves with the graph: shifting up 3 moves $y = 0$ to $y = 3$.',
         'This forgets the reflection: $2^0 + 3 = 4$. After reflecting, the curve passes through $(0, -1)$, and moving up 3 gives $(0, 2)$.',
         null,
         'This translates first and reflects afterwards: $-(2^x + 3) = -2^x - 3$. The question says reflect **then** translate.',
       ],
-      keyIdea: 'Apply the steps in the order given, then read off the asymptote (it moves only with vertical shifts) and put $x = 0$ for the $y$-intercept.',
+      keyIdea: 'Apply the transformations to the equation in order, one at a time. Then read off the features: for $y = a \\cdot b^x + c$, the asymptote is $y = c$, and setting $x = 0$ gives the $y$-intercept, $a + c$.',
     },
     check: {
       optionValues: ['0,2', '3,4', '3,2', '-3,-4'],
@@ -324,19 +336,20 @@ export const questions: StaticQuestion[] = [
     options: ['$x = -1$ and $x = 3$', '$x = -4$ and $x = 12$', '$x = -2$ and $x = 6$', '$x = -6$ and $x = 18$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Where does the new graph have a height of 0?',
       solution:
-        'The graph crosses the $x$-axis where $y = 0$, i.e. where $3f\\left(\\frac{1}{2}x\\right) = 0$, i.e. where $f\\left(\\frac{1}{2}x\\right) = 0$.\n\n' +
-        '**The 3 outside:** a vertical stretch. A point with $y = 0$ stays at $y = 3 \\times 0 = 0$, so it does not change the roots.\n\n' +
-        '**The $\\frac{1}{2}$ inside:** $f$ is zero when its input is $-2$ or $6$, so we need\n\n' +
-        '$$\\frac{1}{2}x = -2 \\Rightarrow x = -4 \\qquad \\frac{1}{2}x = 6 \\Rightarrow x = 12$$\n\n' +
-        'So the new graph crosses the $x$-axis at $x = -4$ and $x = 12$ (a horizontal stretch with scale factor 2).',
+        'A graph crosses the $x$-axis where $y = 0$. So we need to solve $3f\\left(\\frac{1}{2}x\\right) = 0$.\n\n' +
+        'Divide both sides by 3: $f\\left(\\frac{1}{2}x\\right) = 0$. So the 3 doesn\'t change the crossing points. A vertical stretch keeps a height of 0 at 0.\n\n' +
+        'We know $f$ equals 0 only when its input is $-2$ or 6. Here its input is $\\frac{1}{2}x$. So $\\frac{1}{2}x = -2$ or $\\frac{1}{2}x = 6$.\n\n' +
+        'Multiply each by 2 to get $x$ alone: $x = -4$ or $x = 12$.',
+      conclusion: 'The crossing points double because of the $\\frac{1}{2}$ inside the bracket, so the answer is $x = -4$ and $x = 12$.',
       whyWrong: [
         'This halves the roots. Inside the bracket the effect is reversed: multiplying $x$ by $\\frac{1}{2}$ stretches the graph horizontally by factor 2, so the roots double.',
         null,
         'This correctly notices that the vertical stretch by 3 keeps the roots fixed, but forgets the horizontal stretch caused by $\\frac{1}{2}x$.',
         'This applies the factor 3 to the $x$-coordinates. The 3 is outside the function, so it only stretches vertically, and points on the $x$-axis stay where they are.',
       ],
-      keyIdea: 'Vertical stretches never move roots; a horizontal stretch $f(ax)$ divides every root by $a$.',
+      keyIdea: 'To find the new roots of $y = af(bx)$, set the bracket equal to each old root and solve. The outside number $a$ has no effect on roots, because $a \\times 0 = 0$.',
     },
     check: {
       optionValues: ['-1,3', '-4,12', '-2,6', '-6,18'],
@@ -357,21 +370,21 @@ export const questions: StaticQuestion[] = [
     options: ['$y = -2x^2 + 3x - 1$', '$y = -2x^2 + 3x + 1$', '$y = 2x^2 + 3x + 1$', '$y = -2x^2 - 3x - 1$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What is the equation of this curve after a left-right flip?',
       solution:
-        'A reflection in the $y$-axis is $y = f(-x)$: replace **every** $x$ with $(-x)$.\n\n' +
-        '$$f(-x) = 2(-x)^2 - 3(-x) + 1$$\n\n' +
-        '- $(-x)^2 = x^2$ (a negative squared is positive), so $2(-x)^2 = 2x^2$.\n' +
-        '- $-3(-x) = +3x$.\n' +
-        '- The constant 1 has no $x$, so it does not change.\n\n' +
-        'So $y = 2x^2 + 3x + 1$.\n\n' +
-        'Check at $x = 2$: the new graph should equal the old graph at $x = -2$. Old: $f(-2) = 8 + 6 + 1 = 15$. New: $2(4) + 3(2) + 1 = 15$. They match.',
+        'A reflection in the $y$-axis swaps left and right: the height at $x = 2$ moves to $x = -2$, and so on. In an equation, this means replacing $x$ with $-x$, which gives $y = f(-x)$.\n\n' +
+        'Substitute, with brackets: $f(-x) = 2(-x)^2 - 3(-x) + 1$.\n\n' +
+        'Work out the first term. $(-x)^2 = (-x) \\times (-x) = x^2$, since two negatives multiply to a positive. So it stays as $2x^2$.\n\n' +
+        'Work out the second term: $-3 \\times (-x) = 3x$. The $+1$ has no $x$ in it, so it stays the same.\n\n' +
+        'Put it together: $y = 2x^2 + 3x + 1$.',
+      conclusion: 'Replacing $x$ with $-x$ flips only the sign of the $x$ term, so the new graph is $y = 2x^2 + 3x + 1$.',
       whyWrong: [
         'This is $-f(x)$, a reflection in the $x$-axis: every sign has been changed. A reflection in the $y$-axis changes the sign of $x$ only.',
         'This treats $(-x)^2$ as $-x^2$. Squaring a negative gives a positive, $(-x)^2 = x^2$, so the $x^2$ term keeps its sign.',
         null,
         'This is $-f(-x)$, which reflects in **both** axes. A reflection in the $y$-axis alone is just $f(-x)$.',
       ],
-      keyIdea: '$y = f(-x)$ reflects in the $y$-axis: replace every $x$ with $(-x)$, so only the odd powers of $x$ change sign.',
+      keyIdea: 'Reflection in the $y$-axis: replace $x$ with $-x$, so even powers and constants keep their sign and odd powers flip. Reflection in the $x$-axis: put a minus in front of the whole function, so every sign flips.',
     },
     check: {
       // value of each option at x = 2
@@ -392,18 +405,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'What happens to the highest point $(2, 5)$ on the graph of $y = 4 - f(x)$?',
       solution:
-        'Rewrite: $y = 4 - f(x) = -f(x) + 4$. Both changes are **outside** the function, so only $y$-values change, in this order:\n\n' +
-        '1. $-f(x)$: reflect in the $x$-axis. $(2, 5) \\to (2, -5)$. The graph is turned upside down, so the hilltop (maximum) becomes a valley (**minimum**).\n' +
-        '2. $+4$: move up 4. $(2, -5) \\to (2, -1)$.\n\n' +
-        'So the new graph has a **minimum** point at $(2, -1)$.',
+        'Rewrite the equation to see its parts: $y = 4 - f(x)$ is the same as $y = -f(x) + 4$. So there are two changes: a minus sign in front of $f$, then adding 4.\n\n' +
+        'The minus sign reflects the graph in the $x$-axis, turning it upside down. So the maximum (highest point) becomes a **minimum** (lowest point). The height 5 becomes $-5$, giving $(2, -5)$.\n\n' +
+        'Adding 4 moves the graph up 4 without changing its shape, so it is still a minimum. The height becomes $-5 + 4 = -1$.\n\n' +
+        'Neither change touches $x$, since nothing happens inside the bracket. So the new point is a minimum with $x = 2$ and $y = -1$.',
+      conclusion: 'The graph is flipped and then raised, so it has a minimum point at $(2, -1)$.',
       whyWrong: [
         'The coordinates are right, but reflecting in the $x$-axis turns the graph upside down, so a maximum becomes a minimum.',
         null,
         'This adds 4 to 5 and ignores the minus sign in front of $f(x)$, which reflects the graph.',
         'This also changes the sign of $x$. That would need $f(-x)$; here the minus is outside the function, so only $y$-values change.',
       ],
-      keyIdea: 'A reflection in the $x$-axis swaps maximum points and minimum points; $x$-coordinates of turning points do not change.',
+      keyIdea: 'Rewrite $c - f(x)$ as $-f(x) + c$, then apply it to the turning point: reflect first (maximum and minimum swap, and the height changes sign), then add $c$. The $x$-coordinate stays the same when everything happens outside the bracket.',
     },
   },
   {
@@ -414,21 +429,21 @@ export const questions: StaticQuestion[] = [
     options: ['$y = 2x^2 + 12x + 17$', '$y = 2x^2 - 12x + 16$', '$y = 2x^2 - 6x + 17$', '$y = 2x^2 - 12x + 17$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is the expanded equation of $y = x^2$ after the stretch and the slides?',
       solution:
-        'Apply the steps in order.\n\n' +
-        '1. Vertical stretch, factor 2: $y = 2x^2$.\n' +
-        '2. 3 units right: replace $x$ with $x - 3$: $y = 2(x - 3)^2$.\n' +
-        '3. 1 unit down: subtract 1: $y = 2(x - 3)^2 - 1$.\n\n' +
-        'Expand: $(x - 3)^2 = x^2 - 6x + 9$, so\n\n' +
-        '$$y = 2(x^2 - 6x + 9) - 1 = 2x^2 - 12x + 18 - 1 = 2x^2 - 12x + 17$$\n\n' +
-        'Quick check: the vertex should be $(3, -1)$. At $x = 3$: $2(9) - 36 + 17 = -1$.',
+        'Apply each change to the equation in the order given. First, the stretch. A vertical stretch with scale factor 2 multiplies every output by 2: $y = 2x^2$.\n\n' +
+        'Next, moving right 3 means replacing $x$ with $(x - 3)$. The sign looks opposite because the lowest point must now be where the bracket is 0, at $x = 3$. That gives $y = 2(x - 3)^2$.\n\n' +
+        'Moving down 1 means subtracting 1 from every output: $y = 2(x - 3)^2 - 1$.\n\n' +
+        'Expand the bracket by multiplying it by itself: $(x - 3)(x - 3) = x^2 - 3x - 3x + 9 = x^2 - 6x + 9$.\n\n' +
+        'Multiply by 2: $2x^2 - 12x + 18$. Then subtract 1: $y = 2x^2 - 12x + 17$.',
+      conclusion: 'Expanding $2(x - 3)^2 - 1$ gives $2x^2 - 12x + 18 - 1$, so the equation is $y = 2x^2 - 12x + 17$.',
       whyWrong: [
         'This equals $2(x + 3)^2 - 1$, which moves the graph 3 units to the **left**. Moving right by 3 replaces $x$ with $x - 3$.',
         'This equals $2\\left((x - 3)^2 - 1\\right)$: the translation down was done before the stretch, so the $-1$ was also doubled to $-2$.',
         'This expands $(x - 3)^2$ as $x^2 - 3x + 9$, forgetting that the middle term is $2 \\times (-3)x = -6x$.',
         null,
       ],
-      keyIdea: 'Build the equation step by step in the given order (vertex form $a(x - h)^2 + k$), then expand carefully.',
+      keyIdea: 'Build the equation in the stated order: a stretch multiplies the outputs, a move right by $h$ replaces $x$ with $(x - h)$, and a move up by $k$ adds $k$. Expand only at the end.',
     },
     check: {
       // value of each option at x = 1
@@ -444,19 +459,20 @@ export const questions: StaticQuestion[] = [
     options: ['$(14, 1)$', '$(-1, 1)$', '$(5, 1)$', '$(-4, 1)$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Where does the point $(4, 1)$ move to when the bracket becomes $2x + 6$?',
       solution:
-        'Only the inside of the bracket changed, so only $x$ changes; the height stays $f(4) = 1$.\n\n' +
-        '**Method 1 (solve):** the new graph has height $f(4)$ where the input equals 4:\n\n' +
-        '$$2x + 6 = 4 \\Rightarrow 2x = -2 \\Rightarrow x = -1$$\n\n' +
-        '**Method 2 (factorise):** $f(2x + 6) = f\\big(2(x + 3)\\big)$. Starting from $(4, 1)$: horizontal stretch factor $\\frac{1}{2}$ gives $(2, 1)$, then 3 units left gives $(-1, 1)$.\n\n' +
-        'Both methods give $(-1, 1)$.',
+        '$(4, 1)$ on $y = f(x)$ means $f(4) = 1$: when the input to $f$ is 4, the output is 1.\n\n' +
+        'On $y = f(2x + 6)$, the input to $f$ is $2x + 6$. For the output to be 1 again, that input must be 4: $2x + 6 = 4$.\n\n' +
+        'Subtract 6 from both sides: $2x = -2$.\n\n' +
+        'Divide both sides by 2: $x = -1$. The height is unchanged, because nothing changed outside the bracket. So the point has $x = -1$ and $y = 1$.',
+      conclusion: 'Testing: at $x = -1$ the bracket is $-2 + 6 = 4$, which gives $f(4) = 1$. So the point is $(-1, 1)$.',
       whyWrong: [
         'This applies the operations to the $x$-coordinate directly ($2 \\times 4 + 6 = 14$). Changes inside the bracket must be undone: solve $2x + 6 = 4$.',
         null,
         'This adds 6 instead of subtracting it: $\\frac{4 + 6}{2} = 5$. Solving $2x + 6 = 4$ means subtracting 6 first.',
         'This halves and then subtracts 6 ($\\frac{4}{2} - 6 = -4$), treating it as a shift of 6. Since $2x + 6 = 2(x + 3)$, the shift is only 3 units.',
       ],
-      keyIdea: 'For $f(bx + c)$ find the new $x$ by solving $bx + c = $ old $x$ (or factor as $f\\big(b(x + \\frac{c}{b})\\big)$: the shift is $\\frac{c}{b}$, not $c$).',
+      keyIdea: 'For a point on $y = f(\\text{expression})$, don\'t apply the operations to the old $x$. Set the expression equal to the old $x$ and solve: this gives the new $x$, and the height stays the same.',
     },
     check: {
       optionValues: ['14,1', '-1,1', '5,1', '-4,1'],
@@ -471,19 +487,21 @@ export const questions: StaticQuestion[] = [
     options: ['$a = -2$, $b = -3$', '$a = 2$, $b = 3$', '$a = -2$, $b = 3$', '$a = -9$, $b = 3$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What must $a$ and $b$ be for $(2, 3)$ to land on $(5, -6)$?',
       solution:
-        'Under $y = af(x - b)$ a point $(p, q)$ moves to $(p + b, aq)$: $x - b$ inside moves the graph $b$ units right, and $a$ outside multiplies the $y$-value.\n\n' +
-        '**$x$-coordinates:** $2 + b = 5$, so $b = 3$.\n\n' +
-        '**$y$-coordinates:** $a \\times 3 = -6$, so $a = -2$.\n\n' +
-        'Check: with $a = -2$, $b = 3$ the point on $y = -2f(x - 3)$ at $x = 5$ has height $-2f(5 - 3) = -2f(2) = -2 \\times 3 = -6$. Correct.\n\n' +
-        'So $a = -2$ (vertical stretch factor 2 with a reflection in the $x$-axis) and $b = 3$.',
+        'Handle the two coordinates separately. We know $f(2) = 3$. In $y = af(x - b)$, $b$ changes the input and $a$ multiplies the output.\n\n' +
+        'The new point has $x = 5$ and it must use $f(2)$. So the bracket must equal 2 when $x = 5$: $5 - b = 2$.\n\n' +
+        'Solve it. Add $b$ to both sides: $5 = 2 + b$. Subtract 2: $b = 3$.\n\n' +
+        'The new height is $a \\times f(2) = a \\times 3$, and the question says it is $-6$. So $3a = -6$.\n\n' +
+        'Divide both sides by 3: $a = -2$.',
+      conclusion: 'Testing: at $x = 5$, $-2 \\times f(5 - 3) = -2 \\times 3 = -6$, which matches. So the answer is $a = -2$, $b = 3$.',
       whyWrong: [
         'This gets the sign of $b$ backwards. With $b = -3$ the bracket is $x + 3$, which moves the graph 3 units **left**, to $x = -1$, not $x = 5$.',
         'This ignores the sign change of the $y$-value: with $a = 2$ the image would be $(5, 6)$. Going from $3$ to $-6$ needs a negative multiplier.',
         null,
         'This treats the change in $y$ as a translation ($3 + (-9) = -6$). But $a$ **multiplies** the $y$-value: $3a = -6$.',
       ],
-      keyIdea: 'Match coordinates separately: horizontal changes come from inside the bracket ($p + b$), vertical changes from outside ($aq$).',
+      keyIdea: 'With $y = af(x - b)$ and a point $(p, q)$ mapped to $(r, s)$, split it in two. The input gives $r - b = p$, and the output gives $aq = s$. $a$ multiplies, so solve it by dividing, not subtracting.',
     },
     check: {
       optionValues: ['-2,-3', '2,3', '-2,3', '-9,3'],
@@ -506,19 +524,20 @@ export const questions: StaticQuestion[] = [
     options: ['$y = f(-x - 2)$', '$y = f(2 - x)$', '$y = -f(x - 2)$', '$y = f(-x) - 2$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What is the equation after the left-right flip and then the slide to the right?',
       solution:
-        'Work one step at a time, and remember each horizontal change replaces **every** $x$.\n\n' +
-        '1. Reflect in the $y$-axis: replace $x$ with $-x$: $y = f(-x)$.\n' +
-        '2. Translate 2 right: replace $x$ with $(x - 2)$ **everywhere**: $y = f\\big(-(x - 2)\\big) = f(2 - x)$.\n\n' +
-        'Check with a point: if $(1, 7)$ is on $y = f(x)$, reflecting gives $(-1, 7)$ and moving right 2 gives $(1, 7)$. On $y = f(2 - x)$ at $x = 1$: $f(2 - 1) = f(1) = 7$. Correct.\n\n' +
-        'On $y = f(-x - 2)$ at $x = 1$ we would get $f(-3)$, which is not the right height in general.',
+        'Apply the changes in the order given. Each one changes $x$ in the equation so far.\n\n' +
+        'Reflecting $y = f(x)$ in the $y$-axis means replacing $x$ with $-x$. The equation becomes $y = f(-x)$.\n\n' +
+        'Moving a graph 2 units right means replacing **every** $x$ with $(x - 2)$. The only $x$ in $f(-x)$ is the one after the minus sign, so we get $y = f(-(x - 2))$.\n\n' +
+        'Multiply out the minus sign: $-(x - 2) = -x + 2$, which is the same as $2 - x$. So $y = f(2 - x)$.',
+      conclusion: 'A point at $x = a$ reflects to $-a$ and slides to $2 - a$, where the bracket $2 - x$ equals $a$ again. So the equation is $y = f(2 - x)$.',
       whyWrong: [
         'This just writes "$-2$" after the $-x$. But a move right by 2 must replace every $x$: $-(x - 2) = 2 - x$. The graph of $f(-x - 2)$ is the reflected graph moved 2 units **left**.',
         null,
         'This reflects in the $x$-axis (minus outside the function) instead of the $y$-axis.',
         'This moves the reflected graph 2 units **down**. A change outside the function is vertical, not horizontal.',
       ],
-      keyIdea: 'Horizontal transformations act on $x$ itself: to move $f(-x)$ right by 2, replace $x$ with $x - 2$ to get $f(-(x - 2)) = f(2 - x)$.',
+      keyIdea: 'When several sideways changes are combined, change $x$ one step at a time: replace every $x$ in the current equation, keeping the brackets. Never just attach a number after $-x$. Then test with one point.',
     },
     check: {
       // test function f(t) = t^3 + 1; value of each option at x = 5
@@ -538,19 +557,21 @@ export const questions: StaticQuestion[] = [
     options: ['$-7$', '$-1$', '$7$', '$-11$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What number does the rule for $g$ give when $x = 2$?',
       solution:
-        'Work from the inside out.\n\n' +
-        '1. Input to $f$: $1 - x = 1 - 2 = -1$.\n' +
-        '2. Read from the table: $f(-1) = 5$.\n' +
-        '3. Outside: multiply by 2 first, then subtract from 3: $g(2) = 3 - 2 \\times 5 = 3 - 10 = -7$.\n\n' +
-        'So $g(2) = -7$.',
+        '$g(x) = 3 - 2f(1 - x)$ is a rule. To find $g(2)$, replace each $x$ with 2: $g(2) = 3 - 2f(1 - 2)$.\n\n' +
+        'Work out the bracket first, because the table needs one number as the input: $1 - 2 = -1$. So $g(2) = 3 - 2f(-1)$.\n\n' +
+        'Read $f(-1)$ from the table. Find $-1$ in the $x$ row. The value below it is 5, so $f(-1) = 5$.\n\n' +
+        'Substitute this value: $g(2) = 3 - 2 \\times 5$.\n\n' +
+        'Multiply before subtracting: $2 \\times 5 = 10$, and $3 - 10 = -7$.',
+      conclusion: 'The bracket gives $-1$, the table gives 5, and the arithmetic gives $3 - 10$, so the answer is $-7$.',
       whyWrong: [
         null,
         'This uses $f(1) = 2$, reading $1 - x$ as $x - 1$: then $3 - 2 \\times 2 = -1$. With $x = 2$, $1 - x = -1$.',
         'This uses $f(3) = -2$, i.e. the input $x + 1$: then $3 - 2 \\times (-2) = 7$. The input is $1 - x = -1$.',
         'This uses $f(-3) = 7$, writing $1 - x$ as $-(x + 1)$ (a sign slip): then $3 - 2 \\times 7 = -11$. In fact $1 - x = -(x - 1)$.',
       ],
-      keyIdea: 'To evaluate a transformed function, work from the inside out: find the input to $f$, look up $f$, then apply the outside operations.',
+      keyIdea: 'To evaluate a transformed function from a table: substitute, work out the bracket to get one number, read $f$ of that number from the table, then finish the arithmetic, multiplying before adding or subtracting.',
     },
     check: {
       optionValues: [-7, -1, 7, -11],
@@ -571,16 +592,18 @@ export const questions: StaticQuestion[] = [
     options: ['Reflection in the $x$-axis', 'Reflection in the $y$-axis', 'Reflection in the line $y = x$', 'Translation of $1$ unit down'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does a minus sign in front of $f(x)$ do to the graph?',
       solution:
-        'The minus sign is **outside** the function, so it changes the outputs: every $y$-value changes sign and each $x$ stays the same.\n\n' +
-        'A point $(a, b)$ goes to $(a, -b)$, which is a reflection in the $x$-axis.',
+        'In $y = -f(x)$, the minus is outside the bracket. So the input stays the same and every output changes sign. For example, $(2, 5)$ moves to $(2, -5)$, and $(3, -4)$ moves to $(3, 4)$.\n\n' +
+        'Each point stays at the same $x$ and goes to the opposite side of the $x$-axis, the same distance away. That is exactly what a mirror lying along the $x$-axis does.',
+      conclusion: 'Every height changes sign while $x$ stays the same, so the answer is a reflection in the $x$-axis.',
       whyWrong: [
         null,
         'A reflection in the $y$-axis changes the inputs: that is $y = f(-x)$, with the minus sign inside the bracket.',
         'A reflection in $y = x$ swaps the coordinates, which gives the graph of the inverse function.',
         'A translation down is $y = f(x) - 1$. It subtracts from each output; it does not change their signs.',
       ],
-      keyIdea: 'Changes outside the bracket act on $y$: $y = -f(x)$ is a reflection in the $x$-axis.',
+      keyIdea: 'A minus outside the bracket, $-f(x)$, changes $y$ and reflects in the $x$-axis. A minus inside, $f(-x)$, changes $x$ and reflects in the $y$-axis. Try it on one point to decide.',
     },
   },
   {
@@ -591,16 +614,18 @@ export const questions: StaticQuestion[] = [
     options: ['Reflection in the $y$-axis', 'Reflection in the $x$-axis', 'Reflection in the line $y = x$', 'Translation of $1$ unit left'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does a minus sign in front of the $x$ inside the bracket do to the graph?',
       solution:
-        'The minus sign is **inside** the bracket, so it changes the inputs: the height at $x$ is now the old height at $-x$.\n\n' +
-        'A point $(a, b)$ goes to $(-a, b)$, which is a reflection in the $y$-axis.',
+        'In $y = f(-x)$, the minus is inside the bracket. So it changes the input, not the output. Whatever height $f$ had at $x = 2$, the new graph has at $x = -2$.\n\n' +
+        'So each point $(a, b)$ moves to $(-a, b)$. For example, $(2, 5)$ moves to $(-2, 5)$: the same height, on the opposite side of the $y$-axis. That is what a mirror lying along the $y$-axis does.',
+      conclusion: 'Every point keeps its height and swaps sides, so the answer is a reflection in the $y$-axis.',
       whyWrong: [
         null,
         'A reflection in the $x$-axis changes the outputs: that is $y = -f(x)$, with the minus sign outside the bracket.',
         'A reflection in $y = x$ swaps the coordinates, which gives the graph of the inverse function.',
         'A translation left is $y = f(x + 1)$. Here each input changes sign; nothing is added to it.',
       ],
-      keyIdea: 'Changes inside the bracket act on $x$: $y = f(-x)$ is a reflection in the $y$-axis.',
+      keyIdea: 'Decide by where the minus is. Inside the bracket it acts on $x$: $f(-x)$ reflects in the $y$-axis. Outside it acts on $y$: $-f(x)$ reflects in the $x$-axis. To confirm, try the point $(2, 5)$.',
     },
   },
   {
@@ -611,16 +636,18 @@ export const questions: StaticQuestion[] = [
     options: ['$6$ units down', '$6$ units up', '$6$ units left', '$6$ units right'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which way does the graph move when 6 is subtracted from $f(x)$?',
       solution:
-        'The $-6$ is **outside** the bracket, so it acts on the outputs directly.\n\n' +
-        'Every $y$-value becomes $6$ smaller while each $x$ stays the same, so the whole graph moves $6$ units down.',
+        'The $-6$ is outside the bracket. So $x$ is unchanged, and we subtract 6 from every output. For example, a point $(2, 10)$ moves to $(2, 4)$.\n\n' +
+        'Each point stays at the same $x$ and its height falls by 6. That is a move straight down by 6, with no change of shape.',
+      conclusion: 'Every height falls by 6 while $x$ stays the same, so the graph moves $6$ units down.',
       whyWrong: [
         null,
         'Outside the bracket the sign means what it says: subtracting $6$ lowers every output.',
         'A horizontal move needs a change inside the bracket: $6$ units left is $y = f(x + 6)$.',
         'A horizontal move needs a change inside the bracket: $6$ units right is $y = f(x - 6)$.',
       ],
-      keyIdea: '$y = f(x) + a$ moves the graph vertically: up for positive $a$, down for negative $a$.',
+      keyIdea: 'Outside the bracket, the sign means what it says: $f(x) + k$ is up $k$, and $f(x) - k$ is down $k$. Inside the bracket it is reversed: $f(x + k)$ is left $k$, and $f(x - k)$ is right $k$.',
     },
   },
   {
@@ -631,16 +658,19 @@ export const questions: StaticQuestion[] = [
     options: ['Horizontal stretch, scale factor $\\frac{1}{2}$', 'Horizontal stretch, scale factor $2$', 'Vertical stretch, scale factor $2$', 'Translation of $2$ units left'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does replacing $x$ with $2x$ inside the bracket do to the graph?',
       solution:
-        'A number multiplying $x$ **inside** the bracket acts horizontally, and it works the opposite way to what it looks like.\n\n' +
-        'In $y = f(2x)$, the height that $f$ had at $x = a$ now occurs at $x = \\frac{a}{2}$. Every $x$-coordinate is halved, which is a horizontal stretch with scale factor $\\frac{1}{2}$.',
+        'The 2 is inside the bracket, so it affects the inputs. That means a horizontal change, and the heights stay the same.\n\n' +
+        'Follow one point. Suppose $f(8) = 3$. On $y = f(2x)$, the bracket must be 8 to give that height: $2x = 8$, so $x = 4$. The point $(8, 3)$ has moved to $(4, 3)$.\n\n' +
+        'Every $x$-coordinate is halved, so the graph is squashed towards the $y$-axis. This is called a **horizontal stretch**. Its **scale factor** is what each $x$-coordinate is multiplied by, which is $\\frac{1}{2}$.',
+      conclusion: 'All the $x$-coordinates are multiplied by $\\frac{1}{2}$, so the answer is horizontal stretch, scale factor $\\frac{1}{2}$.',
       whyWrong: [
         null,
         'A horizontal stretch with scale factor $2$ is $y = f\\left(\\frac{1}{2}x\\right)$. Inside the bracket the effect is the reciprocal of the number.',
         'A vertical stretch with scale factor $2$ is $y = 2f(x)$, with the $2$ outside the bracket.',
         'A translation left is $y = f(x + 2)$, which adds to $x$ instead of multiplying it.',
       ],
-      keyIdea: '$y = f(ax)$ is a horizontal stretch with scale factor $\\frac{1}{a}$.',
+      keyIdea: 'Inside the bracket the effect is the reciprocal: $f(ax)$ is a horizontal stretch with scale factor $\\frac{1}{a}$. Outside, $af(x)$ is a vertical stretch with scale factor $a$. Try it on a single point to confirm.',
     },
   },
   {
@@ -651,18 +681,19 @@ export const questions: StaticQuestion[] = [
     options: ['$y = (x - 3)^2 - 2$', '$y = (x + 3)^2 - 2$', '$y = (x - 3)^2 + 2$', '$y = (x + 2)^2 + 3$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the equation of $y = x^2$ after it slides right 3 and down 2?',
       solution:
-        'A **translation by the vector** $\\binom{a}{b}$ moves every point $a$ units right and $b$ units up, so a negative $b$ means down.\n\n' +
-        '1. $3$ units right: replace $x$ by $x - 3$, giving $y = (x - 3)^2$.\n' +
-        '2. $2$ units down: subtract $2$, giving $y = (x - 3)^2 - 2$.\n\n' +
-        'Check: the vertex moves from $(0, 0)$ to $(3, -2)$.',
+        'A **translation** by the vector $\\binom{3}{-2}$ slides the graph without changing its shape. The top number is the move across: 3 means 3 units right. The bottom number is the move up: $-2$ means 2 units down.\n\n' +
+        'Moving right 3 means replacing $x$ with $(x - 3)$. The sign looks opposite because the lowest point must now be where the bracket is 0, at $x = 3$. This gives $y = (x - 3)^2$.\n\n' +
+        'Moving down 2 means subtracting 2 from every output: $y = (x - 3)^2 - 2$.',
+      conclusion: 'The lowest point moves from $(0, 0)$ to $(3, -2)$, matching the vector, so the equation is $y = (x - 3)^2 - 2$.',
       whyWrong: [
         null,
         'This moves the graph left. A move of $3$ units right replaces $x$ by $x - 3$, not $x + 3$.',
         'This moves the graph up. The $-2$ in the vector means $2$ units down.',
         'This swaps the two parts of the vector. The top number is the horizontal move and the bottom number the vertical one.',
       ],
-      keyIdea: 'Translating by $\\binom{a}{b}$ turns $y = f(x)$ into $y = f(x - a) + b$.',
+      keyIdea: 'To translate $y = f(x)$ by $\\binom{a}{b}$, write $y = f(x - a) + b$. The top number goes in the bracket with the opposite sign. The bottom number goes outside with the same sign.',
     },
     check: {
       optionValues: [2, 62, 6, 52],

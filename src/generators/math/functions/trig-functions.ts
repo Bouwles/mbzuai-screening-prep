@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num, sqrtTex } from '../../../lib/tex';
 
@@ -35,6 +36,12 @@ const EXACT: Record<Fn, Record<number, [string, number]>> = {
   sin: { 30: ['\\frac{1}{2}', 1 / 2], 45: ['\\frac{\\sqrt{2}}{2}', Math.SQRT2 / 2], 60: ['\\frac{\\sqrt{3}}{2}', Math.sqrt(3) / 2] },
   cos: { 30: ['\\frac{\\sqrt{3}}{2}', Math.sqrt(3) / 2], 45: ['\\frac{\\sqrt{2}}{2}', Math.SQRT2 / 2], 60: ['\\frac{1}{2}', 1 / 2] },
   tan: { 30: ['\\frac{\\sqrt{3}}{3}', Math.sqrt(3) / 3], 45: ['1', 1], 60: ['\\sqrt{3}', Math.sqrt(3)] },
+};
+/** The same values read off the special triangles, for the worked solution. */
+const RATIO: Record<Fn, Record<number, string>> = {
+  sin: { 30: '\\frac{1}{2}', 45: '\\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}', 60: '\\frac{\\sqrt{3}}{2}' },
+  cos: { 30: '\\frac{\\sqrt{3}}{2}', 45: '\\frac{1}{\\sqrt{2}} = \\frac{\\sqrt{2}}{2}', 60: '\\frac{1}{2}' },
+  tan: { 30: '\\frac{1}{\\sqrt{3}} = \\frac{\\sqrt{3}}{3}', 45: '1 \\div 1 = 1', 60: '\\sqrt{3} \\div 1 = \\sqrt{3}' },
 };
 const signedTex = (neg: boolean, t: string) => (neg ? `-${t}` : t);
 const QUAD_NAME = ['first', 'second', 'third', 'fourth'];
@@ -115,30 +122,41 @@ function genExactValue(rng: Rng) {
   }
   const distractors = pickDistinct(m(ansText), ansVal, pool);
 
+  const fnName = fn === 'sin' ? 'sine' : fn === 'cos' ? 'cosine' : 'tangent';
   const refStep =
     quad === 1
-      ? `It is already between ${m('0^\\circ')} and ${m('90^\\circ')}, so the reference angle is ${m(`${ref}^\\circ`)}.`
+      ? `It is already acute, so the reference angle is ${m(`${ref}^\\circ`)}.`
       : quad === 2
-        ? `Reference angle (distance to the ${m('x')}-axis): ${m(`180^\\circ - ${deg}^\\circ = ${ref}^\\circ`)}.`
+        ? `Here it is ${m(`180^\\circ - ${deg}^\\circ = ${ref}^\\circ`)}.`
         : quad === 3
-          ? `Reference angle (distance to the ${m('x')}-axis): ${m(`${deg}^\\circ - 180^\\circ = ${ref}^\\circ`)}.`
-          : `Reference angle (distance to the ${m('x')}-axis): ${m(`360^\\circ - ${deg}^\\circ = ${ref}^\\circ`)}.`;
-  const solution =
-    (useRad
-      ? `Convert to degrees (replace ${m('\\pi')} by ${m('180^\\circ')}): ${m(`${angleTex} = ${new Frac(deg, 180).tex()} \\times 180^\\circ = ${deg}^\\circ`)}.\n\n`
-      : '') +
-    `1. **Quadrant:** ${m(`${deg}^\\circ`)} is in the ${QUAD_NAME[quad - 1]} quadrant, where ${CAST[quad - 1]}. So ${m(`\\${fn}`)} is ${pos ? 'positive' : 'negative'} here.\n` +
-    `2. ${refStep}\n` +
-    `3. **Exact value:** ${m(`\\${fn} ${ref}^\\circ = ${mag}`)}.\n\n` +
-    `Combine sign and size: ${m(`${shown} = ${ansText}`)}.\n\n` +
-    `Answer: ${m(ansText)}`;
+          ? `Here it is ${m(`${deg}^\\circ - 180^\\circ = ${ref}^\\circ`)}.`
+          : `Here it is ${m(`360^\\circ - ${deg}^\\circ = ${ref}^\\circ`)}.`;
+  const triangle =
+    ref === 45
+      ? `A right-angled triangle with two equal sides has sides 1, 1 and ${m('\\sqrt{2}')}, and two angles of ${m('45^\\circ')}.`
+      : `Half an equilateral triangle has sides 1, ${m('\\sqrt{3}')} and 2, and angles ${m('30^\\circ')}, ${m('60^\\circ')} and ${m('90^\\circ')}. The side 1 is opposite ${m('30^\\circ')}.`;
+  const fnRule = fn === 'sin' ? 'sine is the height' : fn === 'cos' ? `cosine is the ${m('x')}-coordinate` : `tangent is the height divided by the ${m('x')}-coordinate`;
+  const corner = ['top right', 'top left', 'bottom left', 'bottom right'][quad - 1];
+  const xWord = cosPos ? 'positive' : 'negative';
+  const yWord = sinPos ? 'positive' : 'negative';
+  const ratioName = fn === 'sin' ? 'opposite over hypotenuse' : fn === 'cos' ? 'adjacent over hypotenuse' : 'opposite over adjacent';
+  const solution = steps(
+    useRad &&
+      `It is easier in degrees. Since ${m('\\pi')} radians is ${m('180^\\circ')}, replace ${m('\\pi')} with ${m('180^\\circ')}: ${m(`${angleTex} = ${new Frac(deg, 180).tex()} \\times 180^\\circ = ${deg}^\\circ`)}.`,
+    `Find the sign. An angle ends at a point on a circle of radius 1, where ${fnRule}. ${m(`${deg}^\\circ`)} is in the ${QUAD_NAME[quad - 1]} quadrant (${corner}). There ${m('x')} is ${xWord} and the height is ${yWord}, so ${fnName} is ${pos ? 'positive' : 'negative'}.`,
+    `Find the **reference angle**, the acute angle between the line and the ${m('x')}-axis. ${refStep}`,
+    `Find the size from a special triangle. ${triangle} ${fnName[0].toUpperCase()}${fnName.slice(1)} is ${ratioName}, so ${m(`\\${fn} ${ref}^\\circ = ${RATIO[fn][ref]}`)}.${RATIO[fn][ref].startsWith('\\frac{1}{\\sqrt') ? ' Multiplying top and bottom by the root removes it from the bottom.' : ''}`,
+    `Combine the sign and the size: ${m(`${shown} = ${ansText}`)}.`,
+  );
   return {
     stem: `What is the exact value of ${m(shown)}?`,
     answer: m(ansText),
     answerValue: ansVal,
     distractors,
+    asking: `What exact number does ${m(shown)} equal?`,
     solution,
-    keyIdea: 'Sign from the quadrant (CAST), size from the reference angle and the exact-value table.',
+    conclusion: `The ${QUAD_NAME[quad - 1]} quadrant makes ${fnName} ${pos ? 'positive' : 'negative'}, and the reference angle gives the size, so the value is ${m(ansText)}.`,
+    keyIdea: 'For any angle, find the quadrant for the sign, find the reference angle for the size, then combine. CAST (Cosine, All, Sine, Tangent), read anticlockwise from the bottom right, names what is positive in each quadrant. Exact values come from two triangles, with sides 1, $\\sqrt{3}$, 2 and sides 1, 1, $\\sqrt{2}$.',
   };
 }
 
@@ -218,15 +236,20 @@ function genArcSector(rng: Rng) {
   const distractors = pickDistinct(answer, answerValue, pool);
 
   const frac360 = new Frac(deg, 360);
-  const solution =
-    `**Step 1: convert the angle to radians** (the formulas ${m('s = r\\theta')} and ${m('A = \\frac{1}{2}r^2\\theta')} need radians):` +
-    `\n\n$$${deg}^\\circ = ${deg} \\times \\frac{\\pi}{180} = ${thetaTex}$$\n\n` +
-    (want === 'arc'
-      ? `**Step 2: arc length.**\n\n$$s = r\\theta = ${r} \\times ${thetaTex} = ${piTex(arcK)}$$\n\n` +
-        `Check: the sector is ${m(frac360.tex())} of the circle, and ${m(`${frac360.tex()} \\times 2\\pi \\times ${r} = ${piTex(arcK)}`)}.\n\n`
-      : `**Step 2: sector area.**\n\n$$A = \\frac{1}{2}r^2\\theta = \\frac{1}{2} \\times ${r}^2 \\times ${thetaTex} = \\frac{1}{2} \\times ${r * r} \\times ${thetaTex} = ${piTex(areaK)}$$\n\n` +
-        `Check: the sector is ${m(frac360.tex())} of the circle, and ${m(`${frac360.tex()} \\times \\pi \\times ${r}^2 = ${piTex(areaK)}`)}.\n\n`) +
-    `Answer: ${answer}`;
+  const halfSq = new Frac(r * r, 2);
+  const solution = steps(
+    want === 'arc'
+      ? `A **sector** is a slice of a circle, like a slice of pizza. The **arc** is its curved edge.`
+      : `A **sector** is a slice of a circle, like a slice of pizza. We want the area of that slice.`,
+    want === 'arc'
+      ? `The formula is ${m('s = r\\theta')}, where ${m('s')} is the arc length, ${m('r')} is the radius and ${m('\\theta')} is the angle at the centre. The angle must be in radians, a unit where a half turn is ${m('\\pi')}.`
+      : `The formula is ${m('A = \\frac{1}{2}r^2\\theta')}, where ${m('r')} is the radius and ${m('\\theta')} is the angle at the centre. The angle must be in radians, a unit where a half turn is ${m('\\pi')}.`,
+    `A half turn is also ${m('180^\\circ')}, so to convert, multiply by ${m('\\frac{\\pi}{180}')}: ${m(`${deg}^\\circ = ${deg} \\times \\frac{\\pi}{180} = ${thetaTex}`)}.`,
+    want === 'arc'
+      ? `Substitute ${m(`r = ${r}`)} and ${m(`\\theta = ${thetaTex}`)}: ${m(`s = ${r} \\times ${thetaTex} = ${piTex(arcK)}`)}.`
+      : `Substitute ${m(`r = ${r}`)} and ${m(`\\theta = ${thetaTex}`)}: ${m(`A = \\frac{1}{2} \\times ${r}^2 \\times ${thetaTex}`)}.`,
+    want === 'area' && `Power first: ${m(`${r}^2 = ${r * r}`)}. Half of that is ${m(halfSq.tex())}. Then multiply: ${m(`${halfSq.tex()} \\times ${thetaTex} = ${piTex(areaK)}`)}.`,
+  );
 
   return {
     stem:
@@ -235,11 +258,16 @@ function genArcSector(rng: Rng) {
     answer,
     answerValue,
     distractors,
+    asking: want === 'arc' ? 'How long is the curved edge of this slice of the circle?' : 'How much area does this slice of the circle cover?',
     solution,
+    conclusion:
+      want === 'arc'
+        ? `Testing: the sector is ${m(`\\frac{${deg}}{360} = ${frac360.tex()}`)} of the circle, whose circumference is ${m(`2\\pi \\times ${r} = ${piTex(circK)}`)}, and ${m(`${frac360.tex()} \\times ${piTex(circK)} = ${piTex(arcK)}`)}. So the answer is ${answer}.`
+        : `Testing: the sector is ${m(`\\frac{${deg}}{360} = ${frac360.tex()}`)} of the circle, whose area is ${m(`\\pi \\times ${r}^2 = ${piTex(discK)}`)}, and ${m(`${frac360.tex()} \\times ${piTex(discK)} = ${piTex(areaK)}`)}. So the answer is ${answer}.`,
     keyIdea:
       want === 'arc'
-        ? 'Arc length $s = r\\theta$, with $\\theta$ in radians.'
-        : 'Sector area $A = \\frac{1}{2}r^2\\theta$, with $\\theta$ in radians.',
+        ? 'For arc length, change the angle to radians, then use $s = r\\theta$. Or skip the radians: arc $= \\frac{\\text{angle}}{360} \\times 2\\pi r$.'
+        : 'For sector area, change the angle to radians, then use $A = \\frac{1}{2}r^2\\theta$. Or skip the radians: area $= \\frac{\\text{angle}}{360} \\times \\pi r^2$.',
   };
 }
 
@@ -315,17 +343,26 @@ function genCosineRule(rng: Rng) {
   const distractors = pickDistinct(answer, answerValue, pool);
 
   const prod = b * c;
-  const solution =
-    `Two sides and the angle **between** them, so use the cosine rule:\n\n` +
-    `$$${P}${Q}^2 = ${V}${P}^2 + ${V}${Q}^2 - 2 \\times ${V}${P} \\times ${V}${Q} \\times \\cos ${V}$$\n\n` +
-    `Substitute ${m(`${V}${P} = ${c}`)}, ${m(`${V}${Q} = ${b}`)} and ${m(`\\cos ${angle}^\\circ = ${cosTex}`)}:\n\n` +
-    `$$${P}${Q}^2 = ${c * c} + ${b * b} - ${2 * prod} \\times \\left(${cosTex}\\right)$$\n\n` +
-    `$$${P}${Q}^2 = ${b * b + c * c} ${sgn < 0 ? '-' : '+'} ${prod} = ${n}$$\n\n` +
-    `Take the square root: ${m(
-      `${P}${Q} = \\sqrt{${n}}${ans === `\\sqrt{${n}}` ? '' : ` = ${ans}`}` +
-        (Number.isInteger(answerValue) ? '' : ` \\approx ${num(answerValue, 2)}`),
-    )}` +
-    `.\n\nAnswer: ${answer}`;
+  // The largest square factor of n, so the root can be simplified in the open.
+  let sq = 1;
+  for (let f = 2; f * f <= n; f++) if (n % (f * f) === 0) sq = f;
+  const rest = n / (sq * sq);
+  const rootLine =
+    rest === 1
+      ? `${P}${Q} = \\sqrt{${n}} = ${ans}`
+      : sq === 1
+        ? `${P}${Q} = \\sqrt{${n}}`
+        : `${P}${Q} = \\sqrt{${n}} = \\sqrt{${sq * sq} \\times ${rest}} = ${ans}`;
+  const solution = steps(
+    `We know two sides and the angle **between** them. That is the pattern for the **cosine rule**, which gives the side opposite the known angle:\n\n$$${P}${Q}^2 = ${V}${P}^2 + ${V}${Q}^2 - 2 \\times ${V}${P} \\times ${V}${Q} \\times \\cos ${V}$$`,
+    `Substitute ${m(`${V}${P} = ${c}`)} and ${m(`${V}${Q} = ${b}`)}: ${m(`${P}${Q}^2 = ${c}^2 + ${b}^2 - 2 \\times ${c} \\times ${b} \\times \\cos ${angle}^\\circ`)}.`,
+    `Work out the squares and the product: ${m(`${P}${Q}^2 = ${c * c} + ${b * b} - ${2 * prod}\\cos ${angle}^\\circ`)}.`,
+    angle === 60
+      ? `Use the exact value ${m('\\cos 60^\\circ = \\frac{1}{2}')}. So ${m(`${2 * prod} \\times \\frac{1}{2} = ${prod}`)}, and this is subtracted.`
+      : `Angles between ${m('90^\\circ')} and ${m('180^\\circ')} have a negative cosine. The reference angle is ${m('180^\\circ - 120^\\circ = 60^\\circ')}, so ${m('\\cos 120^\\circ = -\\frac{1}{2}')}. Taking away a negative adds: ${m(`-${2 * prod} \\times \\left(-\\frac{1}{2}\\right) = ${prod}`)}.`,
+    `So ${m(`${P}${Q}^2 = ${b * b + c * c} ${sgn < 0 ? '-' : '+'} ${prod} = ${n}`)}.`,
+    `Take the square root, since ${m(`${P}${Q}^2`)} is the length multiplied by itself: ${m(rootLine)}.`,
+  );
 
   return {
     stem:
@@ -334,8 +371,10 @@ function genCosineRule(rng: Rng) {
     answer,
     answerValue,
     distractors,
+    asking: `How long is side ${m(`${P}${Q}`)}, given the other two sides and the angle between them?`,
     solution,
-    keyIdea: 'Cosine rule $a^2 = b^2 + c^2 - 2bc\\cos A$; remember $\\cos A < 0$ when $A$ is obtuse.',
+    conclusion: `The cosine rule gives ${m(`${P}${Q}^2 = ${n}`)}, so the length of ${m(`${P}${Q}`)} is ${answer}.`,
+    keyIdea: 'Two sides and the angle between them means the cosine rule: $a^2 = b^2 + c^2 - 2bc\\cos A$. Substitute, find $a^2$, then take the square root. If $A$ is over $90^\\circ$, $\\cos A$ is negative, so the last term adds.',
   };
 }
 

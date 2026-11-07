@@ -1,6 +1,7 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
-import { dm, m, num, paren, signed, sum, term } from '../../../lib/tex';
+import { m, num, paren, signed, sum, term } from '../../../lib/tex';
 
 type Cand = { key: string; text: string; why: string; value?: number };
 
@@ -21,6 +22,7 @@ type Op = '<' | '>' | 'le' | 'ge';
 const OP_TEX: Record<Op, string> = { '<': '<', '>': '>', le: '\\le', ge: '\\ge' };
 const FLIP: Record<Op, Op> = { '<': '>', '>': '<', le: 'ge', ge: 'le' };
 const TOGGLE_STRICT: Record<Op, Op> = { '<': 'le', le: '<', '>': 'ge', ge: '>' };
+const OP_WORD: Record<Op, string> = { '<': 'less than', '>': 'greater than', le: 'less than or equal to', ge: 'greater than or equal to' };
 const ineqText = (op: Op, b: Frac) => m(`x ${OP_TEX[op]} ${b.tex()}`);
 const ineqKey = (op: Op, b: Frac) => `${op}${b.toString()}`;
 
@@ -93,33 +95,25 @@ export const generators: Generator[] = [
         const ds = pickThree(ans.toString(), answer, cands);
         if (ds.length < 3) continue;
 
-        const step1 =
-          r > 0
-            ? `Subtract ${m(term(r, 'x', true))} from both sides`
-            : `Add ${m(term(-r, 'x', true))} to both sides`;
-        const step2 = p * q > 0 ? `Add ${m(num(p * q))} to both sides` : `Subtract ${m(num(-p * q))} from both sides`;
-        const step3 =
-          A === 1
-            ? `So ${m(`x = ${x0}`)}.`
-            : `Divide both sides by ${m(num(A))}: ${m(`x = ${num(B)} \\div ${paren(A)} = ${x0}`)}.`;
         const rTerm = r === 1 ? paren(x0) : r === -1 && x0 !== 0 ? `-${paren(x0)}` : `${r} \\times ${paren(x0)}`;
         const leftCheck = p * (x0 - q);
         const rightCheck = r * x0 + s;
-        const solution =
-          `Expand the bracket (the ${m(num(p))} multiplies both terms): ${m(`${lhs} = ${expanded}`)}, so the equation is` +
-          dm(`${expanded} = ${rhs}`) +
-          `1. ${step1}: ${m(`${sum([[A, 'x'], [-p * q, '']])} = ${num(s)}`)}.\n` +
-          `2. ${step2}: ${m(`${sum([[A, 'x']])} = ${num(B)}`)}.\n` +
-          `3. ${step3}\n\n` +
-          `Check: left side ${m(`${p}\\left(${num(x0)}${signed(-q)}\\right) = ${num(leftCheck)}`)}, right side ${m(`${rTerm}${s === 0 ? '' : signed(s)} = ${num(rightCheck)}`)}. They match.\n\n` +
-          `Answer: ${answer}`;
+        const rhsWork = s === 0 ? num(B) : `${num(s)}${signed(p * q)} = ${num(B)}`;
+        const solution = steps(
+          `First remove the bracket. The ${m(num(p))} outside multiplies both terms inside: ${m(`${p} \\times x = ${p}x`)} and ${m(`${p} \\times ${paren(-q)} = ${num(-p * q)}`)}. So the equation becomes ${m(`${expanded} = ${rhs}`)}.`,
+          `We want all the ${m('x')} terms on one side. ${r > 0 ? `Subtract ${m(term(r, 'x', true))} from` : `Add ${m(term(-r, 'x', true))} to`} both sides: ${m(`${sum([[A, 'x'], [-p * q, '']])} = ${num(s)}`)}.`,
+          `Now move the number away from the ${m('x')} term. ${p * q > 0 ? `Add ${m(num(p * q))} to` : `Subtract ${m(num(-p * q))} from`} both sides: ${m(`${sum([[A, 'x']])} = ${rhsWork}`)}.`,
+          A !== 1 && `To leave ${m('x')} alone, divide both sides by ${m(num(A))}: ${m(`x = ${num(B)} \\div ${paren(A)} = ${x0}`)}.`,
+        );
         return {
           stem: `Solve ${m(`${lhs} = ${rhs}`)}.`,
           answer,
           answerValue: x0,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: `What value of ${m('x')} makes both sides of this equation equal?`,
           solution,
-          keyIdea: 'Expand brackets fully, collect the $x$ terms on one side and the numbers on the other (changing sign when a term crosses), then divide.',
+          conclusion: `The left side is ${m(`${p}\\left(${num(x0)}${signed(-q)}\\right) = ${num(leftCheck)}`)} and the right side is ${m(`${rTerm}${s === 0 ? '' : signed(s)} = ${num(rightCheck)}`)}. They match, so the answer is ${answer}.`,
+          keyIdea: 'For an equation with a bracket and $x$ on both sides: expand the bracket, collect the $x$ terms on one side and the numbers on the other, then divide by the number in front of $x$.',
         };
       }
     },
@@ -192,37 +186,28 @@ export const generators: Generator[] = [
         const ds = pickThree(ineqKey(ansOp, bound), answer, pool);
         if (ds.length < 3) continue;
 
-        const steps: string[] = [];
-        let cur = lhs;
-        if (d !== 0) {
-          cur = sum([[A, 'x'], [b, '']]);
-          steps.push(
-            `${d > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(d), 'x', true))} ${d > 0 ? 'from' : 'to'} both sides: ${m(`${cur} ${OP_TEX[op]} ${num(e)}`)}.`,
-          );
-        }
-        if (b !== 0)
-          steps.push(
-            `${b > 0 ? 'Subtract' : 'Add'} ${m(num(Math.abs(b)))} ${b > 0 ? 'from' : 'to'} both sides: ${m(`${sum([[A, 'x']])} ${OP_TEX[op]} ${num(e - b)}`)}.`,
-          );
-        steps.push(
-          A < 0
-            ? `Divide both sides by ${m(num(A))}. This is **negative**, so the inequality sign flips: ${m(`x ${OP_TEX[ansOp]} ${num(e - b)} \\div \\left(${num(A)}\\right)`)}, which is ${answer}.`
-            : `Divide both sides by ${m(num(A))} (positive, so the sign stays the same): ${m(`x ${OP_TEX[ansOp]} ${num(e - b)} \\div ${num(A)}`)}, which is ${answer}.`,
-        );
         const t = ansOp === '>' || ansOp === 'ge' ? x0 + 1 : x0 - 1;
         const L = a * t + b;
         const R = d * t + e;
-        const solution =
-          steps.map((s, i) => `${i + 1}. ${s}`).join('\n') +
-          `\n\nCheck with a number in the answer: ${m(`x = ${t}`)} gives left side ${m(num(L))} and right side ${m(num(R))}, and ${m(`${num(L)} ${OP_TEX[op]} ${num(R)}`)} is true.\n\n` +
-          `Answer: ${answer}`;
+        const solution = steps(
+          `An **inequality** is solved almost like an equation, but the answer is a range of values. The sign ${m(OP_TEX[op])} means "${OP_WORD[op]}".`,
+          d !== 0 &&
+            `Collect the ${m('x')} terms on the left. ${d > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(d), 'x', true))} ${d > 0 ? 'from' : 'to'} both sides: ${m(`${sum([[A, 'x'], [b, '']])} ${OP_TEX[op]} ${num(e)}`)}.`,
+          b !== 0 &&
+            `Move the number away from the ${m('x')} term. ${b > 0 ? 'Subtract' : 'Add'} ${m(num(Math.abs(b)))} ${b > 0 ? 'from' : 'to'} both sides: ${m(`${sum([[A, 'x']])} ${OP_TEX[op]} ${num(e - b)}`)}.`,
+          A < 0
+            ? `To get ${m('x')} alone, divide both sides by ${m(num(A))}. Dividing by a negative number flips the sign: for example, ${m('3 > 1')} but ${m('-3 < -1')}. So ${m(OP_TEX[op])} becomes ${m(OP_TEX[ansOp])}, and ${m(`${num(e - b)} \\div \\left(${num(A)}\\right) = ${x0}`)}. That gives ${answer}.`
+            : `To get ${m('x')} alone, divide both sides by ${m(num(A))}. This is positive, so the sign stays the same, and ${m(`${num(e - b)} \\div ${num(A)} = ${x0}`)}. That gives ${answer}.`,
+        );
         return {
           stem: `Solve the inequality ${m(stemTex)}.`,
           answer,
           answerValue: ineqKey(ansOp, bound),
           distractors: ds.map((c) => ({ text: c.text, value: c.key, why: c.why })),
+          asking: `Which values of ${m('x')} make ${m(lhs)} ${OP_WORD[op]} ${m(rhs)}?`,
           solution,
-          keyIdea: 'Solve an inequality like an equation, but flip the sign whenever you multiply or divide both sides by a negative number.',
+          conclusion: `Test ${m(`x = ${t}`)}, which should work: the left side is ${m(num(L))} and the right side is ${m(num(R))}, and ${m(`${num(L)} ${OP_TEX[op]} ${num(R)}`)} is true. So the answer is ${answer}.`,
+          keyIdea: 'Solve an inequality like an equation, with one extra rule: whenever you multiply or divide both sides by a negative number, flip the sign. Then test one value from your answer in the original.',
         };
       }
     },
@@ -274,27 +259,29 @@ export const generators: Generator[] = [
         const ds = pickThree(correct.key, correct.text, pool);
         if (ds.length < 3) continue;
 
-        const solveCase = (rhs: number, val: Frac) =>
-          a === 1
-            ? `${m(`${inner} = ${num(rhs)}`)}, so ${m(`x = ${num(rhs)}${signed(-b)} = ${val.tex()}`)}`
-            : `${m(`${inner} = ${num(rhs)}`)}, so ${m(`${a}x = ${num(rhs - b)}`)} and ${m(`x = ${val.tex()}`)}`;
         const check = (v: Frac) => m(`|${a === 1 ? '' : `${a} \\times `}${paren(v)}${signed(b)}| = |${num(a * v.value() + b)}| = ${num(c)}`);
-        const solution =
-          (k !== 0
-            ? `First isolate the absolute value: ${k > 0 ? 'subtract' : 'add'} ${m(num(Math.abs(k)))} ${k > 0 ? 'from' : 'to'} both sides to get ${m(`|${inner}| = ${num(c)}`)}.\n\n`
-            : '') +
-          `${m(`|${inner}| = ${num(c)}`)} means the inside is either ${m(num(c))} or ${m(num(-c))}.\n\n` +
-          `- Case 1: ${solveCase(c, x1)}.\n` +
-          `- Case 2: ${solveCase(-c, x2)}.\n\n` +
-          `Check: ${check(x1)} and ${check(x2)}. Both work.\n\n` +
-          `Answer: ${correct.text}`;
+        const undoB = `${b > 0 ? 'Subtract' : 'Add'} ${m(num(Math.abs(b)))} ${b > 0 ? 'from' : 'to'} both sides${a === 1 ? '' : `, then divide both sides by ${m(num(a))}`}:`;
+        const caseRow = (rhsVal: number, val: Frac): string[] =>
+          a === 1
+            ? [m(`${inner} = ${num(rhsVal)}`), m(`x = ${num(rhsVal)}${signed(-b)} = ${val.tex()}`)]
+            : [m(`${inner} = ${num(rhsVal)}`), m(`${a}x = ${num(rhsVal)}${signed(-b)} = ${num(rhsVal - b)}`), m(`x = ${val.tex()}`)];
+        const solution = steps(
+          k !== 0 &&
+            `Get the bars alone first, because the rule below only works when nothing else is on their side. ${k > 0 ? 'Subtract' : 'Add'} ${m(num(Math.abs(k)))} ${k > 0 ? 'from' : 'to'} both sides: ${m(`|${inner}| = ${num(c)}`)}.`,
+          `The bars mean **absolute value**: the size of a number, ignoring its sign. For example, ${m(`|${num(c)}| = ${num(c)}`)} and ${m(`|${num(-c)}| = ${num(c)}`)}.`,
+          `So the inside must be either ${m(num(c))} or ${m(num(-c))}, because both have size ${m(num(c))}. That gives two separate equations.`,
+          `Solve each one. ${undoB}`,
+          table(a === 1 ? ['Equation', 'Solve it'] : ['Equation', `${b > 0 ? 'Subtract' : 'Add'} ${m(num(Math.abs(b)))}`, `Divide by ${m(num(a))}`], [caseRow(c, x1), caseRow(-c, x2)]),
+        );
         return {
           stem: `Solve ${m(stemTex)}.`,
           answer: correct.text,
           answerValue: correct.key,
           distractors: ds.map((d) => ({ text: d.text, value: d.key, why: d.why })),
+          asking: `Which values of ${m('x')} make the size of ${m(inner)} equal to ${m(num(c))}?`,
           solution,
-          keyIdea: 'Isolate the absolute value first, then split $|A| = c$ into the two equations $A = c$ and $A = -c$.',
+          conclusion: `Both work, since ${check(x1)} and ${check(x2)}. So the answer is ${correct.text}.`,
+          keyIdea: 'Get the bars alone first. Then remove them and write two equations: inside $= c$ and inside $= -c$, where $c$ is the number on the other side. Solve each one. There are usually two answers.',
         };
       }
     },
@@ -339,23 +326,26 @@ export const generators: Generator[] = [
         if (ds.length < 3) continue;
 
         const rearranged = `${term(b, 'y', true)} = ${sum([[-a, 'x'], [c, '']])}`;
-        const steps = [
-          `${a > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(a), 'x', true))} ${a > 0 ? 'from' : 'to'} both sides: ${m(rearranged)}.`,
-          ...(b === 1 ? [] : [`Divide every term by ${m(num(b))}: ${m(`y = ${sum([[slope, 'x'], [intercept, '']])}`)}.`]),
-        ];
-        const solution =
-          `Rearrange into the form ${m('y = mx + c')}, where ${m('m')} is the slope (also called the gradient).\n\n` +
-          steps.map((s, i) => `${i + 1}. ${s}`).join('\n') +
-          `\n\nThe number multiplying ${m('x')} is the slope.\n\n` +
-          `Shortcut: for ${m('ax + by = c')} the slope is ${m('-\\frac{a}{b}')}${b === 1 ? '' : `, which here is ${m(`-\\frac{${a}}{${b}}`)}`}.\n\n` +
-          `Answer: ${answer}`;
+        const moveX = `${a > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(a), 'x', true))} ${a > 0 ? 'from' : 'to'} both sides: ${m(rearranged)}.`;
+        const readSlope = slope.equals(1)
+          ? `No number is written in front of ${m('x')}, which means it is multiplied by 1. So the slope is 1.`
+          : slope.equals(-1)
+            ? `A plain ${m('-x')} means ${m('x')} is multiplied by ${m('-1')}. So the slope is ${m('-1')}.`
+            : `The number multiplying ${m('x')} is ${answer}.`;
+        const solution = steps(
+          `The **slope** (also called the gradient) is how much ${m('y')} changes when ${m('x')} goes up by 1. It is the ${m('m')} in ${m('y = mx + c')}, the number multiplying ${m('x')}. So rearrange to get ${m('y')} on its own.`,
+          b === 1 ? `${moveX} ${readSlope}` : moveX,
+          b !== 1 && `Divide every term by ${m(num(b))} to leave ${m('y')} alone: ${m(`y = ${sum([[slope, 'x'], [intercept, '']])}`)}. ${readSlope}`,
+        );
         return {
           stem: `Find the ${rng.pick(['slope', 'slope', 'gradient'])} of the line ${m(`${sum([[a, 'x'], [b, 'y']])} = ${num(c)}`)}.`,
           answer,
           answerValue: slope.value(),
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: `What number multiplies ${m('x')} once this line is written as ${m('y = mx + c')}?`,
           solution,
-          keyIdea: 'The slope of $ax + by = c$ is $-\\frac{a}{b}$: rearrange to $y = mx + c$ and read off the number multiplying $x$.',
+          conclusion: `In that form, the number multiplying ${m('x')} is the slope, so the answer is ${answer}.`,
+          keyIdea: 'For $ax + by = c$, where $a$ and $b$ are the numbers multiplying $x$ and $y$: move the $x$ term across, then divide every term by $b$ and read off the number multiplying $x$. The result is always $-\\frac{a}{b}$.',
         };
       }
     },

@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { factorial, nCr, nPr } from '../../../lib/mathx';
 import { m } from '../../../lib/tex';
 
@@ -10,6 +11,22 @@ function big(x: number): string {
   const body = s.length <= 4 ? s : s.replace(/\B(?=(\d{3})+(?!\d))/g, '\\,');
   return x < 0 ? `-${body}` : body;
 }
+
+/** A factorial written out: "4 \times 3 \times 2 \times 1". */
+function factProd(k: number): string {
+  return Array.from({ length: k }, (_, i) => k - i).join(' \\times ');
+}
+
+/** How to work out a combination by hand: "\binom{9}{3} = \frac{9 \times 8 \times 7}{3 \times 2 \times 1} = \frac{504}{6} = 84". */
+function chooseWorking(n: number, r: number): string {
+  const head = `\\binom{${n}}{${r}}`;
+  if (r === 1) return `${head} = ${n}`;
+  const top = Array.from({ length: r }, (_, i) => n - i).join(' \\times ');
+  return `${head} = \\frac{${top}}{${factProd(r)}} = \\frac{${big(nPr(n, r))}}{${big(factorial(r))}} = ${big(nCr(n, r))}`;
+}
+
+/** What "choose" means, for a student meeting it for the first time. */
+const CHOOSE_MEANS = `We count groups with ${m('\\binom{n}{r}')}, the number of ways to pick ${m('r')} items from ${m('n')}. To work it out, multiply ${m('r')} numbers counting down from ${m('n')}, then divide by ${m('r!')}, which is every whole number from ${m('r')} down to 1 multiplied together.`;
 
 interface Cand {
   v: number;
@@ -88,6 +105,15 @@ function describeCounts(counts: [string, number][]): string {
   return parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
 }
 
+/** How identical letters swap among themselves: "the 3 A's in $3! = 6$ ways and the 2 N's in $2! = 2$ ways". */
+function swapsText(reps: [string, number][]): string {
+  const parts = reps.map(([L, k]) => `the ${k} ${L}'s in ${m(`${k}! = ${factorial(k)}`)} ways`);
+  return parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+/** How many times each different word gets counted if the identical letters are treated as different. */
+const overCount = (reps: [string, number][]) => reps.reduce((a, [, k]) => a * factorial(k), 1);
+
 const genRepeatedLetters: Generator = {
   id: 'gen-counting-repeated-letters',
   subtopic: 'counting',
@@ -138,13 +164,15 @@ const genRepeatedLetters: Generator = {
           answer: m(big(answer)),
           answerValue: answer,
           distractors: ds.map((d) => ({ text: m(big(d.v)), value: d.v, why: d.why })),
-          solution:
-            `${word} has ${n} letters: ${describeCounts(counts)}.\n\n` +
-            `If all ${n} letters were different there would be ${m(`${n}! = ${big(factorial(n))}`)} arrangements. ` +
-            `Swapping identical letters gives the same word, so divide by ${m('k!')} for every letter that appears ${m('k')} times:` +
-            `\n\n$$${arrWorking(counts)}$$\n\n` +
-            `Answer: ${m(big(answer))}`,
-          keyIdea: 'Arrangements of $n$ letters with repeats: $\\frac{n!}{a!\\,b!\\cdots}$, dividing by $k!$ for each letter repeated $k$ times.',
+          asking: `How many different-looking orders can the letters of ${word} go in?`,
+          solution: steps(
+            `Count each letter first. ${word} has ${n} letters: ${describeCounts(counts)}.`,
+            `If all ${n} letters were different, there would be ${m(`${n}! = ${factProd(n)} = ${big(factorial(n))}`)} orders. The **!** (factorial) means multiply every whole number down to 1.`,
+            `But swapping identical letters gives the same word, so that count is too big. Identical letters can swap among themselves: ${swapsText(reps)}.`,
+            `So each different word was counted ${overCount(reps)} times. Divide to count each word once:\n\n$$${arrWorking(counts)}$$`,
+          ),
+          conclusion: `Dividing out the repeats gives ${m(arrTex(counts))}, so the answer is ${m(big(answer))}.`,
+          keyIdea: 'For arrangements with repeated letters, use $\\frac{n!}{a! \\times b! \\times \\dots}$. Here $n$ is the total number of letters, and $a, b, \\dots$ are how many times each repeated letter appears.',
         };
       }
 
@@ -178,14 +206,19 @@ const genRepeatedLetters: Generator = {
         answer: m(big(answer)),
         answerValue: answer,
         distractors: ds.map((d) => ({ text: m(big(d.v)), value: d.v, why: d.why })),
-        solution:
-          `${word} has ${n} letters: ${describeCounts(counts)}.\n\n` +
-          `1. Put ${kX === 1 ? 'the' : an} ${X} in the first place. ${kX === 1 ? 'There is only one, so there is one way to do this.' : `The ${X}'s are identical, so there is only one way to do this.`}\n` +
-          `2. The ${n - 1} letters left are: ${describeCounts(rest)}.\n` +
-          `3. Arrange them${restReps.length ? ', dividing by ' + m('k!') + ' for each letter repeated ' + m('k') + ' times' : ' (they are all different)'}:` +
-          `\n\n$$${arrWorking(rest)}$$\n\n` +
-          `Answer: ${m(big(answer))}`,
-        keyIdea: 'Fix the restricted letter first, then arrange the remaining letters, dividing by $k!$ for each letter still repeated $k$ times.',
+        asking: `How many different-looking orders of the letters of ${word} start with ${X}?`,
+        solution: steps(
+          `Count each letter first. ${word} has ${n} letters: ${describeCounts(counts)}.`,
+          `Put ${kX === 1 ? 'the' : an} ${X} in the first place. ${kX === 1 ? 'There is only one, so there is only one way to do this.' : `The ${X}'s are identical, so it makes no difference which one goes first.`}`,
+          `That leaves ${n - 1} letters to fill the other places: ${describeCounts(rest)}.`,
+          restReps.length
+            ? `If those letters were all different, there would be ${m(`${n - 1}! = ${factProd(n - 1)} = ${big(factorial(n - 1))}`)} orders. The **!** (factorial) means multiply every whole number down to 1.`
+            : `Those letters are all different, so count their orders with a factorial. The **!** means multiply every whole number down to 1:\n\n$$${n - 1}! = ${factProd(n - 1)} = ${big(answer)}$$`,
+          restReps.length > 0 && `But swapping identical letters gives the same word, so that count is too big. Identical letters can swap among themselves: ${swapsText(restReps)}.`,
+          restReps.length > 0 && `So each different order was counted ${overCount(restReps)} times. Divide to count each one once:\n\n$$${arrWorking(rest)}$$`,
+        ),
+        conclusion: `With ${X} fixed in front, only the other ${n - 1} letters can move, so the answer is ${m(big(answer))}.`,
+        keyIdea: 'When a place is fixed, put that letter there first. Then arrange the remaining letters with $\\frac{n!}{a! \\times b! \\times \\dots}$, dividing only for letters that are still repeated.',
       };
     });
   },
@@ -243,13 +276,16 @@ const genCommittee: Generator = {
           answer: m(big(answer)),
           answerValue: answer,
           distractors: ds.map((d) => ({ text: m(big(d.v)), value: d.v, why: d.why })),
-          solution:
-            `Exactly ${k} ${k === 1 ? g.bOne : g.b} means the committee is ${k} ${k === 1 ? g.bOne : g.b} **and** ${rest} ${rest === 1 ? g.aOne : g.a}. Choose each part separately, then multiply.\n\n` +
-            `- Choose ${k} of the ${b} ${g.b}: ${m(`${C(b, k)} = ${cb}`)}\n` +
-            `- Choose ${rest} of the ${a} ${g.a}: ${m(`${C(a, rest)} = ${ca}`)}\n\n` +
-            `Total: ${m(`${cb} \\times ${ca} = ${big(answer)}`)}.\n\n` +
-            `Answer: ${m(big(answer))}`,
-          keyIdea: 'For "exactly k from one group", choose from each group separately with $\\binom{n}{r}$ and multiply.',
+          asking: `How many committees of ${size} have exactly ${k} ${k === 1 ? g.bOne : g.b}, and so ${rest} ${rest === 1 ? g.aOne : g.a}?`,
+          solution: steps(
+            `Exactly ${k} ${k === 1 ? g.bOne : g.b} in a committee of ${size} means the other ${rest} must be ${rest === 1 ? g.aOne : g.a}. So make two separate choices: ${k} ${k === 1 ? g.bOne : g.b} **and** ${rest} ${rest === 1 ? g.aOne : g.a}.`,
+            `A committee is just a group, so order does not matter. ${CHOOSE_MEANS}`,
+            `Choose ${k} of the ${b} ${g.b}: ${m(chooseWorking(b, k))}.`,
+            `Choose ${rest} of the ${a} ${g.a}: ${m(chooseWorking(a, rest))}.`,
+            `Any choice of ${g.b} can go with any choice of ${g.a}, so multiply: ${m(`${cb} \\times ${ca} = ${big(answer)}`)}.`,
+          ),
+          conclusion: `${cb} ways to choose the ${k === 1 ? g.bOne : g.b} times ${ca} ways to choose the ${rest === 1 ? g.aOne : g.a} gives the answer, ${m(big(answer))}.`,
+          keyIdea: 'For "exactly $k$ from one group", work out how many come from each group. Choose from each group separately with $\\binom{n}{r}$, then multiply the results.',
         };
       }
 
@@ -276,13 +312,16 @@ const genCommittee: Generator = {
         answer: m(big(answer)),
         answerValue: answer,
         distractors: ds.map((d) => ({ text: m(big(d.v)), value: d.v, why: d.why })),
-        solution:
-          `"At least one" is easiest with the complement: (all committees) minus (committees with no ${g.b}).\n\n` +
-          `1. All committees of ${size} from ${n} people: ${m(`${C(n, size)} = ${big(total)}`)}\n` +
-          `2. Committees with **no** ${g.b} (all ${size} from the ${a} ${g.a}): ${m(`${C(a, size)} = ${big(none)}`)}\n` +
-          `3. At least one ${g.bOne}: ${m(`${big(total)} - ${big(none)} = ${big(answer)}`)}\n\n` +
-          `Answer: ${m(big(answer))}`,
-        keyIdea: '"At least one" = total minus "none"; picking one first and then any others double counts.',
+        asking: `How many committees of ${size} include one or more ${g.b}?`,
+        solution: steps(
+          `"At least one ${g.bOne}" covers several cases: one, two or more ${g.b}. The opposite is just one case: no ${g.b} at all. So at least one $=$ all committees $-$ committees with no ${g.b}.`,
+          `A committee is just a group, so order does not matter. ${CHOOSE_MEANS}`,
+          `All committees: pick ${size} from all ${n} people. ${m(chooseWorking(n, size))}.`,
+          `Committees with no ${g.b}: all ${size} must come from the ${a} ${g.a}. ${m(chooseWorking(a, size))}.`,
+          `Subtract: ${m(`${big(total)} - ${big(none)} = ${big(answer)}`)}.`,
+        ),
+        conclusion: `Taking the ${m(big(none))} committees with no ${g.b} from all ${m(big(total))} leaves the answer, ${m(big(answer))}.`,
+        keyIdea: '"At least one" almost always means total minus "none". Count all the groups, count the groups with none of what you want, and subtract. Picking one first and then any others double counts.',
       };
     });
   },
@@ -334,13 +373,16 @@ const genRow: Generator = {
           answer: m(big(answer)),
           answerValue: answer,
           distractors: ds.map((d) => ({ text: m(big(d.v)), value: d.v, why: d.why })),
-          solution:
-            `Glue ${named} together and treat them as one block.\n\n` +
-            `1. Things to arrange: the block plus the other ${n - s} ${people}, so ${units} things: ${m(`${units}! = ${big(factorial(units))}`)} ways.\n` +
-            `2. Inside the block, ${named} can be ordered in ${m(`${s}! = ${factorial(s)}`)} ways.\n` +
-            `3. Total: ${m(`${units}! \\times ${s}! = ${big(factorial(units))} \\times ${factorial(s)} = ${big(answer)}`)}.\n\n` +
-            `Answer: ${m(big(answer))}`,
-          keyIdea: '"Must be together": treat the group as one block, arrange the blocks, then multiply by the arrangements inside the block.',
+          asking: `How many seatings keep ${named} ${s === 2 ? 'next to each other' : 'all together'}?`,
+          solution: steps(
+            `Treat ${named} as one **block** glued together. Wherever the block goes, they stay together.`,
+            `Count the things to arrange: the block plus the other ${n - s} ${people}, which makes ${units} things.`,
+            `${units} things can go in a row in ${m(`${units}! = ${factProd(units)} = ${big(factorial(units))}`)} orders. The **!** (factorial) means multiply every whole number down to 1.`,
+            `Inside the block, ${named} can sit in ${m(`${s}! = ${factProd(s)} = ${factorial(s)}`)} different orders.`,
+            `Each of the ${m(big(factorial(units)))} orders can use any order inside the block, so multiply: ${m(`${big(factorial(units))} \\times ${factorial(s)} = ${big(answer)}`)}.`,
+          ),
+          conclusion: `${units} things in a row times ${factorial(s)} orders inside the block gives the answer, ${m(big(answer))}.`,
+          keyIdea: 'For "must be together", glue the group into one block, arrange the block with everyone else, then multiply by the ways to order the people inside the block.',
         };
       }
 
@@ -363,13 +405,16 @@ const genRow: Generator = {
         answer: m(big(answer)),
         answerValue: answer,
         distractors: ds.map((d) => ({ text: m(big(d.v)), value: d.v, why: d.why })),
-        solution:
-          `Use the complement: (all arrangements) minus (arrangements where they are together).\n\n` +
-          `1. All arrangements: ${m(`${n}! = ${big(all)}`)}.\n` +
-          `2. Together: glue ${named} into one block, giving ${n - 1} things to arrange, ${m(`${n - 1}! = ${big(factorial(n - 1))}`)} ways, and the pair can be in either order, ${m('2! = 2')} ways. So ${m(`${big(factorial(n - 1))} \\times 2 = ${big(together)}`)}.\n` +
-          `3. Not together: ${m(`${big(all)} - ${big(together)} = ${big(answer)}`)}.\n\n` +
-          `Answer: ${m(big(answer))}`,
-        keyIdea: '"Not together" = total arrangements minus "together" arrangements.',
+        asking: `How many line-ups keep ${named} apart?`,
+        solution: steps(
+          `Counting "apart" directly is awkward, so count the opposite. Every line-up has them either together or apart, so apart $=$ all $-$ together.`,
+          `All line-ups with no rule: ${m(`${n}! = ${factProd(n)} = ${big(all)}`)}. The **!** (factorial) means multiply every whole number down to 1.`,
+          `For together, glue ${named} into one block. That leaves ${n - 1} things to arrange: ${m(`${n - 1}! = ${big(factorial(n - 1))}`)} orders.`,
+          `Inside the block they can stand 2 ways: ${who[0]} then ${who[1]}, or ${who[1]} then ${who[0]}. So together $=$ ${m(`${big(factorial(n - 1))} \\times 2 = ${big(together)}`)}.`,
+          `Subtract: ${m(`${big(all)} - ${big(together)} = ${big(answer)}`)}.`,
+        ),
+        conclusion: `Taking the ${m(big(together))} together line-ups away from all ${m(big(all))} leaves the answer, ${m(big(answer))}.`,
+        keyIdea: 'For "must not be together", use total arrangements minus arrangements where they are together. Count the together cases by gluing them into one block, then multiply by the orders inside the block.',
       };
     });
   },

@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num, signed, sum, term } from '../../../lib/tex';
 
@@ -88,20 +89,25 @@ export const generators: Generator[] = [
         const ds = pickDistractors(answer, answerValue, pool);
         if (ds.length < 3) continue;
 
-        const steps: string[] = [];
-        steps.push(`Take $\\ln$ of both sides and bring the power down (power law): ${m(`\\left(${expTex}\\right)\\ln ${b} = \\ln ${c}`)}.`);
-        steps.push(`Divide by ${m(`\\ln ${b}`)}: ${m(`${expTex} = \\frac{\\ln ${c}}{\\ln ${b}} = ${num(L, 4)}`)} (this is ${m(`\\log_{${b}} ${c}`)}).`);
         const afterP = L - p;
-        steps.push(`${p > 0 ? 'Subtract' : 'Add'} ${Math.abs(p)}: ${m(`${term(mm, 'x', true)} = ${num(L, 4)}${signed(-p)} = ${num(afterP, 4)}`)}.`);
-        if (mm > 1) steps.push(`Divide by ${mm}: ${m(`x = \\frac{${num(afterP, 4)}}{${mm}} = ${num(x, 4)}`)}.`);
-        steps.push(`To 2 decimal places, ${m(`x = ${ansS}`)}.`);
+        const moved = `${p > 0 ? 'Subtract' : 'Add'} ${Math.abs(p)} ${p > 0 ? 'from' : 'to'} both sides: ${m(`${term(mm, 'x', true)} \\approx ${num(L, 4)}${signed(-p)} = ${num(afterP, 4)}`)}.`;
+        const rounded = `To 2 decimal places, ${m(`x = ${ansS}`)}.`;
+        const solution = steps(
+          `${m('x')} is stuck in the power, and ${c} is not an exact power of ${b}. A logarithm can bring a power down. So take ${m('\\ln')} of both sides, the log with base ${m('e')}. Here ${m('e')} is a fixed number, about 2.718, and ${m('\\ln')} has its own calculator button: ${m(`\\ln\\left(${b}^{${expTex}}\\right) = \\ln ${c}`)}.`,
+          `The **power law**, ${m('\\ln(a^{n}) = n\\ln a')}, moves the whole power to the front: ${m(`\\left(${expTex}\\right)\\ln ${b} = \\ln ${c}`)}.`,
+          `${m(`\\ln ${b}`)} is just a number multiplying the bracket. Divide both sides by it: ${m(`${expTex} = \\frac{\\ln ${c}}{\\ln ${b}} \\approx ${num(L, 4)}`)}.`,
+          mm === 1 ? `${moved} ${rounded}` : moved,
+          mm !== 1 && `Divide both sides by ${mm}: ${m(`x \\approx \\frac{${num(afterP, 4)}}{${mm}} = ${num(x, 4)}`)}. ${rounded}`,
+        );
         return {
           stem: `Solve ${m(`${b}^{${expTex}} = ${c}`)}, giving $x$ to 2 decimal places.`,
           answer,
           answerValue,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution: steps.join('\n\n') + `\n\nAnswer: ${answer}`,
-          keyIdea: 'Take logs of both sides so the power comes down as a multiplier, then solve the resulting linear equation.',
+          asking: `What value of ${m('x')} makes ${m(`${b}^{${expTex}}`)} equal to ${c}?`,
+          solution,
+          conclusion: `Taking logs turned the power into a simple equation, and solving that gives the answer, ${answer}.`,
+          keyIdea: 'When $x$ is in the power and the numbers are not exact powers of the same base, take $\\ln$ of both sides. Bring the power to the front, divide by the log, then solve the simple equation left.',
         };
       }
     },
@@ -120,7 +126,7 @@ export const generators: Generator[] = [
         const coprime = (s: number) => s % b !== 0;
         let stemExpr = '';
         let n = 0;
-        let steps: string[] = [];
+        let working: string[] = [];
         const pool: Cand[] = [];
         if (type === 'diff') {
           n = b === 5 ? rng.int(1, 2) : rng.int(1, 3);
@@ -128,11 +134,12 @@ export const generators: Generator[] = [
           const X = Y * b ** n;
           if (X > 400) continue;
           stemExpr = `${L(String(X))} - ${L(String(Y))}`;
-          steps = [
-            `Quotient law, ${m('\\log a - \\log b = \\log \\frac{a}{b}')}: ${m(`${stemExpr} = ${L(`\\frac{${X}}{${Y}}`)} = ${L(String(b ** n))}`)}.`,
+          working = [
+            `Neither log comes out neatly by itself, so combine them into one log first. Subtracting logs means dividing the numbers inside. This is the **quotient law**, ${m('\\log p - \\log q = \\log \\frac{p}{q}')}.`,
+            `Use it: ${m(`${stemExpr} = ${L(`\\frac{${X}}{${Y}}`)} = ${L(String(b ** n))}`)}.`,
             n === 1
-              ? `The log of the base itself is 1 (because ${b} to the power 1 is ${b}), so ${m(`${L(String(b))} = 1`)}.`
-              : `Since ${m(`${b}^{${n}} = ${b ** n}`)}, ${m(`${L(String(b ** n))} = ${n}`)}.`,
+              ? `${m(L(String(b)))} asks: ${b} to what power gives ${b}? Any number to the power 1 is itself, so the value is 1.`
+              : `${m(L(String(b ** n)))} asks: ${b} to what power gives ${b ** n}? Since ${m(`${b}^{${n}} = ${b ** n}`)}, the value is ${n}.`,
           ];
           pool.push({ text: m(String(b ** n)), value: b ** n, why: `This stops at ${m(L(String(b ** n)))} and reports ${b ** n}, forgetting that the log of ${b ** n} is the power ${n}.` });
           pool.push({ text: m(L(String(X - Y))), value: lnb(X - Y, b), why: `This subtracts the numbers inside the logs (${m(`${X} - ${Y} = ${X - Y}`)}). Subtracting logs means **dividing** the numbers.` });
@@ -146,10 +153,10 @@ export const generators: Generator[] = [
           n = 2 * k;
           if (X > 200) continue;
           stemExpr = `2${L(String(X))} - ${L(String(Y))}`;
-          steps = [
-            `Power law, ${m('k\\log a = \\log a^{k}')}: ${m(`2${L(String(X))} = ${L(`${X}^{2}`)} = ${L(String(X * X))}`)}.`,
-            `Quotient law: ${m(`${L(String(X * X))} - ${L(String(Y))} = ${L(`\\frac{${X * X}}{${Y}}`)} = ${L(String(b ** n))}`)}.`,
-            `Since ${m(`${b}^{${n}} = ${b ** n}`)}, ${m(`${L(String(b ** n))} = ${n}`)}.`,
+          working = [
+            `First deal with the 2 in front. A number in front of a log goes up as an index. This is the **power law**, ${m('k\\log p = \\log p^{k}')}. So ${m(`2${L(String(X))} = ${L(`${X}^{2}`)} = ${L(String(X * X))}`)}.`,
+            `Now subtract. Subtracting logs means dividing the numbers inside: ${m(`${L(String(X * X))} - ${L(String(Y))} = ${L(`\\frac{${X * X}}{${Y}}`)} = ${L(String(b ** n))}`)}.`,
+            `${m(L(String(b ** n)))} asks: ${b} to what power gives ${b ** n}? Since ${m(`${b}^{${n}} = ${b ** n}`)}, the value is ${n}.`,
           ];
           const dbl = new Frac(2 * X, Y);
           pool.push({ text: m(String(b ** n)), value: b ** n, why: `This stops at ${m(L(String(b ** n)))} and reports ${b ** n}, forgetting that the log of ${b ** n} is the power ${n}.` });
@@ -168,10 +175,10 @@ export const generators: Generator[] = [
           const Z = s * t;
           n = i + j;
           stemExpr = `${L(String(X))} + ${L(String(Y))} - ${L(String(Z))}`;
-          steps = [
-            `Product law, ${m('\\log a + \\log b = \\log(ab)')}: ${m(`${L(String(X))} + ${L(String(Y))} = ${L(String(X * Y))}`)}.`,
-            `Quotient law: ${m(`${L(String(X * Y))} - ${L(String(Z))} = ${L(`\\frac{${X * Y}}{${Z}}`)} = ${L(String(b ** n))}`)}.`,
-            `Since ${m(`${b}^{${n}} = ${b ** n}`)}, ${m(`${L(String(b ** n))} = ${n}`)}.`,
+          working = [
+            `Work from left to right. Adding logs means multiplying the numbers inside. This is the **product law**, ${m('\\log p + \\log q = \\log(pq)')}. So ${m(`${L(String(X))} + ${L(String(Y))} = ${L(String(X * Y))}`)}.`,
+            `Now subtract. Subtracting logs means dividing the numbers inside: ${m(`${L(String(X * Y))} - ${L(String(Z))} = ${L(`\\frac{${X * Y}}{${Z}}`)} = ${L(String(b ** n))}`)}.`,
+            `${m(L(String(b ** n)))} asks: ${b} to what power gives ${b ** n}? Since ${m(`${b}^{${n}} = ${b ** n}`)}, the value is ${n}.`,
           ];
           pool.push({ text: m(String(b ** n)), value: b ** n, why: `This stops at ${m(L(String(b ** n)))} and reports ${b ** n}, forgetting that the log of ${b ** n} is the power ${n}.` });
           if (X + Y - Z > 0)
@@ -187,8 +194,10 @@ export const generators: Generator[] = [
           answer,
           answerValue: n,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution: steps.join('\n\n') + `\n\nAnswer: ${answer}`,
-          keyIdea: 'Combine logs into a single log first (product, quotient and power laws), then ask which power of the base gives the number inside.',
+          asking: 'What single number do these logs combine to?',
+          solution: steps(...working),
+          conclusion: `Everything combines into ${m(L(String(b ** n)))}, which is the power of ${b} that gives ${b ** n}. So the answer is ${answer}.`,
+          keyIdea: 'Combine the logs into one first: add means multiply, subtract means divide, and a number in front goes up as a power. Then ask which power of the base gives the number inside.',
         };
       }
     },
@@ -256,20 +265,23 @@ export const generators: Generator[] = [
         const ds = pickDistractors(answer, answerValue, pool.filter((c) => c.text !== m('0.0') && c.value !== 0));
         if (ds.length < 3) continue;
         const lnf = Math.log(f);
-        const steps = [
-          `Set ${m(`${ctx.sym} = ${target}`)}: ${m(`${Q0}e^{${decay ? '-' : ''}${kT}t} = ${target}`)}.`,
-          `Divide by ${Q0}: ${m(`e^{${decay ? '-' : ''}${kT}t} = \\frac{${target}}{${Q0}} = ${num(f)}`)}.`,
-          `Take $\\ln$ of both sides: ${m(`${decay ? '-' : ''}${kT}t = \\ln ${num(f)} = ${num(lnf, 4)}`)}.`,
-          `Divide by ${m(decay ? `-${kT}` : kT)}: ${m(`t = \\frac{${num(Math.abs(lnf), 4)}}{${kT}} = ${num(t, 3)}`)}.`,
-          `To 1 decimal place, ${m(`t = ${ansS}`)} ${ctx.unit}.`,
-        ];
+        const power = `${decay ? '-' : ''}${kT}t`;
+        const solution = steps(
+          `Put ${m(`${ctx.sym} = ${target}`)} into the formula: ${m(`${target} = ${Q0}e^{${power}}`)}.`,
+          `Here ${m('e')} is a fixed number, about 2.718. We want the ${m('e')} part alone, so divide both sides by ${Q0}: ${m(`\\frac{${target}}{${Q0}} = e^{${power}}`)}, which gives ${m(`${num(f)} = e^{${power}}`)}.`,
+          `${m('t')} is stuck in the power. ${m('\\ln')}, the log with base ${m('e')}, undoes ${m('e')} and brings the power down: ${m(`\\ln ${num(f)} = ${power}`)}.`,
+          `A calculator gives ${m(`\\ln ${num(f)} \\approx ${num(lnf, 4)}`)}. So ${m(`${num(lnf, 4)} = ${power}`)}.`,
+          `Divide both sides by ${m(decay ? `-${kT}` : kT)}${decay ? ', and the two minus signs cancel' : ''}: ${m(`t = \\frac{${num(Math.abs(lnf), 4)}}{${kT}} \\approx ${num(t, 3)}`)}. To 1 decimal place, that is ${ansS}.`,
+        );
         return {
           stem: `${ctx.what(m(model))} Find the time for it to ${ctx.verb} ${ctx.target(target)}, in ${ctx.unit} to 1 decimal place.`,
           answer,
           answerValue,
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution: steps.join('\n\n') + `\n\nAnswer: ${answer}`,
-          keyIdea: 'Isolate the exponential (divide by the starting amount), take $\\ln$ of both sides, then divide by the rate constant.',
+          asking: `At what time ${m('t')} does ${m(ctx.sym)} ${ctx.verb} ${target}?`,
+          solution,
+          conclusion: `Rounding ${num(t, 3)} to 1 decimal place gives ${answer} ${ctx.unit}.`,
+          keyIdea: 'For a model like $Q = Ae^{kt}$: put in the value, divide by $A$ to get the $e$ part alone, take $\\ln$ of both sides, then divide by the number multiplying $t$. Use $\\ln$, not $\\log$, to undo $e$.',
         };
       }
     },

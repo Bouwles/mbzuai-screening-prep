@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { median, modes, quartiles, sumOf } from '../../../lib/mathx';
 import { m, num } from '../../../lib/tex';
 
@@ -86,13 +87,14 @@ const missingValue: Generator = {
       answer,
       answerValue: x,
       distractors,
-      solution:
-        `**Step 1:** Total of all ${n} values $=$ mean $\\times$ number of values $= ${M} \\times ${n} = ${T}$.\n\n` +
-        `**Step 2:** Total of the ${n - 1} known values $= ${known.join(' + ')} = ${S}$.\n\n` +
-        `**Step 3:** Missing value $= ${T} - ${S} = ${x}$.\n\n` +
-        `Check: ${m(`\\frac{${S} + ${x}}{${n}} = \\frac{${T}}{${n}} = ${M}`)}.\n\n` +
-        `Answer: ${answer}`,
-      keyIdea: 'Turn the mean into a total (mean $\\times$ number of values), then subtract the values you already know.',
+      asking: `What must the missing ${ctx.thing} be, for the mean to come out at ${m(num(M))}?`,
+      solution: steps(
+        `A mean tells you the total: total $=$ mean $\\times$ how many values. So all ${n} values must add up to ${m(`${M} \\times ${n} = ${T}`)}.`,
+        `Add the ${n - 1} values you know: ${m(`${known.join(' + ')} = ${S}`)}.`,
+        `The missing value is whatever is needed to reach the total: ${m(`${T} - ${S} = ${x}`)}.`,
+      ),
+      conclusion: `Checking: ${m(`\\frac{${S} + ${x}}{${n}} = \\frac{${T}}{${n}} = ${M}`)}, so the answer is ${answer}.`,
+      keyIdea: 'For a missing value, turn the mean into a total (mean $\\times$ number of values), then subtract the values you know.',
     };
   },
 };
@@ -117,9 +119,10 @@ const freqMean: Generator = {
     let N = 0;
     let S = 0;
     let mean = 0;
+    let k = 0;
     let distractors: { text: string; value: number; why: string }[] | null = null;
     for (;;) {
-      const k = rng.int(4, 5);
+      k = rng.int(4, 5);
       const s0 = ctx.start();
       xs = Array.from({ length: k }, (_, i) => s0 + i);
       fs = Array.from({ length: k }, () => rng.int(1, 9));
@@ -141,27 +144,26 @@ const freqMean: Generator = {
       if (distractors) break;
     }
     const answer = m(num(mean));
-    const tableRows = xs.map((x, i) => `| ${x} | ${fs[i]} | ${x * fs[i]} |`).join('\n');
     return {
       stem: `The table shows ${ctx.intro}. Find the **mean** ${ctx.ask}.`,
       table: { headers: [`${ctx.label}, $x$`, 'Frequency, $f$'], rows: xs.map((x, i) => [x, fs[i]]) },
       answer,
       answerValue: mean,
       distractors,
-      solution:
-        `Multiply each value by its frequency and add up both columns.\n\n` +
-        `| $x$ | $f$ | $fx$ |\n|---|---|---|\n${tableRows}\n| **Total** | **${N}** | **${S}** |\n\n` +
-        `There are ${N} ${ctx.who} in total (${m(`\\sum f = ${N}`)}), and the ${m('fx')} column adds up to ${m(`\\sum fx = ${S}`)}.` +
-        dmLine(`\\bar{x} = \\frac{\\sum fx}{\\sum f} = \\frac{${S}}{${N}} = ${num(mean)}`) +
-        `Answer: ${answer}`,
-      keyIdea: 'Mean from a frequency table: $\\bar{x} = \\frac{\\sum fx}{\\sum f}$, so divide by the number of items, not the number of rows.',
+      asking: `What is the average ${ctx.ask} across all ${N} ${ctx.who}?`,
+      solution: steps(
+        `Each row groups ${ctx.who} with the same value. ${m('x')} is the value and ${m('f')} (the frequency) is how many ${ctx.who} had it. So the row ${m(`x = ${xs[1]}`)}, ${m(`f = ${fs[1]}`)} stands for the value ${xs[1]} counted ${fs[1]} time${fs[1] === 1 ? '' : 's'}.`,
+        `Multiply each value by its frequency, so that each one is counted as many times as it happened:\n\n` +
+          table(['$x$', '$f$', '$f \\times x$'], xs.map((x, i) => [x, fs[i], x * fs[i]])),
+        `Add the last column to get the total of all the values: ${m(`${xs.map((x, i) => x * fs[i]).join(' + ')} = ${S}`)}.`,
+        `Add the ${m('f')} column to get the number of ${ctx.who}: ${m(`${fs.join(' + ')} = ${N}`)}.`,
+        `Divide by the ${N} ${ctx.who}, not by the ${k} rows: ${m(`\\frac{${S}}{${N}} = ${num(mean)}`)}.`,
+      ),
+      conclusion: `A total of ${S} shared across ${N} ${ctx.who} gives the answer, ${answer}.`,
+      keyIdea: 'Mean from a frequency table: $\\bar{x} = \\frac{\\sum fx}{\\sum f}$, where $\\sum$ means add up. Add a column for $f \\times x$, add it up, and divide by the total frequency, never by the number of rows.',
     };
   },
 };
-
-function dmLine(t: string): string {
-  return `\n\n$$${t}$$\n\n`;
-}
 
 // ------------------------------------------------------------------ 3. quartiles, IQR and outlier fence
 const iqrFence: Generator = {
@@ -188,11 +190,13 @@ const iqrFence: Generator = {
     const methodNote = 'Take the quartiles as the medians of the lower and upper halves, leaving out the median.';
     const lower = sorted.slice(0, half);
     const upper = sorted.slice(half + 1);
-    const steps =
-      `**Step 1:** Order the ${n} values: ${sorted.join(', ')}.\n\n` +
-      `**Step 2:** The median is the ${half + 1}th value: ${m(num(q2))}.\n\n` +
-      `**Step 3:** Lower half: ${lower.join(', ')}, so ${m(`Q_1 = ${q1}`)}. Upper half: ${upper.join(', ')}, so ${m(`Q_3 = ${q3}`)}.\n\n` +
-      `**Step 4:** ${m(`\\text{IQR} = Q_3 - Q_1 = ${q3} - ${q1} = ${iqr}`)}.\n\n`;
+    const toIqr = [
+      `Sort the ${n} values, because quartiles depend on order: ${sorted.join(', ')}.`,
+      `The median is the middle value. With ${n} values it is the ${half + 1}th, which is ${q2}. Leave it out, as the question says.`,
+      `The lower half is ${lower.join(', ')}. Its middle value is the **lower quartile**: ${m(`Q_1 = ${q1}`)}.`,
+      `The upper half is ${upper.join(', ')}. Its middle value is the **upper quartile**: ${m(`Q_3 = ${q3}`)}.`,
+      `The **interquartile range** (IQR) is the gap between them: ${m(`Q_3 - Q_1 = ${q3} - ${q1} = ${iqr}`)}.`,
+    ];
     if (ask === 'iqr') {
       const unsortedDiff = Math.abs(raw[3 * qPos - 1] - raw[qPos - 1]);
       const pool: Cand[] = [
@@ -210,8 +214,10 @@ const iqrFence: Generator = {
         answer,
         answerValue: iqr,
         distractors,
-        solution: `${steps}Answer: ${answer}`,
-        keyIdea: 'Always sort first; $Q_1$ and $Q_3$ are the medians of the lower and upper halves, and $\\text{IQR} = Q_3 - Q_1$.',
+        asking: 'How far apart are the upper and lower quartiles of this list?',
+        solution: steps(...toIqr),
+        conclusion: `The quartiles are ${q1} and ${q3}, so the answer is ${answer}.`,
+        keyIdea: 'To find an IQR from raw data: sort, find the median, split into lower and upper halves, take the median of each half ($Q_1$ and $Q_3$), then subtract $Q_3 - Q_1$.',
       };
     }
     const fence = q3 + 1.5 * iqr;
@@ -233,14 +239,14 @@ const iqrFence: Generator = {
       answer,
       answerValue: fence,
       distractors,
-      solution:
-        steps +
-        `**Step 5:** ${m(`1.5 \\times \\text{IQR} = 1.5 \\times ${iqr} = ${num(1.5 * iqr)}`)}, so the upper fence is ${m(`Q_3 + 1.5 \\times \\text{IQR} = ${q3} + ${num(1.5 * iqr)} = ${num(fence)}`)}.\n\n` +
-        (outs.length
-          ? `So ${outs.length === 1 ? 'the value' : 'the values'} ${listAnd(outs)} ${outs.length === 1 ? 'is an outlier' : 'are outliers'} at the top end.\n\n`
-          : `No value in this data set is above the upper fence.\n\n`) +
-        `Answer: ${answer}`,
-      keyIdea: 'Upper outlier fence $= Q_3 + 1.5 \\times \\text{IQR}$ (and lower fence $= Q_1 - 1.5 \\times \\text{IQR}$).',
+      asking: 'Above what number does a value count as an outlier in this list?',
+      solution: steps(
+        ...toIqr,
+        `Find how far above ${m('Q_3')} a value may go: ${m(`1.5 \\times \\text{IQR} = 1.5 \\times ${iqr} = ${num(1.5 * iqr)}`)}.`,
+        `Add that to ${m('Q_3')} to get the upper limit, called the **upper fence**: ${m(`${q3} + ${num(1.5 * iqr)} = ${num(fence)}`)}.`,
+      ),
+      conclusion: `Any value above ${answer} counts as an outlier. In this list, ${outs.length === 0 ? 'no value is above it' : `${listAnd(outs)} ${outs.length === 1 ? 'is' : 'are'} above it`}.`,
+      keyIdea: 'Upper fence $= Q_3 + 1.5 \\times \\text{IQR}$ and lower fence $= Q_1 - 1.5 \\times \\text{IQR}$. Measure from the quartiles, not the median. Anything outside the fences is an outlier.',
     };
   },
 };

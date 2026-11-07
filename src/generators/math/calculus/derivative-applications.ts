@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, poly, sum, term, signed } from '../../../lib/tex';
 
@@ -9,6 +10,9 @@ function lineTex(grad: number | Frac, c: number | Frac): string {
     [c, ''],
   ])}`;
 }
+
+/** "a = b = c", leaving out the middle when it just repeats the end. */
+const chain = (first: string, mid: string, last: string | number): string => (mid === String(last) ? `${first} = ${last}` : `${first} = ${mid} = ${last}`);
 
 /** Linear factor "(x - r)", or "x" when r = 0. */
 function factor(r: number): string {
@@ -99,24 +103,32 @@ export const generators: Generator[] = [
       const expanded = `y = ${sum([
         [grad, 'x'],
         [-grad * p, ''],
-        [yp, ''],
       ])}`;
-      const solution =
-        `1. Find the point on the curve: ${m(`y = ${yCalc} = ${yp}`)}, so the point is ${m(`(${p}, ${yp})`)}.\n` +
-        `2. Differentiate: ${m(`\\frac{dy}{dx} = ${poly([2 * a, b])}`)}.\n` +
-        `3. Gradient at ${m(`x = ${p}`)}: ${m(`m = ${gCalc} = ${grad}`)}.\n` +
-        `4. Use ${m(`y - y_1 = m(x - x_1)`)}: ${m(pointForm)}.\n` +
-        `5. Expand and rearrange: ${m(expanded)}` +
-        (expanded === lineTex(grad, k) ? '' : `, so ${m(lineTex(grad, k))}`) +
-        `.\n\nAnswer: ${answer}`;
+      const solution = steps(
+        'A straight line needs a point and a gradient. A **tangent** touches the curve at one point and has the same gradient as the curve there, so both come from the curve.',
+        `For the point, put ${m(`x = ${p}`)} into the curve: ${m(`y = ${chain(yCalc, sum([[a * p * p, ''], [b * p, ''], [c, '']]), yp)}`)}. So the tangent passes through ${m(`(${p}, ${yp})`)}.`,
+        `For the gradient, differentiate with the power rule (multiply by the power, then lower the power by 1): ${m(`\\frac{dy}{dx} = ${poly([2 * a, b])}`)}.`,
+        `Put in ${m(`x = ${p}`)} to get the gradient ${m('m')} at that point: ${m(`m = ${chain(gCalc, sum([[2 * a * p, ''], [b, '']]), grad)}`)}.`,
+        `Use the line formula ${m('y - y_1 = m(x - x_1)')}, with ${m(`x_1 = ${p}`)}, ${m(`y_1 = ${yp}`)} and ${m(`m = ${grad}`)}: ${m(pointForm)}.`,
+        // With gradient 1 there is no bracket, and at height 0 no number to move: the line is already written out.
+        !(grad === 1 && yp === 0) &&
+          [
+            grad !== 1 && `Multiply out the bracket: ${m(yp === 0 ? expanded : `${pointForm.split(' = ')[0]} = ${sum([[grad, 'x'], [-grad * p, '']])}`)}.`,
+            yp !== 0 && `${yp > 0 ? 'Add' : 'Take'} ${m(String(Math.abs(yp)))} ${yp > 0 ? 'to' : 'from'} both sides, using ${m(`${-grad * p}${signed(yp)} = ${k}`)}. That gives ${m(lineTex(grad, k))}.`,
+          ]
+            .filter(Boolean)
+            .join(' '),
+      );
 
       return {
         stem: `Find the equation of the tangent to the curve ${m(`y = ${poly([a, b, c])}`)} at the point where ${m(`x = ${p}`)}.`,
         answer,
         answerValue: `${grad}|${k}`,
         distractors: distractors.map((d) => ({ text: d.text, why: d.why })),
+        asking: `What is the straight line that just touches this curve at ${m(`x = ${p}`)}?`,
         solution,
-        keyIdea: 'Tangent line: get the point from the curve, the gradient from the derivative at that point, then use $y - y_1 = m(x - x_1)$.',
+        conclusion: `The line through ${m(`(${p}, ${yp})`)} with gradient ${m(String(grad))} is ${answer}.`,
+        keyIdea: 'Tangent at $x = a$: find $y$ at $a$ from the curve, find the gradient by putting $a$ into $\\frac{dy}{dx}$, then use $y - y_1 = m(x - x_1)$ and rearrange.',
       };
     },
   },
@@ -196,22 +208,33 @@ export const generators: Generator[] = [
         [c1, `(${xa})`],
         [d, ''],
       ]);
-      const solution =
-        `1. Differentiate: ${m(`f'(x) = ${f1Tex}`)}.\n` +
-        `2. Factorise: ${m(`f'(x) = ${leadTex}${r2 === 0 ? factor(r2) + factor(r1) : factor(r1) + factor(r2)}`)}, so the stationary points are at ${m(`x = ${r1}`)} and ${m(`x = ${r2}`)}.\n` +
-        `3. Second derivative: ${m(`f''(x) = ${f2Tex}`)}.\n` +
-        `4. At ${m(`x = ${r1}`)}: ${m(`f''(${r1}) = ${f2Calc(r1)} = ${f2(r1)}`)}, ${f2(r1) < 0 ? 'negative' : 'positive'}, so a **${nature(r1)}**.\n` +
-        `5. At ${m(`x = ${r2}`)}: ${m(`f''(${r2}) = ${f2Calc(r2)} = ${f2(r2)}`)}, ${f2(r2) < 0 ? 'negative' : 'positive'}, so a **${nature(r2)}**.\n` +
-        `6. The local ${want} is at ${m(`x = ${xa}`)}. Substitute into the original function: ${m(`f(${xa}) = ${fCalc} = ${f(xa)}`)}.\n\n` +
-        `Answer: ${answer}`;
+      const signWord = (x: number) => (f2(x) < 0 ? 'negative' : 'positive');
+      const classify = table(
+        ['$x$', "$f''(x)$", 'Sign', 'Type'],
+        [r1, r2].map((x) => [m(String(x)), m(chain(f2Calc(x), sum([[6 * k * x, ''], [-3 * k * s, '']]), f2(x))), signWord(x), nature(x)]),
+      );
+      const solution = steps(
+        `A **stationary point** is where the curve is flat, so its gradient is 0. The local ${want} is one of these, so first we find them all by solving ${m(`f'(x) = 0`)}.`,
+        `Differentiate with the power rule (multiply by the power, then lower the power by 1): ${m(`f'(x) = ${f1Tex}`)}.`,
+        `Take out the common factor ${m(leadTex)}: ${m(`f'(x) = ${leadTex}\\left(${poly([1, -s, r1 * r2])}\\right)`)}. ${
+          r1 * r2 === 0
+            ? `Every term in the bracket contains ${m('x')}, so ${m('x')} can be taken out as well.`
+            : `To factorise the bracket, we need two numbers that multiply to ${m(String(r1 * r2))} and add to ${m(String(-s))}. They are ${m(String(-r1))} and ${m(String(-r2))}.`
+        }`,
+        `So ${m(`f'(x) = ${leadTex}${r2 === 0 ? factor(r2) + factor(r1) : factor(r1) + factor(r2)}`)}. This is 0 only when one of its factors is 0, so ${m(`x = ${r1}`)} or ${m(`x = ${r2}`)}.`,
+        `To tell them apart, differentiate again to get the second derivative: ${m(`f''(x) = ${f2Tex}`)}. At a flat point, negative means a maximum and positive means a minimum.\n\n` + classify,
+        `The local ${want} is at ${m(`x = ${xa}`)}. To get its height, put this into the original function: ${m(`f(${xa}) = ${chain(fCalc, sum([[c3 * xa ** 3, ''], [c2 * xa ** 2, ''], [c1 * xa, ''], [d, '']]), f(xa))}`)}. So the local ${want} is ${answer}.`,
+      );
 
       return {
         stem: `Find the coordinates of the local **${want}** of ${m(`f(x) = ${fTex}`)}.`,
         answer,
         answerValue: `${xa},${f(xa)}`,
         distractors: distractors.map((x) => ({ text: x.text, why: x.why })),
+        asking: want === 'maximum' ? 'Where is the top of the hill (the local maximum) on this curve?' : 'Where is the bottom of the valley (the local minimum) on this curve?',
         solution,
-        keyIdea: 'Solve $f\'(x) = 0$ for the stationary points, use the sign of $f\'\'(x)$ to classify them (negative = maximum, positive = minimum), then find $y$ from the original function.',
+        conclusion: `The second derivative is ${signWord(xa)} at ${m(`x = ${xa}`)}, and the height there is ${m(String(f(xa)))}, so the local ${want} is ${answer}.`,
+        keyIdea: "To find and classify: solve $f'(x) = 0$ for the stationary points. Test each in $f''(x)$: negative is a maximum, positive is a minimum. Then get $y$ from the original function, not a derivative.",
       };
     },
   },

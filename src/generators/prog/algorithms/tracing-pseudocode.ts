@@ -1,4 +1,5 @@
 import type { GeneratedCore, Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { m } from '../../../lib/tex';
 
@@ -71,29 +72,40 @@ function genLoopCount(rng: Rng) {
 
   const stem = ask === 'count' ? 'How many times is `print(i)` executed?' : 'What is the value of `i` after this loop has finished?';
 
-  const listing = `The body runs for ${listVals(vals)}, which is ${count} value${count === 1 ? '' : 's'}.`;
   const lastVal = vals[vals.length - 1];
   const next = up ? lastVal + s : lastVal - s;
-  const stopLine =
+
+  // One row per check, as the loop runs it: the last check is the one that fails.
+  const value = (v: number) => (v < 0 ? m(String(v)) : String(v));
+  const trace = [
+    ...vals.map((v, j) => [j + 1, value(v), 'yes', value(up ? v + s : v - s)]),
+    ['', value(after), 'no, stop', ''],
+  ];
+  const work =
     form === 'for'
-      ? `The next value would be ${m(String(next))}, which is past ${m(String(b))}, so the loop stops.`
-      : `After the last pass ${m(`i = ${lastVal}`)} is updated to ${m(`i = ${next}`)}, and the check ${m(opWord.replace('<=', '\\le').replace('>=', '\\ge'))} is false, so the loop stops.`;
+      ? [
+          `\`for i = ${a} to ${b}\` starts \`i\` at ${a}, goes up by 1 and includes ${b}. The line \`print(i)\` runs once for each value.`,
+          `So \`i\` takes these values, one at a time: ${listVals(vals)}.`,
+          `Counting them gives ${count}. The rule end $-$ start $+ 1$ agrees: ${m(`${b} - ${a} + 1 = ${count}`)}.`,
+        ]
+      : [
+          `\`i\` starts at ${up ? a : b}. The check \`${opWord}\` is at the top of each pass. If it is true, the body prints \`i\`, and then line 4 ${up ? `adds ${s} to \`i\`` : `takes ${s} off \`i\``}.`,
+          'Trace every check:',
+          table(['Pass', '`i` at the check', `\`${opWord}\`?`, '`i` becomes'], trace),
+          ask === 'count' ? `The check was true ${count} times, so \`print(i)\` ran ${count} times.` : `\`i\` is now ${value(after)}, and nothing changes it after the loop.`,
+        ];
 
   let answerV: number;
   let pool: Cand[];
   let fallbacks: Cand[];
-  let method: string;
+  let keyIdea: string;
   if (ask === 'count') {
     answerV = count;
     const span = b - a;
-    if (strict) {
-      method =
-        `Shortcut for a strict condition: ${m(`\\left\\lceil \\frac{${span}}{${s}} \\right\\rceil = ${count}`)} passes (divide the distance ${m(`${b} - ${a} = ${span}`)} by the step and round **up**).`;
-    } else {
-      method =
-        `Shortcut for an inclusive range: ${m(`\\left\\lfloor \\frac{${span}}{${s}} \\right\\rfloor + 1 = ${Math.floor(span / s)} + 1 = ${count}`)} passes (divide the distance ${m(`${b} - ${a} = ${span}`)} by the step, round **down**, then add 1 for the first value).`;
-    }
-    if (s === 1) method = strict ? `Shortcut: ${m(`${b} - ${a} = ${count}`)} passes (the end value is not used).` : `Shortcut: ${m(`${b} - ${a} + 1 = ${count}`)} passes (both ends are used).`;
+    keyIdea =
+      form === 'for'
+        ? 'For `for i = a to b`, passes = end $-$ start $+ 1$, because both ends are included. A plain subtraction counts the gaps between values and comes out one too small.'
+        : `To count passes without a table, divide the distance between the start and the limit by the step. With a strict test (\`<\` or \`>\`), round up. With \`<=\`, round down and add 1. Here the distance is ${span} and the step is ${s}.`;
     pool = [];
     if (strict) {
       pool.push({
@@ -102,7 +114,7 @@ function genLoopCount(rng: Rng) {
       });
       pool.push({
         v: Math.floor(span / s),
-        why: `This divides ${m(`${span} \\div ${s}`)} and rounds down, but the last partial step still gives a pass: whenever \`i\` is still on the right side of the boundary, the body runs.`,
+        why: `This divides ${m(`${span} \\div ${s}`)} and rounds down. There is a part-step left over, and \`${opWord}\` is still true after the last whole step, so the body runs once more.`,
       });
     } else {
       pool.push({
@@ -145,7 +157,7 @@ function genLoopCount(rng: Rng) {
     ];
   } else {
     answerV = after;
-    method = `So the final value of \`i\` is ${m(String(after))}: it is the first value that fails the test, not the last value printed.`;
+    keyIdea = 'After a `while` loop ends, the counter holds the first value that made the check fail, not the last value used inside the loop. Trace until a check fails and read off that value.';
     pool = [
       {
         v: lastVal,
@@ -170,23 +182,19 @@ function genLoopCount(rng: Rng) {
   }
   const ds = pickDistinct(answerV, pool, fallbacks);
   const answer = String(answerV);
-  const solution =
-    'Trace the values that `i` takes.\n\n' +
-    `${listing}\n\n` +
-    `${stopLine}\n\n` +
-    `${method}\n\n` +
-    `Answer: ${answer}`;
   return {
     stem,
     code: { lang: 'pseudocode' as const, source: code },
     answer,
     answerValue: answerV,
     distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
-    solution,
-    keyIdea:
+    asking: ask === 'count' ? 'How many values does `i` take while the loop is running?' : "Which value of `i` first makes the loop's check fail?",
+    solution: steps(...work),
+    conclusion:
       ask === 'count'
-        ? 'Count loop passes by listing the values of the counter (first, step, last) and checking whether the end value is included.'
-        : 'After a while loop ends, the counter holds the first value that made the condition false, not the last value used inside the loop.',
+        ? `The body runs once for each value of \`i\`, which is ${count} values, so the answer is ${answer}.`
+        : `The loop stops as soon as the check fails, with \`i\` at ${value(after)}, so the answer is ${answer}.`,
+    keyIdea,
   };
 }
 
@@ -234,38 +242,33 @@ function genAccumulator(rng: Rng) {
   ];
   const ds = pickDistinct(S, pool, fallbacks);
   const answer = String(S);
-  let working: string;
-  const vTex = `\\text{${v}}`;
-  if (eq) {
-    working =
-      chosen.length === 1
-        ? `Only one value of \`i\` from 1 to ${n} is ${condWords}: ${m(String(chosen[0]))}. So it is the only number added, and ${m(`${vTex} = ${S}`)}.`
-        : `The values of \`i\` from 1 to ${n} that are ${condWords} are ${listVals(chosen)}.\n\n` +
-          `Adding them: ${m(`${chosen.join(' + ')} = ${S}`)}.`;
-  } else {
-    const mult = other;
-    const skipped =
-      mult.length === 1
-        ? `The only skipped multiple is ${m(String(mult[0]))}.`
-        : `Sum of the skipped multiples: ${m(`${mult.join(' + ')} = ${sumOf(mult)}`)}.`;
-    working =
-      `The test is true for every \`i\` that is ${condWords}, so the loop adds everything from 1 to ${n} **except** ${listVals(mult)}.\n\n` +
-      `Sum of all the numbers: ${m(`1 + 2 + \\dots + ${n} = \\frac{${n} \\times ${n + 1}}{2} = ${all}`)}.\n\n` +
-      `${skipped}\n\n` +
-      `So ${m(`${vTex} = ${all} - ${sumOf(mult)} = ${S}`)}.`;
-  }
-  const solution =
-    `\`${v}\` starts at 0 and, on each pass, \`i\` is added only if \`${cond}\` is true, which means \`i\` is ${condWords}.\n\n` +
-    `${working}\n\n` +
-    `Answer: ${answer}`;
+  let sofar = 0;
+  const rows = chosen.map((c) => {
+    const row = [c, `$${sofar} + ${c} = ${sofar + c}$`];
+    sofar += c;
+    return row;
+  });
+  const whichPass = eq
+    ? chosen.length === 1
+      ? `From 1 to ${n}, only ${chosen[0]} passes the test:`
+      : `From 1 to ${n}, the values that pass are ${chosen.join(', ')}. Keep a running total:`
+    : `From 1 to ${n}, skip ${other.join(', ')}. Add the remaining values, keeping a running total:`;
   return {
     stem,
     code: { lang: 'pseudocode' as const, source: code },
     answer,
     answerValue: S,
     distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
-    solution,
-    keyIdea: 'An `if` inside a loop filters which passes update the accumulator; list the values that pass the test, then add them.',
+    asking: eq ? `What do the multiples of ${k} from 1 to ${n} add up to?` : `What do the numbers from 1 to ${n} add up to, if you leave out the multiples of ${k}?`,
+    solution: steps(
+      `\`mod(i,${k})\` is the remainder after dividing \`i\` by ${k}. For example, \`mod(${k + 1},${k})\` is 1 and \`mod(${2 * k},${k})\` is 0. A remainder of 0 means \`i\` is a multiple of ${k}.`,
+      `${eq ? '' : '`!=` means "not equal". '}So the test on line 3 is true when \`i\` is ${condWords}. Only then does line 4 add \`i\` to \`${v}\`, which starts at 0.`,
+      whichPass,
+      table(['`i`', `\`${v}\` becomes`], rows),
+      `Line 7 prints \`${v}\`, which is ${S}.`,
+    ),
+    conclusion: chosen.length === 1 ? `Only ${chosen[0]} passes the test, so it is the only value added and the answer is ${answer}.` : `The values that pass add up to ${S}, so the answer is ${answer}.`,
+    keyIdea: 'An `if` with `mod` inside a loop filters the numbers. List the values that pass, then add them with a running total. For "all except the multiples", you can also add 1 to $n$ with $\\frac{n(n + 1)}{2}$ and subtract the left-out values.',
   };
 }
 
@@ -310,9 +313,6 @@ function genWhileTrueMod(rng: Rng): GeneratedCore {
   } while (simulate(start, step, md, 0, '<').t === 0);
   const brk: Brk = rng.bool() ? '<' : '<=';
   const extra = rng.bool(0.3) ? 1 : 0;
-  const addTex = extra ? `\\text{mod}(n, ${md}) + ${extra}` : `\\text{mod}(n, ${md})`;
-  const table = (rows: Row[]) => `| \`n\` | \`mod(n,${md})\` | \`t\` |\n|---|---|---|\n${rows.map((x) => `| ${x.n} | ${x.r} | ${x.t} |`).join('\n')}`;
-  const keyIdea = 'In a `while (true)` loop, keep one row per pass and test the `break` straight after `n` changes.';
   const trueLoop = simulate(start, step, md, extra, brk);
 
   if (rng.bool(0.15)) {
@@ -321,15 +321,6 @@ function genWhileTrueMod(rng: Rng): GeneratedCore {
     const update = skip ? `   n = n - ${step}` : `   n = n + ${step}`;
     const test = skip ? 'n==0' : `n${brk}0`;
     const code = [`n = ${start}`, 't = 0', 'while (true)', modLine(md, extra), update, `   if ${test}`, '      break', '   end if', 'end while', 'print(t)'].join('\n');
-    const shown: Row[] = [];
-    let n = start;
-    let t = 0;
-    for (let i = 0; i < 4; i++) {
-      const r = posMod(n, md);
-      t += r + extra;
-      shown.push({ n, r, t });
-      n += skip ? -step : step;
-    }
     const finish = simulate(start, step, md, extra, skip ? '<=' : brk);
     const lastRow = finish.rows[finish.rows.length - 1];
     const first = posMod(start, md) + extra;
@@ -353,17 +344,27 @@ function genWhileTrueMod(rng: Rng): GeneratedCore {
       { v: finish.t + 2, why: noTotal },
       { v: finish.t + 3, why: noTotal },
     ]);
-    const why = skip
-      ? `\`n\` takes the values ${start}, ${start - step}, ${start - 2 * step}, and so on. ${start} is not a multiple of ${step}, so \`n\` is never exactly 0 and \`n==0\` is never true.`
-      : `\`n\` starts positive and goes up by ${step} on every pass, so \`${test}\` is never true.`;
+    const closest = start % step; // the last value of n above 0 when it falls past 0
     return {
       stem: 'What is printed?',
       code: { lang: 'pseudocode', source: code },
       answer: INFINITE,
       answerValue: INFINITE,
       distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
-      solution: `The first few passes, with \`n\` as it is at the start of each pass:\n\n${table(shown)}\n\n${why} The \`break\` never runs, so the loop never ends and \`print(t)\` is never reached.\n\nAnswer: ${INFINITE}`,
-      keyIdea: 'Check which values the loop variable really takes: if it can never satisfy the `break` test, the loop never ends.',
+      asking: skip ? 'Does `n` ever equal exactly 0, so that the `break` can run?' : `Can \`${test}\` ever be true when \`n\` keeps growing?`,
+      solution: steps(
+        `\`while (true)\` never stops by itself. The only way out is the \`break\` on line 7, which needs \`${test}\` to be true.`,
+        'Line 4 only changes `t`, so it has no effect on stopping. Only line 5 changes `n`.',
+        skip
+          ? `\`n\` starts at ${start} and falls by ${step} on each pass: ${m(`${start - step}, ${start - 2 * step}, ${start - 3 * step}`)}, and so on.`
+          : `\`n\` starts at ${start} and goes up by ${step} on each pass: ${m(`${start + step}, ${start + 2 * step}, ${start + 3 * step}`)}, and so on.`,
+        skip
+          ? `${start} is not a multiple of ${step}, so \`n\` never lands on 0. The last value above 0 is ${closest}, and the next is ${m(String(closest - step))}, which jumps straight over 0.`
+          : `\`n\` starts positive and only gets bigger, so \`${test}\` is false every time.`,
+        'So `break` never runs, and `print(t)` on line 10 is never reached.',
+      ),
+      conclusion: `The \`break\` test can never be true, so the loop has no way out. The answer is: ${INFINITE}.`,
+      keyIdea: 'Write down the values the loop variable really takes and compare them with the `break` test. If it moves away from the test, or jumps over an exact value, the `break` never runs and the loop never ends.',
     };
   }
 
@@ -407,11 +408,26 @@ function genWhileTrueMod(rng: Rng): GeneratedCore {
       ...ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
       { text: INFINITE, value: INFINITE, why: `\`n\` falls by ${step} on every pass, so \`n${brk}0\` eventually becomes true and the \`break\` runs.` },
     ],
-    solution:
-      `Each pass adds ${m(addTex)} to \`t\`, then lowers \`n\` by ${step}, then tests for the \`break\`. With \`n\` as it is at the start of each pass:\n\n` +
-      `${table(trueLoop.rows)}\n\n` +
-      `After the last row \`n\` becomes ${m(String(trueLoop.last))}, so \`n${brk}0\` is true and the loop breaks. It prints the value of \`t\`.\n\nAnswer: ${answer}`,
-    keyIdea,
+    asking: `What total is in \`t\` by the time \`n\` is ${brk === '<' ? 'below 0' : '0 or below'}?`,
+    solution: steps(
+      `\`mod(n,${md})\` is the remainder after dividing \`n\` by ${md}. For example, ${
+        posMod(start, md) === 0
+          ? `${md} goes into ${start} exactly ${start / md} times, so \`mod(${start},${md})\` is 0.`
+          : `${m(`${start} = ${Math.floor(start / md)} \\times ${md} + ${posMod(start, md)}`)}, so \`mod(${start},${md})\` is ${posMod(start, md)}.`
+      }`,
+      `\`while (true)\` only ends through the \`break\` on line 7, which runs once \`n\` is ${brk === '<' ? 'below 0' : '0 or below'}. Each pass adds ${extra ? `the remainder plus ${extra}` : 'the remainder'} to \`t\`, takes ${step} off \`n\`, then tests \`n\`.`,
+      'Trace it:',
+      table(
+        ['Pass', '`n` at start', `\`mod(n,${md})\``, '`t` becomes', '`n` becomes', `\`n${brk}0\`?`],
+        trueLoop.rows.map((x, i) => {
+          const after = x.n - step;
+          return [i + 1, x.n, x.r, x.t, after < 0 ? m(String(after)) : after, i === trueLoop.rows.length - 1 ? 'yes' : 'no'];
+        }),
+      ),
+      '`break` jumps to line 10, which prints `t`.',
+    ),
+    conclusion: `The loop breaks after pass ${trueLoop.rows.length} with \`t\` at ${answer}, so the answer is ${answer}.`,
+    keyIdea: 'For a `while (true)` loop, draw one row per pass with a column for each variable. Update them in the order of the code, and test the `break` straight after `n` changes. The value that triggers `break` never starts a row of its own.',
   };
 }
 

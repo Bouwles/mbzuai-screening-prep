@@ -49,18 +49,19 @@ export const questions: StaticQuestion[] = [
     options: ['True positive (TP)', 'False negative (FN)', 'False positive (FP)', 'True negative (TN)'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What do we call it when a genuine email gets marked as spam?',
       solution:
-        'Read the two words of the name separately.\n\n' +
-        '1. The **second** word is what the model *predicted*. The filter said "spam", which is the positive class, so the second word is **positive**.\n' +
-        '2. The **first** word says whether that prediction was right. The email was actually genuine, so the prediction was wrong: **false**.\n\n' +
-        'Putting them together: a **false positive (FP)**. In plain English, it is a false alarm.',
+        'Each outcome has a two-word name. The second word is what the model predicted: **positive** means it said "spam", and **negative** means it said "not spam".\n\n' +
+        'The first word says whether that prediction was right: **true** if it was right, **false** if it was wrong.\n\n' +
+        'Here the filter said "spam", so the second word is positive. The email was genuine, so the prediction was wrong, and the first word is false.',
+      conclusion: 'A wrong prediction of spam is a false alarm, so this is a False positive (FP).',
       whyWrong: [
         'A true positive would need the email to really be spam. Here the prediction "spam" was wrong, so the first word must be "false", not "true".',
         'A false negative is the other kind of error: a spam email that the filter lets through (it predicted "not spam"). Here the filter predicted "spam", so the outcome is a positive, not a negative.',
         null,
         'A true negative is a genuine email that the filter correctly leaves alone. Here the filter predicted "spam", so it is not a negative at all.',
       ],
-      keyIdea: 'The second word (positive/negative) is what the model predicted; the first word (true/false) says whether it was right.',
+      keyIdea: 'Name an outcome in two moves. What did the model predict? That gives positive or negative. Was it right? That gives true or false. Then put the two words together.',
     },
   },
   {
@@ -79,22 +80,20 @@ export const questions: StaticQuestion[] = [
     options: ['$0.9$', '$0.8$', '$0.75$', '$0.45$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What fraction of all 100 photos did the model get right?',
       solution:
-        'Treat "cat" as the positive class and read the four cells:\n\n' +
-        '- TP (actual cat, predicted cat) $= 45$\n' +
-        '- FN (actual cat, predicted not cat) $= 15$\n' +
-        '- FP (actual not cat, predicted cat) $= 5$\n' +
-        '- TN (actual not cat, predicted not cat) $= 35$\n\n' +
-        'Total photos: $45 + 15 + 5 + 35 = 100$.\n\n' +
-        'Correct predictions are on the diagonal: $\\text{TP} + \\text{TN} = 45 + 35 = 80$.\n\n' +
-        '$$\\text{Accuracy} = \\frac{\\text{TP} + \\text{TN}}{\\text{total}} = \\frac{80}{100} = 0.8$$',
+        '**Accuracy** is the fraction of predictions that are correct: correct predictions divided by all predictions.\n\n' +
+        'A **confusion matrix** is a table of right and wrong predictions. A prediction is correct when the actual class and the predicted class match.\n\n' +
+        'Two cells match. Actual cat, predicted cat has 45. Actual not cat, predicted not cat has 35. The other two cells, 15 and 5, are mistakes.\n\n' +
+        'Correct predictions: $45 + 35 = 80$. The total is 100 photos, so the accuracy is $\\frac{80}{100} = 0.8$.',
+      conclusion: 'The model is right on 80 of the 100 photos, so the accuracy is $0.8$.',
       whyWrong: [
         'This is $\\frac{45}{50}$, the **precision** (correct cats out of everything predicted "cat"). Accuracy counts every correct prediction, cats and non-cats.',
         null,
         'This is $\\frac{45}{60}$, the **recall** (cats found out of all actual cats). Accuracy also gives credit for the 35 non-cats correctly rejected.',
         'This is $\\frac{45}{100}$: it only counts the true positives as correct and forgets the 35 true negatives, which are also correct predictions.',
       ],
-      keyIdea: 'Accuracy is the fraction of ALL predictions that are correct: the diagonal of the confusion matrix divided by the total.',
+      keyIdea: 'For accuracy, add the cells where actual and predicted match, then divide by the total of all four cells. In a confusion matrix those matching cells usually run along the diagonal.',
     },
     check: {
       optionValues: [0.9, 0.8, 0.75, 0.45],
@@ -114,20 +113,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which of these formulas is the one for precision?',
       solution:
-        'Precision answers the question: **"Of everything the model predicted positive, how many really were positive?"**\n\n' +
-        '- Everything predicted positive = the correct positives plus the false alarms $= \\text{TP} + \\text{FP}$.\n' +
-        '- The ones that really were positive $= \\text{TP}$.\n\n' +
-        'So\n\n' +
-        '$$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$$\n\n' +
-        'Memory trick: **P**recision is about the **P**redicted positives; **R**ecall is about the **R**eal (actual) positives.',
+        'First, the four counts. **TP** (true positive): predicted positive, really positive. **FP** (false positive): predicted positive, really negative. **FN** (false negative): predicted negative, really positive. **TN** (true negative): predicted negative, really negative.\n\n' +
+        '**Precision** answers one question: when the model says positive, how often is it right? So we look only at the times it said positive.\n\n' +
+        'The times it said positive are TP and FP, so $\\text{TP} + \\text{FP}$ goes on the bottom. The ones it got right are TP, so TP goes on top.',
+      conclusion: 'Right positive predictions over all positive predictions gives $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$.',
       whyWrong: [
         'This is **recall**: it divides by all *actual* positives ($\\text{TP} + \\text{FN}$), so it measures how many real positives were found, not how trustworthy a positive prediction is.',
         'This is **accuracy**: the fraction of all predictions (positive and negative) that are correct.',
         'This is **specificity** (the true negative rate): the fraction of actual negatives correctly predicted negative. It does not involve the true positives at all.',
         null,
       ],
-      keyIdea: 'Precision = TP divided by everything the model PREDICTED positive (TP + FP).',
+      keyIdea: 'Build the formula from its question. Precision: of everything **predicted** positive, how much was right? Recall: of everything **actually** positive, how much was found? Both have TP on top, and the bottom is the group you count from.',
     },
   },
   {
@@ -138,21 +136,20 @@ export const questions: StaticQuestion[] = [
     options: ['$0.75$', '$0.6$', '$0.075$', '$0.925$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Out of the patients who really have the disease, what fraction did the model catch?',
       solution:
-        'Positive class = "has the disease". Turn the words into counts:\n\n' +
-        '- TP (ill and flagged) $= 15$\n' +
-        '- FN (ill but not flagged) $= 20 - 15 = 5$\n' +
-        '- FP (healthy but flagged) $= 10$\n\n' +
-        'Recall asks: of the patients who **really** have the disease, what fraction did the model find?\n\n' +
-        '$$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{15}{15 + 5} = \\frac{15}{20} = 0.75$$\n\n' +
-        'The 10 false positives do not affect recall at all.',
+        '**Recall** answers: of all the real positive cases, what fraction did the model find? Here a positive case is a patient with the disease.\n\n' +
+        'The formula is $\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$. TP (true positives) are ill patients who got flagged. FN (false negatives) are ill patients who were missed.\n\n' +
+        'Pick out the numbers. TP is 15, the ill patients flagged. There are 20 ill patients altogether, so FN is $20 - 15 = 5$. The 10 healthy patients flagged don\'t count, because recall looks only at ill patients.\n\n' +
+        'Substitute: $\\text{Recall} = \\frac{15}{15 + 5} = \\frac{15}{20} = 0.75$.',
+      conclusion: 'The model catches 15 of the 20 ill patients, so its recall is $0.75$.',
       whyWrong: [
         null,
         'This is $\\frac{15}{25}$, the **precision**: it divides by all 25 flagged patients (including the 10 healthy ones). Recall divides by the 20 patients who are actually ill.',
         'This is $\\frac{15}{200}$: it divides by every patient screened, not just the 20 who have the disease.',
         'This is the **accuracy**, $\\frac{15 + 170}{200}$, which also counts the 170 healthy patients correctly cleared. Recall only looks at the ill patients.',
       ],
-      keyIdea: 'Recall = TP divided by all ACTUAL positives (TP + FN): what fraction of the real cases did the model catch?',
+      keyIdea: 'For recall, ignore the healthy people entirely. Count only the real positives: recall is how many were caught divided by how many there are. Numbers like the total screened are there to distract you.',
     },
     check: {
       optionValues: [0.75, 0.6, 0.075, 0.925],
@@ -171,19 +168,20 @@ export const questions: StaticQuestion[] = [
     options: ['$2\\%$', '$0\\%$', '$50\\%$', '$98\\%$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What percentage of transactions does a model that always says "not fraud" get right?',
       solution:
-        'The model says "not fraud" every time.\n\n' +
-        '- It is right for every genuine transaction: $500 - 10 = 490$ correct (true negatives).\n' +
-        '- It is wrong for the 10 frauds (false negatives).\n\n' +
-        '$$\\text{Accuracy} = \\frac{490}{500} = 0.98 = 98\\%$$\n\n' +
-        'This looks excellent, but the model is useless: it never catches a single fraud (its recall is $0$). This is why **accuracy is misleading on imbalanced data**.',
+        '**Accuracy** is correct predictions divided by all predictions.\n\n' +
+        'The model says "not fraud" every time. That is correct for every genuine transaction and wrong for every fraud.\n\n' +
+        'Genuine transactions: $500 - 10 = 490$. So the model gets 490 right.\n\n' +
+        'Accuracy is $\\frac{490}{500} = 0.98$. To turn that into a percentage, multiply by 100, which gives 98 per cent.',
+      conclusion: 'It is right on 490 of 500 without catching any fraud, so the accuracy is $98\\%$.',
       whyWrong: [
         'This is $\\frac{10}{500}$, the fraction of transactions that are fraud. Accuracy counts correct predictions, and the model is correct on the 490 genuine ones.',
         'This is the model\'s **recall** (it catches none of the 10 frauds). Accuracy also counts the 490 genuine transactions it labelled correctly.',
         'This assumes that with two classes a model must score about 50%. The classes here are very unbalanced, so always guessing the majority class scores far higher.',
         null,
       ],
-      keyIdea: 'On imbalanced data, always predicting the majority class gives a high accuracy even though the model finds none of the cases you care about.',
+      keyIdea: 'When a model always gives the same prediction, its accuracy is the share of examples in that class. This is why accuracy misleads on imbalanced data, where one class is far more common than the other.',
     },
     check: {
       optionValues: [2, 0, 50, 98],
@@ -217,24 +215,21 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which of the four claims about this table is correct?',
       solution:
-        'First read the four cells carefully (rows are the **actual** class):\n\n' +
-        '- TP (defective, predicted defective) $= 30$\n' +
-        '- FN (defective, predicted not defective) $= 20$\n' +
-        '- FP (not defective, predicted defective) $= 10$\n' +
-        '- TN (not defective, predicted not defective) $= 140$\n\n' +
-        'Now work out each metric:\n\n' +
-        '- Recall $= \\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{30}{50} = 60\\%$\n' +
-        '- Accuracy $= \\frac{\\text{TP} + \\text{TN}}{200} = \\frac{170}{200} = 85\\%$\n' +
-        '- Precision $= \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{30}{40} = 75\\%$\n\n' +
-        'So the true statement is that the **precision is $75\\%$**: of the 40 parts flagged as defective, 30 really were.',
+        'Defective is the positive class. Rows tell you the actual class and columns tell you the prediction, so label each cell:\n\n| Actual | Predicted | Name | Count |\n|---|---|---|---|\n| Defective | Defective | TP (true positive) | 30 |\n| Defective | Not defective | FN (false negative) | 20 |\n| Not defective | Defective | FP (false positive) | 10 |\n| Not defective | Not defective | TN (true negative) | 140 |\n\n' +
+        'Test the recall claim. **Recall** is the share of actual positives found: $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{30}{30 + 20} = \\frac{30}{50} = 60\\%$. That isn\'t 75%, so this claim is false.\n\n' +
+        'Test the false positives claim. The table shows FP is 10. The 20 are false negatives, so this claim is false.\n\n' +
+        'Test the accuracy claim. **Accuracy** is the share of all predictions that are correct: $\\frac{30 + 140}{200} = \\frac{170}{200} = 85\\%$. That isn\'t 15%, so this claim is false.\n\n' +
+        'Test the precision claim. **Precision** is the share of positive predictions that are right: $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{30}{30 + 10} = \\frac{30}{40} = 75\\%$. This claim is true.',
+      conclusion: 'The other three claims all fail, and 30 of the 40 flagged parts really are defective, so the answer is The precision is $75\\%$.',
       whyWrong: [
         '$75\\%$ is the **precision** ($\\frac{30}{40}$, dividing by the "Predicted: defective" column). Recall divides by the "Defective" row, all actual defective parts: $\\frac{30}{50} = 60\\%$.',
         'The $20$ is in the "Actual: defective, predicted not defective" cell, so those are **false negatives** (missed defective parts). There are only $10$ false positives.',
         null,
         '$15\\%$ is the **error rate**, $\\frac{20 + 10}{200}$: the fraction classified wrongly. Accuracy counts the correct ones on the diagonal: $\\frac{30 + 140}{200} = 85\\%$.',
       ],
-      keyIdea: 'For "which statement is true" on a confusion matrix, write down TP, FP, FN and TN from the labels first, then compute each metric the options mention.',
+      keyIdea: 'For "which statement is true", label the four cells first, then calculate each claim in turn. Precision uses the cells predicted positive. Recall uses the cells that are actually positive.',
     },
     check: {
       optionValues: ['recall75', 'fp20', 'precision75', 'accuracy15'],
@@ -262,20 +257,21 @@ export const questions: StaticQuestion[] = [
     options: ['$0.72$', '$0.75$', '$0.54$', '$0.36$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How do precision 0.6 and recall 0.9 combine into one F1 score?',
       solution:
-        'The F1 score is the **harmonic mean** of precision $P$ and recall $R$:\n\n' +
-        '$$F_1 = \\frac{2PR}{P + R}$$\n\n' +
-        'Top: $2 \\times 0.6 \\times 0.9 = 1.08$\n\n' +
-        'Bottom: $0.6 + 0.9 = 1.5$\n\n' +
-        '$$F_1 = \\frac{1.08}{1.5} = 0.72$$\n\n' +
-        'Check: the harmonic mean is always pulled towards the **smaller** value, so it should be below the ordinary average $0.75$. It is.',
+        'The **F1 score** combines precision $P$ and recall $R$ into one number. It uses a special average called the **harmonic mean**: $F_1 = \\frac{2PR}{P + R}$.\n\n' +
+        'It uses this average because a low value drags it down, so a model can\'t hide poor recall behind good precision, or the other way round.\n\n' +
+        'Work out the top: $2 \\times 0.6 \\times 0.9 = 2 \\times 0.54 = 1.08$.\n\n' +
+        'Work out the bottom: $0.6 + 0.9 = 1.5$.\n\n' +
+        'Divide: $\\frac{1.08}{1.5} = 0.72$.',
+      conclusion: 'Twice the product over the sum is $\\frac{1.08}{1.5}$, so the F1 score is $0.72$.',
       whyWrong: [
         null,
         'This is the ordinary (arithmetic) mean $\\frac{0.6 + 0.9}{2}$. F1 uses the harmonic mean, which is pulled towards the lower of the two values.',
         'This is just $0.6 \\times 0.9$: the product on top without the factor 2 and without dividing by $P + R$.',
         'This is $\\frac{0.6 \\times 0.9}{1.5}$: the factor 2 on top of the formula has been forgotten.',
       ],
-      keyIdea: 'F1 = 2PR / (P + R), the harmonic mean of precision and recall, which is always at or below their ordinary average.',
+      keyIdea: 'When you\'re given precision and recall and asked for F1, use $F_1 = \\frac{2PR}{P + R}$. The result always lies between the two values and is never above their ordinary average, which helps to rule out options.',
     },
     check: {
       optionValues: [0.72, 0.75, 0.54, 0.36],
@@ -303,24 +299,21 @@ export const questions: StaticQuestion[] = [
     options: ['$0.625$', '$0.6$', '$0.8$', '$0.375$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What is the F1 score, given a table whose rows are the predictions?',
       solution:
-        'Here the rows are the **predicted** class, so:\n\n' +
-        '- TP (predicted churn, actually churned) $= 30$\n' +
-        '- FP (predicted churn, actually stayed) $= 10$\n' +
-        '- FN (predicted stay, actually churned) $= 30$\n' +
-        '- TN (predicted stay, actually stayed) $= 130$\n\n' +
-        'Precision: $P = \\frac{30}{30 + 10} = \\frac{30}{40} = 0.75$\n\n' +
-        'Recall: $R = \\frac{30}{30 + 30} = \\frac{30}{60} = 0.5$\n\n' +
-        '$$F_1 = \\frac{2PR}{P + R} = \\frac{2 \\times 0.75 \\times 0.5}{0.75 + 0.5} = \\frac{0.75}{1.25} = 0.6$$\n\n' +
-        'Shortcut straight from the counts: $F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}} = \\frac{60}{60 + 10 + 30} = \\frac{60}{100} = 0.6$.\n\n' +
-        'Notice that F1 treats FP and FN in exactly the same way, so here misreading the table would not change F1. It **would** swap precision and recall, so always read the labels first.',
+        'The rows here are the **predicted** class and the columns are the **actual** class, the opposite of the usual layout. So read each cell by its labels, not its position.\n\n' +
+        'Churn is the positive class. Label the cells we need:\n\n| Predicted | Actual | Name | Count |\n|---|---|---|---|\n| Churn | Churned | TP (true positive) | 30 |\n| Churn | Stayed | FP (false positive) | 10 |\n| Stay | Churned | FN (false negative) | 30 |\n\n' +
+        '**Precision** $P$ is the share of churn predictions that were right: $P = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{30}{30 + 10} = \\frac{30}{40} = 0.75$.\n\n' +
+        '**Recall** $R$ is the share of real churners the model found: $R = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}} = \\frac{30}{30 + 30} = \\frac{30}{60} = 0.5$.\n\n' +
+        'The **F1 score** combines them with $F_1 = \\frac{2PR}{P + R}$. The top is $2 \\times 0.75 \\times 0.5 = 0.75$. The bottom is $0.75 + 0.5 = 1.25$. So $F_1 = \\frac{0.75}{1.25} = 0.6$.',
+      conclusion: 'With precision 0.75 and recall 0.5, the formula gives an F1 score of $0.6$.',
       whyWrong: [
         'This is the ordinary average $\\frac{0.75 + 0.5}{2}$. F1 is the harmonic mean, $\\frac{2PR}{P + R}$, which is lower.',
         null,
         'This is the **accuracy**, $\\frac{30 + 130}{200}$. It is inflated by the 130 customers correctly predicted to stay.',
         'This is $P \\times R = 0.75 \\times 0.5$: the multiplication is right but the factor 2 and the division by $P + R$ are missing.',
       ],
-      keyIdea: 'F1 = 2TP / (2TP + FP + FN); read the table labels first so you do not mix up FP and FN.',
+      keyIdea: 'Read a table\'s labels before using any cell, because rows and columns can be swapped. Find TP, FP and FN, then use $P$ and $R$ in $\\frac{2PR}{P + R}$, or go straight to $\\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$.',
     },
     check: {
       optionValues: [0.625, 0.6, 0.8, 0.375],
@@ -346,20 +339,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'In cancer screening with cheap follow-up tests, which measure matters most?',
       solution:
-        'Ask: **which mistake is worse?**\n\n' +
-        '- A **false negative** (a patient with cancer who is not flagged) could be fatal.\n' +
-        '- A **false positive** (a healthy patient flagged) only costs a cheap, safe follow-up test.\n\n' +
-        'The metric that punishes false negatives is **recall**:\n\n' +
-        '$$\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$$\n\n' +
-        'Recall is $1$ only when there are no false negatives, i.e. every patient with cancer is caught. So recall should be maximised (even if that means more false alarms).',
+        'Think about the two possible mistakes. A **false positive** flags a healthy person: they take a cheap, safe extra test and are fine. A **false negative** misses someone with cancer: they get no follow-up, and a treatable cancer goes untreated.\n\n' +
+        'So false negatives are by far the worse mistake, and we want as few of them as possible.\n\n' +
+        'The metric built around false negatives is **recall**: $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$, the share of real cases the model catches. TP is true positives and FN is false negatives. Fewer false negatives means a higher value.',
+      conclusion: 'Missing a cancer is the costly mistake and this metric counts exactly those misses, so the answer is Recall.',
       whyWrong: [
         'Precision, $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$, punishes **false positives**. Here false positives are cheap; the dangerous mistake is the false negative.',
         null,
         'Cancer is rare, so accuracy is dominated by the many healthy patients. A model could have high accuracy while still missing many cancers.',
         'Specificity measures how well **healthy** patients are cleared, which is again about false positives, the cheap kind of mistake in this situation.',
       ],
-      keyIdea: 'When missing a real case (false negative) is the costly mistake, maximise recall.',
+      keyIdea: 'Ask which mistake costs more. If missing a real case is worse, maximise recall. If a false alarm is worse, maximise precision. Don\'t trust accuracy when the thing you\'re looking for is rare.',
     },
   },
   {
@@ -375,22 +367,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 3,
     markScheme: {
+      asking: 'In which task are false alarms worse than missed cases?',
       solution:
-        'Precision is hurt by **false positives**; recall is hurt by **false negatives**. For each task, decide which mistake is more costly.\n\n' +
-        '| Task | False positive costs | False negative costs | Prioritise |\n' +
-        '|---|---|---|---|\n' +
-        '| Airport scanner | a quick manual check | a weapon gets through | recall |\n' +
-        '| Disease screening | a cheap second test | an ill patient missed | recall |\n' +
-        '| Engine parts | an engineer inspects a good part | a faulty part flies | recall |\n' +
-        '| Deleting spam filter | an important real email is **lost forever** | one spam email in the inbox | **precision** |\n\n' +
-        'Only for the deleting spam filter is the false positive the expensive mistake, so precision matters most there.',
+        'High **precision** means few **false positives**: false alarms, items flagged that shouldn\'t have been. High **recall** means few **false negatives**: real cases that get missed.\n\n' +
+        'So precision matters more only when a false alarm does more damage than a miss. Compare the costs in each task:\n\n| Task | A false alarm costs | A miss costs |\n|---|---|---|\n| Airport scanner | A quick check | A weapon gets through |\n| Disease screen | A cheap second test | An illness goes untreated |\n| Engine parts | An inspection | A possible crash |\n| Spam filter that deletes | A real email lost for ever | One spam email in the inbox |\n\n' +
+        'Only in the last row is the false alarm the disaster. A deleted email can\'t be recovered, while a missed spam email is a small annoyance.',
+      conclusion: 'False alarms do the most damage when flagged items are destroyed, so the answer is A spam filter that **permanently deletes** flagged emails.',
       whyWrong: [
         'Here a false negative (a missed weapon) is the disaster and a false positive only costs a quick check, so recall is the priority, not precision.',
         'Missing an ill patient (false negative) is far worse than a cheap second test (false positive), so this task needs high recall.',
         'A faulty part that is missed could cause a crash, while a wrongly flagged part only costs an inspection, so recall matters more here.',
         null,
       ],
-      keyIdea: 'Choose precision when false alarms (false positives) are the expensive mistake, and recall when misses (false negatives) are.',
+      keyIdea: 'For each task, write down what a false alarm costs and what a miss costs. If a false alarm is worse, precision matters most. If a miss is worse, recall matters most. A cheap follow-up check makes false alarms harmless.',
     },
   },
   {
@@ -406,18 +395,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 2,
     markScheme: {
+      asking: 'What happens to precision and recall when the model must be more sure before saying positive?',
       solution:
-        'A higher threshold means the model needs to be **more confident** before it says "positive", so it predicts positive **less often**.\n\n' +
-        '- The predictions that stay positive are the ones with very high probabilities, which are usually correct, so there are fewer false positives. **Precision typically rises.**\n' +
-        '- Some real positives with probabilities between $0.5$ and $0.8$ are now predicted negative, so TP can only go down (or stay the same) while the number of actual positives is fixed. **Recall falls** (or at best stays the same).\n\n' +
-        'This is the **precision-recall trade-off**.',
+        'The model gives each example a probability. If that reaches the **threshold**, it predicts positive. Raising the threshold from 0.5 to 0.8 means it says positive less often, and only when it is more sure.\n\n' +
+        'Here is a tiny example. Suppose there are 10 real positives. At 0.5 the model flags 10 examples: 8 real and 2 false alarms. At 0.8 it flags 5 examples: all 5 real.\n\n' +
+        '**Precision** is the share of positive predictions that are right. In the example it goes from $\\frac{8}{10}$ to $\\frac{5}{5}$. The predictions dropped are the least certain ones, and those include most false alarms, so precision usually goes up.\n\n' +
+        '**Recall** is the share of real positives that are found. In the example it goes from $\\frac{8}{10}$ to $\\frac{5}{10}$. Saying positive less often can only lose real positives, so recall goes down.',
+      conclusion: 'Saying positive less often makes those calls more reliable but misses more real cases, so the answer is Precision rises and recall falls.',
       whyWrong: [
         'This is what happens when the threshold is **lowered**: more examples are called positive, catching more real positives but also more false alarms.',
         'Raising the threshold can only remove positive predictions, so true positives cannot increase; recall cannot rise.',
         null,
         'Changing the threshold changes which examples are predicted positive, so TP, FP and FN all change, and therefore precision and recall change too.',
       ],
-      keyIdea: 'Raising the threshold makes the model more cautious: precision usually goes up and recall goes down.',
+      keyIdea: 'Use the trade-off. Higher threshold: fewer positive predictions, so higher precision and lower recall. Lower threshold: more positive predictions, so lower precision and higher recall. If unsure, invent small numbers and work out both.',
     },
   },
   {
@@ -432,25 +423,21 @@ export const questions: StaticQuestion[] = [
     options: ['$\\frac{2}{3}$', '$\\frac{4}{5}$', '$\\frac{7}{10}$', '$\\frac{2}{5}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Of the emails the filter calls spam, what fraction really are spam?',
       solution:
-        'Emails with score $\\ge 0.5$ are predicted spam: emails 1 to 6 (scores $0.95, 0.85, 0.80, 0.70, 0.65, 0.55$).\n\n' +
-        '| Email | Score | Predicted | Actual | Outcome |\n' +
-        '|---|---|---|---|---|\n' +
-        '| 1 | 0.95 | spam | spam | TP |\n' +
-        '| 2 | 0.85 | spam | spam | TP |\n' +
-        '| 3 | 0.80 | spam | not spam | FP |\n' +
-        '| 4 | 0.70 | spam | spam | TP |\n' +
-        '| 5 | 0.65 | spam | not spam | FP |\n' +
-        '| 6 | 0.55 | spam | spam | TP |\n\n' +
-        'So $\\text{TP} = 4$ and $\\text{FP} = 2$.\n\n' +
-        '$$\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}} = \\frac{4}{6} = \\frac{2}{3}$$',
+        '**Precision** is the share of spam predictions that are right: $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$. TP (true positive) is predicted spam and really spam. FP (false positive) is predicted spam but not really spam.\n\n' +
+        'The filter predicts spam when the score is at least 0.5. That means emails 1 to 6, because email 6 scores 0.55 and email 7 only 0.40.\n\n' +
+        'Compare those six with the last column of the table:\n\n| Email | Score | Actually spam? | Outcome |\n|---|---|---|---|\n| 1 | 0.95 | Yes | TP |\n| 2 | 0.85 | Yes | TP |\n| 3 | 0.80 | No | FP |\n| 4 | 0.70 | Yes | TP |\n| 5 | 0.65 | No | FP |\n| 6 | 0.55 | Yes | TP |\n\n' +
+        'Count them: TP is 4 and FP is 2. Emails 7 to 10 were not predicted spam, so they play no part in precision.\n\n' +
+        'Substitute: $\\frac{4}{4 + 2} = \\frac{4}{6}$. Divide top and bottom by 2 to simplify, which gives $\\frac{2}{3}$.',
+      conclusion: '4 of the 6 emails flagged really are spam, so the precision is $\\frac{2}{3}$.',
       whyWrong: [
         null,
         'This is the **recall**: 4 of the 5 actual spam emails were caught (email 8, score $0.30$, was missed). Precision divides by the 6 emails predicted spam.',
         'This is the **accuracy**: 4 true positives plus 3 true negatives (emails 7, 9, 10) out of 10.',
         'This is $\\frac{4}{10}$: it divides the true positives by all 10 emails instead of only the 6 that were predicted spam.',
       ],
-      keyIdea: 'Apply the threshold to turn scores into predictions, label each as TP/FP/FN/TN, then use the metric formula.',
+      keyIdea: 'With scores and a threshold, first mark which examples are predicted positive. For precision, use only those rows: how many are really positive, out of how many were flagged.',
     },
     check: {
       optionValues: [2 / 3, 4 / 5, 7 / 10, 2 / 5],
@@ -473,22 +460,21 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which model wins on accuracy, and which wins on catching fraud?',
       solution:
-        '**Model A** (always "not fraud"): TN $= 990$, FN $= 10$, TP $= 0$, FP $= 0$.\n\n' +
-        '- Accuracy $= \\frac{990}{1000} = 99\\%$\n' +
-        '- Recall $= \\frac{0}{10} = 0\\%$ (it never catches fraud)\n\n' +
-        '**Model B**: TP $= 8$, FP $= 50 - 8 = 42$, FN $= 10 - 8 = 2$, TN $= 1000 - 8 - 42 - 2 = 948$.\n\n' +
-        '- Accuracy $= \\frac{8 + 948}{1000} = \\frac{956}{1000} = 95.6\\%$\n' +
-        '- Recall $= \\frac{8}{10} = 80\\%$\n' +
-        '- Precision $= \\frac{8}{50} = 16\\%$\n\n' +
-        'So A has the higher accuracy (99% against 95.6%), but B catches 80% of frauds while A catches none. On imbalanced data, accuracy hides this; B is far more useful.',
+        '**Accuracy** is the share of all predictions that are correct. **Recall** is the share of real frauds caught. **Precision** is the share of fraud flags that are right.\n\n' +
+        'Model A says "not fraud" every time. It is right on the $1000 - 10 = 990$ genuine transactions, so its accuracy is $\\frac{990}{1000} = 99\\%$. It catches none of the 10 frauds, so its recall is 0.\n\n' +
+        'Model B flags 50, and 8 of those are real. So it has 8 caught frauds and $50 - 8 = 42$ false alarms.\n\n' +
+        'Model B\'s correct predictions are the 8 caught frauds plus the genuine transactions it left alone, $990 - 42 = 948$. So its accuracy is $\\frac{8 + 948}{1000} = \\frac{956}{1000} = 95.6\\%$.\n\n' +
+        'Model B\'s recall is $\\frac{8}{10} = 80\\%$, and its precision is $\\frac{8}{50} = 16\\%$. Comparing the two models, accuracy is 99% against 95.6%, and recall is 0 against 80%.',
+      conclusion: 'Model A\'s high score only comes from fraud being rare, so the correct statement is Model A has higher accuracy, but Model B has higher recall.',
       whyWrong: [
         'Model B\'s 42 false alarms count as errors too: its accuracy is $\\frac{956}{1000} = 95.6\\%$, which is lower than Model A\'s 99%.',
         null,
         'This trusts accuracy on imbalanced data. Model A gets 99% just by always saying "not fraud", but its recall is 0: it never catches a single fraud.',
         '80% is Model B\'s **recall** ($\\frac{8}{10}$). Its precision is $\\frac{8}{50} = 16\\%$, because 42 of its 50 flags are false alarms.',
       ],
-      keyIdea: 'With imbalanced classes, a useless majority-class model can beat a useful model on accuracy; compare recall and precision instead.',
+      keyIdea: 'On imbalanced data, where one class is much rarer, work out accuracy and recall for each model in a small table. A model that always says the common class scores high accuracy but has a recall of 0.',
     },
   },
   {
@@ -499,20 +485,22 @@ export const questions: StaticQuestion[] = [
     options: ['$15$', '$5$', '$6$', '$50$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many items does the model wrongly call positive?',
       solution:
-        '**Step 1 (recall gives TP).** Recall $= \\frac{\\text{TP}}{\\text{actual positives}}$, so\n\n' +
-        '$$\\text{TP} = 0.75 \\times 60 = 45$$\n\n' +
-        '**Step 2 (precision gives the number of predicted positives).** Precision $= \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$, so\n\n' +
-        '$$\\text{TP} + \\text{FP} = \\frac{45}{0.9} = 50$$\n\n' +
-        '**Step 3.** $\\text{FP} = 50 - 45 = 5$.\n\n' +
-        'Check: precision $= \\frac{45}{50} = 0.9$ and recall $= \\frac{45}{60} = 0.75$.',
+        'We need the **false positives** (FP): items that are really negative but predicted positive. We are given recall and precision, and each one unlocks a number. TP means true positives.\n\n' +
+        '**Recall** is $\\frac{\\text{TP}}{\\text{actual positives}}$. There are 60 actual positives and recall is 0.75, so $\\frac{\\text{TP}}{60} = 0.75$.\n\n' +
+        'Multiply both sides by 60 to get TP on its own: $\\text{TP} = 0.75 \\times 60 = 45$.\n\n' +
+        '**Precision** is $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$, where the bottom is everything predicted positive. So $\\frac{45}{\\text{TP} + \\text{FP}} = 0.9$.\n\n' +
+        'Multiply both sides by the bottom, then divide by 0.9, to get the bottom on its own: $\\text{TP} + \\text{FP} = \\frac{45}{0.9} = 50$. So the model made 50 positive predictions.\n\n' +
+        'Of those 50, 45 were right. The rest are false positives: $\\text{FP} = 50 - 45 = 5$.',
+      conclusion: 'It predicts positive 50 times and is right 45 times, so it makes $5$ false positives.',
       whyWrong: [
         'This is the number of **false negatives**, $60 - 45 = 15$: the actual positives that were missed. False positives come from the precision, not the recall.',
         null,
         'This is $0.1 \\times 60$: it applies "10% of positive predictions are wrong" to the 60 **actual** positives. Precision is about the 50 **predicted** positives.',
         'This is $\\text{TP} + \\text{FP} = 50$, the total number of positive predictions; the 45 true positives still need to be subtracted.',
       ],
-      keyIdea: 'Recall turns the number of actual positives into TP; precision turns TP into the number of predicted positives (TP + FP).',
+      keyIdea: 'To go backwards from metrics to counts: recall and the actual positives give TP. Then TP and precision give the predicted positives. Subtract TP from the predicted positives for FP, or from the actual positives for FN.',
     },
     check: {
       optionValues: [15, 5, 6, 50],
@@ -553,26 +541,21 @@ print(tp / (tp + fp))`,
     ],
     correctIndex: 0,
     markScheme: {
+      asking: 'What number does the code print after comparing the two arrays?',
       solution:
-        'The loop counts true positives and false positives, pair by pair:\n\n' +
-        '| $i$ | `T[i]` | `P[i]` | Outcome | `tp` | `fp` |\n' +
-        '|---|---|---|---|---|---|\n' +
-        '| 1 | 1 | 1 | TP | 1 | 0 |\n' +
-        '| 2 | 0 | 0 | TN | 1 | 0 |\n' +
-        '| 3 | 1 | 0 | FN | 1 | 0 |\n' +
-        '| 4 | 1 | 1 | TP | 2 | 0 |\n' +
-        '| 5 | 0 | 1 | FP | 2 | 1 |\n' +
-        '| 6 | 1 | 1 | TP | 3 | 1 |\n' +
-        '| 7 | 0 | 0 | TN | 3 | 1 |\n' +
-        '| 8 | 0 | 1 | FP | 3 | 2 |\n\n' +
-        'It prints `tp / (tp + fp)` $= \\frac{3}{3 + 2} = 0.6$, which is the **precision**.',
+        '`T` holds the true labels and `P` the predictions, where 1 means positive and 0 means negative. The loop on line 5 looks at one position `i` at a time, from 1 to 8.\n\n' +
+        'Line 6 is true when `T[i]` and `P[i]` are both 1, so `tp` counts true positives: really positive and predicted positive.\n\n' +
+        'Line 9 is true when `T[i]` is 0 and `P[i]` is 1, so `fp` counts false positives: really negative but predicted positive. When `P[i]` is 0, neither condition is true and nothing changes.\n\n' +
+        'Trace it, one row per position:\n\n| `i` | `T[i]` | `P[i]` | What happens | `tp` | `fp` |\n|---|---|---|---|---|---|\n| 1 | 1 | 1 | `tp` goes up | 1 | 0 |\n| 2 | 0 | 0 | nothing | 1 | 0 |\n| 3 | 1 | 0 | nothing | 1 | 0 |\n| 4 | 1 | 1 | `tp` goes up | 2 | 0 |\n| 5 | 0 | 1 | `fp` goes up | 2 | 1 |\n| 6 | 1 | 1 | `tp` goes up | 3 | 1 |\n| 7 | 0 | 0 | nothing | 3 | 1 |\n| 8 | 0 | 1 | `fp` goes up | 3 | 2 |\n\n' +
+        'Line 13 prints `tp / (tp + fp)`, which is the formula for precision. With `tp` at 3 and `fp` at 2, that is $\\frac{3}{3 + 2} = \\frac{3}{5} = 0.6$.',
+      conclusion: 'The loop finds 3 true positives and 2 false positives, so the code prints $0.6$.',
       whyWrong: [
         null,
         'This is the **recall**, $\\frac{3}{4}$, dividing by the 4 actual positives. The code divides by `tp + fp`, the predicted positives.',
         'This is the **accuracy**, $\\frac{5}{8}$, counting the 5 positions where the two arrays agree. The code only counts positive predictions.',
         'This is $\\frac{3}{8}$: the true positives divided by all 8 examples. The code divides by `tp + fp` $= 5$.',
       ],
-      keyIdea: 'Count TP and FP pair by pair; precision is tp divided by tp + fp.',
+      keyIdea: 'Spot the metric from the last line: `tp / (tp + fp)` is precision and `tp / (tp + fn)` is recall. Then go through the arrays position by position, marking each as TP, FP, FN or TN, and count.',
     },
     check: {
       optionValues: [0.6, 0.75, 0.625, 0.375],
@@ -597,20 +580,22 @@ print(tp / (tp + fp))`,
     options: ['$\\frac{2}{13}$', '$\\frac{9}{10}$', '$\\frac{9}{1000}$', '$\\frac{19}{20}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Of the people flagged, what fraction really have the disease?',
       solution:
-        'Turn every percentage into a count.\n\n' +
-        '- Ill: $1\\%$ of $10000 = 100$ people. Recall 90%, so $\\text{TP} = 0.9 \\times 100 = 90$ and $\\text{FN} = 10$.\n' +
-        '- Healthy: $10000 - 100 = 9900$ people. 5% are wrongly flagged, so $\\text{FP} = 0.05 \\times 9900 = 495$.\n\n' +
-        'Everyone flagged: $\\text{TP} + \\text{FP} = 90 + 495 = 585$.\n\n' +
-        '$$\\text{Precision} = \\frac{90}{585} = \\frac{2}{13} \\approx 0.154$$\n\n' +
-        'So only about 15% of flagged people are actually ill, even though the model catches 90% of ill people. Because the disease is rare, the healthy group is huge, and 5% of it swamps the true positives.',
+        '**Precision** is $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$. TP (true positives) are ill people who get flagged. FP (false positives) are healthy people who get flagged. We need both counts, so we turn the percentages into people.\n\n' +
+        'Split the population. Ill: 1% of 10,000 is $0.01 \\times 10{,}000 = 100$ people. Healthy: $10{,}000 - 100 = 9{,}900$ people.\n\n' +
+        '**Recall** is the share of ill people who get flagged. It is 90%, so $\\text{TP} = 0.9 \\times 100 = 90$.\n\n' +
+        'The model wrongly flags 5% of healthy people, so $\\text{FP} = 0.05 \\times 9{,}900 = 495$.\n\n' +
+        'Substitute into the formula: $\\text{Precision} = \\frac{90}{90 + 495} = \\frac{90}{585}$.\n\n' +
+        'Simplify by dividing top and bottom by 45. $90 \\div 45 = 2$ and $585 \\div 45 = 13$, which gives $\\frac{2}{13}$.',
+      conclusion: 'Healthy people are so common that false alarms outnumber real cases, 495 to 90, so the precision is only $\\frac{2}{13}$.',
       whyWrong: [
         null,
         'This is the **recall** given in the question. Precision divides by everyone flagged, which includes the 495 false positives.',
         'This is $\\frac{90}{10000}$: the true positives divided by the whole population instead of by the 585 people flagged.',
         'This is $1 - 0.05$, the fraction of healthy people correctly cleared (the specificity). It says nothing about how many flagged people are ill.',
       ],
-      keyIdea: 'When positives are rare, even a small false-positive rate produces many false positives, so precision can be low despite high recall.',
+      keyIdea: 'For a rare condition, turn percentages into a table of people: ill and healthy, flagged and not flagged. A round population such as 10,000 avoids fractions. Then precision is ill and flagged, divided by everyone flagged.',
     },
     check: {
       optionValues: [2 / 13, 9 / 10, 9 / 1000, 19 / 20],
@@ -633,16 +618,19 @@ print(tp / (tp + fp))`,
     options: ['An actual positive predicted as negative', 'An actual negative predicted as positive', 'An actual negative predicted as negative', 'An actual positive predicted as positive'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does the term false negative mean?',
       solution:
-        'Read the name in two parts. "Negative" is what the model **predicted**, and "false" says that prediction was wrong.\n\n' +
-        'A wrong negative prediction means the example was really positive. It is a case the model **missed**.',
+        'Read the two words backwards. The second word is what the model predicted, so "negative" means the model said no.\n\n' +
+        'The first word says whether that prediction was right. "False" means it was wrong, so the real answer was yes.\n\n' +
+        'For example, a medical test says a patient is healthy when they really have the disease. The model said negative, and the truth is positive.',
+      conclusion: 'The model said negative but the truth was positive, so a false negative is An actual positive predicted as negative.',
       whyWrong: [
         null,
         'This is a **false positive**: the model predicted positive and was wrong, a false alarm.',
         'This is a **true negative**: the prediction of negative was correct.',
         'This is a **true positive**: the prediction of positive was correct.',
       ],
-      keyIdea: 'The second word is the prediction and the first says if it was right, so a false negative is a missed positive.',
+      keyIdea: 'Decode any of the four outcome names from its two words: the second word is the prediction, and the first word says if that prediction was right. So a false prediction of negative means the truth was positive.',
     },
   },
   {
@@ -658,18 +646,19 @@ print(tp / (tp + fp))`,
     ],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which of these formulas is the one for recall?',
       solution:
-        'Recall answers: **"Of all the real positives, how many did the model find?"**\n\n' +
-        '- All the real positives are the ones found plus the ones missed: $\\text{TP} + \\text{FN}$.\n' +
-        '- The ones found: $\\text{TP}$.\n\n' +
-        'So recall is $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$.',
+        '**TP** (true positives) are positive cases the model found. **FN** (false negatives) are positive cases the model missed. **FP** (false positives) are negative cases wrongly called positive.\n\n' +
+        '**Recall** asks: of all the cases that are really positive, what share did the model find? If 20 people are ill and the model finds 15, recall is $\\frac{15}{20}$.\n\n' +
+        'Every real positive is either found (TP) or missed (FN), so the bottom is the sum of those two. The top is the ones found, which is TP.',
+      conclusion: 'Found positives over all real positives gives $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$.',
       whyWrong: [
         null,
         'This is **precision**, which divides by everything **predicted** positive. Recall divides by everything **actually** positive.',
         'This is **accuracy**: the fraction of all predictions that are correct.',
         'This is **specificity**: the fraction of actual negatives correctly predicted negative.',
       ],
-      keyIdea: 'Recall = TP divided by all actual positives (TP + FN).',
+      keyIdea: 'Precision and recall both have TP on top. For the bottom, ask what you\'re counting from. Recall counts from real positives, $\\text{TP} + \\text{FN}$. Precision counts from predicted positives, $\\text{TP} + \\text{FP}$.',
     },
   },
   {
@@ -680,17 +669,19 @@ print(tp / (tp + fp))`,
     options: ['Harmonic mean', 'Arithmetic mean', 'Geometric mean', 'Quadratic mean'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What kind of average is the F1 score?',
       solution:
-        'The F1 score is the **harmonic mean** of precision $P$ and recall $R$:\n\n' +
-        '$$F_1 = \\frac{2PR}{P + R}$$\n\n' +
-        'The harmonic mean is pulled towards the smaller value, so a model only scores well if **both** $P$ and $R$ are good.',
+        'The F1 score combines precision $P$ and recall $R$ with the formula $F_1 = \\frac{2PR}{P + R}$.\n\n' +
+        'This average is pulled towards the lower value. Try $P = 1$ and $R = 0.2$. The formula gives $\\frac{2 \\times 1 \\times 0.2}{1 + 0.2} = \\frac{0.4}{1.2} \\approx 0.33$, while the ordinary average is 0.6.\n\n' +
+        'The average with exactly this formula, twice the product over the sum, is called the **harmonic mean**.',
+      conclusion: 'F1 uses twice the product over the sum, so it is the Harmonic mean of precision and recall.',
       whyWrong: [
         null,
         'The arithmetic mean is $\\frac{P + R}{2}$, the ordinary average. It would let a high value hide a very low one.',
         'The geometric mean is $\\sqrt{PR}$, which is a different average and is not what F1 uses.',
         'The quadratic mean is $\\sqrt{\\frac{P^2 + R^2}{2}}$, which is pulled towards the **larger** value, the opposite of what F1 wants.',
       ],
-      keyIdea: 'F1 is the harmonic mean of precision and recall, $\\frac{2PR}{P + R}$.',
+      keyIdea: 'Recognise a mean of two numbers $a$ and $b$ by its formula. Arithmetic: $\\frac{a + b}{2}$. Geometric: $\\sqrt{ab}$. Harmonic: $\\frac{2ab}{a + b}$. The harmonic mean suits F1 because the lower value drags it down, so a model can only score well when precision and recall are both good.',
     },
   },
 ];

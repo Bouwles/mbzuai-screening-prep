@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { m, num } from '../../../lib/tex';
 
 type NumCand = { v: number; why: string };
@@ -32,7 +33,9 @@ interface LoopCase {
   pool: NumCand[];
   /** When set, "Infinite loop" replaces the last distractor, with this explanation. */
   infiniteWhy?: string;
+  asking: string;
   steps: string;
+  conclusion: string;
   idea: string;
 }
 
@@ -61,11 +64,15 @@ function loopCase(rng: Rng): LoopCase {
         { v: (A - 2) * B, why: `This stops the outer loop before ${A}. Both ends of \`for i = 2 to ${A}\` are included, so it runs ${A - 1} times.` },
         { v: (A - 1) * (B - 1), why: `This assumes \`for j = 1 to ${B}\` runs ${B - 1} times. Both ends are included, so it runs ${B} times.` },
       ],
-      steps:
-        `- The outer loop \`for i = 2 to ${A}\` gives $i = 2, 3, \\dots, ${A}$: that is ${A - 1} passes.\n` +
-        `- For each pass, the inner loop \`for j = 1 to ${B}\` runs ${B} times.\n` +
-        `- Nested loops multiply: ${m(`${A - 1} \\times ${B} = ${count}`)}.`,
-      idea: 'Nested loops multiply: (outer passes) times (inner runs per pass); remember `for i = a to b` gives $b - a + 1$ values.',
+      asking: 'How many times does the line `count = count + 1` run in total?',
+      steps: steps(
+        '`count` goes up by 1 each time line 4 runs, so we need to know how many times line 4 runs.',
+        `The outer loop \`for i = 2 to ${A}\` includes both ends. Its number of passes is end minus start plus 1: ${m(`${A} - 2 + 1 = ${A - 1}`)}.`,
+        `The inner loop \`for j = 1 to ${B}\` runs all the way through on every outer pass. Each time it makes ${m(`${B} - 1 + 1 = ${B}`)} runs.`,
+        `So line 4 runs ${B} times on each of the ${A - 1} outer passes. One loop is inside the other, so the counts multiply: ${m(`${A - 1} \\times ${B} = ${count}`)}. Line 7 prints this value.`,
+      ),
+      conclusion: `${A - 1} outer passes with ${B} inner runs each make ${count} runs of line 4, so the answer is ${count}.`,
+      idea: 'Nested loops multiply: outer passes times inner runs per pass. A loop `for i = a to b` has $b - a + 1$ passes. Two nested loops of size $n$ make $n \\times n$ runs, so the work grows like $n^2$, written $O(n^2)$.',
     };
   }
   if (kind === 'tri') {
@@ -87,18 +94,31 @@ function loopCase(rng: Rng): LoopCase {
           { v: N, why: 'This counts only the outer loop. The counted line is inside the inner loop, which runs several times per outer pass.' },
           { v: N * (N - 1), why: `This forgets to divide by 2 in $\\frac{n(n-1)}{2}$.` },
         ];
-    const runs = fromI ? `${N}, ${N - 1}, ${N - 2}, \\dots, 1` : `${N - 1}, ${N - 2}, \\dots, 1, 0`;
-    const formula = fromI ? `\\frac{${N} \\times ${N + 1}}{2}` : `\\frac{${N} \\times ${N - 1}}{2}`;
+    // The largest number of inner runs: the sum is t + (t - 1) + ... + 1.
+    const t = fromI ? N : N - 1;
+    const runsFor = (i: number) => (fromI ? N - i + 1 : N - i);
+    const rowFor = (i: number): (string | number)[] => {
+      const first = fromI ? i : i + 1;
+      return [i, first > N ? `none, as ${first} is past ${N}` : `${first} to ${N}`, runsFor(i)];
+    };
+    const shown: (string | number)[][] =
+      N <= 6 ? Array.from({ length: N }, (_, x) => rowFor(x + 1)) : [rowFor(1), rowFor(2), rowFor(3), ['...', '...', '...'], rowFor(N - 1), rowFor(N)];
+    const sum = `${t} + ${t - 1} + ${t - 2} + \\dots + 1`;
     return {
       code: `count = 0\nfor i = 1 to ${N}\n   ${inner}\n      count = count + 1\n   end for\nend for\nprint(count)`,
       count,
       pool,
-      steps:
-        `- The outer loop gives $i = 1, 2, \\dots, ${N}$.\n` +
-        `- The inner loop \`${inner}\` gets shorter each time, so the runs are ${m(runs)}. A loop whose start is past its end runs 0 times.\n` +
-        `- Add them with the triangular-number formula: ${m(`${formula} = ${count}`)}.\n` +
-        '- In general this is about $\\frac{n^2}{2}$, so the algorithm is $O(n^2)$.',
-      idea: 'A triangular nested loop runs $1 + 2 + \\dots$ times, given by $\\frac{n(n+1)}{2}$ or $\\frac{n(n-1)}{2}$: still $O(n^2)$.',
+      asking: 'How many times does the line `count = count + 1` run in total?',
+      steps: steps(
+        '`count` goes up by 1 each time line 4 runs, so we need to know how many times line 4 runs.',
+        `The inner loop starts at \`j = ${start}\`, so it gets shorter as \`i\` grows. Count its runs for each value of \`i\`:`,
+        table(['`i`', '`j` goes', 'Runs of line 4'], shown),
+        `So the total is ${m(sum)}.`,
+        `To add this quickly, write the sum twice, once forwards and once backwards. Each column then adds to ${m(`${t} + 1 = ${t + 1}`)}, and there are ${t} columns. So twice the sum is ${m(`${t} \\times ${t + 1}`)}.`,
+        `Halve that to get the sum itself: ${m(`\\frac{${t} \\times ${t + 1}}{2} = ${count}`)}. Line 7 prints this value.`,
+      ),
+      conclusion: `The inner runs are ${m(sum)}, which adds up to ${count}, so the answer is ${count}.`,
+      idea: 'An inner loop that shrinks by one each pass gives $1 + 2 + \\dots + t = \\frac{t(t + 1)}{2}$ runs, where $t$ is the runs on the first pass. That grows like $\\frac{n^2}{2}$, written $O(n^2)$ once the number in front is dropped.',
     };
   }
   if (kind === 'halve') {
@@ -118,13 +138,15 @@ function loopCase(rng: Rng): LoopCase {
         { v: strict1 ? N - 1 : N, why: 'This assumes `n` goes down by 1 each pass, as in `n = n - 1`. Halving shrinks `n` much faster.' },
       ],
       infiniteWhy: `\`div(n,2)\` makes \`n\` smaller on every pass, so \`${cond}\` eventually fails and the loop stops.`,
-      steps:
-        '`div(n,2)` halves `n` and rounds down. The values of `n` are:\n\n' +
-        `${m(trace.map((v) => texBig(v)).join(' \\to '))}\n\n` +
-        `- That is ${count} arrows, so ${count} passes; then \`${cond}\` is false and the loop stops.\n` +
-        `- Check: ${m(`2^{${Math.floor(Math.log2(N))}} \\le ${texBig(N)} < 2^{${Math.floor(Math.log2(N)) + 1}}`)}, so it takes ${Math.floor(Math.log2(N))} halvings to reach 1${strict1 ? '' : ', plus one more pass to reach 0'}.\n` +
-        '- A loop that halves is $O(\\log n)$.',
-      idea: 'A loop that halves $n$ runs about $\\log_2 n$ times; check the stopping condition to get the exact count.',
+      asking: 'How many times is `n` halved before the loop stops?',
+      steps: steps(
+        `\`div(n,2)\` divides by 2 and drops any remainder. For example, \`div(${N},2)\` is ${Math.floor(N / 2)}.`,
+        `The loop on line 3 keeps going while \`${cond}\`. Each pass halves \`n\` and adds 1 to \`count\`, so \`count\` is the number of passes:`,
+        table(['Pass', '`n` at the start', '`n` after line 4', '`count`'], trace.slice(0, count - 1).map((v, x) => [x + 1, v, trace[x + 1], x + 1])),
+        `On the next pass \`n\` starts at ${trace[count - 1]} and line 4 makes it ${trace[count]}, so \`count\` becomes ${count}. Now \`${cond}\` is false, so the loop stops and line 7 prints ${count}.`,
+      ),
+      conclusion: `Halving takes \`n\` from ${N} down to ${trace[count]} in ${count} passes, so the answer is ${count}.`,
+      idea: 'A loop that halves `n` runs about $\\log_2 n$ times, so it is $O(\\log n)$: doubling $n$ adds only one pass. For the exact count, list the values and test the stopping condition.',
     };
   }
   if (kind === 'double') {
@@ -157,12 +179,15 @@ function loopCase(rng: Rng): LoopCase {
         { v: count - 1, why: 'This misses the last pass: count every time the loop body runs, including the one that takes `i` past the limit.' },
       ],
       infiniteWhy: `\`i\` doubles on every pass, so it passes ${N} and \`${cond}\` fails.`,
-      steps:
-        'Each pass doubles `i`. The values of `i` are:\n\n' +
-        `${m(vals.map((v) => texBig(v)).join(' \\to '))}\n\n` +
-        `- After ${count} passes \`i\` is ${i}, so \`${cond}\` is false and the loop stops.\n` +
-        `- So \`count\` is ${count}. A loop that doubles up to $n$ runs about $\\log_2 n$ times: $O(\\log n)$.`,
-      idea: 'A loop that doubles a variable up to $n$ runs about $\\log_2 n$ times: $O(\\log n)$.',
+      asking: 'How many times is `i` doubled before the loop stops?',
+      steps: steps(
+        `The loop on line 3 keeps going while \`${cond}\`. Line 4 doubles \`i\`, and line 5 adds 1 to \`count\`, so \`count\` is the number of passes.`,
+        'Here is each pass up to the last one:',
+        table(['Pass', '`i` at the start', '`i` after line 4', '`count`'], vals.slice(0, count - 1).map((v, x) => [x + 1, v, vals[x + 1], x + 1])),
+        `On the next pass \`i\` starts at ${vals[count - 1]} and line 4 makes it ${i}, so \`count\` becomes ${count}. Now \`${le ? `${i} <= ${N}` : `${i} < ${N}`}\` is false, so the loop stops and line 7 prints ${count}.`,
+      ),
+      conclusion: `After ${count} doublings \`i\` is ${i}, which fails the test \`${cond}\`, so the answer is ${count}.`,
+      idea: 'A loop that doubles a variable up to $n$ runs about $\\log_2 n$ times, so it is $O(\\log n)$. For the exact count, list the powers of 2, and see whether the test is `<` or `<=`.',
     };
   }
   // outer loop of A passes, each running a halving loop on N
@@ -180,11 +205,15 @@ function loopCase(rng: Rng): LoopCase {
       { v: h, why: `This is one run of the inner loop. The outer loop repeats it ${A} times, because \`n\` is reset to ${N} each time.` },
       { v: A * (h + 1), why: 'This counts one extra inner pass each time, as if the condition were `n > 0`.' },
     ],
-    steps:
-      `- Inner loop: \`n\` goes ${m(trace.map((v) => texBig(v)).join(' \\to '))}, which is ${h} passes (then \`n > 1\` is false).\n` +
-      `- \`n\` is reset to ${N} at the start of every outer pass, so the inner loop does ${h} passes every time.\n` +
-      `- Outer loop: \`for k = 1 to ${A}\` runs ${A} times. Nested loops multiply: ${m(`${A} \\times ${h} = ${count}`)}.`,
-    idea: 'A halving loop inside an outer loop: multiply the outer count by the number of halvings (about $\\log_2 n$).',
+    asking: 'How many times does the line `count = count + 1` run in total?',
+    steps: steps(
+      '`count` goes up by 1 each time line 6 runs, so we need to know how many times line 6 runs.',
+      `Line 5 halves \`n\`, because \`div\` divides by 2 and drops any remainder. Starting at ${N}, \`n\` goes ${m(trace.map((v) => texBig(v)).join(' \\to '))}. That is ${h} halvings, and then \`n > 1\` is false.`,
+      `Line 3 sets \`n\` back to ${N} at the start of every outer pass. So the inner loop makes those same ${h} runs every time.`,
+      `\`for k = 1 to ${A}\` makes ${A} outer passes. One loop is inside the other, so the counts multiply: ${m(`${A} \\times ${h} = ${count}`)}. Line 9 prints this value.`,
+    ),
+    conclusion: `${A} outer passes with ${h} halvings each make ${count} runs of line 6, so the answer is ${count}.`,
+    idea: 'For a halving loop inside an outer loop, count the halvings, then multiply by the outer passes. With $n$ outer passes and about $\\log_2 n$ halvings, that is $O(n\\log n)$.',
   };
 }
 
@@ -194,16 +223,26 @@ interface TermType {
   tex: string;
   big: string;
   rank: number;
+  /** The term's value, with no coefficient, at a given n. */
+  at: (n: number) => number;
 }
 const TERM_TYPES: TermType[] = [
-  { key: 'log', tex: '\\log_2 n', big: '\\log n', rank: 1 },
-  { key: 'sqrt', tex: '\\sqrt{n}', big: '\\sqrt{n}', rank: 2 },
-  { key: 'n', tex: 'n', big: 'n', rank: 3 },
-  { key: 'nlog', tex: 'n\\log_2 n', big: 'n\\log n', rank: 4 },
-  { key: 'n2', tex: 'n^2', big: 'n^2', rank: 5 },
-  { key: 'n3', tex: 'n^3', big: 'n^3', rank: 6 },
-  { key: 'exp', tex: '2^n', big: '2^n', rank: 7 },
+  { key: 'log', tex: '\\log_2 n', big: '\\log n', rank: 1, at: (n) => Math.log2(n) },
+  { key: 'sqrt', tex: '\\sqrt{n}', big: '\\sqrt{n}', rank: 2, at: (n) => Math.sqrt(n) },
+  { key: 'n', tex: 'n', big: 'n', rank: 3, at: (n) => n },
+  { key: 'nlog', tex: 'n\\log_2 n', big: 'n\\log n', rank: 4, at: (n) => n * Math.log2(n) },
+  { key: 'n2', tex: 'n^2', big: 'n^2', rank: 5, at: (n) => n ** 2 },
+  { key: 'n3', tex: 'n^3', big: 'n^3', rank: 6, at: (n) => n ** 3 },
+  { key: 'exp', tex: '2^n', big: '2^n', rank: 7, at: (n) => 2 ** n },
 ];
+/** A convenient large n: its square root and its log are whole numbers. */
+const TRY_N = 64;
+/** A term's value for the table: exact while it is readable, otherwise rounded. */
+function growthValue(x: number): string {
+  if (x < 1e9) return commas(x);
+  const [mantissa, power] = x.toExponential(1).split('e');
+  return `about ${m(`${mantissa} \\times 10^{${Number(power)}}`)}`;
+}
 const LADDER = '1 < \\log n < \\sqrt{n} < n < n\\log n < n^2 < n^3 < 2^n';
 
 function termTex(c: number, t: TermType): string {
@@ -234,7 +273,9 @@ export const generators: Generator[] = [
         answer,
         answerValue: c.count,
         distractors,
-        solution: `${c.steps}\n\nThe code prints the final value of \`count\`.\n\nAnswer: ${answer}`,
+        asking: c.asking,
+        solution: c.steps,
+        conclusion: c.conclusion,
         keyIdea: c.idea,
       };
     },
@@ -253,7 +294,9 @@ export const generators: Generator[] = [
       let stem: string;
       let ans: number;
       let pool: NumCand[];
-      let steps: string;
+      let working: string;
+      let asking: string;
+      let conclusion: string;
       let idea: string;
       if (kind === 'log') {
         const a = rng.pick([5, 8, 10]);
@@ -270,12 +313,16 @@ export const generators: Generator[] = [
           { v: t + (b - a), why: `This adds the increase in $\\log_2 n$ (${m(`${b} - ${a} = ${b - a}`)}) to the time instead of multiplying the time by ${m(`\\frac{${b}}{${a}}`)}.` },
           { v: t * (j - 1), why: 'This works out only the **extra** time and forgets to add the original time.' },
         ];
-        steps =
-          `- Time is proportional to $\\log_2 n$.\n` +
-          `- ${m(`\\log_2 ${texBig(n0)} = ${a}`)} because ${m(`2^{${a}} = ${texBig(n0)}`)}, and ${m(`\\log_2 ${texBig(n1)} = ${b}`)} because ${m(`2^{${b}} = ${texBig(n1)}`)}.\n` +
-          `- The time is multiplied by ${m(`\\frac{${b}}{${a}} = ${j}`)}.\n` +
-          `- New time ${m(`= ${t} \\times ${j} = ${ans}`)} ${unit}.`;
-        idea = 'For $O(\\log n)$, multiplying $n$ by a huge factor only adds a little to $\\log_2 n$, so the time grows very slowly.';
+        asking = `About how long does it take once ${m(`n = ${texBig(n1)}`)}?`;
+        working = steps(
+          '$\\log_2 n$ asks how many times you must double, starting from 1, to reach $n$. For example, $\\log_2 8 = 3$, because $2^3 = 8$.',
+          'The running time grows in proportion to $\\log_2 n$, so work out that value for both sizes.',
+          `${m(`\\log_2 ${texBig(n0)} = ${a}`)} because ${m(`2^{${a}} = ${texBig(n0)}`)}, and ${m(`\\log_2 ${texBig(n1)} = ${b}`)} because ${m(`2^{${b}} = ${texBig(n1)}`)}.`,
+          `So the number of steps is multiplied by ${m(`\\frac{${b}}{${a}} = ${j}`)}.`,
+          `The time grows by the same factor: ${m(`${t} \\times ${j} = ${ans}`)} ${unit}.`,
+        );
+        conclusion = `${m(`\\log_2 n`)} goes from ${a} to ${b}, which is ${j} times as big, so the time is ${fmtT(ans)}.`;
+        idea = 'For $O(\\log n)$, work out $\\log_2$ of both sizes, then multiply the old time by new log divided by old log. Even a huge jump in $n$ only adds a little to $\\log_2 n$.';
       } else if (kind === 'exp') {
         const n0 = rng.pick([20, 25, 30, 40]);
         const d = rng.int(2, 5);
@@ -290,12 +337,15 @@ export const generators: Generator[] = [
           { v: t + d, why: `This adds ${d} to the time, as if each extra 1 in $n$ added one ${unit.slice(0, -1)}.` },
           { v: t * 2 ** (d + 1), why: 'This doubles the time one time too many: $n$ goes up by exactly the difference between the two sizes.' },
         ];
-        steps =
-          `- Time is proportional to $2^n$, so every increase of 1 in $n$ doubles the time.\n` +
-          `- $n$ goes from ${n0} to ${n1}, an increase of ${d}.\n` +
-          `- The time is multiplied by ${m(`2^{${d}} = ${f}`)}.\n` +
-          `- New time ${m(`= ${t} \\times ${f} = ${ans}`)} ${unit}.`;
-        idea = 'For $O(2^n)$, each increase of 1 in $n$ doubles the running time.';
+        asking = `About how long does it take once ${m(`n = ${n1}`)}?`;
+        working = steps(
+          '$2^n$ means 2 multiplied by itself $n$ times. Adding 1 to $n$ adds one more $\\times 2$, so each extra 1 doubles the number of steps.',
+          `$n$ goes from ${n0} to ${n1}, an increase of ${d}. So the steps double ${d} times.`,
+          `Doubling ${d} times multiplies the steps by ${m(`2^{${d}} = ${f}`)}.`,
+          `The time grows by the same factor: ${m(`${t} \\times ${f} = ${ans}`)} ${unit}.`,
+        );
+        conclusion = `Adding ${d} to $n$ doubles the time ${d} times, so ${fmtT(t)} becomes ${fmtT(ans)}.`;
+        idea = 'For $O(2^n)$, each increase of 1 in $n$ doubles the time, so adding $d$ to $n$ multiplies the time by $2^d$. Look at the difference between the two sizes, not their ratio.';
       } else {
         const p = kind === 'n' ? 1 : kind === 'n2' ? 2 : 3;
         const n0 = rng.pick([500, 1000, 2000, 5000, 10000]);
@@ -317,12 +367,25 @@ export const generators: Generator[] = [
         if (p > 1) pool.push({ v: t ** p, why: `This raises the **time** to the power ${p} (${m(`${t}^${p}`)}) instead of the scale factor of $n$, which is ${k}.` });
         pool.push({ v: t + f, why: `This adds the factor ${f} to the time instead of multiplying the time by it.` });
         pool.push({ v: t * 2 ** k, why: `This multiplies by ${m(`2^{${k}}`)}, treating the algorithm as exponential.` });
-        steps =
-          `- Time is proportional to ${m(bigO)}.\n` +
-          `- Scale factor for $n$: ${m(`\\frac{${texBig(n1)}}{${texBig(n0)}} = ${k}`)}.\n` +
-          (p === 1 ? `- So the time is also multiplied by ${k}.\n` : `- So the time is multiplied by ${m(`${k}^${p} = ${f}`)}.\n`) +
-          `- New time ${m(`= ${t} \\times ${f} = ${texBig(ans)}`)} ${unit}.`;
-        idea = 'For $O(n^p)$, multiplying $n$ by $k$ multiplies the running time by $k^p$.';
+        const meaning =
+          p === 1
+            ? '$O(n)$ means the steps grow in step with $n$, as in one loop over the items.'
+            : p === 2
+              ? '$O(n^2)$ means about $n \\times n$ steps, as in a loop inside a loop.'
+              : '$O(n^3)$ means about $n \\times n \\times n$ steps, as in three loops nested together.';
+        const growth =
+          p === 1
+            ? `There is one $n$ in the count, so the steps are also multiplied by ${k}.`
+            : `Each $n$ in that product becomes ${k} times bigger, so the steps are multiplied by ${m(`${Array(p).fill(k).join(' \\times ')} = ${f}`)}.`;
+        asking = `About how long does it take once ${m(`n = ${texBig(n1)}`)}?`;
+        working = steps(
+          meaning,
+          `Find how many times bigger $n$ gets: ${m(`\\frac{${texBig(n1)}}{${texBig(n0)}} = ${k}`)}.`,
+          growth,
+          `The time grows by the same factor: ${m(`${t} \\times ${f} = ${texBig(ans)}`)} ${unit}.`,
+        );
+        conclusion = `Making $n$ ${k} times bigger multiplies the work by ${commas(f)}, so ${fmtT(t)} becomes ${fmtT(ans)}.`;
+        idea = 'For time proportional to $n^p$, find $k$, the new size divided by the old size. Then multiply the old time by $k^p$. So $O(n)$ multiplies by $k$, and $O(n^2)$ by $k^2$.';
       }
       const ds = pickNums(ans, pool, [
         { v: ans * 2, why: 'This is double the correct estimate, as if the time were doubled once more at the end. Multiply the original time by the scale factor once only.' },
@@ -334,7 +397,9 @@ export const generators: Generator[] = [
         answer,
         answerValue: ans,
         distractors: ds.map((d) => ({ text: fmtT(d.v), value: d.v, why: d.why })),
-        solution: `${steps}\n\nAnswer: ${answer}`,
+        asking,
+        solution: working,
+        conclusion,
         keyIdea: idea,
       };
     },
@@ -377,22 +442,28 @@ export const generators: Generator[] = [
           why: `This picks the constant ${c0}, the biggest number in the formula. A constant does not grow with $n$ at all, so for large $n$ it becomes negligible.`,
         },
       ];
-      const solution =
-        `Big-O keeps only the fastest-growing term and drops its coefficient.\n\n` +
-        `1. The terms are ${order.map((t) => m(termTex(coefs.get(t.key)!, t))).join(', ')} and the constant ${m(String(c0))}.\n` +
-        `2. Ignore the coefficients and compare the growth rates using the ladder ${m(LADDER)}.\n` +
-        `3. The highest on the ladder is ${m(dom.tex)}, so the dominant term is ${m(domT)}, even though other terms have bigger coefficients.\n` +
-        (coefs.get(dom.key) === 1
-          ? `4. This term has no coefficient to drop, so ${m(`T(n) = O(${dom.big})`)}.\n\n`
-          : `4. Drop the coefficient ${coefs.get(dom.key)}: ${m(`T(n) = O(${dom.big})`)}.\n\n`) +
-        `Answer: ${answer}`;
+      const domCoef = coefs.get(dom.key)!;
+      const solution = steps(
+        '$T(n)$ counts the steps for an input of size $n$. Big-O asks how that count grows as $n$ gets very large, so only the fastest-growing part matters.',
+        `The parts of this formula are ${order.map((t) => m(termTex(coefs.get(t.key)!, t))).join(', ')} and the constant ${c0}. A constant never changes with $n$, so it gets left behind.`,
+        `To compare the other parts, cover up the numbers in front of them and try a large value, ${m(`n = ${TRY_N}`)}:`,
+        table(['Part', `Value at ${m(`n = ${TRY_N}`)}`], types.map((t) => [m(t.tex), growthValue(t.at(TRY_N))])),
+        types.some((t) => t.key === 'log' || t.key === 'nlog') &&
+          `$\\log_2 n$ asks how many times you must double, starting from 1, to reach $n$. At ${m(`n = ${TRY_N}`)} that is ${Math.log2(TRY_N)}, because ${m(`2^{${Math.log2(TRY_N)}} = ${TRY_N}`)}.${types.some((t) => t.key === 'nlog') ? ` So $n\\log_2 n$ is ${m(`${TRY_N} \\times ${Math.log2(TRY_N)} = ${TRY_N * Math.log2(TRY_N)}`)}.` : ''}`,
+        `Why cover up the numbers in front? They only multiply by a fixed amount. Even with ${coefs.get(bigCoefTerm.key)} in front, ${m(bigCoefTerm.tex)} is left behind by ${m(dom.tex)} once $n$ is big enough.`,
+        domCoef === 1
+          ? `The fastest-growing part is ${m(domT)}, and it has no number in front to drop. So the Big-O is ${answer}.`
+          : `The fastest-growing part is ${m(domT)}. Big-O drops the ${domCoef} in front of it, which leaves ${answer}.`,
+      );
       return {
         stem: `An algorithm performs ${m(`T(n) = ${expr}`)} steps on an input of size $n$. What is the simplest, tightest Big-O description of $T(n)$?`,
         answer,
         answerValue: dom.key,
         distractors,
+        asking: 'Which part of this step-count formula grows fastest as $n$ gets huge, and what Big-O does that give?',
         solution,
-        keyIdea: 'The term highest on the growth ladder dominates for large $n$, whatever the coefficients; drop the coefficient to get the Big-O.',
+        conclusion: `For large $n$ the part ${m(domT)} outgrows everything else, so the answer is ${answer}.`,
+        keyIdea: `Big-O keeps the part highest on this ladder and drops the number in front of it: ${m(LADDER)}. Big numbers in front do not change a part's place on the ladder.`,
       };
     },
   },

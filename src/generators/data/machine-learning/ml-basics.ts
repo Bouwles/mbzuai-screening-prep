@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m } from '../../../lib/tex';
 
@@ -85,36 +86,37 @@ function whyNot(wrong: TaskType, t: Task): string {
 }
 
 function taskSolution(t: Task): string {
-  // Numbered steps are joined with single newlines so they render as ONE list (1, 2, 3);
-  // a blank line between items would start a new list and every item would show "1.".
-  const steps: string[] = [];
-  let conclusion: string;
+  const noRewards = 'First look for actions and rewards. Does the system try things and get rewards or penalties for the results? Here it does not: it learns from a set of data.';
+  const labels = 'Next look for **labels**, which are correct answers attached to the examples.';
   if (t.type === 'rl') {
-    steps.push(
-      '1. **Is there an agent taking actions and receiving rewards or penalties?** Yes: the system tries actions and is rewarded or penalised for the results. Nobody gives it labelled correct answers.',
+    return steps(
+      'First look for actions and rewards. Does the system try things and get rewards or penalties for the results? Here it does, and nobody gives it the correct answers.',
+      'Learning by trial and error from rewards is called **reinforcement learning**.',
     );
-    conclusion = 'That is enough: learning by trial and error from rewards is **reinforcement learning**.';
-  } else {
-    steps.push('1. **Is there an agent taking actions and receiving rewards?** No: the system learns from a dataset, not from rewards for actions.');
-    if (t.type === 'clu') {
-      steps.push(
-        '2. **Does the data come with labels (correct answers)?** No: there are no labels and no groups chosen in advance. The system must find groups of similar items itself.',
-      );
-      conclusion = 'Finding groups in unlabelled data is **clustering**, a type of **unsupervised** learning.';
-    } else {
-      steps.push('2. **Does the data come with labels (correct answers)?** Yes: the past examples include the correct output, so this is **supervised** learning.');
-      steps.push(
-        t.type === 'reg'
-          ? `3. **Is the output a category or a continuous number?** The output is ${t.out}, a number on a continuous scale.`
-          : `3. **Is the output a category or a continuous number?** The output is ${t.out}.`,
-      );
-      conclusion =
-        t.type === 'reg'
-          ? 'Supervised learning that predicts a continuous number is **regression**.'
-          : 'Supervised learning that predicts a category from a fixed set is **classification**.';
-    }
   }
-  return `Ask these questions in order, stopping as soon as you have the answer.\n\n${steps.join('\n')}\n\n${conclusion}\n\nAnswer: ${TYPE_NAME[t.type]}`;
+  if (t.type === 'clu') {
+    return steps(
+      noRewards,
+      `${labels} Here there are none, and no groups are chosen in advance.`,
+      'So the system must find groups of similar items by itself. Finding groups in data with no labels is called **clustering**, a type of **unsupervised learning**.',
+    );
+  }
+  return steps(
+    noRewards,
+    `${labels} Here the past examples come with the correct output, so this is **supervised learning**.`,
+    t.type === 'reg'
+      ? `Now look at the output: ${t.out}. That is a number on a scale, where any value in a range is possible.`
+      : `Now look at the output: ${t.out}. That is a choice from a fixed list, not a number on a scale.`,
+    t.type === 'reg'
+      ? 'Supervised learning that predicts a number on a scale is called **regression**.'
+      : 'Supervised learning that picks a category from a fixed list is called **classification**.',
+  );
+}
+
+function taskConclusion(t: Task): string {
+  if (t.type === 'rl') return `The system learns from rewards for its actions, so the answer is ${TYPE_NAME.rl}.`;
+  if (t.type === 'clu') return `There are no labels and the groups come from the data itself, so the answer is ${TYPE_NAME.clu}.`;
+  return `The examples have labels and the output is ${t.out}, so the answer is ${TYPE_NAME[t.type]}.`;
 }
 
 // ---------------------------------------------------------------- approval-rate gap (fairness)
@@ -199,8 +201,10 @@ export const generators: Generator[] = [
         answer: TYPE_NAME[t.type],
         answerValue: t.type,
         distractors: others.map((o) => ({ text: TYPE_NAME[o], value: o, why: whyNot(o, t) })),
+        asking: 'Which type of machine learning matches what this system learns from and what it outputs?',
         solution: taskSolution(t),
-        keyIdea: 'Actions and rewards: reinforcement learning. No labels: clustering. Labels with a category output: classification. Labels with a number output: regression.',
+        conclusion: taskConclusion(t),
+        keyIdea: 'Ask in order. Actions and rewards: reinforcement learning. No labels, only finding groups: clustering. Labels with a number output: regression. Labels with a category output: classification.',
       };
     },
   },
@@ -275,14 +279,15 @@ export const generators: Generator[] = [
           answer: pp(gap),
           answerValue: gap,
           distractors: ds.map((d) => ({ text: pp(d.v), value: d.v, why: d.why })),
-          solution:
-            `The groups are different sizes, so compare **rates** (the number ${ctx.verbed} divided by that group's own number of applicants), not counts.\n\n` +
-            `- ${gA}: ${fracLine(aA, nA, rA)}\n` +
-            `- ${gB}: ${fracLine(aB, nB, rB)}\n\n` +
-            `Difference: ${m(`${Math.max(rA, rB)}\\% - ${Math.min(rA, rB)}\\% = ${gap}`)} percentage points: the ${ctx.rateWord} for ${hi} is higher than for ${lo}.\n\n` +
-            `A large gap like this is a warning sign that the model may be treating the groups unfairly (comparing rates like this is called checking **demographic parity**).\n\n` +
-            `Answer: ${pp(gap)}`,
-          keyIdea: 'To compare groups of different sizes fairly, turn each count into a rate using that group\'s own total, then subtract the rates.',
+          asking: `What is the gap between the two groups' ${ctx.rateWord}s?`,
+          solution: steps(
+            `The groups have different sizes (${nA} and ${nB}), so comparing counts wouldn't be fair. We compare each group's **${ctx.rateWord}**: the number ${ctx.verbed} divided by that group's own number of applicants.`,
+            `${gA}: ${fracLine(aA, nA, rA)}.`,
+            `${gB}: ${fracLine(aB, nB, rB)}.`,
+            `**Percentage points** are the plain gap between two percentages, so subtract the smaller from the larger: ${m(`${Math.max(rA, rB)} - ${Math.min(rA, rB)} = ${gap}`)}.`,
+          ),
+          conclusion: `The rates are ${m(`${Math.max(rA, rB)}\\%`)} for ${hi} and ${m(`${Math.min(rA, rB)}\\%`)} for ${lo}, a gap of ${pp(gap)}.`,
+          keyIdea: 'To compare groups of different sizes, turn each count into a rate using that group\'s own total, then subtract the rates. A percentage-point gap is a plain subtraction, not a ratio. This fairness check is called demographic parity.',
         };
       }
     },
@@ -327,20 +332,22 @@ export const generators: Generator[] = [
       const ds = pickNum(answer, pool);
       while (ds.length < 3) ds.push({ v: answer * 2 + ds.length, why: 'This doubles the count, as if every value were stored twice; each value is one feature.' });
 
-      const calc = colour
-        ? `${m(`${W} \\times ${H} = ${pixels}`)} pixels, and each pixel has 3 values, so ${m(`${pixels} \\times 3 = ${answer}`)} features.`
-        : `${m(`${W} \\times ${H} = ${pixels}`)} pixels, and each pixel has 1 value, so there are ${m(String(answer))} features.`;
       return {
         stem: `A model reads labelled ${W} by ${H} pixel ${kind}. Every stored pixel value is one input feature. How many **input features** does each image give the model?`,
         answer: m(String(answer)),
         answerValue: answer,
         distractors: ds.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
-        solution:
-          `The image is a grid with ${W} pixels across and ${H} pixels down.\n\n` +
-          `${calc}\n\n` +
-          'The label is **not** a feature: it is the answer the model learns to predict.\n\n' +
-          `Answer: ${m(String(answer))}`,
-        keyIdea: 'Image features = width times height times values per pixel (1 for grayscale, 3 for colour); the label is never an input.',
+        asking: 'How many stored values does one image give the model as inputs?',
+        solution: steps(
+          `An image is a grid of tiny squares called **pixels**. This one is ${W} pixels across and ${H} pixels down.`,
+          colour
+            ? 'A **colour** pixel stores 3 values: one each for red, green and blue.'
+            : 'A **grayscale** pixel stores just 1 value: its brightness.',
+          'The images are labelled, but a label is not an input. It is the answer the model learns to predict, so only the pixel values count.',
+          `The grid has ${m(`${W} \\times ${H} = ${pixels}`)} pixels. Every stored value is one feature, so multiply by the values per pixel: ${m(`${pixels} \\times ${c} = ${answer}`)}.`,
+        ),
+        conclusion: `${pixels} pixels with ${c} value${c === 1 ? '' : 's'} each gives ${m(String(answer))} input features.`,
+        keyIdea: 'Features in an image $=$ width $\\times$ height $\\times$ values per pixel, with 1 value for grayscale and 3 for colour. Multiply the sides, never add them. The label is never an input.',
       };
     },
   },

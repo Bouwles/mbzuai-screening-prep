@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { approxEqual, sumOf } from '../../../lib/mathx';
 import { m, num, paren, sqrtTex, sum } from '../../../lib/tex';
@@ -98,33 +99,40 @@ export const generators: Generator[] = [
         const distractors = pickDistractors(answerValue, answer, pool);
         if (distractors.length < 3) continue;
 
-        const rows = data.map((x, i) => `| ${m(String(x))} | ${m(String(devs[i]))} | ${m(String(devs[i] * devs[i]))} |`).join('\n');
         const nonZeroSquares = devs.map((d) => d * d).filter((s) => s > 0);
-        const rootStep =
+        const hasZero = nonZeroSquares.length < n;
+        const solution = steps(
           kind === 'variance'
-            ? ''
-            : isInt(sigma)
-              ? `**Step 5: standard deviation.** ${m(`\\sigma = \\sqrt{${num(V)}} = ${num(sigma)}`)}.\n\n`
-              : `**Step 5: standard deviation.** ${m(`\\sigma = \\sqrt{${num(V)}} \\approx ${dp2(sigma)}`)} (2 d.p.).\n\n`;
-        const solution =
-          `**Step 1: mean.** ${m(`\\bar{x} = \\frac{${data.join(' + ')}}{${n}} = \\frac{${sumOf(data)}}{${n}} = ${mu}`)}.\n\n` +
-          `**Step 2: deviations and their squares.**\n\n` +
-          `| ${m('x')} | ${m('x - \\bar{x}')} | ${m('(x - \\bar{x})^2')} |\n| --- | --- | --- |\n${rows}\n\n` +
-          `**Step 3: add the squared deviations.** ${m(`\\sum (x - \\bar{x})^2 = ${nonZeroSquares.length > 1 ? `${nonZeroSquares.join(' + ')} = ` : ''}${ss}`)}.\n\n` +
-          `**Step 4: variance** (divide by ${m(`n = ${n}`)}). ${m(`\\sigma^2 = \\frac{${ss}}{${n}} = ${num(V)}`)}.\n\n` +
-          rootStep +
-          `Answer: ${answer}`;
+            ? `**Variance** measures spread. It is the average squared distance from the mean. **Population** means these values are all the data, so we divide by ${m('n')}, the number of values.`
+            : `The **standard deviation** (SD) measures how far values tend to be from the mean. **Population** means these values are all the data, so we divide by ${m('n')}, the number of values.`,
+          `Find the mean: ${m(`\\frac{${data.join(' + ')}}{${n}} = \\frac{${sumOf(data)}}{${n}} = ${mu}`)}.`,
+          `Subtract the mean from each value, then square. Squaring stops the negatives cancelling the positives:\n\n` +
+            table(
+              ['$x$', m(`x - ${mu}`), m(`(x - ${mu})^2`)],
+              data.map((x, i) => [m(String(x)), m(String(devs[i])), m(String(devs[i] * devs[i]))]),
+            ),
+          `Add the last column${hasZero ? ', where any zero adds nothing' : ''}: ${m(`${nonZeroSquares.join(' + ')} = ${ss}`)}.`,
+          kind === 'variance'
+            ? `Divide by ${m(`n = ${n}`)}: ${m(`${ss} \\div ${n} = ${num(V)}`)}.`
+            : `Divide by ${m(`n = ${n}`)} to get the **variance**, the average squared distance: ${m(`${ss} \\div ${n} = ${num(V)}`)}.`,
+          kind !== 'variance' && `The SD is the square root of the variance: ${m(`\\sqrt{${num(V)}} ${isInt(sigma) ? '=' : '\\approx'} ${dp2(sigma)}`)}.`,
+        );
 
         return {
           stem: `${ctx.intro} ${n} ${ctx.unit} are:\n\n${m(data.join(', '))}\n\nFind the **population ${kind}** of these values. Give non-integer answers to 2 decimal places.`,
           answer,
           answerValue,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking: `How spread out are these ${n} values, measured by the ${kind}?`,
           solution,
+          conclusion:
+            kind === 'variance'
+              ? `The squared distances total ${ss}, and dividing by ${n} gives the answer, ${answer}.`
+              : `The variance is ${num(V)}, and its square root gives the answer, ${answer}.`,
           keyIdea:
             kind === 'variance'
-              ? 'Population variance = (sum of squared deviations from the mean) divided by $n$.'
-              : 'Population SD = square root of (sum of squared deviations from the mean divided by $n$).',
+              ? 'Population variance: find the mean, subtract it from each value, square the results, add them, and divide by $n$. A table with one row per value keeps the working tidy.'
+              : 'Population SD: find the mean, subtract it from each value, square the results, add them, divide by $n$, then take the square root. A table with one row per value keeps the working tidy.',
         };
       }
     },
@@ -150,11 +158,17 @@ export const generators: Generator[] = [
           ? `Every value ${m('x')} is replaced by ${m(`y = ${formula}`)}.`
           : `Every value is multiplied by ${m(num(a))} and then ${b > 0 ? `${m(String(b))} is added` : `${m(String(-b))} is subtracted`}.`;
 
-        const newMean = a * mu + b;
+        // The explanation names a and b, then says what each one does to the gaps between the values.
+        const aText = isInt(a) ? `a = ${num(a)}` : `a = ${aF.tex()} = ${num(a)}`;
+        const shiftStep = (spreadName: string) =>
+          `${b > 0 ? `Adding ${b} moves every value up` : `Subtracting ${-b} moves every value down`} by the same amount. The gaps stay the same, so this part doesn't change the ${spreadName}.`;
+        const flip = a < 0 ? ' It also flips the order of the values, but that has no effect on how spread out they are.' : '';
         let stem: string;
         let answerValue: number;
         let pool: Cand[];
         let solution: string;
+        let asking: string;
+        let conclusion: string;
 
         if (kind === 'sd') {
           const sigma = rng.pick([2, 3, 4, 5, 6, 8, 10, 1.5, 2.5]);
@@ -169,12 +183,14 @@ export const generators: Generator[] = [
             { value: sigma, text: m(num(sigma)), why: `This assumes the SD is unchanged. The added constant does not change it, but multiplying by ${m(num(a))} scales every distance from the mean by ${m(num(absA))}.` },
             { value: (absA * sigma) ** 2, text: m(num((absA * sigma) ** 2)), why: `This is the new **variance** ${m(`${num(absA * sigma)}^2`)}; the question asks for the standard deviation.` },
           ];
-          solution =
-            `For ${m('y = ax + b')}: the SD is multiplied by ${m('|a|')}, and adding ${m('b')} has **no effect** on spread (it only shifts the values).\n\n` +
-            `Here ${m(`a = ${num(a)}`)} and ${m(`b = ${b}`)}, so\n\n` +
-            `$$\\sigma_y = |${num(a)}| \\times ${num(sigma)} = ${num(absA)} \\times ${num(sigma)} = ${num(answerValue)}$$\n\n` +
-            `(For comparison, the mean does change: ${m(`${paren(a)} \\times ${mu}${signed0(b, true)} = ${num(newMean)}`)}.)\n\n` +
-            `Answer: ${m(num(answerValue))}`;
+          asking = 'What is the standard deviation after every value is changed this way?';
+          solution = steps(
+            `The **standard deviation** (SD) measures spread, so ask what the change does to the gaps between values. The mean isn't needed. In the form ${m('y = ax + b')}, the change has ${m(aText)} and ${m(`b = ${b}`)}.`,
+            shiftStep('SD'),
+            `Multiplying by ${m(num(a))} makes every gap ${m(num(absA))} times as wide.${flip} So the SD is multiplied by ${m(num(absA))}.`,
+            `New SD: ${m(`${num(absA)} \\times ${num(sigma)} = ${num(answerValue)}`)}.`,
+          );
+          conclusion = `Only the multiplying changes the spread, so the SD becomes ${m(num(answerValue))}.`;
         } else {
           const V = rng.pick([4, 9, 16, 25, 36, 2, 5, 8, 10, 12, 20]);
           answerValue = a * a * V;
@@ -188,7 +204,6 @@ export const generators: Generator[] = [
               : V % 4 === 0
                 ? sqrtTex(V / 4)
                 : `\\frac{${sqrtTex(V)}}{2}`;
-          const oldSdStep = oldSdTex === `\\sqrt{${V}}` ? oldSdTex : `\\sqrt{${V}} = ${oldSdTex}`;
           stem = `A data set has mean ${m(String(mu))} and variance ${m(String(V))}. ${describe} What is the variance of the new data set?`;
           pool = [
             { signSlip: a < 0, value: a * V, text: m(num(a * V)), why: `This multiplies the variance by ${m(num(a))} instead of ${m(`${paren(a)}^2 = ${num(a * a)}`)}. The variance is in squared units, so the multiplier must be squared.` },
@@ -197,12 +212,14 @@ export const generators: Generator[] = [
             { value: V, text: m(String(V)), why: `This assumes the variance is unchanged. The added constant has no effect, but multiplying by ${m(num(a))} changes the spread.` },
             { value: a * V + b, text: m(num(a * V + b)), why: `This applies the transformation to the variance itself (${m(`${paren(a)} \\times ${V}${signed0(b, true)}`)}): the multiplier should be squared and the constant ignored.` },
           ];
-          solution =
-            `For ${m('y = ax + b')}: the variance is multiplied by ${m('a^2')}, and adding ${m('b')} has **no effect** on spread.\n\n` +
-            `Here ${m(`a = ${num(a)}`)} and ${m(`b = ${b}`)}, so\n\n` +
-            `$$\\text{Var}(y) = ${paren(a)}^2 \\times ${V} = ${num(a * a)} \\times ${V} = ${num(answerValue)}$$\n\n` +
-            `(Check with SDs: the old SD is ${m(oldSdStep)}, the new SD is ${m(`${num(absA)} \\times ${oldSdTex} = ${newSdTex}`)}, and squaring it gives ${m(num(answerValue))}.)\n\n` +
-            `Answer: ${m(num(answerValue))}`;
+          asking = 'What is the variance after every value is changed this way?';
+          solution = steps(
+            `**Variance** measures spread, so ask what the change does to the gaps between values. The mean isn't needed. In the form ${m('y = ax + b')}, the change has ${m(aText)} and ${m(`b = ${b}`)}.`,
+            shiftStep('variance'),
+            `Multiplying by ${m(num(a))} makes every gap ${m(num(absA))} times as wide.${flip} Variance uses **squared** distances, so it is multiplied by ${m(`${paren(a)}^2 = ${num(a * a)}`)}.`,
+            `New variance: ${m(`${num(a * a)} \\times ${V} = ${num(answerValue)}`)}.`,
+          );
+          conclusion = `Only the multiplying changes the spread, and it counts squared, so the variance becomes ${m(num(answerValue))}.`;
         }
 
         const answer = m(num(answerValue));
@@ -215,8 +232,10 @@ export const generators: Generator[] = [
           answer,
           answerValue,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
+          asking,
           solution,
-          keyIdea: 'For $y = ax + b$: mean becomes $a\\bar{x} + b$, SD becomes $|a|\\sigma$, variance becomes $a^2\\sigma^2$; the $+b$ never affects spread.',
+          conclusion,
+          keyIdea: 'For $y = ax + b$: new SD $= |a| \\times$ old SD, where $|a|$ is $a$ without any minus sign, and new variance $= a^2 \\times$ old variance. The $b$ only moves the values along, so it never changes the spread.',
         };
       }
     },

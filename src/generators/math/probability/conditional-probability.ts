@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m } from '../../../lib/tex';
 
@@ -27,6 +28,7 @@ function fracSteps(n: number, d: number): string {
 interface BayesCtx {
   intro: (prev: number, sens: number, fpr: number) => string;
   question: string;
+  asking: string; // the question in very simple words
   items: string; // "people"
   has: string; // "have the disease"
   hasNot: string; // "do not have the disease"
@@ -41,6 +43,7 @@ const BAYES_CTX: BayesCtx[] = [
     intro: (p, s, f) =>
       `A disease affects ${p}% of a population. A screening test is positive for ${s}% of people who have the disease, and it is also (wrongly) positive for ${f}% of people who do not have it.`,
     question: 'A randomly chosen person tests positive. What is the probability that they actually have the disease?',
+    asking: 'If a person tests positive, how likely is it that they really have the disease?',
     items: 'people',
     has: 'have the disease',
     hasNot: 'do not have the disease',
@@ -53,6 +56,7 @@ const BAYES_CTX: BayesCtx[] = [
     intro: (p, s, f) =>
       `${p}% of the emails arriving at a company are spam. A spam filter flags ${s}% of spam emails, and it also wrongly flags ${f}% of genuine emails.`,
     question: 'An email is flagged by the filter. What is the probability that it really is spam?',
+    asking: 'If an email is flagged, how likely is it that it really is spam?',
     items: 'emails',
     has: 'are spam',
     hasNot: 'are genuine',
@@ -65,6 +69,7 @@ const BAYES_CTX: BayesCtx[] = [
     intro: (p, s, f) =>
       `${p}% of the card payments at an online shop are fraudulent. A fraud-detection model raises an alert for ${s}% of fraudulent payments, and it also raises an alert for ${f}% of genuine payments.`,
     question: 'A payment triggers an alert. What is the probability that it is fraudulent?',
+    asking: 'If a payment triggers an alert, how likely is it that it really is fraudulent?',
     items: 'payments',
     has: 'are fraudulent',
     hasNot: 'are genuine',
@@ -178,13 +183,14 @@ export const generators: Generator[] = [
         answer: m(answer.tex()),
         answerValue: answer.value(),
         distractors: distractors.map((d) => ({ text: m(d.f.tex()), value: d.f.value(), why: d.why })),
-        solution:
-          `There are ${n} balls, ${k} of them ${colour}.\n\n` +
-          `- First ball ${colour}: ${m(`\\frac{${k}}{${n}}`)}\n` +
-          `- Second ball ${colour}, given the first was: ${m(`\\frac{${k - 1}}{${n - 1}}`)} (one ${colour} ball and one ball in total are gone)\n\n` +
-          `Multiply along the branch: ${m(`\\frac{${k}}{${n}} \\times \\frac{${k - 1}}{${n - 1}} = ${fracSteps(k * (k - 1), n * (n - 1))}`)}` +
-          `.\n\nAnswer: ${m(answer.tex())}`,
-        keyIdea: 'Without replacement, both the number of favourable balls and the total drop by one after each draw; multiply along the branch.',
+        asking: `How likely is it that both balls are ${colour}, when the first one isn't put back?`,
+        solution: steps(
+          `There are ${m(`${r} + ${b} = ${n}`)} balls, and ${k} of them are ${colour}. So the first ball is ${colour} with probability ${m(`\\frac{${k}}{${n}}`)}.`,
+          `**Without replacement** means the first ball stays out. If it was ${colour}, that leaves ${k - 1} ${colour} ball${k - 1 === 1 ? '' : 's'} out of ${n - 1}. So the second ball is ${colour} with probability ${m(`\\frac{${k - 1}}{${n - 1}}`)}.`,
+          `We need the first ${colour} **and** the second ${colour}, so multiply: ${m(`\\frac{${k}}{${n}} \\times \\frac{${k - 1}}{${n - 1}} = ${fracSteps(k * (k - 1), n * (n - 1))}`)}.`,
+        ),
+        conclusion: `Multiplying the chance for the first ball by the chance for the second gives the answer, ${m(answer.tex())}.`,
+        keyIdea: 'Without replacement, the top and the bottom of the fraction each drop by one after a ball of that colour is taken. Multiply the fractions along the path.',
       };
     },
   },
@@ -245,14 +251,16 @@ export const generators: Generator[] = [
         answer: m(answer.tex()),
         answerValue: answer.value(),
         distractors: distractors.map((d) => ({ text: m(d.f.tex()), value: d.f.value(), why: d.why })),
-        solution:
-          `Imagine ${N} ${ctx.items} (natural frequencies).\n\n` +
-          `- ${prev}% of ${N} ${ctx.has}: ${m(`${N} \\times ${prev / 100} = ${D}`)}. Of these, ${sens}% ${ctx.flagged}: ${m(`${D} \\times ${sens / 100} = ${TP}`)} (true positives).\n` +
-          `- The other ${m(`${N} - ${D} = ${H}`)} ${ctx.hasNot}. Of these, ${fpr}% ${ctx.flagged}: ${m(`${H} \\times ${fpr / 100} = ${FP}`)} (false positives).\n\n` +
-          `Total ${ctx.flaggedNoun}: ${m(`${TP} + ${FP} = ${allPos}`)}. Of these, ${TP} really ${ctx.has}, so\n\n` +
-          `$$P(\\text{${ctx.cond}} \\mid \\text{${ctx.ev}}) = ${fracSteps(TP, allPos)}$$\n\n` +
-          `Answer: ${m(answer.tex())}`,
-        keyIdea: 'Bayes: divide the true positives by ALL positives; when the condition is rare, even a good test gives many false positives.',
+        asking: ctx.asking,
+        solution: steps(
+          `Percentages are easier to follow as counts, so imagine ${N} ${ctx.items}. ${prev}% ${ctx.has}: ${m(`${N} \\times ${prev / 100} = ${D}`)}. The other ${m(`${N} - ${D} = ${H}`)} ${ctx.hasNot}.`,
+          `Of the ${D} that ${ctx.has}, ${sens}% ${ctx.flagged}: ${m(`${D} \\times ${sens / 100} = ${TP}`)}. These are correct results.`,
+          `Of the ${H} that ${ctx.hasNot}, ${fpr}% ${ctx.flagged} as well: ${m(`${H} \\times ${fpr / 100} = ${FP}`)}. These are **false positives**, meaning results that are wrong.`,
+          `So the total number of ${ctx.flaggedNoun} is ${m(`${TP} + ${FP} = ${allPos}`)}.`,
+          `We are looking at one of those ${allPos} ${ctx.flaggedNoun}, and ${TP} of them really ${ctx.has}. So the probability is this fraction${answer.n === TP ? '' : `, simplified by dividing top and bottom by ${TP / answer.n}`}:\n\n$$${fracSteps(TP, allPos)}$$`,
+        ),
+        conclusion: `${TP} of the ${allPos} ${ctx.flaggedNoun} really ${ctx.has}, so the answer is ${m(answer.tex())}.`,
+        keyIdea: 'For a test or filter question, imagine a round number of cases. Split them into really yes and really no, find the flagged ones in each group, then divide the true ones by all the flagged ones.',
       };
     },
   },
@@ -324,12 +332,15 @@ export const generators: Generator[] = [
           answer: m(answer.tex()),
           answerValue: answer.value(),
           distractors: distractors.map((x) => ({ text: m(x.f.tex()), value: x.f.value(), why: x.why })),
-          solution:
-            `"Given that ${ctx.pronoun === 'it' ? `the ${ctx.item}` : ctx.pronoun} ${condPh[0]}" means we only look at the "${condLabel}" ${givenCol ? 'column' : 'row'}: ${condTotal} ${ctx.plural}.\n\n` +
-            `Of these ${condTotal}, the number that ${targetPh[1]} ("${targetLabel}") is ${cell}.\n\n` +
-            `$$P = \\frac{\\text{(${condLabel}) and (${targetLabel})}}{\\text{${condLabel} total}} = ${fracSteps(cell, condTotal)}$$\n\n` +
-            `Answer: ${m(answer.tex())}`,
-          keyIdea: 'In a two-way table, the condition tells you which row or column total to divide by.',
+          asking: `Among the ${ctx.plural} that ${condPh[1]}, what fraction ${targetPh[1]}?`,
+          solution: steps(
+            `"Given that ${ctx.pronoun === 'it' ? `the ${ctx.item}` : ctx.pronoun} ${condPh[0]}" means we ignore all the other ${ctx.plural}. Only the "${condLabel}" ${givenCol ? 'column' : 'row'} matters.`,
+            `The total for "${condLabel}" is ${condTotal}. That is our whole group now, so ${condTotal} goes on the bottom.`,
+            `Inside that ${givenCol ? 'column' : 'row'}, read the "${targetLabel}" entry, which is ${cell}. These are the ${ctx.plural} we want, so ${cell} goes on top.`,
+            `Write the fraction: ${m(fracSteps(cell, condTotal))}.`,
+          ),
+          conclusion: `${cell} of the ${condTotal} ${ctx.plural} that ${condPh[1]} ${targetPh[1]}, so the answer is ${m(answer.tex())}.`,
+          keyIdea: 'In a two-way table, the "given" group decides the bottom of the fraction. Divide the cell where both conditions meet by that group\'s total, not by the grand total.',
         };
       }
     },

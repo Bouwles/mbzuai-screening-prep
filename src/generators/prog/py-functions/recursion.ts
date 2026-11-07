@@ -1,4 +1,5 @@
 import type { Generator, GeneratedCore } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { num } from '../../../lib/tex';
 
@@ -31,13 +32,6 @@ function texAffine(a: number, x: number, b: number): string {
   return `${a} \\times ${num(x)} ${b < 0 ? '-' : '+'} ${Math.abs(b)}`;
 }
 
-function traceTable(rows: [string, string, number][], fname: string): string {
-  return (
-    `| $n$ | Working | \`${fname}(n)\` |\n| --- | --- | --- |\n` +
-    rows.map(([n, w, v]) => `| ${n} | ${w} | ${num(v)} |`).join('\n')
-  );
-}
-
 /** Sum of N, N - step, N - 2 step, ... while the terms stay positive. */
 function sumDown(N: number, step: number): number {
   let t = 0;
@@ -52,7 +46,7 @@ function genStepTwo(rng: Rng, fname: string): GeneratedCore {
   const down: number[] = [];
   for (let n = N; n >= -1; n -= 2) down.push(n);
   const code = (v: number) => `\`${num(v)}\``;
-  const keyIdea = 'Every recursive call must move towards the base case; a step that can jump over it means the function never stops.';
+  const keyIdea = 'Write out the values `n` takes and check that they land exactly on the base case. If they do, add them back up from there. A step of 2 from an odd number misses `n == 0`, so those calls never end.';
   if (N % 2 === 1) {
     return {
       stem: 'What does this pseudocode print?',
@@ -64,13 +58,21 @@ function genStepTwo(rng: Rng, fname: string): GeneratedCore {
         { text: code(sumDown(N, 1)), value: sumDown(N, 1), why: 'This reads the step as 1. The code calls the function on `n - 2`.' },
         { text: code(sumDown(N, 2) - 1), value: sumDown(N, 2) - 1, why: 'This stops before adding 1. The function only stops when `n` is exactly 0, which never happens.' },
       ],
-      solution:
-        `The base case is \`n == 0\`, but each call subtracts 2. Starting from the odd number ${N}, the input goes ${down.join(', ')} and so on.\n\n` +
-        `It jumps from 1 straight to $-1$, so it never equals 0. No call ever returns and nothing is printed.\n\nAnswer: ${NEVER}`,
+      asking: `Does \`${fname}(${N})\` ever reach the case that stops the calls?`,
+      solution: steps(
+        `\`${fname}\` calls itself, which is called **recursion**. Lines 2 and 3 are the **base case**, the only way to stop. They run only when \`n\` is **exactly** 0.`,
+        `Line 5 makes each new call with \`n - 2\`. Follow \`n\` down from ${N}:`,
+        table(['Call', '`n == 0`?', 'Next call'], down.map((n) => [`\`${fname}(${n})\``, 'no', `\`${fname}(${n - 2})\``])),
+        '`n` goes from 1 straight to $-1$, jumping over 0. Taking 2 from an odd number always leaves an odd number, and 0 is even. So `n` is never 0.',
+        'So line 3 never runs and the calls go on forever. Each call is waiting for the next one, so nothing ever returns and line 8 never prints.',
+      ),
+      conclusion: `\`n\` jumps over 0, so the base case is never reached. ${NEVER}.`,
       keyIdea,
     };
   }
   const answer = sumDown(N, 2);
+  const upRows: (string | number)[][] = [[`\`${fname}(0)\``, 'base case', 0]];
+  for (let n = 2, total = 0; n <= N; total += n, n += 2) upRows.push([`\`${fname}(${n})\``, `\`${n} + ${total}\``, n + total]);
   return {
     stem: 'What does this pseudocode print?',
     code: { lang: 'pseudocode', source },
@@ -81,9 +83,14 @@ function genStepTwo(rng: Rng, fname: string): GeneratedCore {
       { text: code(sumDown(N, 1)), value: sumDown(N, 1), why: 'This reads the step as 1. The code calls the function on `n - 2`.' },
       { text: code(sumDown(N - 2, 2)), value: sumDown(N - 2, 2), why: `This is \`${fname}(${N - 2})\`: you stopped one level too early. The first call still adds ${N}.` },
     ],
-    solution:
-      `The base case is \`${fname}(0)\` = 0, and each call adds \`n\` and subtracts 2. Starting from the even number ${N}, the input goes ${down.join(', ')}, so it reaches the base case.\n\n` +
-      `Adding on the way back up: ${down.filter((x) => x > 0).join(' + ')} = ${answer}.\n\nAnswer: ${code(answer)}`,
+    asking: `What number does \`${fname}(${N})\` hand back for \`print\` to show?`,
+    solution: steps(
+      `\`${fname}\` calls itself, which is called **recursion**. Lines 2 and 3 are the **base case**: when \`n\` is exactly 0, the function returns 0 with no further call.`,
+      `Line 5 makes each new call with \`n - 2\`. Going down from ${N}, \`n\` takes the values ${down.join(', ')}. ${N} is even, so taking 2 each time lands exactly on 0 and the calls stop.`,
+      'Coming back up, each call adds its own `n` to the value it receives. Line 8 prints the value in the last row:',
+      table(['Call', 'Line 5 with numbers', 'Returns'], upRows),
+    ),
+    conclusion: `Adding $${down.filter((x) => x > 0).join(' + ')}$ on the way back up gives ${code(answer)}.`,
     keyIdea,
   };
 }
@@ -97,9 +104,19 @@ function genTrace(rng: Rng): GeneratedCore {
   let source: string;
   let N: number;
   let answer: number;
-  let table: string;
-  let intro: string;
+  let working: string;
+  let conclusion: string;
+  let keyIdea: string;
   let pool: Cand[];
+
+  /** "`f(3)`, `f(2)` and `f(1)`" */
+  const callList = (from: number, to: number) => {
+    const calls: string[] = [];
+    for (let n = from; n >= to; n--) calls.push(`\`${fname}(${n})\``);
+    return `${calls.slice(0, -1).join(', ')} and ${calls[calls.length - 1]}`;
+  };
+  const waits = `\`${fname}\` calls itself, which is called **recursion**. Line 5 cannot finish until it knows \`${fname}(n - 1)\`, so each call pauses and waits for a smaller call.`;
+  const twoStages = 'Trace recursion in two stages. Going down, list the calls until you reach the base case. Coming back up, fill a table from the base value, where each row uses the value from the row before. Keep the order of operations from the code.';
 
   if (kind === 'affine') {
     const a = rng.int(2, 3);
@@ -111,10 +128,19 @@ function genTrace(rng: Rng): GeneratedCore {
     const f = (n: number): number => (n === 0 ? c : a * f(n - 1) + b);
     answer = f(N);
     source = `function ${fname}(n)\n   if n == 0\n      return ${c}\n   end if\n   return ${codeAffine(a, `${fname}(n - 1)`, b)}\nend function\n\nprint(${fname}(${N}))`;
-    const rows: [string, string, number][] = [['0', 'base case', c]];
-    for (let n = 1; n <= N; n++) rows.push([String(n), `$${texAffine(a, f(n - 1), b)}$`, f(n)]);
-    table = traceTable(rows, fname);
-    intro = `The base case is \`${fname}(0)\` = ${c}. Every other call multiplies the previous value by ${a} and then ${b < 0 ? `subtracts ${-b}` : `adds ${b}`}. Work upwards from the base case:`;
+    const rows: (string | number)[][] = [[`\`${fname}(0)\``, 'base case', c]];
+    for (let n = 1; n <= N; n++) {
+      const got = f(n - 1);
+      rows.push([`\`${fname}(${n})\``, `$${texAffine(a, got, b)} = ${num(a * got)} ${b < 0 ? '-' : '+'} ${Math.abs(b)}$`, num(f(n))]);
+    }
+    working = steps(
+      waits,
+      `Going down, the calls are ${callList(N, 0)}. \`${fname}(0)\` is the **base case**: \`n == 0\` on line 2 is true, so line 3 returns ${c} with no further call.`,
+      `Coming back up, each call multiplies the value it receives by ${a}, then ${b < 0 ? `subtracts ${-b}` : `adds ${b}`}. Line 8 prints the value in the last row:`,
+      table(['Call', 'Line 5 with numbers', 'Returns'], rows),
+    );
+    conclusion = `Starting from \`${fname}(0)\`, which is ${c}, and using line 5 once per level gives ${code(answer)}.`;
+    keyIdea = twoStages;
     const noB = c * a ** N;
     const g = (n: number): number => (n === 0 ? c : a * (g(n - 1) + b));
     pool = [
@@ -132,10 +158,19 @@ function genTrace(rng: Rng): GeneratedCore {
     answer = f(N);
     const kn = k === 1 ? 'n' : `${k} * n`;
     source = `function ${fname}(n)\n   if n == 1\n      return ${c}\n   end if\n   return ${fname}(n - 1) + ${kn}\nend function\n\nprint(${fname}(${N}))`;
-    const rows: [string, string, number][] = [['1', 'base case', c]];
-    for (let n = 2; n <= N; n++) rows.push([String(n), k === 1 ? `$${f(n - 1)} + ${n}$` : `$${f(n - 1)} + ${k} \\times ${n}$`, f(n)]);
-    table = traceTable(rows, fname);
-    intro = `The base case is \`${fname}(1)\` = ${c}. Every other call adds ${k === 1 ? '`n`' : `${k} times \`n\``} to the previous value. Work upwards from the base case:`;
+    const rows: (string | number)[][] = [[`\`${fname}(1)\``, 'base case', c]];
+    for (let n = 2; n <= N; n++) {
+      const got = f(n - 1);
+      rows.push([`\`${fname}(${n})\``, k === 1 ? `$${got} + ${n}$` : `$${got} + ${k} \\times ${n} = ${got} + ${k * n}$`, f(n)]);
+    }
+    working = steps(
+      waits,
+      `Going down, the calls are ${callList(N, 1)}. \`${fname}(1)\` is the **base case**: \`n == 1\` on line 2 is true, so line 3 returns ${c} with no further call.`,
+      `Coming back up, each call adds ${k === 1 ? 'its own `n`' : `${k} times its own \`n\``} to the value it receives. Line 8 prints the value in the last row:`,
+      table(['Call', 'Line 5 with numbers', 'Returns'], rows),
+    );
+    conclusion = `Starting from \`${fname}(1)\`, which is ${c}, and adding on each level gives ${code(answer)}.`;
+    keyIdea = twoStages;
     const useN1 = (n: number): number => (n === 1 ? c : useN1(n - 1) + k * (n - 1));
     pool = [
       { value: f(N - 1), why: `This is \`${fname}(${N - 1})\`: you stopped one level too early. The first call \`${fname}(${N})\` still adds ${k * N}.` },
@@ -156,13 +191,19 @@ function genTrace(rng: Rng): GeneratedCore {
     const f = mk(p, q);
     answer = f(N);
     source = `function ${fname}(n)\n   if n == 0\n      return ${p}\n   end if\n   if n == 1\n      return ${q}\n   end if\n   return ${fname}(n - 1) + ${fname}(n - 2)\nend function\n\nprint(${fname}(${N}))`;
-    const rows: [string, string, number][] = [
-      ['0', 'base case', p],
-      ['1', 'base case', q],
+    const rows: (string | number)[][] = [
+      [0, 'base case', p],
+      [1, 'base case', q],
     ];
-    for (let n = 2; n <= N; n++) rows.push([String(n), `$${f(n - 1)} + ${f(n - 2)}$`, f(n)]);
-    table = traceTable(rows, fname);
-    intro = `There are two base cases: \`${fname}(0)\` = ${p} and \`${fname}(1)\` = ${q}. Every other value is the sum of the previous two. Build a table upwards instead of drawing the whole call tree:`;
+    for (let n = 2; n <= N; n++) rows.push([n, `$${f(n - 1)} + ${f(n - 2)}$`, f(n)]);
+    working = steps(
+      `\`${fname}\` calls itself, which is called **recursion**. Lines 2 to 7 are the **base cases**: \`${fname}(0)\` returns ${p} and \`${fname}(1)\` returns ${q}, with no further calls.`,
+      'For larger `n`, line 8 adds the two previous values. Each call makes two more calls, so drawing them all takes a long time. A table built upwards is quicker, because each row only needs the two rows before it.',
+      'Fill in the table. Line 11 prints the value in the last row:',
+      table(['`n`', 'Line 8 with numbers', `\`${fname}(n)\``], rows),
+    );
+    conclusion = `\`${fname}(${N})\` adds \`${fname}(${N - 1})\` and \`${fname}(${N - 2})\`, which is $${f(N - 1)} + ${f(N - 2)}$, so the answer is ${code(answer)}.`;
+    keyIdea = 'When a function makes two calls, on `n - 1` and `n - 2`, skip the call tree. Write the base values, then fill a table upwards, each row adding the previous two. Stop at the input you were asked for.';
     pool = [
       { value: f(N - 1), why: `This is \`${fname}(${N - 1})\`: you stopped one row too early in the table.` },
       { value: mk(q, p)(N), why: `This swaps the two base cases (using ${q} for $n = 0$ and ${p} for $n = 1$). Read the base cases carefully.` },
@@ -183,8 +224,10 @@ function genTrace(rng: Rng): GeneratedCore {
     answer: ans,
     answerValue: answer,
     distractors: ds.map((d) => ({ text: code(d.value), value: d.value, why: d.why })),
-    solution: `${intro}\n\n${table}\n\nSo \`${fname}(${N})\` returns ${num(answer)}, and that is printed.\n\nAnswer: ${ans}`,
-    keyIdea: 'To trace a recursive function, start from the base case and apply the recursive rule once per level, keeping a table of values.',
+    asking: `What number does \`${fname}(${N})\` hand back for \`print\` to show?`,
+    solution: working,
+    conclusion,
+    keyIdea,
   };
 }
 

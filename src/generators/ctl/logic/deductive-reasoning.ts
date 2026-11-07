@@ -1,5 +1,6 @@
 import type { Generator, GeneratedCore } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 
 // ---------------------------------------------------------------- shared contexts for if-then generators
 // Each clause has a positive and a negative wording, both usable after "If ..." / "then ...".
@@ -110,27 +111,44 @@ function genForms(rng: Rng): GeneratedCore {
     .map((f) => ({ text: text[f], value: f, why: whyFor(f) }));
   const answer = text[target];
 
-  const solution =
-    `Write the rule as "If $P$, then $Q$" with\n\n` +
-    `- $P$: ${A}\n` +
-    `- $Q$: ${B}\n\n` +
-    `The negation of $P$ is "${notA}" and the negation of $Q$ is "${notB}". The related statements are:\n\n` +
-    `| Name | Form | Truth value |\n| --- | --- | --- |\n` +
-    `| Converse | If $Q$ then $P$ | can differ from the rule |\n` +
-    `| Inverse | If not $P$ then not $Q$ | can differ from the rule |\n` +
-    `| Contrapositive | If not $Q$ then not $P$ | always the same as the rule |\n\n` +
-    (ask === 'equivalent'
-      ? `Only the **contrapositive** is always equivalent to the original: if $Q$ fails, $P$ cannot have happened, because $P$ would have forced $Q$.\n\n`
-      : `We need the **${ask}**, so we use the form "${ask === 'converse' ? 'If $Q$ then $P$' : ask === 'inverse' ? 'If not $P$ then not $Q$' : 'If not $Q$ then not $P$'}".\n\n`) +
-    `Answer: ${answer}`;
+  const formOf: Record<Exclude<Form, 'negation'>, string> = {
+    converse: 'If $Q$ then $P$',
+    inverse: 'If not $P$ then not $Q$',
+    contrapositive: 'If not $Q$ then not $P$',
+  };
+  const howBuilt: Record<Exclude<Form, 'negation'>, string> = {
+    converse: 'swaps the two parts',
+    inverse: 'negates both parts',
+    contrapositive: 'swaps the two parts and negates both',
+  };
+  const solution = steps(
+    `Name the two parts of the rule. $P$ is the "if" part: "${A}". $Q$ is the "then" part: "${B}".`,
+    `To **negate** a part means to say its opposite. So "not $P$" is "${notA}", and "not $Q$" is "${notB}".`,
+    `Three rewordings of an if-then rule have their own names:\n\n${table(
+      ['Name', 'Form', 'How it is made', 'Always means the same as the rule?'],
+      [
+        ['Converse', formOf.converse, 'swap the parts', 'No'],
+        ['Inverse', formOf.inverse, 'negate both parts', 'No'],
+        ['Contrapositive', formOf.contrapositive, 'swap and negate both', 'Yes'],
+      ],
+    )}`,
+    ask === 'equivalent' &&
+      'Only one of them always means the same as the rule. If the "then" part fails, the "if" part cannot have happened, because it would have forced the "then" part.',
+    `We need the form "${formOf[target as Exclude<Form, 'negation'>]}". Put our two parts into it: "${answer}"`,
+  );
 
   return {
     stem,
     answer,
     answerValue: target,
     distractors,
+    asking: ask === 'equivalent' ? 'Which sentence says exactly the same thing as the rule?' : `Which rewording of the rule is its ${ask}?`,
     solution,
-    keyIdea: 'Converse = swap; inverse = negate both; contrapositive = swap and negate both, and only the contrapositive is equivalent to the original.',
+    conclusion:
+      ask === 'equivalent'
+        ? `The contrapositive always means the same as the rule, so the equivalent sentence is: ${answer}`
+        : `The ${ask} ${howBuilt[ask]}, which gives: ${answer}`,
+    keyIdea: 'Label the parts $P$ and $Q$, then build the form. Converse means swap the parts. Inverse means negate both. Contrapositive means do both, and it is the only one that always means the same as the original rule.',
   };
 }
 
@@ -158,59 +176,59 @@ function genArgForm(rng: Rng): GeneratedCore {
 
   // What each form would have needed, in this argument's own words.
   const needs: Record<ArgForm, string> = {
-    MP: `Modus ponens needs the second premise to be the "if" part ("${A}") and concludes the "then" part ("${B}").`,
-    MT: `Modus tollens needs the second premise to deny the "then" part ("${notB}") and concludes that the "if" part fails ("${notA}").`,
-    AC: `Affirming the consequent would start from the "then" part ("${B}") and conclude the "if" part ("${A}").`,
-    DA: `Denying the antecedent would start from "${notA}" and conclude "${notB}".`,
+    MP: `Modus ponens needs the second statement to be the "if" part ("${A}").`,
+    MT: `Modus tollens needs the second statement to deny the "then" part ("${notB}").`,
+    AC: `Affirming the consequent would start from the "then" part ("${B}").`,
+    DA: `Denying the antecedent would start from denying the "if" part ("${notA}").`,
   };
   const actually: Record<ArgForm, string> = {
-    MP: 'Here the second premise is the "if" part itself, so this is modus ponens, which is valid.',
-    MT: 'Here the second premise denies the "then" part, so this is modus tollens, which is valid.',
-    AC: 'Here the second premise is the "then" part, so this is affirming the consequent, which is invalid.',
-    DA: 'Here the second premise denies the "if" part, so this is denying the antecedent, which is invalid.',
+    MP: 'Here the second statement is the "if" part itself, so this is modus ponens, which is valid.',
+    MT: 'Here the second statement denies the "then" part, so this is modus tollens, which is valid.',
+    AC: 'Here the second statement is the "then" part, so this is affirming the consequent, which is invalid.',
+    DA: 'Here the second statement denies the "if" part, so this is denying the antecedent, which is invalid.',
   };
   const all: ArgForm[] = ['MP', 'MT', 'AC', 'DA'];
   const distractors = all
     .filter((f) => f !== form)
-    .map((f) => {
-      const validityClash =
-        (f === 'MP' || f === 'MT') !== (form === 'MP' || form === 'MT')
-          ? form === 'MP' || form === 'MT'
-            ? ' The argument is in fact valid, so calling it invalid is wrong.'
-            : ' The argument is in fact invalid, so calling it valid is wrong.'
-          : '';
-      return { text: LABEL[f], value: f, why: `${needs[f]} ${actually[form]}${validityClash}` };
-    });
+    .map((f) => ({ text: LABEL[f], value: f, why: `${needs[f]} ${actually[form]}` }));
   const answer = LABEL[form];
 
   const explain: Record<ArgForm, string> = {
-    MP: `The second premise says the "if" part is true, so the rule forces the "then" part. The conclusion "${B}" is guaranteed, so the argument is **valid**.`,
-    MT: `The second premise says the "then" part is false. If the "if" part had been true, the "then" part would have been true too, so the "if" part must be false: "${notA}". The argument is **valid**.`,
-    AC: `The second premise says the "then" part is true. But the rule only says what happens when "${A}"; the "then" part could be true for some other reason. So the premises can be true while the conclusion is false, and the argument is **invalid**.`,
-    DA: `The second premise says the "if" part is false. But the rule says nothing about what happens then: "${B}" could still happen for another reason. So the premises can be true while the conclusion is false, and the argument is **invalid**.`,
+    MP: 'The second statement says the "if" part is true. The rule says that whenever that happens, the "then" part happens too. So the conclusion has to be true, and the argument is **valid**.',
+    MT: 'The second statement says the "then" part is false. If the "if" part had been true, the rule would have made the "then" part true. So the "if" part must be false, and the argument is **valid**.',
+    AC: `The second statement says the "then" part is true. But the rule only says what happens when "${A}". The "then" part could be true for another reason. So the conclusion can be false, and the argument is **invalid**.`,
+    DA: `The second statement says the "if" part is false. The rule says nothing about that situation, so "${B}" could still happen for another reason. So the conclusion can be false, and the argument is **invalid**.`,
   };
-  const pattern: Record<ArgForm, string> = {
-    MP: '$P$, therefore $Q$',
-    MT: 'not $Q$, therefore not $P$',
-    AC: '$Q$, therefore $P$',
-    DA: 'not $P$, therefore not $Q$',
+  const shortPattern: Record<ArgForm, string> = {
+    MP: '$P$, so $Q$',
+    MT: 'not $Q$, so not $P$',
+    AC: '$Q$, so $P$',
+    DA: 'not $P$, so not $Q$',
   };
-  const solution =
-    `Label the rule "If $P$, then $Q$":\n\n` +
-    `- $P$ (the "if" part, antecedent): ${A}\n` +
-    `- $Q$ (the "then" part, consequent): ${B}\n\n` +
-    `The second premise "${given}" is ${form === 'MP' ? '$P$' : form === 'MT' ? 'not $Q$' : form === 'AC' ? '$Q$' : 'not $P$'}, and the conclusion "${concl}" is ${form === 'MP' ? '$Q$' : form === 'MT' ? 'not $P$' : form === 'AC' ? '$P$' : 'not $Q$'}. So the pattern is: ${pattern[form]}.\n\n` +
-    `${explain[form]}\n\n` +
-    `Remember: modus ponens ($P$, so $Q$) and modus tollens (not $Q$, so not $P$) are valid; affirming the consequent ($Q$, so $P$) and denying the antecedent (not $P$, so not $Q$) are not.\n\n` +
-    `Answer: ${answer}`;
+  const givenLabel: Record<ArgForm, string> = { MP: '$P$', MT: 'not $Q$', AC: '$Q$', DA: 'not $P$' };
+  const conclLabel: Record<ArgForm, string> = { MP: '$Q$', MT: 'not $P$', AC: '$P$', DA: 'not $Q$' };
+  const named: Record<ArgForm, string> = {
+    MP: 'A valid argument with the pattern "$P$, so $Q$" is called **modus ponens**.',
+    MT: 'A valid argument with the pattern "not $Q$, so not $P$" is called **modus tollens**.',
+    AC: 'This mistake has its own name. Stating that the "then" part (the consequent) is true is called affirming it, so this is **affirming the consequent**.',
+    DA: 'This mistake has its own name. Stating that the "if" part (the antecedent) is false is called denying it, so this is **denying the antecedent**.',
+  };
+  const solution = steps(
+    `Name the parts of the rule. $P$ is the "if" part, called the **antecedent**: "${A}". $Q$ is the "then" part, called the **consequent**: "${B}".`,
+    `Now label the rest of the argument. The second statement, "${given}", is ${givenLabel[form]}. The conclusion, "${concl}", is ${conclLabel[form]}. So the pattern is: ${shortPattern[form]}.`,
+    explain[form],
+    named[form],
+  );
 
   return {
     stem,
     answer,
     answerValue: form,
     distractors,
+    asking: 'Does the conclusion have to follow from the rule, and what is this pattern called?',
     solution,
-    keyIdea: 'Match the second premise to the rule: the "if" part true or the "then" part false gives a valid argument; the "then" part true or the "if" part false proves nothing.',
+    conclusion: `The pattern is ${shortPattern[form]}, so the description is: ${answer}`,
+    keyIdea: 'Label the rule $P$ then $Q$, then see which part the second statement uses. $P$ or not $Q$ gives a valid argument (modus ponens, modus tollens). $Q$ or not $P$ proves nothing (affirming the consequent, denying the antecedent).',
   };
 }
 
@@ -242,8 +260,8 @@ interface SylForm {
   name: string;
   prem: Cat[];
   concl: Cat;
-  /** Reasoning, in terms of the three words. */
-  steps: (a: string, b: string, c: string) => string;
+  /** Reasoning, one step per string, in terms of the three words. */
+  reason: (a: string, b: string, c: string) => string[];
 }
 const FORMS: SylForm[] = [
   {
@@ -253,8 +271,11 @@ const FORMS: SylForm[] = [
       ['all', 1, 2],
     ],
     concl: ['all', 0, 2],
-    steps: (a, b, c) =>
-      `The ${a} circle sits inside the ${b} circle, and the ${b} circle sits inside the ${c} circle. Nested circles stay nested, so every one of the ${a} is inside the ${c} circle.`,
+    reason: (a, b, c) => [
+      `"All ${a} are ${b}" puts the ${a} circle completely inside the ${b} circle.`,
+      `"All ${b} are ${c}" puts the ${b} circle completely inside the ${c} circle.`,
+      `A circle inside a circle inside a third circle is still inside the third. So every one of the ${a} is in the ${c} circle.`,
+    ],
   },
   {
     name: 'all-no',
@@ -263,8 +284,11 @@ const FORMS: SylForm[] = [
       ['no', 1, 2],
     ],
     concl: ['no', 0, 2],
-    steps: (a, b, c) =>
-      `The ${a} circle sits inside the ${b} circle, and the ${b} circle does not overlap the ${c} circle at all. So the ${a} circle cannot reach the ${c} circle either.`,
+    reason: (a, b, c) => [
+      `"All ${a} are ${b}" puts the ${a} circle completely inside the ${b} circle.`,
+      `"No ${b} are ${c}" means the ${b} circle and the ${c} circle do not touch at all.`,
+      `The ${a} sit inside the ${b}, so they cannot reach the ${c} circle either. None of the ${a} are in it.`,
+    ],
   },
   {
     name: 'some-all',
@@ -273,8 +297,11 @@ const FORMS: SylForm[] = [
       ['all', 1, 2],
     ],
     concl: ['some', 0, 2],
-    steps: (a, b, c) =>
-      `At least one thing is one of the ${a} and one of the ${b}. Every one of the ${b} is one of the ${c}, so that thing is also one of the ${c}. That one thing proves that some ${a} are ${c}.`,
+    reason: (a, b, c) => [
+      `In logic, "some" means at least one. So "Some ${a} are ${b}" means at least one thing is in both groups. Call it Item X.`,
+      `"All ${b} are ${c}" covers every one of the ${b}, so Item X is also one of the ${c}.`,
+      `So Item X is one of the ${a} and also one of the ${c}. One such item is enough for a "some" statement.`,
+    ],
   },
   {
     name: 'some-no',
@@ -283,8 +310,11 @@ const FORMS: SylForm[] = [
       ['no', 1, 2],
     ],
     concl: ['someNot', 0, 2],
-    steps: (a, b, c) =>
-      `At least one thing is one of the ${a} and one of the ${b}. None of the ${b} are ${c}, so that thing is not one of the ${c}. That one thing proves that some ${a} are not ${c}.`,
+    reason: (a, b, c) => [
+      `In logic, "some" means at least one. So "Some ${a} are ${b}" means at least one thing is in both groups. Call it Item X.`,
+      `"No ${b} are ${c}" covers every one of the ${b}, so Item X is not one of the ${c}.`,
+      `So Item X is one of the ${a} but not one of the ${c}. One such item is enough for a "some ... are not" statement.`,
+    ],
   },
   {
     name: 'no-all',
@@ -293,8 +323,11 @@ const FORMS: SylForm[] = [
       ['all', 0, 1],
     ],
     concl: ['no', 0, 2],
-    steps: (a, b, c) =>
-      `The ${a} circle sits inside the ${b} circle, and the ${c} circle does not overlap the ${b} circle at all. So the ${a} circle cannot overlap the ${c} circle.`,
+    reason: (a, b, c) => [
+      `"No ${c} are ${b}" means the ${c} circle and the ${b} circle do not touch at all.`,
+      `"All ${a} are ${b}" puts the ${a} circle completely inside the ${b} circle.`,
+      `The ${a} sit inside the ${b}, so they cannot reach the ${c} circle either. None of the ${a} are in it.`,
+    ],
   },
 ];
 
@@ -357,13 +390,12 @@ function genSyllogism(rng: Rng): GeneratedCore {
     if (swapped && q === cq)
       mistake = `This swaps the two groups in the valid conclusion, and that is not allowed for ${cq === 'all' ? 'an "all"' : 'a "some ... are not"'} statement. `;
     else if (same && q === 'all' && cq === 'some')
-      mistake = `This upgrades "some" to "all": the premises only guarantee at least one ${w[cx].replace(/s$/, '')} that is linked through the ${w[1]}, not that every one of them is. `;
+      mistake = `This upgrades "some" to "all". The premises only guarantee one ${w[cx].replace(/s$/, '')} linked through the ${w[1]}. `;
     else if (swapped && q === 'all' && cq === 'some') mistake = 'This swaps the two groups and also upgrades "some" to "all". ';
     else if (same && q === 'no' && cq === 'someNot')
-      mistake = `This upgrades "some ... are not" to "no ... are": the premises only guarantee at least one ${w[cx].replace(/s$/, '')} outside the ${w[cy]}, not that all of them are. `;
+      mistake = `This upgrades "some ... are not" to "no ... are". The premises only guarantee one ${w[cx].replace(/s$/, '')} outside the ${w[cy]}. `;
     else if ((same || swapped) && ((q === 'someNot' && cq === 'some') || (q === 'some' && cq === 'someNot')))
-      mistake =
-        'This treats "some are" as if it also meant "some are not" (or the other way round). In logic "some" just means "at least one", so knowing that some things are inside a group tells you nothing about whether any are outside it. ';
+      mistake = 'This treats "some are" as if it also meant "some are not" (or the other way round). In logic "some" only means "at least one". ';
     else if (swapped && q === 'someNot' && cq === 'all')
       mistake = `This assumes the ${w[x]} must have extra members that are not ${w[y]}. "All ${w[y]} are ${w[x]}" allows the two groups to be exactly the same. `;
     else if (x === 1 || y === 1) mistake = `This is about the linking group (the ${w[1]}), and the premises do not pin it down. `;
@@ -384,19 +416,21 @@ function genSyllogism(rng: Rng): GeneratedCore {
     `The words below are made up, so you cannot use real-world knowledge. Assume both statements are true:\n\n` +
     `- ${sentence(prem[0], w)}\n- ${sentence(prem[1], w)}\n\n` +
     'Which conclusion **must** be true?';
-  const solution =
-    `Ignore what the words "mean" and look only at how the groups are linked. The group that appears in both premises, the ${w[1]}, is the link.\n\n` +
-    `${form.steps(w[0], w[1], w[2])}\n\n` +
-    `Every other option can be false while both premises are true, so none of them is forced.\n\n` +
-    `Answer: ${answer}`;
+  const solution = steps(
+    'The words are made up, so do not try to picture real things. Treat each word as a group, and draw each group as a circle.',
+    `The ${w[1]} appear in both statements, so that group is the link between the ${w[0]} and the ${w[2]}.`,
+    ...form.reason(w[0], w[1], w[2]),
+  );
 
   return {
     stem,
     answer,
     answerValue: catKey(form.concl),
     distractors: picked.map((c) => ({ text: sentence(c, w), value: catKey(c), why: whyFor(c) })),
+    asking: 'Going only by how the groups link together, which conclusion has to be true?',
     solution,
-    keyIdea: 'A conclusion must be true in every situation that fits the premises; the middle group links the other two, and "some" conclusions need a guaranteed member to follow through.',
+    conclusion: `The other conclusions can be false while both statements are true, so the only one that is forced is: ${answer}`,
+    keyIdea: 'Draw a circle for each group and find the group named in both statements: it links the others. "All" nests circles, "no" separates them, and "some" gives one item to follow. A conclusion must hold in every possible drawing.',
   };
 }
 

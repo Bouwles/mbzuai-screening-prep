@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps as stepsOf, table as tbl } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { m } from '../../../lib/tex';
 
@@ -34,6 +35,7 @@ function randomGraph(rng: Rng, n: number, p: number): number[][] {
 }
 
 const rowSum = (r: number[]) => r.reduce((a, b) => a + b, 0);
+const listAnd = (xs: string[]) => (xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`);
 
 // ---------------------------------------------------------------- shortest path helpers
 type WEdge = [number, number, number]; // u, v, weight
@@ -118,13 +120,15 @@ export const generators: Generator[] = [
             answer,
             answerValue: E,
             distractors: ds.map((d) => ({ text: d.text, value: d.v, why: d.why })),
-            solution:
-              `Use the **handshake lemma**: each edge has two ends and adds 1 to the degree of each end, so\n\n` +
-              `$$\\text{sum of degrees} = 2E$$\n\n` +
-              `Sum of degrees: ${m(`${degs.join(' + ')} = ${S}`)}.\n\n` +
-              `Number of edges: ${m(`E = \\frac{${S}}{2} = ${E}`)}.\n\n` +
-              `Answer: ${answer}`,
-            keyIdea: 'Handshake lemma: the degrees add up to twice the number of edges, so halve the degree sum.',
+            asking: 'Given the degrees, how many edges are in the graph?',
+            solution: stepsOf(
+              'A graph is made of points called **vertices** (one is a **vertex**), joined by lines called **edges**. The **degree** of a vertex is how many edges touch it. Each edge has two ends, so it adds 1 to the degree of two vertices.',
+              'So if you add all the degrees, each edge has been counted exactly twice. This is the **handshake lemma**: sum of degrees $= 2 \\times$ number of edges.',
+              `Add the degrees: ${m(`${degs.join(' + ')} = ${S}`)}.`,
+              `Halve that total to undo the double counting: ${m(`${S} \\div 2 = ${E}`)}.`,
+            ),
+            conclusion: `The degrees total ${S} and each edge was counted twice, so there are ${answer} edges.`,
+            keyIdea: 'Whenever degrees and edges appear together, use: sum of degrees $= 2E$, where $E$ is the number of edges. This also means the degree sum must be even.',
           };
         }
         // ---- regular graph: n vertices, every vertex of degree d
@@ -159,15 +163,17 @@ export const generators: Generator[] = [
           answer,
           answerValue: E,
           distractors: ds.map((x) => ({ text: x.text, value: x.v, why: x.why })),
-          solution:
-            (ctx.v === 'vertices'
-              ? `Every one of the ${n} vertices has degree ${d}.\n\n`
-              : `Model it as a graph: the ${ctx.v} are vertices and the ${ctx.e} are edges. Every vertex has degree ${d}.\n\n`) +
-            `Sum of the degrees: ${m(`${n} \\times ${d} = ${n * d}`)}.\n\n` +
-            `Each edge has two ends, so it is counted twice in this sum (handshake lemma: sum of degrees ${m('= 2E')}):\n\n` +
-            `$$E = \\frac{${n * d}}{2} = ${E}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Handshake lemma: add up the degrees and halve, because every edge has two ends.',
+          asking: ctx.v === 'people' ? 'How many handshakes happen in total?' : 'How many edges does the graph have?',
+          solution: stepsOf(
+            ctx.v === 'vertices'
+              ? `A graph is made of points called **vertices** (one is a **vertex**), joined by lines called **edges**. The **degree** of a vertex is how many edges touch it. Here every one of the ${n} vertices has degree ${d}.`
+              : `Treat this as a graph: each person is a **vertex** (a point) and each handshake is an **edge** (a line joining two points). Each person's **degree**, the number of edges touching them, is ${d}.`,
+            `Add up all the degrees. There are ${n} ${ctx.v} with ${d} each, so the total is ${m(`${n} \\times ${d} = ${n * d}`)}.`,
+            `Each ${ctx.e === 'handshakes' ? 'handshake' : 'edge'} has two ends, so it was counted twice in that total. This is the **handshake lemma**: sum of degrees $= 2 \\times$ number of edges.`,
+            `Halve the total to undo the double counting: ${m(`${n * d} \\div 2 = ${E}`)}.`,
+          ),
+          conclusion: `The degrees total ${n * d} and each ${ctx.e === 'handshakes' ? 'handshake' : 'edge'} was counted twice, so there are ${answer} ${ctx.e}.`,
+          keyIdea: 'When every vertex has the same degree, the degree total is vertices $\\times$ degree. Halve it to get the edges, because every edge has two ends: sum of degrees $= 2E$.',
         };
       }
     },
@@ -213,13 +219,15 @@ export const generators: Generator[] = [
             answer,
             answerValue: E,
             distractors: ds.map((x) => ({ text: x.text, value: x.v, why: x.why })),
-            solution:
-              `Each row sum is the degree of that vertex: ${names.map((x, i) => `${x}: ${degs[i]}`).join(', ')}.\n\n` +
-              `Total of all entries ${m(`= ${degs.join(' + ')} = ${S}`)}. This is the sum of the degrees, which equals ${m('2E')} because every edge appears twice in a symmetric matrix.\n\n` +
-              `$$E = \\frac{${S}}{2} = ${E}$$\n\n` +
-              `Check by listing the 1s above the diagonal: ${edgeList.join(', ')} (${edgeList.length} edges).\n\n` +
-              `Answer: ${answer}`,
-            keyIdea: 'In an undirected adjacency matrix, the 1s add up to twice the number of edges.',
+            asking: 'How many edges does the graph in this matrix have?',
+            solution: stepsOf(
+              'A graph is made of points called **vertices** (one is a **vertex**), joined by lines called **edges**. An **adjacency matrix** is a table with a row and a column for each vertex. A 1 in row X, column Y means there is an edge between X and Y.',
+              'The graph is undirected, so each edge shows up twice. For example, an edge between A and B would appear in row A, column B and in row B, column A.',
+              `Count the 1s in each row: ${names.map((x, i) => `${x} has ${degs[i]}`).join(', ')}. The total is ${m(`${degs.join(' + ')} = ${S}`)}.`,
+              `Each edge was counted twice, so halve the total: ${m(`${S} \\div 2 = ${E}`)}. Listing them confirms it: ${edgeList.join(', ')}.`,
+            ),
+            conclusion: `There are ${S} ones in the matrix and each edge appears twice, so the graph has ${answer} edges.`,
+            keyIdea: "For an undirected adjacency matrix, edges $=$ number of 1s $\\div 2$. Or count only the 1s above the diagonal (the line of 0s from top left to bottom right). A row's sum gives that vertex's degree, the number of edges touching it. In a directed graph, where edges are one-way, do not halve.",
           };
         }
 
@@ -242,12 +250,14 @@ export const generators: Generator[] = [
             answer,
             answerValue: d,
             distractors: ds.map((c) => ({ text: c.text, value: c.v, why: c.why })),
-            solution:
-              `The degree of a vertex is the number of edges at it, which is the number of 1s in its row.\n\n` +
-              `Row ${names[x]} is ${m(M[x].join(',\\ '))}. The 1s are in ${nbrs.length === 1 ? 'column' : 'columns'} ${nbrs.join(', ')}, so ${names[x]} is joined to ${nbrs.length === 1 ? 'one vertex' : `${nbrs.length} vertices`}.\n\n` +
-              `$$\\deg(${names[x]}) = ${d === 1 ? '1' : `${Array(d).fill(1).join(' + ')} = ${d}`}$$\n\n` +
-              `Answer: ${answer}`,
-            keyIdea: 'The degree of a vertex is the sum of its row in the adjacency matrix.',
+            asking: `How many edges touch vertex ${names[x]}?`,
+            solution: stepsOf(
+              `A graph is made of points called **vertices** (one is a **vertex**), joined by lines called **edges**. The **degree** of a vertex is the number of edges touching it. In an **adjacency matrix**, a 1 in row ${names[x]}, column Y means there is an edge between ${names[x]} and Y.`,
+              `So read along row ${names[x]}: ${m(M[x].join(',\\ '))}. The 1s are in ${nbrs.length === 1 ? 'column' : 'columns'} ${listAnd(nbrs)}.`,
+              `Count them: ${names[x]} is joined to ${nbrs.length === 1 ? 'one vertex' : `${nbrs.length} vertices`}, so its degree is ${d}.`,
+            ),
+            conclusion: `Row ${names[x]} holds ${d === 1 ? 'a single 1' : `${d} ones`}, so the degree of ${names[x]} is ${answer}.`,
+            keyIdea: 'The degree of a vertex is the number of 1s in its row of the adjacency matrix. In an undirected graph, the row and the column hold the same edges, so count only one of them.',
           };
         }
 
@@ -269,23 +279,22 @@ export const generators: Generator[] = [
         const checkRows = names
           .map((z, k) => ({ z, k }))
           .filter(({ k }) => k !== x && k !== y)
-          .map(({ z, k }) => `| ${z} | ${M[x][k] ? 'yes' : 'no'} | ${M[k][y] ? 'yes' : 'no'} | ${M[x][k] && M[k][y] ? '**yes**' : 'no'} |`)
-          .join('\n');
+          .map(({ z, k }) => [z, M[x][k] ? 'Yes' : 'No', M[k][y] ? 'Yes' : 'No', M[x][k] && M[k][y] ? 'Yes' : 'No']);
         return {
           stem: `${intro} How many walks of length 2 go from ${names[x]} to ${names[y]}?`,
           table,
           answer,
           answerValue: c,
           distractors: ds.map((q) => ({ text: q.text, value: q.v, why: q.why })),
-          solution:
-            `A walk of length 2 is ${names[x]}–Z–${names[y]}, where the middle vertex Z must be joined to **both** ${names[x]} and ${names[y]}.\n\n` +
-            `Neighbours of ${names[x]} (1s in row ${names[x]}): ${names.filter((_, k) => M[x][k] === 1).join(', ')}.\n\n` +
-            `Neighbours of ${names[y]} (1s in row ${names[y]}): ${names.filter((_, k) => M[y][k] === 1).join(', ')}.\n\n` +
-            `Common neighbours: ${mids.join(', ')}, giving the walks ${mids.map((z) => `${names[x]}–${z}–${names[y]}`).join(', ')}.\n\n` +
-            `Checking every possible middle vertex:\n\n| Middle vertex Z | edge ${names[x]}–Z? | edge Z–${names[y]}? | walk? |\n|---|---|---|---|\n${checkRows}\n\n` +
-            `So ${m(`(M^2)_{${names[x]}${names[y]}} = ${c}`)}: multiplying row ${names[x]} by column ${names[y]} adds 1 exactly for each common neighbour.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'The number of walks of length 2 from X to Y is the number of common neighbours, which is the entry of $M^2$.',
+          asking: `How many two-step routes go from ${names[x]} to ${names[y]}?`,
+          solution: stepsOf(
+            'A graph is made of points called **vertices** (one is a **vertex**), joined by lines called **edges**.',
+            `A **walk of length 2** is a route along two edges in a row: ${names[x]} to a middle vertex, then on to ${names[y]}. Call the middle vertex Z. In the matrix, a 1 in a row and column means those two vertices are joined.`,
+            `So Z must be joined to both ${names[x]} and ${names[y]}. Test every other vertex as Z, reading rows ${names[x]} and ${names[y]}:\n\n${tbl(['Z', `Joined to ${names[x]}?`, `Joined to ${names[y]}?`, 'Walk?'], checkRows)}`,
+            `Count the rows with Yes in the last column: ${listAnd(mids)}, which makes ${c}.`,
+          ),
+          conclusion: `The middle ${c === 1 ? 'vertex that works is' : 'vertices that work are'} ${listAnd(mids)}, so there ${c === 1 ? 'is' : 'are'} ${answer} ${c === 1 ? 'walk' : 'walks'}.`,
+          keyIdea: 'To count 2-step walks from X to Y, find the vertices joined to both: compare rows X and Y and count the columns where both hold a 1. This equals the X, Y entry of the matrix multiplied by itself.',
         };
       }
     },
@@ -366,13 +375,14 @@ export const generators: Generator[] = [
           answer,
           answerValue: best.len,
           distractors: ds.map((q) => ({ text: q.text, value: q.v, why: q.why })),
-          solution:
-            `List the routes from A to ${end} that never revisit a vertex, and add up the road lengths${paths.length > shown.length ? ' (the shortest few are shown; every other route is longer)' : ''}:\n\n` +
-            `| Route | Total (km) |\n|---|---|\n` +
-            shown.map((q) => `| ${pathName(q.p)} | ${m(pathSum(edges, q.p))} |`).join('\n') +
-            `\n\nThe best route with the fewest roads (${roads}) is ${pathName(hopRoute.p)} at ${hopRoute.len} km, but a route with more roads can be shorter.\n\n` +
-            `Shortest route: ${pathName(best.p)}.\n\nAnswer: ${answer}`,
-          keyIdea: 'The shortest path has the smallest total weight, not the fewest edges; compare all sensible routes.',
+          asking: `What is the smallest total distance from A to ${end}?`,
+          solution: stepsOf(
+            'Shortest means the smallest total km, not the fewest roads. A route with more roads can still be shorter, so we compare the routes by total length.',
+            `Going back through a place you have already visited only adds distance. So we only need the routes from A to ${end} that never revisit a place.`,
+            `List those routes and add up the road lengths on each${paths.length > shown.length ? ' (the shortest few are shown, and every other route is longer)' : ''}:\n\n${tbl(['Route', 'Total (km)'], shown.map((q) => [pathName(q.p), m(pathSum(edges, q.p))]))}`,
+          ),
+          conclusion: `The smallest total belongs to ${pathName(best.p)}, so the shortest route is ${answer}.`,
+          keyIdea: 'For a small network, list every route that never revisits a place, add up its road lengths and take the smallest total. The route with the fewest roads is often not the shortest.',
         };
       }
     },

@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps as stepsOf, table as tbl } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 
 // ---------------------------------------------------------------- a tiny formula AST
@@ -50,7 +51,7 @@ const ROWS2: Env[] = [
 const col = (f: F): string => ROWS2.map((e) => TV(ev(f, e))).join('');
 const colText = (c: string): string => c.split('').join(', ');
 
-const OP_NAME: Record<Op, string> = { and: 'AND', or: 'OR', imp: 'implication', iff: 'biconditional' };
+const OP_NAME: Record<Op, string> = { and: 'AND', or: 'OR', imp: 'implication', iff: '"if and only if"' };
 
 // ================================================================ generator 1: truth-table column
 function genColumn(rng: Rng) {
@@ -88,8 +89,8 @@ function genColumn(rng: Rng) {
   }
   if (op === 'imp') {
     add(wrap(Bin('imp', b, a)), `This is the column of $${tex(wrap(Bin('imp', b, a)))}$: the arrow has been read backwards (the converse).`);
-    add(wrap(Bin('iff', a, b)), 'This treats the one-way arrow $\\to$ as the two-way arrow $\\leftrightarrow$ ("same truth value"), but an implication with a false hypothesis is always true.');
-    add(wrap(Bin('and', a, b)), 'This treats the implication as AND, forgetting that an implication with a false hypothesis is (vacuously) true.');
+    add(wrap(Bin('iff', a, b)), 'This treats the one-way arrow $\\to$ as the two-way arrow $\\leftrightarrow$ ("same truth value"), but an implication with a false left side is always true.');
+    add(wrap(Bin('and', a, b)), 'This treats the implication as AND, forgetting that an implication with a false left side is always true.');
   }
   if (op === 'or') {
     add(wrap(Bin('and', a, b)), 'This uses AND instead of OR: OR is true when **at least one** part is true.');
@@ -101,7 +102,7 @@ function genColumn(rng: Rng) {
   }
   if (op === 'iff') {
     add(wrap(Bin('imp', a, b)), 'This treats the two-way arrow $\\leftrightarrow$ as a one-way implication $\\to$.');
-    add(wrap(Bin('and', a, b)), 'This forgets that a biconditional is also true when **both** sides are false.');
+    add(wrap(Bin('and', a, b)), 'This forgets that $\\leftrightarrow$ is also true when **both** sides are false.');
     add(wrap(Not(Bin('iff', a, b))), 'This reverses the rule for $\\leftrightarrow$: it is true when the two sides are the **same**, not when they differ.');
   }
   pool.push({ c: answerCol.split('').map((x) => (x === 'T' ? 'F' : 'T')).join(''), why: 'Every row has been flipped: this is the column of the negation of the whole statement.' });
@@ -109,7 +110,7 @@ function genColumn(rng: Rng) {
   for (let i = 0; i < 4; i++) {
     const c = answerCol.split('');
     c[i] = c[i] === 'T' ? 'F' : 'T';
-    pool.push({ c: c.join(''), why: `This has a slip in the row with ${rowName[i]}: work that row out again carefully, one connective at a time.` });
+    pool.push({ c: c.join(''), why: `This has a slip in the row with ${rowName[i]}: work that row out again, one symbol at a time.` });
   }
   const picked: Cand[] = [];
   for (const d of pool) {
@@ -124,37 +125,32 @@ function genColumn(rng: Rng) {
   if (b.k === 'not') cols.push(b);
   if (outer) cols.push(inner);
   cols.push(S);
-  const header = '| ' + cols.map((f) => `$${tex(f)}$`).join(' | ') + ' |';
-  const sep = '| ' + cols.map(() => '---').join(' | ') + ' |';
-  const body = ROWS2.map((e) => '| ' + cols.map((f) => TV(ev(f, e))).join(' | ') + ' |').join('\n');
+  const truthTable = tbl(
+    cols.map((f) => `$${tex(f)}$`),
+    ROWS2.map((e) => cols.map((f) => TV(ev(f, e)))),
+  );
   const rule: Record<Op, string> = {
-    and: '$X \\land Y$ is true only when both parts are true.',
-    or: '$X \\lor Y$ is true when at least one part is true (false only when both are false).',
-    imp: '$X \\to Y$ is false only when $X$ is true and $Y$ is false.',
-    iff: '$X \\leftrightarrow Y$ is true when both sides have the same truth value.',
+    and: `The symbol $${OP_TEX[op]}$ is read "and". It is true only when both sides are true.`,
+    or: `The symbol $${OP_TEX[op]}$ is read "or". It is true when at least one side is true, so it is false only when both sides are false.`,
+    imp: `The symbol $${OP_TEX[op]}$ is read "if ... then". It is false only when the left side is true and the right side is false. Every other row is true.`,
+    iff: `The symbol $${OP_TEX[op]}$ is read "if and only if". It is true when the two sides match, and false when they differ.`,
   };
-  const steps: string[] = [];
-  steps.push(`Build the truth table one column at a time, in the row order $(p, q)$ = (T, T), (T, F), (F, T), (F, F).`);
-  if (a.k === 'not' || b.k === 'not') steps.push('First negate the letters that carry a $\\neg$ (just flip T and F).');
-  steps.push(`Then apply the main connective. Rule: ${rule[op]}`);
-  if (outer) steps.push('Finally the outer $\\neg$ flips every value of the bracket.');
-  const solution =
-    steps.join('\n\n') +
-    '\n\n' +
-    header +
-    '\n' +
-    sep +
-    '\n' +
-    body +
-    `\n\nReading the last column from top to bottom gives the answer.\n\nAnswer: ${answer}`;
+  const anyNot = a.k === 'not' || b.k === 'not' || outer;
+  const solution = stepsOf(
+    rule[op],
+    anyNot && 'The symbol $\\neg$ means "not". It flips every T to F and every F to T.',
+    `Work from the inside out, adding one column at a time${outer ? ', and flip the bracket last' : ''}. The rows go in the order given:\n\n${truthTable}`,
+  );
 
   return {
     stem: `In a truth table with rows in the order $(p, q)$ = (T, T), (T, F), (F, T), (F, F), which column gives the statement $${tex(S)}$?`,
     answer,
     answerValue: answerCol,
     distractors: picked.map((d) => ({ text: colText(d.c), value: d.c, why: d.why })),
+    asking: `What are the four truth values of $${tex(S)}$, from the top row to the bottom?`,
     solution,
-    keyIdea: 'Work inside out: negate single letters first, then apply the connective, then any outer negation, one row at a time.',
+    conclusion: `Reading the last column from top to bottom gives ${answer}.`,
+    keyIdea: 'Add one helper column for each negated letter and bracket. Work from the inside out: flip single letters first, apply the main symbol row by row, then any outer $\\neg$. The last column is the result.',
   };
 }
 
@@ -177,13 +173,6 @@ const CTX: Ctx[] = [
 ];
 const cap = (s: string) => (/^[a-z]/.test(s) ? s[0].toUpperCase() + s.slice(1) : s);
 
-const KIND_DEF: Record<Exclude<Kind, 'equivalent'>, string> = {
-  converse: 'the **converse** swaps the two parts',
-  inverse: 'the **inverse** negates both parts but does not swap them',
-  contrapositive: 'the **contrapositive** swaps the two parts **and** negates both',
-  negation: 'the **negation** says the implication fails: the hypothesis happens **and** the conclusion does not',
-};
-
 function genForms(rng: Rng) {
   const kind = rng.pick<Kind>(['converse', 'inverse', 'contrapositive', 'contrapositive', 'negation', 'equivalent']);
   const english = rng.bool(0.55);
@@ -192,7 +181,7 @@ function genForms(rng: Rng) {
 
   let stmt: string;
   let text: Record<string, string>;
-  let symbolSteps: string;
+  let partsStep: string;
   if (english) {
     const c = rng.pick(CTX);
     stmt = `"If ${c.P}, then ${c.Q}."`;
@@ -202,7 +191,7 @@ function genForms(rng: Rng) {
       contrapositive: `If ${c.nQ}, then ${c.nP}.`,
       negation: `${cap(c.P)} and ${c.nQ}.`,
     };
-    symbolSteps = `The hypothesis is $H$ = "${c.P}" and the conclusion is $C$ = "${c.Q}", so the statement is $H \\to C$.`;
+    partsStep = `Name the two parts. The "if" part is "${c.P}". The "then" part is "${c.Q}".`;
   } else {
     const a: F = rng.bool() ? Not(V('p')) : V('p');
     const b: F = rng.bool() ? Not(V('q')) : V('q');
@@ -213,7 +202,7 @@ function genForms(rng: Rng) {
       contrapositive: `$${tex(Bin('imp', neg(b), neg(a)))}$`,
       negation: `$${tex(Bin('and', a, neg(b)))}$`,
     };
-    symbolSteps = `The hypothesis is $H = ${tex(a)}$ and the conclusion is $C = ${tex(b)}$. When you negate, remove double negations: $\\neg\\neg p \\equiv p$.`;
+    partsStep = `Name the two parts. The left part of the arrow is $${tex(a)}$ and the right part is $${tex(b)}$. The symbol $\\neg$ means "not", and putting "not" on a part that already has $\\neg$ cancels it, because "not not $p$" means $p$.`;
   }
 
   const stem =
@@ -221,22 +210,16 @@ function genForms(rng: Rng) {
       ? `Which statement is **logically equivalent** to ${stmt}?`
       : `Which statement is the **${kind}** of ${stmt}?`;
 
-  const sym: Record<string, string> = {
-    converse: '$C \\to H$',
-    inverse: '$\\neg H \\to \\neg C$',
-    contrapositive: '$\\neg C \\to \\neg H$',
-    negation: '$H \\land \\neg C$',
-  };
   const whyFor = (f: Exclude<Kind, 'equivalent'>): string => {
     const base: Record<string, string> = {
       converse: 'This is the **converse** (the parts are swapped but not negated).',
       inverse: 'This is the **inverse** (both parts are negated but not swapped).',
       contrapositive: 'This is the **contrapositive** (the parts are swapped **and** both negated).',
-      negation: 'This is the **negation** of the statement (hypothesis true and conclusion false); it is not an implication at all.',
+      negation: 'This is the **negation** of the statement (the first part true and the second part false). It is not an implication at all.',
     };
     let w = base[f];
     if (kind === 'equivalent' && (f === 'converse' || f === 'inverse'))
-      w += ' It is not equivalent: it can be false when the original is true (hypothesis false, conclusion true).';
+      w += ' It is not equivalent: it can be false when the original is true (first part false, second part true).';
     if (kind === 'equivalent' && f === 'negation') w += ' It is true exactly when the original is false, the opposite of equivalent.';
     return w;
   };
@@ -246,30 +229,57 @@ function genForms(rng: Rng) {
     .filter((f) => f !== target)
     .map((f) => ({ text: text[f], value: f, why: whyFor(f) }));
 
-  const solLines = [
-    symbolSteps,
-    'For an implication $H \\to C$ (hypothesis $H$, conclusion $C$) the four related statements are:',
-    `- converse: ${sym.converse}\n- inverse: ${sym.inverse}\n- contrapositive: ${sym.contrapositive}\n- negation: ${sym.negation}`,
-    `Applied to ${stmt}:`,
-    forms.map((f) => `- ${f}: ${text[f]}`).join('\n'),
-  ];
-  if (kind === 'equivalent')
-    solLines.push(
-      'A statement is always logically equivalent to its **contrapositive** (they are false in exactly the same case: hypothesis true, conclusion false). The converse and inverse are not equivalent to it, and the negation has the opposite truth value in every case.',
-    );
-  else solLines.push(`Here we need the ${kind}: ${KIND_DEF[kind]}.`);
-  solLines.push(`Answer: ${answer}`);
+  const end = (t: string) => (t.endsWith('.') ? t : `${t}.`);
+  const asking: Record<Kind, string> = {
+    converse: 'What do you get when you swap the two parts of this if-then statement?',
+    inverse: 'What do you get when you put "not" on both parts of this if-then statement, without swapping them?',
+    contrapositive: 'What is the "swap and negate" version of this if-then statement?',
+    negation: 'What statement is true exactly when this if-then statement is false?',
+    equivalent: 'Which statement is true and false in exactly the same cases as this if-then statement?',
+  };
+  const ruleStep: Record<Kind, string> = {
+    converse: 'The **converse** swaps the two parts and changes nothing else.',
+    inverse: 'The **inverse** puts "not" on both parts and does not swap them.',
+    contrapositive: 'The **contrapositive** does two things: it swaps the two parts, and it puts "not" on both.',
+    negation: 'The **negation** is true exactly when the original is false. An if-then statement is false in only one case: the first part is true and the second part is false.',
+    equivalent: '**Logically equivalent** means true and false in exactly the same cases. An if-then statement is false in only one case: the first part is true and the second part is false.',
+  };
+  const lastStep: Record<Kind, string> = {
+    converse: `Swap the two parts: ${text.converse}`,
+    inverse: `Put "not" on each part and keep the order: ${text.inverse}`,
+    contrapositive: `Swap the parts: ${end(text.converse)} Then put "not" on each part: ${text.contrapositive}`,
+    negation: english
+      ? `So the negation says the first part happens and the second part doesn't: ${text.negation}`
+      : `So the negation says the first part happens and the second part doesn't. The symbol $\\land$ means "and", which gives ${text.negation}`,
+    equivalent: `Swap the parts: ${end(text.converse)} Then put "not" on each part: ${text.contrapositive}`,
+  };
+  const conclusion: Record<Kind, string> = {
+    converse: `Swapping the two parts and changing nothing else gives: ${end(answer)}`,
+    inverse: `Putting "not" on both parts without swapping gives: ${end(answer)}`,
+    contrapositive: `Swapping the parts and putting "not" on both gives: ${end(answer)}`,
+    negation: `This is true in the one case where the original is false, so the negation is: ${end(answer)}`,
+    equivalent: `It is false in the same single case as the original, so the equivalent statement is: ${end(answer)}`,
+  };
+  const solution = stepsOf(
+    partsStep,
+    ruleStep[kind],
+    kind === 'equivalent' &&
+      'The **contrapositive** (swap the two parts and put "not" on both) is false in that same case and no other, so it always matches the original. The converse and the inverse can be false when the original is true, so they do not match.',
+    lastStep[kind],
+  );
 
   return {
     stem,
     answer,
     answerValue: target,
     distractors,
-    solution: solLines.join('\n\n'),
+    asking: asking[kind],
+    solution,
+    conclusion: conclusion[kind],
     keyIdea:
       kind === 'equivalent'
-        ? 'An implication is equivalent to its contrapositive, $\\neg q \\to \\neg p$, and to nothing else among converse, inverse and negation.'
-        : 'Converse = swap; inverse = negate both; contrapositive = swap and negate; negation of $p \\to q$ is $p \\land \\neg q$.',
+        ? 'An if-then statement, written $p \\to q$, always matches its contrapositive, $\\neg q \\to \\neg p$, where $\\neg$ means "not". The converse, the inverse and the negation do not. To test a claimed match, try $p$ true and $q$ false, the one case where $p \\to q$ is false.'
+        : 'For $p \\to q$, meaning "if $p$ then $q$", with $\\neg$ for "not" and $\\land$ for "and": the converse swaps to $q \\to p$. The inverse negates to $\\neg p \\to \\neg q$. The contrapositive does both, $\\neg q \\to \\neg p$. The negation is $p \\land \\neg q$.',
   };
 }
 
@@ -294,20 +304,20 @@ function genEvaluate(rng: Rng) {
   const q = V('q');
   const clueOpts: Clue[] =
     env.p && env.q
-      ? [{ f: Bin('and', p, q), isTrue: true, deduce: 'AND is true only when both parts are true, so $p$ and $q$ are both true.' }]
+      ? [{ f: Bin('and', p, q), isTrue: true, deduce: 'An "and" ($\\land$) is true only when both parts are true, so $p$ and $q$ are both true.' }]
       : !env.p && !env.q
         ? [
-            { f: Bin('or', p, q), isTrue: false, deduce: 'OR is false only when both parts are false, so $p$ and $q$ are both false.' },
-            { f: Not(Bin('or', p, q)), isTrue: true, deduce: 'If $\\neg(p \\lor q)$ is true then $p \\lor q$ is false, and OR is false only when both parts are false. So $p$ and $q$ are both false.' },
+            { f: Bin('or', p, q), isTrue: false, deduce: 'An "or" ($\\lor$) is false only when both parts are false, so $p$ and $q$ are both false.' },
+            { f: Not(Bin('or', p, q)), isTrue: true, deduce: 'If $\\neg(p \\lor q)$ is true then $p \\lor q$ is false. An "or" is false only when both parts are false, so $p$ and $q$ are both false.' },
           ]
         : env.p
           ? [
-              { f: Bin('imp', p, q), isTrue: false, deduce: 'An implication is false only when the hypothesis is true and the conclusion is false, so $p$ is true and $q$ is false.' },
-              { f: Bin('and', p, Not(q)), isTrue: true, deduce: 'AND is true only when both parts are true, so $p$ is true and $\\neg q$ is true, i.e. $q$ is false.' },
+              { f: Bin('imp', p, q), isTrue: false, deduce: 'An implication ($\\to$) is false only when its left side is true and its right side is false, so $p$ is true and $q$ is false.' },
+              { f: Bin('and', p, Not(q)), isTrue: true, deduce: 'An "and" ($\\land$) is true only when both parts are true. So $p$ is true and $\\neg q$ is true, which means $q$ is false.' },
             ]
           : [
-              { f: Bin('imp', q, p), isTrue: false, deduce: 'An implication is false only when the hypothesis is true and the conclusion is false, so $q$ is true and $p$ is false.' },
-              { f: Bin('and', Not(p), q), isTrue: true, deduce: 'AND is true only when both parts are true, so $\\neg p$ is true (i.e. $p$ is false) and $q$ is true.' },
+              { f: Bin('imp', q, p), isTrue: false, deduce: 'An implication ($\\to$) is false only when its left side is true and its right side is false, so $q$ is true and $p$ is false.' },
+              { f: Bin('and', Not(p), q), isTrue: true, deduce: 'An "and" ($\\land$) is true only when both parts are true. So $\\neg p$ is true, which means $p$ is false, and $q$ is true.' },
             ];
   const clueF = rng.bool() ? rng.pick(clueOpts) : null;
   const clue = clueF ? { ...clueF, text: `$${tex(clueF.f)}$ is ${clueF.isTrue ? '**true**' : '**false**'}` } : null;
@@ -361,12 +371,12 @@ function genEvaluate(rng: Rng) {
       case 'imp':
         r = iv
           ? lv
-            ? 'the conclusion is true, so the implication holds'
-            : 'the hypothesis is false, so the implication is (vacuously) true'
-          : 'a true hypothesis with a false conclusion is the one case where an implication is false';
+            ? 'the right side is true, so the implication holds'
+            : 'the left side is false, so the implication counts as true'
+          : 'true then false is the one case where an implication is false';
         break;
       case 'iff':
-        r = iv ? 'both sides have the same truth value' : `the two sides differ, ${TV(lv)} versus ${TV(rv)}, so the biconditional is false`;
+        r = iv ? 'both sides have the same truth value' : `the two sides differ, ${TV(lv)} versus ${TV(rv)}, so the "if and only if" is false`;
         break;
     }
     if (f.k === 'not') r += `; then the outer $\\neg$ flips the bracket from ${TV(iv)} to ${TV(!iv)}`;
@@ -394,12 +404,25 @@ function genEvaluate(rng: Rng) {
 
   const all = [answerF, ...bad];
   const order = rng.shuffle(all);
-  const lines = order.map((f) => `- $${tex(f)}$: $${subst(f)}$ (${reason(f)})`).join('\n');
-  const solution =
-    (clue ? `**Step 1: find $p$ and $q$.** ${clue.deduce}\n\n**Step 2: substitute.** ` : '') +
-    `Substitute $p = ${TVt(env.p)}$, $q = ${TVt(env.q)}$, $r = ${TVt(env.r)}$ into each statement. Negate single letters first, then apply the connective, then any outer $\\neg$.\n\n` +
-    lines +
-    `\n\nOnly one statement is ${word}.\n\nAnswer: ${answer}`;
+  const inners = all.map((f) => (f.k === 'not' ? (f.a as Extract<F, { k: 'bin' }>) : (f as Extract<F, { k: 'bin' }>)));
+  const usedOps = (['and', 'or', 'imp', 'iff'] as Op[]).filter((op) => inners.some((f) => f.op === op));
+  const opRow: Record<Op, string[]> = {
+    and: ['$\\land$', 'and', 'both sides are true'],
+    or: ['$\\lor$', 'or', 'at least one side is true'],
+    imp: ['$\\to$', 'if ... then', 'any case except true then false'],
+    iff: ['$\\leftrightarrow$', 'if and only if', 'both sides match'],
+  };
+  const clueHasNot = clue !== null && (clue.f.k === 'not' || (clue.f.k === 'bin' && (clue.f.a.k === 'not' || clue.f.b.k === 'not')));
+  const hasNot = clueHasNot || all.some((f) => f.k === 'not') || inners.some((f) => f.a.k === 'not' || f.b.k === 'not');
+  const symbolTable = tbl(['Symbol', 'Read it as', 'True when'], usedOps.map((op) => opRow[op]));
+  const solution = stepsOf(
+    `${hasNot ? 'The symbol $\\neg$ means "not": it flips T and F. Here is what the other symbols mean' : 'Here is what the symbols mean'}:\n\n${symbolTable}`,
+    clue && `First find $p$ and $q$. ${clue.deduce}`,
+    `Put in $p = ${TVt(env.p)}$, $q = ${TVt(env.q)}$ and $r = ${TVt(env.r)}$. Flip single letters first, then apply the main symbol, then any $\\neg$ outside a bracket:\n\n${tbl(
+      ['Statement', 'Working', 'Result'],
+      order.map((f) => [`$${tex(f)}$`, `$${subst(f)}$`, ev(f, env) ? 'True' : 'False']),
+    )}`,
+  );
 
   const tvWord = (b: boolean) => (b ? '**true**' : '**false**');
   const given = clue
@@ -410,8 +433,10 @@ function genEvaluate(rng: Rng) {
     answer,
     answerValue: tex(answerF),
     distractors,
+    asking: clue ? `After working out $p$ and $q$, which statement comes out ${word}?` : `With these truth values, which statement comes out ${word}?`,
     solution,
-    keyIdea: 'Substitute the truth values, negate single letters first, then use the rule for the connective (an implication is false only for true $\\to$ false).',
+    conclusion: `Only one of the four statements comes out ${word} with these values, and that is ${answer}.`,
+    keyIdea: 'Replace each letter with T or F. Flip any $\\neg$ on a single letter first, apply the main symbol, then any outer $\\neg$. An implication is false only for true then false.',
   };
 }
 

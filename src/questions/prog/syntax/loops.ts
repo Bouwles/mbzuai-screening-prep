@@ -27,18 +27,20 @@ export const questions: StaticQuestion[] = [
     options: ['`15`', '`26`', '`18`', '`44`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What do the values of `i` add up to?',
       solution:
-        '`range(start, stop, step)` starts **at** `start`, adds `step` each time, and stops before reaching `stop` (the stop value is never included).\n\n' +
-        '1. The values of `i` are 2, 5 and 8. The next would be 11, which is past 10.\n' +
-        '2. `total` adds them: $2 + 5 + 8 = 15$.\n\n' +
-        'Output: `15`.',
+        '`range(start, stop, step)` gives a run of values: begin at `start`, jump by `step` each time, and stop **before** reaching `stop`. The `stop` value itself is not included.\n\n' +
+        'Here that means begin at 2 and jump by 3. We get 2, 5 and 8. The next would be 11, which is past the stop value 10, so the loop ends.\n\n' +
+        'Each pass adds `i` to `total`, which starts at 0:\n\n| `i` | `total` becomes |\n|---|---|\n| 2 | $0 + 2 = 2$ |\n| 5 | $2 + 5 = 7$ |\n| 8 | $7 + 8 = 15$ |\n\n' +
+        'Line 4 prints `total`, which is 15.',
+      conclusion: 'The values 2, 5 and 8 add up to 15, so the answer is `15`.',
       whyWrong: [
         null,
         'This goes one step too far and also adds 11. The range stops before reaching 10.',
         'This starts at the step (3, 6, 9) instead of at the start value 2.',
         'This ignores the step and adds every whole number from 2 to 9.',
       ],
-      keyIdea: '`range(start, stop, step)` begins at start, jumps by step, and never includes stop.',
+      keyIdea: 'For `range(a, b, c)`, write out the values: start at `a`, add `c`, and stop before `b`. If `c` is missing it is 1. Then add, count or print them as the code says.',
     },
     check: { optionValues: [15, 26, 18, 44], compute: () => rangeVals(2, 10, 3).reduce((s, v) => s + v, 0) },
     python: { stdout: '15\n' },
@@ -52,18 +54,19 @@ export const questions: StaticQuestion[] = [
     options: ['`17`', '`20`', '`15`', '`16`'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many values does `range(4, 20)` give?',
       solution:
-        '`range(4, 20)` gives the values $4, 5, 6, \\dots, 19$. It includes the start (4) and stops before the stop value (20).\n\n' +
-        'The number of values in `range(a, b)` is simply $b - a$:\n\n' +
-        '$$20 - 4 = 16$$\n\n' +
-        'So the loop body runs 16 times and `hi` is printed 16 times.',
+        '`range(4, 20)` starts at 4, goes up by 1 each time, and stops **before** 20. So 20 itself is not included.\n\n' +
+        'So `i` takes the values 4, 5, 6, and so on up to 19. `print("hi")` runs once for each value.\n\n' +
+        'To count them without listing them all, use stop minus start: $20 - 4 = 16$.',
+      conclusion: 'The loop runs once for each value from 4 to 19, which makes 16 passes, so the answer is `16`.',
       whyWrong: [
         'This counts both ends, 4 **and** 20. But 20 is the stop value and is not included; the last value is 19.',
         'This reads only the stop value. The loop starts at 4, not at 0, so it runs fewer than 20 times.',
         'This removes one value too many, as if both the start and the stop were excluded. The start value 4 is included.',
         null,
       ],
-      keyIdea: '`range(a, b)` with step 1 produces exactly $b - a$ values: a is included, b is not.',
+      keyIdea: '`range(a, b)` runs exactly $b - a$ times, because `a` is included and `b` is not. Try a small case to confirm: `range(1, 4)` gives 1, 2, 3, which is $4 - 1 = 3$ values.',
     },
     check: { optionValues: [17, 20, 15, 16], compute: () => rangeVals(4, 20).length },
   },
@@ -79,17 +82,19 @@ export const questions: StaticQuestion[] = [
     options: ['`14`', '`5`', '`11`', '`3 4 8 9 14`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What do all the numbers in array `A` add up to?',
       solution:
-        '`total` is an **accumulator**: it starts at 0 and each pass of the loop adds the current item to it.\n\n' +
-        '| i | A[i] | total |\n|---|---|---|\n| 1 | 3 | 3 |\n| 2 | 1 | 4 |\n| 3 | 4 | 8 |\n| 4 | 1 | 9 |\n| 5 | 5 | 14 |\n\n' +
-        'The `print` comes after `end for`, so it runs once, when the loop has finished.\n\nOutput: `14`.',
+        '`length(A)` is the number of items, which is 5. So line 3 makes `i` go from 1 to 5. `A[i]` means the item at position `i`.\n\n' +
+        '`total` starts at 0. Line 4 adds the current item to it on each pass:\n\n| `i` | `A[i]` | `total` becomes |\n|---|---|---|\n| 1 | 3 | 3 |\n| 2 | 1 | 4 |\n| 3 | 4 | 8 |\n| 4 | 1 | 9 |\n| 5 | 5 | 14 |\n\n' +
+        'Line 6 prints `total` once, after the loop.',
+      conclusion: 'Adding every item gives 14, and the `print` sits after the loop so it runs once. The answer is `14`.',
       whyWrong: [
         null,
         'This is the last item only. That would happen with `total = A[i]`, which overwrites the total instead of adding to it.',
         'This skips the first item (3), as if the loop started at position 2. The loop starts at $i = 1$.',
         'These are the running totals. They would only all be printed if `print(total)` were inside the loop.',
       ],
-      keyIdea: 'An accumulator starts at 0 and adds each item in turn; a `print` after the loop runs only once.',
+      keyIdea: '`total = total + A[i]` inside a loop is a running total. See whether `print` is inside or after the loop: inside it prints every step, after it prints only the final value.',
     },
     check: {
       optionValues: [14, 5, 11, null],
@@ -110,17 +115,19 @@ export const questions: StaticQuestion[] = [
     options: ['`16`', '`20`', '`32`', INFINITE],
     correctIndex: 2,
     markScheme: {
+      asking: 'What is the first doubling of 1 that reaches 20 or more?',
       solution:
-        'A `while` loop checks its condition **before** every pass.\n\n' +
-        '| check `n < 20` | n after the body |\n|---|---|\n| $1 < 20$ true | 2 |\n| $2 < 20$ true | 4 |\n| $4 < 20$ true | 8 |\n| $8 < 20$ true | 16 |\n| $16 < 20$ true | 32 |\n| $32 < 20$ **false**: stop | |\n\n' +
-        'The condition is only checked at the top, so `n` can overshoot 20 on the last pass.\n\nOutput: `32`.',
+        'A `while` loop checks its condition at the top. If it is true, the body runs, and then it checks again. It stops only when the check is false.\n\n' +
+        'Trace it:\n\n| `n` at the check | `n < 20`? | `n` becomes |\n|---|---|---|\n| 1 | yes | 2 |\n| 2 | yes | 4 |\n| 4 | yes | 8 |\n| 8 | yes | 16 |\n| 16 | yes | 32 |\n| 32 | no, stop | |\n\n' +
+        'Line 5 prints `n`, which is 32.',
+      conclusion: '16 is still below 20, so it doubles once more and `n` ends at 32. The answer is `32`.',
       whyWrong: [
         'This is the last value that is still less than 20. But $16 < 20$ is true, so the loop runs once more and doubles it to 32.',
         'This assumes the loop stops exactly at the limit. `n` only takes the values 1, 2, 4, 8, 16, 32, so it can never equal 20.',
         null,
         '`n` grows on every pass, so `n < 20` soon becomes false and the loop stops.',
       ],
-      keyIdea: 'A while loop checks its condition only at the top, so the variable can overshoot the limit on the final pass.',
+      keyIdea: 'A `while` loop stops at the first value that fails the check, which is usually past the limit. Draw a row per check and keep going until one says no.',
     },
     check: {
       optionValues: [16, 20, 32, INFINITE],
@@ -146,17 +153,20 @@ export const questions: StaticQuestion[] = [
     options: ['`rob`', '`root`', '`robot`', '`ro`'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which letters get added to `t` before the loop reaches `b`?',
       solution:
-        'The loop visits the characters one at a time. `break` immediately ends the **whole loop**.\n\n' +
-        '| i | s[i] | action | t |\n|---|---|---|---|\n| 1 | r | add | r |\n| 2 | o | add | ro |\n| 3 | b | `break` | ro |\n\n' +
-        'The test comes before the line that adds to `t`, so `b` is never added.\n\nOutput: `ro`.',
+        '`break` ends the whole loop at once. Any lines left in the body, and any passes left, are skipped.\n\n' +
+        'Look at the order. The `if` on line 4 comes **before** line 7, which adds the letter to `t`. So the `b` is tested first and never gets added.\n\n' +
+        '`s[i]` is the letter at position `i`. Trace it:\n\n| `i` | `s[i]` | Is it `b`? | `t` after this pass |\n|---|---|---|---|\n| 1 | r | no | `r` |\n| 2 | o | no | `ro` |\n| 3 | b | yes, `break` | `ro` |\n\n' +
+        'Line 9 prints `t`, which is `ro`.',
+      conclusion: 'The loop ends on reaching `b`, before adding it, so the output is `ro`.',
       whyWrong: [
         'This adds the `b` before stopping. The `if` comes **before** the line `t = t + s[i]`.',
         'This skips just this character and carries on. `break` ends the loop, so the rest is never visited.',
         'This assumes `break` only leaves the `if` block. It exits the whole `for` loop.',
         null,
       ],
-      keyIdea: '`break` ends the entire loop at once; any lines below it in the loop body are skipped.',
+      keyIdea: 'With `break`, see whether the work comes before or after the test. Work placed after the test doesn\'t happen on the pass that breaks. Then trace until the test is true and stop.',
     },
     check: {
       optionValues: ['rob', 'root', 'robot', 'ro'],
@@ -179,15 +189,18 @@ export const questions: StaticQuestion[] = [
     options: ['`for i = 1 to 10`', '`for i = 0 to 10`', '`for i = 1 to 9`', '`for i = 2 to 10`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which loop starts `i` at 1 and finishes with `i` at 10?',
       solution:
-        '`for i = a to b` includes **both** ends. So the loop starts at 1 and finishes at 10 with `for i = 1 to 10`.',
+        'In `for i = a to b`, the first value of `i` is `a` and the last value is `b`. Both ends are included.\n\n' +
+        'We want `i` to start at 1, so `a` is 1. We want it to finish at 10, so `b` is 10. That gives `for i = 1 to 10`.',
+      conclusion: 'Starting at 1 and finishing at 10, with both included, gives `for i = 1 to 10`.',
       whyWrong: [
         null,
         'This also runs with $i = 0$, giving 11 passes.',
         'This stops at 9. The end value is included, so to reach 10 the end must be 10.',
         'This misses $i = 1$. The start value is the first value of `i`.',
       ],
-      keyIdea: '`for i = a to b` runs from a to b inclusive.',
+      keyIdea: 'Read `for i = a to b` as "first value `a`, last value `b`". The number after `=` is the first value, and the number after `to` is the last one.',
     },
   },
   {
@@ -199,16 +212,18 @@ export const questions: StaticQuestion[] = [
     options: ['`7`', '`6`', '`9`', '`3`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many values does `i` take when it goes from 3 to 9?',
       solution:
-        '`i` takes the values 3, 4, 5, 6, 7, 8, 9, including both ends.\n\n' +
-        'The count is last $-$ first $+ 1$: $9 - 3 + 1 = 7$.',
+        '`for i = 3 to 9` starts `i` at 3, goes up by 1 and includes 9. The body runs once for each value.\n\n' +
+        'List them: 3, 4, 5, 6, 7, 8, 9. Counting them gives 7.',
+      conclusion: 'There are 7 values of `i` from 3 to 9, so the body runs 7 times and the answer is `7`.',
       whyWrong: [
         null,
         'This is $9 - 3$, which forgets that both ends are included.',
         'This reads only the end value. The loop starts at 3, not 1.',
         'This reads only the start value.',
       ],
-      keyIdea: '`for i = a to b` runs $b - a + 1$ times.',
+      keyIdea: 'For a `for` loop, use: passes = end $-$ start $+ 1$. Here that is $9 - 3 + 1 = 7$. The $+ 1$ is needed because both ends are included.',
     },
     check: {
       optionValues: [7, 6, 9, 3],
@@ -228,15 +243,19 @@ export const questions: StaticQuestion[] = [
     options: ['`0`', '`1`', '`10`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many passes does this loop make when `x` starts at 10?',
       solution:
-        'The condition is checked **before** the first pass. `10 < 10` is false, so the body never runs.\n\nAnswer: `0`.',
+        'A `while` loop checks its condition **before** running the body, including the very first time.\n\n' +
+        '`x` starts at 10, so the first check is `10 < 10`. 10 is not less than 10, so this is false.\n\n' +
+        'The check failed straight away, so line 3 never runs. That is 0 passes.',
+      conclusion: 'The first check fails, so the body never runs and the answer is `0`.',
       whyWrong: [
         null,
         'This assumes the body always runs once. A `while` loop tests first, so it can run zero times.',
         'This reads the value of `x` as the number of passes.',
         'The condition is false at the start, so the loop ends straight away.',
       ],
-      keyIdea: 'If a `while` condition is false at the start, the body runs zero times.',
+      keyIdea: 'Always test a `while` condition with the starting value first. If it is false, the body runs zero times. A `while` loop does not promise even one pass.',
     },
     check: {
       optionValues: [0, 1, 10, INFINITE],
@@ -264,18 +283,19 @@ export const questions: StaticQuestion[] = [
     options: ['`15`', INFINITE, '`10`', '`5`'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Does this loop ever finish, and if it does, what does it print?',
       solution:
-        'Nothing in the loop body changes `i`.\n\n' +
-        '1. `i` stays 1, so `i <= 5` is true on every check.\n' +
-        '2. The loop never ends, and `print` is never reached.\n\n' +
-        'Answer: Infinite loop.',
+        'The loop keeps going while `i <= 5`. For it to stop, `i` has to become bigger than 5.\n\n' +
+        'Look at the body, line 4: `total = total + i`. It changes `total`, but no line changes `i`.\n\n' +
+        'So `i` stays at 1 and the check `1 <= 5` is true every time. `total` goes 1, 2, 3 and on with no end, and line 6 is never reached.',
+      conclusion: 'Nothing ever changes `i`, so the condition can\'t become false. The answer is: Infinite loop.',
       whyWrong: [
         'This is the total if the body also had `i = i + 1`. That line is missing.',
         null,
         'This assumes the loop adds 1 to 4 and stops. `i` never changes.',
         'This reads the limit in the condition as the output.',
       ],
-      keyIdea: 'A `while` loop needs something in its body that eventually makes the condition false.',
+      keyIdea: 'For every `while` loop, find the variable in the condition and look for a line in the body that changes it. If there is no such line and the loop starts at all, it never ends.',
     },
     check: {
       optionValues: [15, INFINITE, 10, 5],
@@ -298,15 +318,18 @@ export const questions: StaticQuestion[] = [
     options: ['Ends the loop at once', 'Skips to the next pass', 'Restarts the loop', 'Ends the whole program'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What happens when a loop reaches `break`?',
       solution:
-        '`break` ends the loop immediately, and the program carries on with the first line after the loop. In nested loops it ends only the innermost one.',
+        '`break` means "leave this loop now". The rest of the body is skipped, and no more passes happen.\n\n' +
+        'The program then carries on from the first line after the loop. So only the loop has finished, and the rest of the program still runs.',
+      conclusion: '`break` leaves the loop immediately with no further passes, so the answer is: Ends the loop at once.',
       whyWrong: [
         null,
         '`break` does not move on to another pass: it leaves the loop altogether.',
         'Nothing starts again. The loop is finished.',
         'Only the loop ends. Lines after the loop still run.',
       ],
-      keyIdea: '`break` leaves the loop at once; the first line after the loop runs next.',
+      keyIdea: 'In a trace, when `break` runs, draw a line under your table and jump to the first line below the `end for` or `end while`. That is where the program carries on.',
     },
   },
   {
@@ -317,16 +340,19 @@ export const questions: StaticQuestion[] = [
     options: ['$b - a + 1$', '$b - a$', '$b - a - 1$', '$a + b$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the formula for how many values `i` takes going from $a$ to $b$?',
       solution:
-        'An **inclusive** range counts both of its end values, so the count is last $-$ first $+ 1$.\n\n' +
-        'For example, `for i = 3 to 5` runs with 3, 4 and 5, which is $5 - 3 + 1 = 3$ passes.',
+        'Try real numbers first. `for i = 3 to 5` gives `i` the values 3, 4 and 5, which is 3 passes.\n\n' +
+        'Subtraction alone gives $5 - 3 = 2$. That counts the gaps between the values, and it is one too few, because both ends are included.\n\n' +
+        'So add 1 to the subtraction: $b - a + 1$. For our example, $5 - 3 + 1 = 3$, which matches.',
+      conclusion: 'The gaps between the values number $b - a$, and there is one more value than gaps, so the answer is $b - a + 1$.',
       whyWrong: [
         null,
         'This leaves out one end. `for i = 3 to 5` runs 3 times, not 2.',
         'This leaves out both ends. Both are included.',
         'This adds the two ends. `for i = 3 to 5` would then seem to run 8 times.',
       ],
-      keyIdea: 'An inclusive range from a to b has $b - a + 1$ values.',
+      keyIdea: 'For a formula question in letters, try small real numbers such as 3 and 5 and count by hand. Keep only the formula that gives your count. For loops with both ends included: end $-$ start $+ 1$.',
     },
     check: {
       optionValues: [3, 2, 1, 8],
@@ -345,15 +371,18 @@ export const questions: StaticQuestion[] = [
     options: ['A `while` loop', 'A `for` loop', 'An `if` statement', 'An assignment'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which tool repeats work when you don\'t know how many repeats you\'ll need?',
       solution:
-        'A `while` loop repeats for as long as a condition holds, so it does not need the number of passes up front. A `for` loop is the natural choice when the range is known.',
+        'A `for` loop has its range fixed when it starts, such as `for i = 1 to 10`. So it suits tasks where the count is known.\n\n' +
+        'A `while` loop keeps checking a condition and stops when it fails. Halving a number until it reaches 1 is an example. You don\'t have to know the number of passes in advance.',
+      conclusion: 'Repeating until a condition fails, with no fixed count, is the job of A `while` loop.',
       whyWrong: [
         null,
         'A `for` loop suits a known range of values, fixed when it starts.',
         'An `if` statement runs its block at most once. It does not repeat.',
         'An assignment stores one value. It does not repeat anything.',
       ],
-      keyIdea: 'Use `for` for a known range and `while` when repetition depends on a condition.',
+      keyIdea: 'Ask: can I say how many passes there will be before starting? If yes, use a `for` loop. If the stopping point depends on what happens during the loop, use a `while` loop.',
     },
   },
 
@@ -370,18 +399,20 @@ export const questions: StaticQuestion[] = [
     options: ['`18`', '`37`', '`55`', '`3`'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What do the numbers from 1 to 10 add up to, if you leave out the multiples of 3?',
       solution:
-        '`mod(i,3) != 0` is true when `i` is **not** a multiple of 3, so the multiples of 3 (3, 6, 9) are never added.\n\n' +
-        'Numbers that get added: $1, 2, 4, 5, 7, 8, 10$.\n\n' +
-        '$$1 + 2 + 4 + 5 + 7 + 8 + 10 = 37$$\n\n' +
-        'Quick check: the sum of 1 to 10 is 55, and the skipped numbers add to 18, so $55 - 18 = 37$.\n\nOutput: `37`.',
+        '`mod(i,3)` is the remainder after dividing `i` by 3. For example, `mod(7,3)` is 1, because $7 = 2 \\times 3 + 1$. A remainder of 0 means `i` is a multiple of 3.\n\n' +
+        '`!=` means "not equal". So line 3 is true when the remainder isn\'t 0, which is when `i` is **not** a multiple of 3. That means 3, 6 and 9 are skipped.\n\n' +
+        'Add up the rest, keeping a running total:\n\n| `i` | 1 | 2 | 4 | 5 | 7 | 8 | 10 |\n|---|---|---|---|---|---|---|---|\n| `total` | 1 | 3 | 7 | 12 | 19 | 27 | 37 |\n\n' +
+        'Line 7 prints `total`, which is 37.',
+      conclusion: 'Adding every number except 3, 6 and 9 gives 37, so the answer is `37`.',
       whyWrong: [
         'This is the total of the numbers that were **left out** ($3 + 6 + 9$). The condition `!=` adds the numbers that are not multiples of 3.',
         null,
         'This ignores the `if` and adds every number from 1 to 10.',
         'This adds 1 and 2, then stops the loop at $i = 3$. A false `if` skips only its own block, and the loop carries on.',
       ],
-      keyIdea: 'A false `if` skips only its own block for that pass; the loop itself carries on to the next value.',
+      keyIdea: 'An `if` with `mod` inside a loop filters the numbers. List the ones that pass, then add. A shortcut for "all except": the total of 1 to 10 is 55, and taking off the left-out 18 gives 37.',
     },
     check: {
       optionValues: [18, 37, 55, 3],
@@ -406,17 +437,20 @@ export const questions: StaticQuestion[] = [
     options: ['`16`', '`10`', '`4`', '`6`'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many times does the inner line run in total?',
       solution:
-        'For each value of `i`, the inner loop runs exactly `i` times.\n\n' +
-        '| i | values of j | inner passes |\n|---|---|---|\n| 1 | 1 | 1 |\n| 2 | 1, 2 | 2 |\n| 3 | 1, 2, 3 | 3 |\n| 4 | 1, 2, 3, 4 | 4 |\n\n' +
-        'Total: $1 + 2 + 3 + 4 = 10$.\n\nOutput: `10`.',
+        'The `count` line is inside both loops. So it runs once for every pass of the inner loop.\n\n' +
+        'The inner loop is `for j = 1 to i`, so its length depends on `i`. When `i` is 3, `j` goes 1, 2, 3, which is 3 passes.\n\n' +
+        'Work it out for each pass of the outer loop:\n\n| `i` | Inner passes | `count` after this `i` |\n|---|---|---|\n| 1 | 1 | 1 |\n| 2 | 2 | 3 |\n| 3 | 3 | 6 |\n| 4 | 4 | 10 |\n\n' +
+        'Line 7 prints `count`, which is 10.',
+      conclusion: 'The total is $1 + 2 + 3 + 4 = 10$, so the answer is `10`.',
       whyWrong: [
         'This multiplies $4 \\times 4$, as if the inner loop always ran 4 times. Its length changes with `i`.',
         null,
         'This counts only the outer loop passes. The `count` line is inside the inner loop.',
         'This adds $0 + 1 + 2 + 3$, as if the inner loop stopped at $i - 1$. The end value is included.',
       ],
-      keyIdea: 'For nested loops, add up the inner passes for each outer value; it is a simple product only if the inner length is fixed.',
+      keyIdea: 'For nested loops, make a table with one row per outer value and write how many times the inner loop runs. Then add the column. Only multiply when the inner loop\'s length never changes.',
     },
     check: {
       optionValues: [16, 10, 4, 6],
@@ -439,17 +473,19 @@ export const questions: StaticQuestion[] = [
     options: ['`7`', '`6`', '`5`', '`1`'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many times can 100 be halved with `div` before it reaches 1?',
       solution:
-        'The condition `x > 1` is checked before every pass.\n\n' +
-        '| check `x > 1` | new x | steps |\n|---|---|---|\n| $100 > 1$ | 50 | 1 |\n| $50 > 1$ | 25 | 2 |\n| $25 > 1$ | 12 | 3 |\n| $12 > 1$ | 6 | 4 |\n| $6 > 1$ | 3 | 5 |\n| $3 > 1$ | 1 | 6 |\n| $1 > 1$ false: stop | | |\n\n' +
-        'Output: `6`.',
+        '`div(x,2)` is integer division: it halves `x` and throws away any decimal part. For example, $25 \\div 2 = 12.5$, so `div(25,2)` is 12.\n\n' +
+        'The loop runs while `x > 1`. Each pass halves `x` and adds 1 to `steps`:\n\n| Pass | `x` at start | `x` becomes | `steps` |\n|---|---|---|---|\n| 1 | 100 | 50 | 1 |\n| 2 | 50 | 25 | 2 |\n| 3 | 25 | 12 | 3 |\n| 4 | 12 | 6 | 4 |\n| 5 | 6 | 3 | 5 |\n| 6 | 3 | 1 | 6 |\n\n' +
+        'Now `1 > 1` is false, so line 7 prints `steps`.',
+      conclusion: 'It takes 6 halvings to bring `x` down to 1, and `steps` counts them, so the answer is `6`.',
       whyWrong: [
         'This uses ordinary division: 12.5, 6.25, 3.125, 1.5625, which is still above 1, so one extra pass is needed. With `div` the decimals are dropped and 3 halves straight to 1.',
         null,
         'This stops one pass too early, at $x = 3$. But $3 > 1$ is true, so the loop runs once more.',
         'This is the final value of `x`, not of `steps`.',
       ],
-      keyIdea: 'Count while-loop passes with a trace table: check the condition, update, count, and repeat until the check fails.',
+      keyIdea: 'Halving with `div` drops decimals, so trace the real values. Keep one row per pass and test the condition after each row. The loop stops only when the test is false.',
     },
     check: {
       optionValues: [7, 6, 5, 1],
@@ -476,18 +512,20 @@ export const questions: StaticQuestion[] = [
     options: ['`i <= 5`', '`i < 5`', '`i >= 5`', '`i != 5`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which condition makes `i` run through 1, 2, 3, 4 and 5 and then stop?',
       solution:
-        'The `for` loop runs with $i = 1, 2, 3, 4, 5$, so `product` ends at 120. The `while` loop must also run when $i = 5$, then stop at $i = 6$.\n\n' +
-        '- `i <= 5` is true for 1 to 5 and false at 6: five passes, product 120.\n' +
-        '- `i < 5` and `i != 5` both stop as soon as $i = 5$: four passes, product 24.\n' +
-        '- `i >= 5` is false at the start: no passes, product 1.',
+        '`for i = 1 to 5` runs the body with `i` = 1, 2, 3, 4, 5. The value 5 is included.\n\n' +
+        'In the `while` version, the condition is checked at the top of each pass. It has to be true for each of those values, and false for the next value, 6.\n\n' +
+        'Test each condition at the values that matter:\n\n| Condition | `i` = 1 | `i` = 5 | `i` = 6 |\n|---|---|---|---|\n| `i <= 5` | true | true | false |\n| `i < 5` | true | false | false |\n| `i >= 5` | false | true | true |\n| `i != 5` | true | false | true |\n\n' +
+        'Only the first row is true, true, then false.',
+      conclusion: 'It keeps going up to and including 5 and then stops, so the condition must be `i <= 5`.',
       whyWrong: [
         null,
         'This stops before using 5, so it runs only 4 passes and prints 24.',
         'This is false when $i = 1$, so the body never runs.',
         'This stops as soon as $i$ reaches 5, so 5 is never multiplied in and it prints 24.',
       ],
-      keyIdea: 'To rewrite an inclusive `for` as a `while`, keep the start value, use `<=`, and update the counter at the end of the body.',
+      keyIdea: 'To turn `for i = a to b` into a `while`, start `i` at `a`, use `while (i <= b)`, and put `i = i + 1` last in the body. Test the condition at the first, last and next values.',
     },
     check: {
       optionValues: [0, 1, 2, 3],
@@ -521,19 +559,21 @@ export const questions: StaticQuestion[] = [
     options: ['`16`', '`2`', '`14`', '`13`'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many numbers from 1 to 30 are multiples of 3 or multiples of 5?',
       solution:
-        '`range(1, 31)` stops before 31, so `n` runs from 1 to 30. `count` goes up once for every `n` that is a multiple of 3 **or** of 5.\n\n' +
-        '- Multiples of 3 up to 30: $30 \\div 3 = 10$ numbers.\n' +
-        '- Multiples of 5 up to 30: $30 \\div 5 = 6$ numbers.\n' +
-        '- 15 and 30 are multiples of both and have been counted twice: $10 + 6 - 2 = 14$.\n\n' +
-        'Output: `14`.',
+        '`range(1, 31)` gives 1, 2, and so on up to 30. It stops before 31, so 31 is not included.\n\n' +
+        '`n % 3` is the remainder, what is left over after dividing `n` by 3. For example, `7 % 3` is 1. A remainder of 0 means `n` is a multiple of 3. The same goes for 5.\n\n' +
+        'List the multiples:\n\n- Multiples of 3: 3, 6, 9, 12, 15, 18, 21, 24, 27, 30. That is 10 numbers.\n- Multiples of 5: 5, 10, 15, 20, 25, 30. That is 6 numbers.\n\n' +
+        '`count` goes up by 1 at most once per number, even if both tests pass. 15 and 30 appear in both lists, so they must be counted only once.\n\n' +
+        'Add the two lists and take off the repeats: $10 + 6 - 2 = 14$.',
+      conclusion: '10 multiples of 3 plus 6 multiples of 5, minus the 2 counted twice, gives 14. The answer is `14`.',
       whyWrong: [
         'This adds 10 and 6 without noticing that 15 and 30 were counted twice. Each `n` can add at most 1.',
         'This reads `or` as `and`, counting only numbers divisible by both 3 and 5 (15 and 30).',
         null,
         'This leaves out 30, as if `range(1, 31)` stopped at 29. It stops before 31, so the last value is 30.',
       ],
-      keyIdea: 'A counter with an `if` inside a loop counts how many items pass the test; `or` passes if at least one part is true.',
+      keyIdea: 'To count "A or B", add the two counts and subtract the overlap: count(A) $+$ count(B) $-$ count(both). Multiples of 3 and 5 overlap at multiples of 15.',
     },
     check: {
       optionValues: [16, 2, 14, 13],
@@ -553,17 +593,19 @@ export const questions: StaticQuestion[] = [
     options: ['`5 15`', '`7 21`', '`7 28`', '`6 21`'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What are `n` and `total` when `total` first goes over 20?',
       solution:
-        'Each pass first increases `n` by 1, then adds the new `n` to `total`. The check happens at the top.\n\n' +
-        '| check `total <= 20` | n | total |\n|---|---|---|\n| $0 \\le 20$ | 1 | 1 |\n| $1 \\le 20$ | 2 | 3 |\n| $3 \\le 20$ | 3 | 6 |\n| $6 \\le 20$ | 4 | 10 |\n| $10 \\le 20$ | 5 | 15 |\n| $15 \\le 20$ | 6 | 21 |\n| $21 \\le 20$ false: stop | | |\n\n' +
-        'Output: `6` then `21`.',
+        'The check `total <= 20` is at the top of the loop, so the loop carries on until `total` is more than 20. Inside, `n` goes up by 1 first, then the new `n` is added to `total`.\n\n' +
+        'Trace it:\n\n| Pass | `n` becomes | `total` becomes | `total <= 20`? |\n|---|---|---|---|\n| 1 | 1 | 1 | yes |\n| 2 | 2 | 3 | yes |\n| 3 | 3 | 6 | yes |\n| 4 | 4 | 10 | yes |\n| 5 | 5 | 15 | yes |\n| 6 | 6 | 21 | no, stop |\n\n' +
+        'Lines 7 and 8 print `n` and then `total`.',
+      conclusion: 'The loop stops when `total` reaches 21, at which point `n` is 6, so the output is `6 21`.',
       whyWrong: [
         'This stops at the last total that is still at most 20. But $15 \\le 20$ is true, so the loop runs once more.',
         'This swaps the two lines in the body, adding `n` to `total` before increasing `n`.',
         'This runs one pass too many. After `total` becomes 21, the check $21 \\le 20$ is false and the loop stops.',
         null,
       ],
-      keyIdea: 'Trace a while loop row by row: check the condition, then do the body lines in order; stop at the first failed check.',
+      keyIdea: 'Keep the body\'s lines in their order when tracing: here `n` changes first, then `total` uses the new `n`. Swap them and the answer changes. Test the condition only after each full pass.',
     },
     check: {
       optionValues: ['5 15', '7 21', '7 28', '6 21'],
@@ -587,17 +629,19 @@ export const questions: StaticQuestion[] = [
     options: [INFINITE, '`1`', '`-2`', '`0`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Will subtracting 3 from 10 over and over ever land exactly on 0?',
       solution:
-        'The loop continues as long as `i` is **not equal** to 0.\n\n' +
-        '| i at the check | `i != 0` | new i |\n|---|---|---|\n| 10 | true | 7 |\n| 7 | true | 4 |\n| 4 | true | 1 |\n| 1 | true | -2 |\n| -2 | true | -5 |\n\n' +
-        'Counting down by 3 from 10 never lands exactly on 0, so the condition stays true for ever.\n\nAnswer: Infinite loop.',
+        '`!=` means "not equal to". The loop only stops when `i != 0` is false. That happens only if `i` is exactly 0.\n\n' +
+        'Follow `i`: it goes 10, 7, 4, 1, then $-2$, then $-5$, and keeps falling.\n\n' +
+        'It jumps from 1 to $-2$, straight over 0. After that, `i` only gets further from 0. So the test is true every time, and line 5 is never reached.',
+      conclusion: '`i` never equals 0, so the loop condition never becomes false. The answer is: Infinite loop.',
       whyWrong: [
         null,
         'This assumes the loop stops before going negative, as if the condition were `i > 3`. The condition is `i != 0`.',
         'This assumes the loop stops once `i` drops below 0, as if the condition were `i > 0`. `-2 != 0` is still true.',
         'This assumes `i` reaches 0. The values are 10, 7, 4, 1, then $-2$, jumping over 0.',
       ],
-      keyIdea: 'A `!=` stopping condition is dangerous: if the counter can jump over the target value, the loop never ends.',
+      keyIdea: 'A `!=` stopping test is risky. See whether the variable can land exactly on the target: 10 minus multiples of 3 gives 10, 7, 4, 1, $-2$, and 0 isn\'t there. A miss means the loop never ends.',
     },
     check: {
       optionValues: [INFINITE, 1, -2, 0],
@@ -623,17 +667,20 @@ export const questions: StaticQuestion[] = [
     options: ['`165`', '`385`', '`30`', '`220`'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What do the squares of the even numbers from 1 to 10 add up to?',
       solution:
-        '`mod(i,2) == 0` is true when `i` is **even**. So only 2, 4, 6, 8, 10 are used, and each adds its **square** to `s`.\n\n' +
-        '| i | i * i | s |\n|---|---|---|\n| 2 | 4 | 4 |\n| 4 | 16 | 20 |\n| 6 | 36 | 56 |\n| 8 | 64 | 120 |\n| 10 | 100 | 220 |\n\n' +
-        'Output: `220`.',
+        '`mod(i,2)` is the remainder, what is left over after dividing `i` by 2. For example, `mod(7,2)` is 1. It is 0 when `i` is even, so line 3 lets through only the even values: 2, 4, 6, 8 and 10.\n\n' +
+        'Line 4 adds `i * i`, which is `i` multiplied by itself (its **square**). `s` starts at 0.\n\n' +
+        'Trace the even values:\n\n| `i` | `i * i` | `s` becomes |\n|---|---|---|\n| 2 | 4 | 4 |\n| 4 | 16 | 20 |\n| 6 | 36 | 56 |\n| 8 | 64 | 120 |\n| 10 | 100 | 220 |\n\n' +
+        'Line 7 prints `s`, which is 220.',
+      conclusion: 'The even squares add to 220, so the answer is `220`.',
       whyWrong: [
         'This adds the squares of the **odd** numbers. A remainder of 0 picks out the even ones.',
         'This ignores the `if` and adds the squares of all numbers from 1 to 10.',
         'This adds `i` instead of `i * i`.',
         null,
       ],
-      keyIdea: 'An `if` inside a loop filters which passes update the accumulator.',
+      keyIdea: 'Split a filter-and-add loop into two questions: which values pass the `if`, and what gets added for each? Make a table of only the passing values, with a column for the amount added and one for the running total.',
     },
     check: {
       optionValues: [165, 385, 30, 220],
@@ -653,16 +700,19 @@ export const questions: StaticQuestion[] = [
     options: ['`6`', '`5`', '`7`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many times can 7 be taken from 40 while `n` is still positive at the check?',
       solution:
-        '| pass | n before | n after |\n|---|---|---|\n| 1 | 40 | 33 |\n| 2 | 33 | 26 |\n| 3 | 26 | 19 |\n| 4 | 19 | 12 |\n| 5 | 12 | 5 |\n| 6 | 5 | -2 |\n\n' +
-        'Now `n > 0` is false, so the body ran **6** times.',
+        'The check `n > 0` happens at the top of each pass. `n` falls by 7 each time, and the body keeps running as long as `n` is above 0.\n\n' +
+        'Trace it:\n\n| Pass | `n` at the check | `n > 0`? | `n` becomes |\n|---|---|---|---|\n| 1 | 40 | yes | 33 |\n| 2 | 33 | yes | 26 |\n| 3 | 26 | yes | 19 |\n| 4 | 19 | yes | 12 |\n| 5 | 12 | yes | 5 |\n| 6 | 5 | yes | $-2$ |\n\n' +
+        '`-2 > 0` is false, so there is no further pass.',
+      conclusion: '5 is still above 0, so one more pass runs and takes `n` to $-2$. That makes 6 passes, and the answer is `6`.',
       whyWrong: [
         null,
         'This stops when `n` is 5. But $5 > 0$ is true, so there is one more pass.',
         'This runs one pass too many. After `n` becomes $-2$, the check fails.',
         '`n` falls on every pass, so `n > 0` eventually fails and the loop stops.',
       ],
-      keyIdea: 'Count passes by checking the condition before each one; the last pass can take the variable past the limit.',
+      keyIdea: 'To count passes of `while (n > 0)` with `n = n - d`, divide `n` by `d` and round **up**: $40 \\div 7$ is about 5.7, which rounds up to 6. A table confirms it.',
     },
     check: {
       optionValues: [6, 5, 7, INFINITE],
@@ -687,17 +737,19 @@ export const questions: StaticQuestion[] = [
     options: ['`7`', '`6`', '`8`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many times is 8 subtracted from 50 before `n` goes below 0?',
       solution:
-        '`while (true)` keeps going until `break` runs. Here `break` runs on the first pass that leaves `n` below 0.\n\n' +
-        '| pass | n after | n < 0? |\n|---|---|---|\n| 1 | 42 | no |\n| 2 | 34 | no |\n| 3 | 26 | no |\n| 4 | 18 | no |\n| 5 | 10 | no |\n| 6 | 2 | no |\n| 7 | -6 | yes: `break` |\n\n' +
-        'The body ran **7** times.',
+        '`while (true)` has no stopping test of its own. It only ends when `break` on line 5 runs, and this happens when `n < 0`.\n\n' +
+        'Each pass takes 8 off first, then tests `n`:\n\n| Pass | `n` becomes | `n < 0`? |\n|---|---|---|\n| 1 | 42 | no |\n| 2 | 34 | no |\n| 3 | 26 | no |\n| 4 | 18 | no |\n| 5 | 10 | no |\n| 6 | 2 | no |\n| 7 | $-6$ | yes, `break` |\n\n' +
+        'The pass that breaks still counts as a pass.',
+      conclusion: '2 is not below 0, so pass 7 runs and takes `n` to $-6$. The `break` ends that pass, so the answer is `7`.',
       whyWrong: [
         null,
         'This stops when `n` is 2. But $2 < 0$ is false, so the loop carries on.',
         'This runs one pass too many. `break` ends the loop on the pass that makes `n` negative.',
         'The `break` does run, because `n` falls by 8 each pass and soon drops below 0.',
       ],
-      keyIdea: 'With `while (true)`, the loop ends on the pass where the `break` test first succeeds.',
+      keyIdea: 'In a `while (true)` loop, the pass on which `break` runs still counts. Make one row per pass and test straight after the line that changes the variable, following the order in the code.',
     },
     check: {
       optionValues: [7, 6, 8, INFINITE],
@@ -723,17 +775,20 @@ export const questions: StaticQuestion[] = [
     options: ['`9`', '`12`', '`10`', '`6`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many times does the inner loop\'s line run altogether?',
       solution:
-        'The inner loop starts at the current `i`, so it gets shorter each time.\n\n' +
-        '| i | values of j | inner passes |\n|---|---|---|\n| 1 | 1, 2, 3, 4 | 4 |\n| 2 | 2, 3, 4 | 3 |\n| 3 | 3, 4 | 2 |\n\n' +
-        'Total: $4 + 3 + 2 = 9$.',
+        '`c = c + 1` is inside both loops, so it runs once per pass of the inner loop.\n\n' +
+        'The inner loop is `for j = i to 4`. It starts at the current `i`, so it gets shorter as `i` grows. When `i` is 2, `j` goes 2, 3, 4, which is 3 passes.\n\n' +
+        'Count for each `i`:\n\n| `i` | Values of `j` | Inner passes |\n|---|---|---|\n| 1 | 1, 2, 3, 4 | 4 |\n| 2 | 2, 3, 4 | 3 |\n| 3 | 3, 4 | 2 |\n\n' +
+        'Add the last column: $4 + 3 + 2 = 9$.',
+      conclusion: 'The inner passes add to 9, so the line runs 9 times and the answer is `9`.',
       whyWrong: [
         null,
         'This multiplies $3 \\times 4$, as if the inner loop always ran 4 times.',
         'This adds $4 + 3 + 2 + 1$, as if the outer loop went up to 4. It stops at 3.',
         'This adds $1 + 2 + 3$, as if `j` ran from 1 to `i`. Here `j` runs from `i` to 4.',
       ],
-      keyIdea: 'When the inner range depends on the outer variable, add the inner lengths pass by pass.',
+      keyIdea: 'When the inner range uses `i`, make a table with each `i` and its inner passes, found by end $-$ start $+ 1$. Then add the column. The outer loop\'s end tells you when to stop.',
     },
     check: {
       optionValues: [9, 12, 10, 6],
@@ -753,16 +808,19 @@ export const questions: StaticQuestion[] = [
     options: [INFINITE, '`10`', '`9`', '`11`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Will adding 2 repeatedly to 1 ever give exactly 10?',
       solution:
-        '`n` starts at 1 and goes up by 2, so it takes the values 3, 5, 7, 9, 11, 13, and so on. These are all odd.\n\n' +
-        'So `n == 10` is never true, `break` never runs, and the loop never ends.\n\nAnswer: Infinite loop.',
+        '`while (true)` never stops by itself. The only way out is the `break` on line 5, which needs `n` to be exactly 10.\n\n' +
+        '`n` starts at 1 and goes up by 2 on each pass: 3, 5, 7, 9, 11, 13, and so on.\n\n' +
+        'An odd number plus 2 is always odd, so `n` is never even. It goes from 9 to 11, jumping over 10. So `n == 10` is never true, and line 5 never runs.',
+      conclusion: '`n` only ever takes odd values, so the `break` never runs. The answer is: Infinite loop.',
       whyWrong: [
         null,
         'This assumes `n` lands on 10. Starting at 1 and adding 2 only ever gives odd numbers.',
         'This assumes the loop stops at the last value below 10. Only `n == 10` can trigger the `break`.',
         'This assumes the loop stops at the first value above 10. The test is `==`, not `>=`.',
       ],
-      keyIdea: 'Check whether the `break` test can ever be true; a variable can jump over the exact value it is compared with.',
+      keyIdea: 'When a `break` test uses `==`, see whether the variable can land exactly on the target. Starting at 1 with jumps of 2 gives only odd numbers. A test like `n >= 10` would not have this problem.',
     },
     check: {
       optionValues: [INFINITE, 10, 9, 11],
@@ -789,16 +847,20 @@ export const questions: StaticQuestion[] = [
     options: ['`9`', '`6`', '`3`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'What total does `t` reach before `n` falls to 0 or below?',
       solution:
-        '| n | mod(n,4) | t |\n|---|---|---|\n| 23 | 3 | 3 |\n| 18 | 2 | 5 |\n| 13 | 1 | 6 |\n| 8 | 0 | 6 |\n| 3 | 3 | 9 |\n\n' +
-        'After the last row `n` becomes $-2$, so the loop breaks and prints 9.\n\nOutput: `9`.',
+        '`mod(n,4)` is the remainder after dividing `n` by 4. For example, $23 = 5 \\times 4 + 3$, so `mod(23,4)` is 3.\n\n' +
+        '`while (true)` only ends through `break`, on line 7. Each pass adds the remainder to `t`, takes 5 off `n`, then tests `n <= 0`.\n\n' +
+        'Trace it:\n\n| Pass | `n` at start | `mod(n,4)` | `t` becomes | `n` becomes | `n <= 0`? |\n|---|---|---|---|---|---|\n| 1 | 23 | 3 | 3 | 18 | no |\n| 2 | 18 | 2 | 5 | 13 | no |\n| 3 | 13 | 1 | 6 | 8 | no |\n| 4 | 8 | 0 | 6 | 3 | no |\n| 5 | 3 | 3 | 9 | $-2$ | yes |\n\n' +
+        '`break` jumps to line 10, which prints `t`.',
+      conclusion: 'The loop breaks after pass 5 with `t` at 9, so the answer is `9`.',
       whyWrong: [
         null,
         'This stops one pass early, at $n = 3$. `n` is 3 after the fourth pass, and $3 \\le 0$ is false, so there is another pass.',
         'This stops after the first pass. `break` runs only when `n` is 0 or below.',
         '`n` falls by 5 each pass, so `n <= 0` soon becomes true and `break` runs.',
       ],
-      keyIdea: 'Trace `while (true)` loops row by row and test the `break` condition after each update.',
+      keyIdea: 'For a `while (true)` loop, draw a row per pass with a column for each variable, in the same order as the code. Test the `break` straight after the line that changes the variable.',
     },
     check: {
       optionValues: [9, 6, 3, INFINITE],
@@ -824,17 +886,20 @@ export const questions: StaticQuestion[] = [
     options: ['`5050`', '`4950`', '`10100`', '`100`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the sum of all the whole numbers from 1 to 100?',
       solution:
-        'The loop adds $1 + 2 + \\dots + 100$. No need to trace it: the sum of the first $n$ whole numbers is $\\frac{n(n + 1)}{2}$.\n\n' +
-        '$$\\frac{100 \\times 101}{2} = 5050$$\n\n' +
-        'Output: `5050`.',
+        '`t` starts at 0 and each pass adds `i`. So by the end `t` holds $1 + 2 + 3 + \\dots + 100$. Tracing 100 passes by hand is too slow, so we use a trick.\n\n' +
+        'Pair the numbers from the outside in: $1 + 100 = 101$, $2 + 99 = 101$, $3 + 98 = 101$. Every pair adds to 101.\n\n' +
+        'There are 100 numbers, so there are $100 \\div 2 = 50$ pairs.\n\n' +
+        'The total is $50 \\times 101 = 5050$.',
+      conclusion: 'The loop adds 1 to 100, and each of the 50 pairs makes 101, so the answer is `5050`.',
       whyWrong: [
         null,
         'This stops at 99. `for i = 1 to 100` includes 100.',
         'This forgets to divide by 2 in the formula.',
         'This counts the passes, as if the line were `t = t + 1`.',
       ],
-      keyIdea: 'For a long accumulator loop, use $1 + 2 + \\dots + n = \\frac{n(n + 1)}{2}$.',
+      keyIdea: 'To add the whole numbers from 1 to $n$, use $\\frac{n(n + 1)}{2}$, where $n$ is the last number. Spot it from `t = t + i` in a loop starting at 1. Here that is $\\frac{100 \\times 101}{2}$.',
     },
     check: {
       optionValues: [5050, 4950, 10100, 100],
@@ -854,16 +919,19 @@ export const questions: StaticQuestion[] = [
     options: ['`30`', '`20`', '`42`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'What do the values of `x` add up to as it goes up in twos to 10?',
       solution:
-        '| x | s | new x |\n|---|---|---|\n| 2 | 2 | 4 |\n| 4 | 6 | 6 |\n| 6 | 12 | 8 |\n| 8 | 20 | 10 |\n| 10 | 30 | 12 |\n\n' +
-        'Then $12 \\le 10$ is false, so the loop stops.\n\nOutput: `30`.',
+        'The loop runs while `x <= 10`, and the `<=` means 10 itself is allowed. `s` adds the current `x`, and then `x` goes up by 2.\n\n' +
+        'Trace it:\n\n| Pass | `x` at the check | `s` becomes | `x` becomes |\n|---|---|---|---|\n| 1 | 2 | 2 | 4 |\n| 2 | 4 | 6 | 6 |\n| 3 | 6 | 12 | 8 |\n| 4 | 8 | 20 | 10 |\n| 5 | 10 | 30 | 12 |\n\n' +
+        '`12 <= 10` is false, so line 7 prints `s`.',
+      conclusion: '10 is included because of `<=`, and 12 fails the check, so $2 + 4 + 6 + 8 + 10$ gives 30. The answer is `30`.',
       whyWrong: [
         null,
         'This leaves out 10, as if the condition were `x < 10`. `<=` includes 10.',
         'This also adds 12. The check $12 \\le 10$ fails before the body runs again.',
         '`x` goes up on every pass, so it soon passes 10 and the loop stops.',
       ],
-      keyIdea: 'Check the last pass carefully: `<=` includes the limit and `<` does not.',
+      keyIdea: 'List the values the loop variable takes, and test the first value that might fail. `<=` includes the limit and `<` doesn\'t. Then add only the values that passed the check.',
     },
     check: {
       optionValues: [30, 20, 42, INFINITE],
@@ -888,17 +956,19 @@ export const questions: StaticQuestion[] = [
     options: ['`5`', '`4`', '`243`', '`6`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many times must you multiply 1 by 3 to reach 100 or more?',
       solution:
-        'In Python the loop body is the indented block, and the condition is checked before each pass.\n\n' +
-        '| check `n < 100` | new n | count |\n|---|---|---|\n| $1 < 100$ | 3 | 1 |\n| $3 < 100$ | 9 | 2 |\n| $9 < 100$ | 27 | 3 |\n| $27 < 100$ | 81 | 4 |\n| $81 < 100$ | 243 | 5 |\n| $243 < 100$ false: stop | | |\n\n' +
-        'Output: `5`.',
+        'The loop checks `n < 100` at the top. Each pass multiplies `n` by 3 and adds 1 to `count`.\n\n' +
+        'Trace it:\n\n| Pass | `n` at the check | `n` becomes | `count` |\n|---|---|---|---|\n| 1 | 1 | 3 | 1 |\n| 2 | 3 | 9 | 2 |\n| 3 | 9 | 27 | 3 |\n| 4 | 27 | 81 | 4 |\n| 5 | 81 | 243 | 5 |\n\n' +
+        '`243 < 100` is false, so line 6 prints `count`.',
+      conclusion: '81 is still below 100, so pass 5 runs and `count` ends at 5. The answer is `5`.',
       whyWrong: [
         null,
         'This stops at 81. But $81 < 100$ is true, so there is one more pass.',
         'This is the final value of `n`. The code prints `count`.',
         'This runs one pass too many. Once `n` is 243 the check fails.',
       ],
-      keyIdea: 'A Python `while` works like the pseudocode one: test at the top, then run the indented block.',
+      keyIdea: 'For a loop that multiplies, write out the powers until one fails the condition. The count is how many multiplications happened. Keep it apart from the final value of `n`, which here is 243.',
     },
     check: {
       optionValues: [5, 4, 243, 6],

@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac, gcd } from '../../../lib/frac';
 import { m, num, paren, signed, sum, term } from '../../../lib/tex';
 
@@ -108,24 +109,28 @@ export const generators: Generator[] = [
       if (distractors.length < 3) throw new Error('not enough distinct distractors');
 
       const ans = m(num(answer));
-      const solution =
-        order === 'fg'
-          ? `${m(label('fg'))} means: apply $g$ first, then put the result into $f$ (work from the inside out).\n\n` +
-            `1. Inner: ${m(gLine)}.\n` +
-            `2. Outer: ${m(`f(${gk}) = ${num(a)} \\times ${paren(gk)}${signed(b)} = ${num(fg)}`)}.\n\n` +
-            `Answer: ${ans}`
-          : `${m(label('gf'))} means: apply $f$ first, then put the result into $g$ (work from the inside out).\n\n` +
-            `1. Inner: ${m(fLine)}.\n` +
-            `2. Outer: ${m(`g(${fk}) = ${paren(fk)}^{2}${signed(c)} = ${num(fk * fk)}${signed(c)} = ${num(gf)}`)}.\n\n` +
-            `Answer: ${ans}`;
+      const inner = order === 'fg' ? 'g' : 'f';
+      const outer = order === 'fg' ? 'f' : 'g';
+      const mid = order === 'fg' ? gk : fk;
+      const fRule = `$f$ multiplies its input by ${m(num(a))}, then ${b > 0 ? 'adds' : 'subtracts'} ${m(num(Math.abs(b)))}`;
+      const gRule = `$g$ squares its input, then ${c > 0 ? 'adds' : 'subtracts'} ${m(num(Math.abs(c)))}`;
+      const fFull = (x: number) => `f(${x}) = ${num(a)} \\times ${paren(x)}${signed(b)} = ${num(a * x)}${signed(b)} = ${num(f(x))}`;
+      const gFull = (x: number) => `g(${x}) = ${paren(x)}^{2}${signed(c)} = ${num(x * x)}${signed(c)} = ${num(g(x))}`;
+      const solution = steps(
+        `${m(label(order))} is a **composite**: one function feeding into another.${useCirc ? ` The small circle means "composed with". It does not mean multiply.` : ''} Work from the inside out: $${inner}$ is next to the number, so $${inner}$ acts first.`,
+        `Find the inside part. ${order === 'fg' ? gRule : fRule}: ${m(order === 'fg' ? gFull(k) : fFull(k))}.`,
+        `Now put ${m(num(mid))} into $${outer}$, where ${order === 'fg' ? fRule : gRule}: ${m(order === 'fg' ? fFull(mid) : gFull(mid))}.`,
+      );
 
       return {
         stem: `Let ${m(`f(x) = ${fTex}`)} and ${m(`g(x) = ${gTex}`)}. Find ${m(label(order))}.`,
         answer: ans,
         answerValue: answer,
         distractors,
+        asking: `What do we get if we apply $${inner}$ to ${m(num(k))}, then apply $${outer}$ to the result?`,
         solution,
-        keyIdea: 'In a composite, the function written closest to the number acts first; its output becomes the input of the outer function.',
+        conclusion: `$${inner}$ turns ${m(num(k))} into ${m(num(mid))}, and $${outer}$ turns ${m(num(mid))} into the final value, so the answer is ${ans}.`,
+        keyIdea: 'In a composite, the function written closest to the number acts first, and its output becomes the input of the other function. Never multiply or add the two outputs.',
       };
     },
   },
@@ -155,7 +160,7 @@ export const generators: Generator[] = [
       const pool: { r: Rat; why: string }[] = [
         { r: [c, d, a, b], why: `This is the reciprocal ${m('\\frac{1}{f(x)}')}. The $-1$ in $f^{-1}$ means the inverse function (undo $f$), not "one over".` },
         { r: [d, -b, c, -a], why: `This has a sign slip when moving terms across: after collecting the $y$ terms the right-hand side should be ${m(sum([[-d, 'x'], [b, '']]))}, not ${m(sum([[d, 'x'], [-b, '']]))}. The result is the negative of the true inverse.` },
-        { r: [-a, b, c, -d], why: `This misuses the shortcut "swap the $x$-coefficient on top with the constant on the bottom, and change the signs of the other two numbers": it changes the signs but never swaps ${m(num(a))} (the $x$-coefficient on top) with ${m(num(d))} (the constant on the bottom). Substituting a value shows it does not undo $f$.` },
+        { r: [-a, b, c, -d], why: `This changes the signs of ${m(num(a))} (the $x$-coefficient on top) and ${m(num(d))} (the constant on the bottom), but the correct inverse also swaps those two numbers. Substituting a value shows this does not undo $f$.` },
         { r: [-d, b, c, a], why: `This forgets to change the sign of ${m(term(a, 'y', true))} when moving it to the left-hand side, so the bracket becomes ${m(sum([[c, 'x'], [a, '']]))} instead of ${m(sum([[c, 'x'], [-a, '']]))}.` },
         { r: [a, b, c, d], why: `This is $f(x)$ itself; it was never inverted.` },
         { r: [-d, -b, c, -a], why: `This has a sign slip on the constant: the right-hand side should be ${m(sum([[-d, 'x'], [b, '']]))}, not ${m(sum([[-d, 'x'], [-b, '']]))}.` },
@@ -178,22 +183,26 @@ export const generators: Generator[] = [
 
       const excl = new Frac(-d, c);
       const fTex = `\\frac{${sum([[a, 'x'], [b, '']])}}{${sum([[c, 'x'], [d, '']])}}`;
-      const solution =
-        `Swap $x$ and $y$, then clear the fraction by multiplying both sides by the denominator, and gather every $y$ term on one side.\n\n` +
-        `1. Write ${m(`y = ${fTex}`)} and swap $x$ and $y$: ${m(`x = \\frac{${sum([[a, 'y'], [b, '']])}}{${sum([[c, 'y'], [d, '']])}}`)}.\n` +
-        `2. Multiply both sides by the denominator: ${m(`${sum([[c, 'xy'], [d, 'x']])} = ${sum([[a, 'y'], [b, '']])}`)}.\n` +
-        `3. Collect the $y$ terms on the left and everything else on the right: ${m(`${sum([[c, 'xy'], [-a, 'y']])} = ${sum([[-d, 'x'], [b, '']])}`)}.\n` +
-        `4. Factorise out $y$: ${m(`y(${sum([[c, 'x'], [-a, '']])}) = ${sum([[-d, 'x'], [b, '']])}`)}.\n` +
-        `5. Divide by the bracket and tidy up: ${ans}.\n\n` +
-        `Check with ${m(`x = ${x0}`)}: ${m(`f(${x0}) = ${y0.tex()}`)} and ${m(`f^{-1}\\left(${y0.tex()}\\right) = ${back.tex()}`)}, so the inverse takes us back to ${m(String(x0))}.\n\n` +
-        `Answer: ${ans}`;
+      const yTop = sum([[a, 'y'], [b, '']]);
+      const yBot = sum([[c, 'y'], [d, '']]);
+      const collect = `${a > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(a), 'y', true))} ${a > 0 ? 'from' : 'to'} both sides, and ${d > 0 ? 'subtract' : 'add'} ${m(term(Math.abs(d), 'x', true))} ${d > 0 ? 'from' : 'to'} both sides`;
+      const solution = steps(
+        `The **inverse** ${m('f^{-1}')} undoes $f$, so it swaps inputs and outputs. To find it, write ${m(`y = ${fTex}`)}, then swap $x$ and $y$: ${m(`x = \\frac{${yTop}}{${yBot}}`)}.`,
+        `Now we need $y$ on its own. Multiply both sides by ${m(yBot)} to clear the fraction: ${m(`x(${yBot}) = ${yTop}`)}.`,
+        `Multiply out the bracket: ${m(`${sum([[c, 'xy'], [d, 'x']])} = ${yTop}`)}.`,
+        `Gather all the $y$ terms on one side, because we want to take $y$ out as a factor. ${collect}: ${m(`${sum([[c, 'xy'], [-a, 'y']])} = ${sum([[-d, 'x'], [b, '']])}`)}.`,
+        `Take out $y$ as a common factor: ${m(`y(${sum([[c, 'x'], [-a, '']])}) = ${sum([[-d, 'x'], [b, '']])}`)}.`,
+        `Divide both sides by the bracket to get $y$ alone: ${m(`y = ${ratTex(correct)}`)}. This $y$ is the output of the inverse, so it is ${m('f^{-1}(x)')}.`,
+      );
 
       return {
         stem: `The function $f$ is defined by ${m(`f(x) = ${fTex}`)}, ${m(`x \\ne ${excl.tex()}`)}. Find ${m('f^{-1}(x)')}.`,
         answer: ans,
         distractors,
+        asking: 'What rule undoes this fraction function?',
         solution,
-        keyIdea: 'For a fraction, swap $x$ and $y$, multiply out, collect the $y$ terms on one side, factorise out $y$ and divide.',
+        conclusion: `Testing: ${m(`f(${x0}) = ${y0.tex()}`)}, and the rule sends ${m(y0.tex())} back to ${m(back.tex())}. So the answer is ${ans}.`,
+        keyIdea: 'For a fraction, swap $x$ and $y$, multiply by the denominator, gather the $y$ terms on one side, take out $y$ as a factor, then divide. To test it, put a number through $f$ and then the inverse: it must come back unchanged.',
       };
     },
   },

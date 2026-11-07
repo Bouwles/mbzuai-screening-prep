@@ -1,4 +1,5 @@
 import type { Generator, GeneratedCore } from '../../../types';
+import { steps as stepsOf, table as tbl } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { m } from '../../../lib/tex';
 
@@ -45,28 +46,16 @@ const finish = (core: Omit<GeneratedCore, 'distractors'>, ds: Cand[]): Generated
   distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
 });
 
-/** Markdown table of place values and digits. */
-function placeTable(digits: string, base: number): string {
+/** Table of place values and digits, with an optional extra row. */
+function placeTable(digits: string, base: number, label = 'Digit', extra?: (string | number)[]): string {
   const L = digits.length;
-  const pv = [...digits].map((_, i) => String(base ** (L - 1 - i)));
-  return (
-    `| Place value | ${pv.join(' | ')} |\n` +
-    `| --- | ${pv.map(() => '---').join(' | ')} |\n` +
-    `| Digit | ${[...digits].join(' | ')} |\n\n`
-  );
+  const pv = [...digits].map((_, i) => base ** (L - 1 - i));
+  return tbl(['Place value', ...pv], [[label, ...digits], ...(extra ? [extra] : [])]);
 }
 
-/** Repeated-division table for decimal n in base b; returns the markdown. */
-function divisionTable(n: number, b: number): string {
-  let out = `| Division | Quotient | Remainder |\n| --- | --- | --- |\n`;
-  let x = n;
-  while (x > 0) {
-    const q = Math.floor(x / b);
-    const r = x % b;
-    out += `| $${x} \\div ${b}$ | ${q} | ${r}${r >= 10 ? ` (${DIGITS[r]})` : ''} |\n`;
-    x = q;
-  }
-  return out + '\n';
+/** "32, 16, 4 and 1". */
+function listAnd(xs: (string | number)[]): string {
+  return xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
 }
 
 // ---------------------------------------------------------------- conversions
@@ -116,13 +105,19 @@ function convert(rng: Rng): GeneratedCore {
           stem: `Convert the binary number ${binT(s)} to decimal.`,
           answer,
           answerValue: n,
-          solution:
-            `In binary each place is worth double the place to its right, starting from 1 at the right.\n\n` +
-            placeTable(s, 2) +
-            `Add the place values that have a 1 under them:\n\n` +
-            `$$${ones.join(' + ')} = ${n}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Binary place values are powers of 2 starting from $2^0 = 1$ at the right; add the place values where there is a 1.',
+          asking: `What is ${binT(s)} written as an ordinary number?`,
+          solution: stepsOf(
+            'The small 2 means base 2, also called **binary**. Each place is worth double the place to its right, starting with 1 on the far right.',
+            `Write the digits under their place values:\n\n${placeTable(s, 2)}`,
+            ones.length === 1
+              ? `A 1 means that place value counts, and a 0 means it doesn't. Only one place holds a 1, so the value is ${n}.`
+              : `A 1 means that place value counts, and a 0 means it doesn't. So add the place values above the 1s: ${m(`${ones.join(' + ')} = ${n}`)}.`,
+          ),
+          conclusion:
+            ones.length === 1
+              ? `The only place holding a 1 is worth ${answer}.`
+              : `The places holding a 1 are worth ${listAnd(ones)}, which add up to ${answer}.`,
+          keyIdea: 'To convert from any base to decimal, write the place values above the digits, starting with 1 on the right and multiplying by the base each time. Multiply each digit by its place value, then add.',
         },
         ds,
       );
@@ -141,7 +136,7 @@ function convert(rng: Rng): GeneratedCore {
           text: binT(r),
           value: r,
           key: String(fromBase(r, 2)),
-          why: `This writes the remainders from the **top down**. The first remainder is the units digit, so the remainders must be read from the bottom up.`,
+          why: `This is the right digits in reverse order. The largest place value belongs on the left, and the units digit belongs on the right.`,
         },
         {
           text: binT(unitsFlipped),
@@ -149,8 +144,8 @@ function convert(rng: Rng): GeneratedCore {
           key: String(n ^ 1),
           why:
             n % 2 === 1
-              ? `This ends in 0, but ${n} is odd, so its binary form must end in 1 (the first remainder, ${n} divided by 2, is 1).`
-              : `This ends in 1, but ${n} is even, so its binary form must end in 0 (the first remainder, ${n} divided by 2, is 0).`,
+              ? `This ends in 0, but ${n} is odd, so its binary form must end in 1. Every other place value is even, so only the units place can make the total odd.`
+              : `This ends in 1, but ${n} is even, so its binary form must end in 0. Every other place value is even, so a 1 in the units place would make the total odd.`,
         },
         ...(noZeros !== s
           ? [
@@ -166,24 +161,36 @@ function convert(rng: Rng): GeneratedCore {
           text: binT(lastLost),
           value: lastLost,
           key: String(fromBase(lastLost, 2)),
-          why: `This leaves out the very first remainder (the units digit). Every division by 2 gives one binary digit, and all of them are needed.`,
+          why: `This leaves off the units digit on the right. Every place needs a digit, and without it ${binT(lastLost)} is only ${fromBase(lastLost, 2)}.`,
         },
       ];
       const ds = pickDistinct(String(n), answer, pool);
       if (ds.length < 3) continue;
       const ones = [...s].map((c, i) => (c === '1' ? 2 ** (s.length - 1 - i) : 0)).filter((x) => x > 0);
+      const places = [...s].map((_, i) => 2 ** (s.length - 1 - i));
+      let left = n;
+      const buildRows = places.map((p, i) => {
+        if (s[i] === '0') return [p, 'No', left, 0];
+        const row = [p, 'Yes', m(`${left} - ${p} = ${left - p}`), 1];
+        left -= p;
+        return row;
+      });
       return finish(
         {
           stem: `Write the decimal number $${n}$ in binary.`,
           answer,
           answerValue: s,
-          solution:
-            `Divide by 2 repeatedly and write down each remainder:\n\n` +
-            divisionTable(n, 2) +
-            `Read the remainders from the **bottom up**: ${binT(s)}.\n\n` +
-            `Check with place values: $${ones.join(' + ')} = ${n}$.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Decimal to binary: divide by 2 repeatedly and read the remainders from the last one to the first.',
+          asking: `How do we write ${n} using only 1s and 0s?`,
+          solution: stepsOf(
+            `In binary the places are worth ${listAnd(places)}, each double the next. We build ${n} from these, using each place at most once.`,
+            `Go through the places from largest to smallest. If a place value fits into what is left, write 1 and subtract it. If not, write 0:\n\n${tbl(['Place', 'Fits?', 'Left over', 'Digit'], buildRows)}`,
+            `Read the Digit column from top to bottom: ${s}.`,
+          ),
+          conclusion:
+            ones.length === 1
+              ? `${n} is exactly one place value, so in binary it is ${answer}.`
+              : `${m(`${ones.join(' + ')} = ${n}`)}, so in binary it is ${answer}.`,
+          keyIdea: 'Decimal to binary: write the powers of 2 up to the number. Working from the largest, write 1 and subtract if it fits, and write 0 if it does not. Keep the zeros, since they hold the places.',
         },
         ds,
       );
@@ -225,19 +232,20 @@ function convert(rng: Rng): GeneratedCore {
       ];
       const ds = pickDistinct(String(n), answer, pool);
       if (ds.length < 3) continue;
-      const letters = [...h].filter((c) => DIGITS.indexOf(c) >= 10);
       return finish(
         {
           stem: `Convert the hexadecimal number ${hexT(h)} to decimal.`,
           answer,
           answerValue: n,
-          solution:
-            `Hexadecimal uses $\\mathrm{A} = 10$, $\\mathrm{B} = 11$, $\\mathrm{C} = 12$, $\\mathrm{D} = 13$, $\\mathrm{E} = 14$, $\\mathrm{F} = 15$. ` +
-            `Here ${letters.map((c) => m(`\\mathrm{${c}} = ${DIGITS.indexOf(c)}`)).join(' and ')}.\n\n` +
-            `The place values are 16 (left) and 1 (right):\n\n` +
-            `$$${hexT(h).slice(1, -1)} = ${d1} \\times 16 + ${d0} \\times 1 = ${16 * d1} + ${d0} = ${n}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Each hexadecimal place is worth 16 times the place to its right; the letters A to F stand for 10 to 15.',
+          asking: `What is the hexadecimal number ${hexT(h)} as an ordinary number?`,
+          solution: stepsOf(
+            '**Hexadecimal** is base 16. It needs 16 digits, so after 9 it uses letters: A is 10, B is 11, C is 12, D is 13, E is 14 and F is 15.',
+            `In base 16 the rightmost place is worth 1 and the next place is worth 16. So ${h[0]} is in the 16s place and ${h[1]} is in the units place. Their values are ${d1} and ${d0}.`,
+            `Multiply each digit by its place value: ${m(`${d1} \\times 16 = ${16 * d1}`)} and ${m(`${d0} \\times 1 = ${d0}`)}.`,
+            `Add the two results: ${m(`${16 * d1} + ${d0} = ${n}`)}.`,
+          ),
+          conclusion: `${d1} ${d1 === 1 ? 'sixteen' : 'sixteens'} and ${d0} ${d0 === 1 ? 'one' : 'ones'} make ${answer}.`,
+          keyIdea: 'Hexadecimal to decimal: turn letters into numbers (A is 10 up to F is 15), then multiply the left digit by 16 and add the right digit. For longer numbers the places are 1, 16, 256.',
         },
         ds,
       );
@@ -256,7 +264,7 @@ function convert(rng: Rng): GeneratedCore {
           text: hexT(rev(h)),
           value: rev(h),
           key: String(fromBase(rev(h), 16)),
-          why: `This writes the remainders top-down. The first remainder (${r}) is the units digit and goes on the **right**.`,
+          why: `This puts the digits the wrong way round. The number of 16s goes on the left, and the remainder ${r} is the units digit, on the **right**.`,
         });
       const cat = `${q}${r}`;
       pool.push({
@@ -265,10 +273,10 @@ function convert(rng: Rng): GeneratedCore {
         key: String(fromBase(cat, 16)),
         why: `This writes ${
           q >= 10 && r >= 10
-            ? `both remainders, ${q} and ${r}, as two decimal digits each`
+            ? `both values, ${q} and ${r}, as two decimal digits each`
             : q >= 10
-              ? `the remainder ${q} as two decimal digits`
-              : `the remainder ${r} as two decimal digits`
+              ? `the value ${q} as two decimal digits`
+              : `the value ${r} as two decimal digits`
         }. In hexadecimal every value from 10 to 15 is a **single** digit (A to F).`,
       });
       if (r === 4 || r === 8 || r === 12) {
@@ -296,14 +304,15 @@ function convert(rng: Rng): GeneratedCore {
           stem: `Write the decimal number $${n}$ in hexadecimal.`,
           answer,
           answerValue: h,
-          solution:
-            `Divide by 16 and keep the whole-number remainders:\n\n` +
-            `- $${n} \\div 16 = ${q}$ remainder $${r}$ (because $${q} \\times 16 = ${16 * q}$ and $${n} - ${16 * q} = ${r}$)\n` +
-            `- $${q} \\div 16 = 0$ remainder $${q}$\n\n` +
-            `Read the remainders from the bottom up: ${q} then ${r}. As hex digits these are ${m(`\\mathrm{${DIGITS[q]}}`)} and ${m(`\\mathrm{${DIGITS[r]}}`)}.\n\n` +
-            `Check: $${q} \\times 16 + ${r} = ${n}$.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Decimal to hex: divide by 16, write each remainder as one digit 0 to F, and read them from last to first.',
+          asking: `What is ${n} written in base 16?`,
+          solution: stepsOf(
+            `Hexadecimal places are worth 1, then 16, then 256. Since 256 is bigger than ${n}, we only need the 16s place and the units place.`,
+            `Find how many 16s fit into ${n}. ${m(`16 \\times ${q} = ${16 * q}`)} fits, and ${m(`16 \\times ${q + 1} = ${16 * (q + 1)}`)} is too big. So ${q} sixteens fit.`,
+            `The remainder (what is left over) goes in the units place: ${m(`${n} - ${16 * q} = ${r}`)}.`,
+            `In hexadecimal the values 10 to 15 are the letters A to F: A is 10, B is 11, C is 12, D is 13, E is 14 and F is 15. So the 16s digit is ${DIGITS[q]} and the units digit is ${DIGITS[r]}, which gives ${h}.`,
+          ),
+          conclusion: `${m(`${q} \\times 16 + ${r} = ${n}`)}, so the number in hexadecimal is ${answer}.`,
+          keyIdea: 'Decimal to hex: divide by 16. The whole-number result is the left digit and the remainder is the right digit. Write values from 10 to 15 as A to F. Ignore any decimal places shown on a calculator.',
         },
         ds,
       );
@@ -349,12 +358,14 @@ function convert(rng: Rng): GeneratedCore {
         stem: `Convert the octal (base 8) number ${octT(o)} to decimal.`,
         answer,
         answerValue: n,
-        solution:
-          `In base 8 the place values from the right are $1$, $8$, $8^2 = 64$.\n\n` +
-          placeTable(o, 8) +
-          `$$${a} \\times 64 + ${b} \\times 8 + ${c} \\times 1 = ${64 * a} + ${8 * b} + ${c} = ${n}$$\n\n` +
-          `Answer: ${answer}`,
-        keyIdea: 'In base $b$ the place values from the right are $1, b, b^2, b^3, \\dots$; multiply each digit by its place value and add.',
+        asking: `What is ${octT(o)} as an ordinary number?`,
+        solution: stepsOf(
+          '**Octal** is base 8. Each place is worth 8 times the place to its right: 1, then 8, then $8 \\times 8 = 64$.',
+          `Line up the digits under those places and multiply each digit by its place value:\n\n${placeTable(o, 8, 'Digit', ['Digit $\\times$ place', 64 * a, 8 * b, c])}`,
+          `Add the bottom row: ${m(`${64 * a} + ${8 * b} + ${c} = ${n}`)}.`,
+        ),
+        conclusion: `${m(`${a} \\times 64 + ${b} \\times 8 + ${c}`)} comes to ${answer}.`,
+        keyIdea: 'In base $b$, the places from the right are 1, $b$, $b^2$, and so on. Multiply each digit by its place value and add. Every digit must be smaller than $b$.',
       },
       ds,
     );
@@ -373,6 +384,8 @@ function twosComplement(rng: Rng): GeneratedCore {
       const answer = binT(ans);
       const signMag = '1' + toBase(k, 2).padStart(7, '0');
       const minus1 = toBase(254 - k, 2);
+      const kTerms = [128, 64, 32, 16, 8, 4, 2, 1].filter((p) => (k & p) !== 0);
+      const negTerms = [64, 32, 16, 8, 4, 2, 1].filter((p) => ((128 - k) & p) !== 0);
       const pool: Cand[] = [
         {
           text: binT(signMag),
@@ -406,14 +419,17 @@ function twosComplement(rng: Rng): GeneratedCore {
           stem: `What is the **8-bit two's complement** representation of $-${k}$?`,
           answer,
           answerValue: ans,
-          solution:
-            `To make a negative number in two's complement: write the positive number in 8 bits, **flip every bit**, then **add 1**.\n\n` +
-            `1. $${k}$ in 8 bits is ${binT(pos)}.\n` +
-            `2. Flip every bit: ${binT(fl)}.\n` +
-            `3. Add 1: ${binT(ans)}.\n\n` +
-            `Check: a pattern starting with 1 is worth its unsigned value minus 256. Here ${binT(ans)} is $${256 - k}$ unsigned, and $${256 - k} - 256 = -${k}$. Correct.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: "Two's complement of a negative number: write the positive value, invert all the bits, then add 1.",
+          asking: `What pattern of 8 bits stores $-${k}$ in two's complement?`,
+          solution: stepsOf(
+            "**Two's complement** is the usual way to store negative whole numbers in bits (binary digits, each 0 or 1). The recipe is: write the positive number, flip every bit, then add 1.",
+            `Write ${k} in 8 bits. ${kTerms.length === 1 ? `${k} is a single place value` : m(`${k} = ${kTerms.join(' + ')}`)}, so it is ${m(pos)}.`,
+            `Flip every bit, so each 0 becomes 1 and each 1 becomes 0: ${m(fl)}.`,
+            fl.endsWith('0')
+              ? `Add 1. The last digit is 0, so it simply becomes 1: ${m(ans)}.`
+              : `Add 1. In binary $1 + 1$ is written $10_2$, so the 1s at the end turn into 0s and the carry lands on the first 0 to their left: ${m(ans)}.`,
+          ),
+          conclusion: `Check, with the leftmost bit worth $-128$: ${m(`-128 + ${negTerms.join(' + ')} = -${k}`)}. So the pattern is ${answer}.`,
+          keyIdea: "To negate in two's complement: write the positive value in the full number of bits, flip every bit, add 1. To check, treat the leftmost bit as negative (here $-128$) and add the place values.",
         },
         ds,
       );
@@ -459,13 +475,17 @@ function twosComplement(rng: Rng): GeneratedCore {
         stem: `The 8-bit pattern ${binT(bits)} is a signed integer stored in **two's complement**. What decimal value does it represent?`,
         answer,
         answerValue: v,
-        solution:
-          `The leftmost bit is 1, so the number is negative.\n\n` +
-          `**Method 1 (flip and add 1).** Flip every bit: ${m(`${fl}_2 = ${255 - u}`)}. Add 1: $${255 - u} + 1 = ${256 - u}$. So the value is $${v}$.\n\n` +
-          `**Method 2 (negative top bit).** In 8-bit two's complement the leftmost place is worth $-128$ instead of $+128$:\n\n` +
-          `$$-128 + ${restTerms.join(' + ')} = ${v}$$\n\n` +
-          `Answer: ${answer}`,
-        keyIdea: "In $n$-bit two's complement the leftmost bit is worth $-2^{n-1}$; all the other bits keep their usual positive place values.",
+        asking: `What number does the bit pattern ${binT(bits)} stand for in two's complement?`,
+        solution: stepsOf(
+          "In **two's complement**, every place has its normal value, except that the leftmost place counts as negative. In 8 bits (binary digits, each 0 or 1) the places are $-128, 64, 32, 16, 8, 4, 2, 1$.",
+          `Write the bits under the places:\n\n${tbl(['Place value', '$-128$', 64, 32, 16, 8, 4, 2, 1], [['Bit', ...bits]])}`,
+          `A 1 means that place value counts. So add the values above the 1s: ${m(`-128 + ${restTerms.join(' + ')}`)}.`,
+          restTerms.length === 1
+            ? `Work it out: ${m(`-128 + ${rest} = ${v}`)}.`
+            : `First add the positive places: ${m(`${restTerms.join(' + ')} = ${rest}`)}. Then ${m(`-128 + ${rest} = ${v}`)}.`,
+        ),
+        conclusion: `The leftmost bit gives $-128$ and the others add back ${rest}, so the value is ${answer}.`,
+        keyIdea: "Two's complement to decimal: give the leftmost bit a negative place value ($-2^{n-1}$ for $n$ bits) and add as usual. A leading 0 means a positive number, which you read as normal.",
       },
       ds,
     );
@@ -490,18 +510,15 @@ function binaryAddition(rng: Rng): GeneratedCore {
     const answer = binT(ans);
 
     // column-by-column working
-    const steps: string[] = [];
+    const rows: (string | number)[][] = [];
     let carry = 0;
     for (let i = 0; i < w; i++) {
       const da = Number(pa[w - 1 - i]);
       const db = Number(pb[w - 1 - i]);
       const tot = da + db + carry;
-      steps.push(
-        `- ${PLACE_NAMES[i]} column: digits ${da} and ${db}${carry ? ', plus the carry 1' : ''}, total ${tot}. Write ${tot % 2}, carry ${Math.floor(tot / 2)}.`,
-      );
+      rows.push([PLACE_NAMES[i], da, db, carry, tot, tot % 2, Math.floor(tot / 2)]);
       carry = Math.floor(tot / 2);
     }
-    if (carry) steps.push(`- The final carry 1 becomes a new ${PLACE_NAMES[w]} digit on the left.`);
 
     const decDigits = [...pa].map((c, i) => Number(c) + Number(pb[i])).join('').replace(/^0+/, '');
     const xor = toBase(a ^ b, 2);
@@ -542,16 +559,16 @@ function binaryAddition(rng: Rng): GeneratedCore {
         stem: `Calculate ${m(`${sa}_2 + ${sb}_2`)}, giving your answer in binary.`,
         answer,
         answerValue: ans,
-        solution:
-          `Line the numbers up on the right and add column by column. In binary $1 + 1 = 10_2$ (write 0, carry 1) and $1 + 1 + 1 = 11_2$ (write 1, carry 1).\n\n` +
-          `| Number | ${[...pa].map((_, i) => String(2 ** (w - 1 - i))).join(' | ')} |\n` +
-          `| --- | ${[...pa].map(() => '---').join(' | ')} |\n` +
-          `| First | ${[...pa].join(' | ')} |\n` +
-          `| Second | ${[...pb].join(' | ')} |\n\n` +
-          steps.join('\n') +
-          `\n\nResult: ${binT(ans)}. Check in decimal: $${a} + ${b} = ${sum}$.\n\n` +
-          `Answer: ${answer}`,
-        keyIdea: 'In binary addition $1 + 1 = 10_2$: write 0 and carry 1 into the next column, exactly like carrying a ten in decimal.',
+        asking: 'What do you get by adding these two binary numbers?',
+        solution: stepsOf(
+          'Add column by column from the right, like ordinary addition. In binary, $1 + 1$ is 2, which is written $10_2$: write 0 and carry 1. And $1 + 1 + 1$ is 3, which is written $11_2$: write 1 and carry 1.',
+          `Line the numbers up on the right as ${pa} and ${pb}, then work through the columns:\n\n${tbl(['Column', 'Top digit', 'Bottom digit', 'Carry in', 'Total', 'Write', 'Carry out'], rows)}`,
+          carry
+            ? `The final carry of 1 becomes a new digit on the far left. Reading the Write column from bottom to top, with that carry first, gives ${ans}.`
+            : `Reading the Write column from bottom to top gives ${ans}.`,
+        ),
+        conclusion: `Check: ${binT(sa)} is ${a} and ${binT(sb)} is ${b}, and ${m(`${a} + ${b} = ${sum}`)}. So the sum is ${answer}.`,
+        keyIdea: 'Binary addition: work right to left. Total 0 or 1: write it. Total 2: write 0 and carry 1. Total 3: write 1 and carry 1. Convert both numbers to decimal as a check.',
       },
       ds,
     );

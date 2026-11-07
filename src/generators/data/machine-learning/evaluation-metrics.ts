@@ -1,5 +1,6 @@
 import type { GeneratedCore, Generator, TableSpec } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table as mdTable } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num } from '../../../lib/tex';
 
@@ -59,13 +60,6 @@ const CONTEXTS: Ctx[] = [
   { model: 'An image classifier', items: 'photos', pos: 'Cat', neg: 'Not cat' },
 ];
 
-const FORMULA: Record<Metric, string> = {
-  accuracy: '\\text{Accuracy} = \\frac{\\text{TP} + \\text{TN}}{\\text{TP} + \\text{FP} + \\text{FN} + \\text{TN}}',
-  precision: '\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}',
-  recall: '\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}',
-  'F1 score': 'F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}',
-};
-
 interface Counts {
   tp: number;
   fp: number;
@@ -93,22 +87,62 @@ function metricFracs(c: Counts) {
   };
 }
 
-/** Worked computation of one metric from the counts (rich text, ends with the value). */
-function metricWorking(metric: Metric, c: Counts): string {
-  const n = c.tp + c.fp + c.fn + c.tn;
+/** The question in simple words, for each metric. */
+function metricAsking(metric: Metric, ctx: Ctx): string {
   switch (metric) {
     case 'accuracy':
-      return `$$\\text{Accuracy} = \\frac{${c.tp} + ${c.tn}}{${n}} = ${fracWorking(c.tp + c.tn, n)}$$`;
+      return `What fraction of all the ${ctx.items} did the model get right?`;
     case 'precision':
-      return `$$\\text{Precision} = \\frac{${c.tp}}{${c.tp} + ${c.fp}} = ${fracWorking(c.tp, c.tp + c.fp)}$$`;
+      return `Of the ${ctx.items} predicted as ${ctx.pos}, what fraction really are ${ctx.pos}?`;
     case 'recall':
-      return `$$\\text{Recall} = \\frac{${c.tp}}{${c.tp} + ${c.fn}} = ${fracWorking(c.tp, c.tp + c.fn)}$$`;
+      return `Of the ${ctx.items} that really are ${ctx.pos}, what fraction did the model find?`;
     case 'F1 score':
-      return (
-        `Precision $= ${fracWorking(c.tp, c.tp + c.fp)}$ and recall $= ${fracWorking(c.tp, c.tp + c.fn)}$. ` +
-        'The quickest way to get F1 is straight from the counts:\n\n' +
-        `$$F_1 = \\frac{2 \\times ${c.tp}}{2 \\times ${c.tp} + ${c.fp} + ${c.fn}} = ${fracWorking(2 * c.tp, 2 * c.tp + c.fp + c.fn)}$$`
-      );
+      return "What is the single score that combines this model's precision and recall?";
+  }
+}
+
+/** Worked computation of one metric from the counts, one step per entry. The last step reaches the value. */
+function metricSteps(metric: Metric, c: Counts): string[] {
+  const n = c.tp + c.fp + c.fn + c.tn;
+  const f1Bottom = 2 * c.tp + c.fp + c.fn;
+  switch (metric) {
+    case 'accuracy':
+      return [
+        '**Accuracy** is the share of all predictions that are correct. The correct ones are TP and TN, so $\\text{Accuracy} = \\frac{\\text{TP} + \\text{TN}}{\\text{total}}$.',
+        `Correct predictions: $${c.tp} + ${c.tn} = ${c.tp + c.tn}$. The total of all four counts: $${c.tp} + ${c.fp} + ${c.fn} + ${c.tn} = ${n}$.`,
+        `Divide: $\\text{Accuracy} = ${fracWorking(c.tp + c.tn, n)}$.`,
+      ];
+    case 'precision':
+      return [
+        '**Precision** asks: of everything the model called positive, how much really was? It called positive $\\text{TP} + \\text{FP}$ times and was right TP times, so $\\text{Precision} = \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$.',
+        `Substitute: $\\text{Precision} = \\frac{${c.tp}}{${c.tp} + ${c.fp}} = ${fracWorking(c.tp, c.tp + c.fp)}$.`,
+      ];
+    case 'recall':
+      return [
+        '**Recall** asks: of everything that really is positive, how much did the model find? There are $\\text{TP} + \\text{FN}$ real positives and it found TP of them, so $\\text{Recall} = \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$.',
+        `Substitute: $\\text{Recall} = \\frac{${c.tp}}{${c.tp} + ${c.fn}} = ${fracWorking(c.tp, c.tp + c.fn)}$.`,
+      ];
+    case 'F1 score':
+      return [
+        'The **F1 score** combines precision $P$ (the share of positive predictions that are right) and recall $R$ (the share of real positives found) using $F_1 = \\frac{2PR}{P + R}$. When you have the counts, a quicker formula gives the same value: $F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$.',
+        `Work out the top: $2 \\times ${c.tp} = ${2 * c.tp}$.`,
+        `Work out the bottom: $2 \\times ${c.tp} + ${c.fp} + ${c.fn} = ${2 * c.tp} + ${c.fp} + ${c.fn} = ${f1Bottom}$.`,
+        `Divide: $F_1 = ${fracWorking(2 * c.tp, f1Bottom)}$.`,
+      ];
+  }
+}
+
+/** One or two sentences that link the counts to the marked option. */
+function metricConclusion(metric: Metric, c: Counts, ctx: Ctx, ans: string): string {
+  switch (metric) {
+    case 'accuracy':
+      return `The model is right on ${c.tp + c.tn} of the ${c.tp + c.fp + c.fn + c.tn} ${ctx.items}, so the accuracy is ${ans}.`;
+    case 'precision':
+      return `Of the ${c.tp + c.fp} ${ctx.items} predicted as ${ctx.pos}, ${c.tp} really are, so the precision is ${ans}.`;
+    case 'recall':
+      return `Of the ${c.tp + c.fn} ${ctx.items} that really are ${ctx.pos}, the model found ${c.tp}, so the recall is ${ans}.`;
+    case 'F1 score':
+      return `With ${c.tp} true positives, ${c.fp} false positives and ${c.fn} false negatives, the F1 score is ${ans}.`;
   }
 }
 
@@ -156,7 +190,9 @@ function core(
   table: TableSpec,
   answer: Frac,
   cands: Cand[],
+  asking: string,
   solution: string,
+  conclusion: (ans: string) => string,
   keyIdea: string,
 ): GeneratedCore {
   const show = renderer([answer, ...cands.map((d) => d.f)]);
@@ -167,7 +203,9 @@ function core(
     answer: ans,
     answerValue: answer.value(),
     distractors: cands.map((d) => ({ text: show(d.f), value: d.f.value(), why: d.why })),
-    solution: `${solution}\n\nAnswer: ${ans}`,
+    asking,
+    solution,
+    conclusion: conclusion(ans),
     keyIdea,
   };
 }
@@ -219,26 +257,30 @@ function genConfusion(rng: Rng): GeneratedCore {
       `${ctx.model} is tested on ${n} ${ctx.items}, with **${ctx.pos}** as the positive class. ` +
       `From the confusion matrix${rowsArePredicted ? ' (the **rows** are the **predicted** class)' : ''}, what is its **${metric}**?`;
 
-    const solution =
-      `First read the four cells (${rowsArePredicted ? 'rows are the **predicted** class, columns the **actual** class' : 'rows are the **actual** class, columns the **predicted** class'}):\n\n` +
-      `- TP (actual ${ctx.pos}, predicted ${ctx.pos}) $= ${c.tp}$\n` +
-      `- FP (actual ${ctx.neg}, predicted ${ctx.pos}) $= ${c.fp}$\n` +
-      `- FN (actual ${ctx.pos}, predicted ${ctx.neg}) $= ${c.fn}$\n` +
-      `- TN (actual ${ctx.neg}, predicted ${ctx.neg}) $= ${c.tn}$\n\n` +
-      `Total: $${c.tp} + ${c.fp} + ${c.fn} + ${c.tn} = ${n}$.\n\n` +
-      `The formula is $${FORMULA[metric]}$.\n\n` +
-      metricWorking(metric, c);
+    const solution = steps(
+      `Here the **rows** are the ${rowsArePredicted ? 'predicted' : 'actual'} class and the columns are the ${rowsArePredicted ? 'actual' : 'predicted'} class. ${ctx.pos} is the positive class. Name each cell by reading both its row and its column:\n\n` +
+        mdTable(
+          ['Actual', 'Predicted', 'Name', 'Count'],
+          [
+            [ctx.pos, ctx.pos, 'TP (true positive)', c.tp],
+            [ctx.neg, ctx.pos, 'FP (false positive)', c.fp],
+            [ctx.pos, ctx.neg, 'FN (false negative)', c.fn],
+            [ctx.neg, ctx.neg, 'TN (true negative)', c.tn],
+          ],
+        ),
+      ...metricSteps(metric, c),
+    );
 
     const keyIdea =
       metric === 'accuracy'
-        ? 'Accuracy = correct predictions (TP + TN) divided by all predictions.'
+        ? 'For accuracy, add the cells where actual and predicted match (TP and TN), then divide by the total of all four cells.'
         : metric === 'precision'
-          ? 'Precision = TP divided by everything PREDICTED positive (TP + FP).'
+          ? 'For precision, find the cells **predicted** positive and divide the correct one (TP) by their sum. Read the row and column labels first, because tables can be laid out either way round.'
           : metric === 'recall'
-            ? 'Recall = TP divided by everything ACTUALLY positive (TP + FN).'
-            : 'F1 = 2TP / (2TP + FP + FN), the harmonic mean of precision and recall.';
+            ? 'For recall, find the cells that are **actually** positive and divide the found one (TP) by their sum. Read the row and column labels first, because tables can be laid out either way round.'
+            : 'For F1, read TP, FP and FN from the table and use $F_1 = \\frac{2\\text{TP}}{2\\text{TP} + \\text{FP} + \\text{FN}}$. True negatives play no part. Read the row and column labels first, because tables can be swapped.';
 
-    return core(stem, table, answer, cands, solution, keyIdea);
+    return core(stem, table, answer, cands, metricAsking(metric, ctx), solution, (ans) => metricConclusion(metric, c, ctx, ans), keyIdea);
   }
 }
 
@@ -301,24 +343,27 @@ function genThreshold(rng: Rng): GeneratedCore {
       const pred = r.s >= t;
       return pred ? (r.pos ? 'TP' : 'FP') : r.pos ? 'FN' : 'TN';
     };
-    const traceRows = rows
-      .map((r, i) => `| ${i + 1} | ${sStr(r.s)} | ${r.s >= t ? ctx.pos : ctx.neg} | ${r.pos ? ctx.pos : ctx.neg} | ${outcome(r)} |`)
-      .join('\n');
-    const solution =
-      `Predict ${ctx.pos} when the score is $\\ge ${tStr}$${includeTie ? ` (a score of exactly ${sStr(t)} **counts** as ${ctx.pos})` : ''}. Label each example:\n\n` +
-      '| Example | Score | Predicted | Actual | Outcome |\n|---|---|---|---|---|\n' +
-      traceRows +
-      `\n\nCounts: $\\text{TP} = ${c.tp}$, $\\text{FP} = ${c.fp}$, $\\text{FN} = ${c.fn}$, $\\text{TN} = ${c.tn}$.\n\n` +
-      `The formula is $${FORMULA[metric]}$.\n\n` +
-      metricWorking(metric, c);
+    const solution = steps(
+      `The model predicts ${ctx.pos} when the score is at least ${tStr}.${includeTie ? ` A score of exactly ${sStr(t)} **counts**, because "at least" includes it.` : ''} Any lower score means ${ctx.neg}.`,
+      `Compare each prediction with the actual class. TP (true positive): predicted ${ctx.pos}, actually ${ctx.pos}. FP (false positive): predicted ${ctx.pos}, actually ${ctx.neg}. FN (false negative): predicted ${ctx.neg}, actually ${ctx.pos}. TN (true negative): predicted ${ctx.neg}, actually ${ctx.neg}.`,
+      'Label every example:\n\n' +
+        mdTable(
+          ['Example', 'Score', 'Predicted', 'Actual', 'Outcome'],
+          rows.map((r, i) => [i + 1, sStr(r.s), r.s >= t ? ctx.pos : ctx.neg, r.pos ? ctx.pos : ctx.neg, outcome(r)]),
+        ),
+      `Count each outcome in the last column: $\\text{TP} = ${c.tp}$, $\\text{FP} = ${c.fp}$, $\\text{FN} = ${c.fn}$, $\\text{TN} = ${c.tn}$.`,
+      ...metricSteps(metric, c),
+    );
 
     return core(
       stem,
       table,
       answer,
       cands,
+      metricAsking(metric, ctx),
       solution,
-      'Turn scores into predictions with the threshold (watch for a score exactly on it), label TP/FP/FN/TN, then apply the formula.',
+      (ans) => metricConclusion(metric, c, ctx, ans),
+      'Use the threshold to turn each score into a prediction, and treat a score exactly on it as "at least". Label each row TP, FP, FN or TN, count them, then use the formula for the metric.',
     );
   }
 }
@@ -353,11 +398,16 @@ function genReverse(rng: Rng): GeneratedCore {
     let stem: string;
     let answer: number;
     let pool: ICand[];
+    let asking: string;
     let solution: string;
-    const step1 =
-      `**Step 1 (recall gives TP).** Recall $= \\frac{\\text{TP}}{\\text{actual positives}}$, so $\\text{TP} = ${rS} \\times ${actual} = ${tp}$.`;
-    const step2 =
-      `**Step 2 (precision gives the predicted positives).** Precision $= \\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$, so $\\text{TP} + \\text{FP} = \\frac{${tp}}{${pS}} = ${predicted}$, which gives $\\text{FP} = ${predicted} - ${tp} = ${fp}$.`;
+    let conclusion: string;
+    const ans = m(String(kind === 'FP' ? fp : kind === 'FN' ? fn : tn));
+    const formulas =
+      'Two formulas link these counts. **Recall** is $\\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$, where the bottom is all actual positives. **Precision** is $\\frac{\\text{TP}}{\\text{TP} + \\text{FP}}$, where the bottom is all predicted positives. TP means true positives, FP false positives and FN false negatives.';
+    const tpFromRecall =
+      `Use recall to find TP. There are ${actual} actual positives, so $\\frac{\\text{TP}}{${actual}} = ${rS}$. Multiply both sides by ${actual} to get TP on its own: $\\text{TP} = ${rS} \\times ${actual} = ${tp}$.`;
+    const predictedFromPrecision =
+      `Use precision to find all the positive predictions. We know $\\frac{${tp}}{\\text{TP} + \\text{FP}} = ${pS}$. Multiply both sides by the bottom, then divide by ${pS}, to get the bottom on its own: $\\text{TP} + \\text{FP} = \\frac{${tp}}{${pS}} = ${predicted}$.`;
 
     if (kind === 'FP') {
       stem =
@@ -370,7 +420,14 @@ function genReverse(rng: Rng): GeneratedCore {
         { v: tp, why: `This is the number of **true positives**, $${rS} \\times ${actual} = ${tp}$, which is only the first step.` },
         ...(new Frac(1).sub(p).mul(actual).isInt() ? [{ v: new Frac(1).sub(p).mul(actual).n, why: `This applies $1 - ${pS}$ to the ${actual} **actual** positives. Precision is about the **predicted** positives ($\\text{TP} + \\text{FP}$), not the actual ones.` }] : []),
       ];
-      solution = `${step1}\n\n${step2}`;
+      asking = `How many ${ctx.items} does the model wrongly predict as ${ctx.pos}?`;
+      solution = steps(
+        formulas,
+        tpFromRecall,
+        predictedFromPrecision,
+        `Of those ${predicted} positive predictions, ${tp} were right. The rest are false positives: $\\text{FP} = ${predicted} - ${tp} = ${fp}$.`,
+      );
+      conclusion = `It predicts positive ${predicted} times and is right ${tp} times, so it makes ${ans} false positives.`;
     } else if (kind === 'FN') {
       stem =
         `${ctx.model} predicts **${ctx.pos}** (the positive class) for ${predicted} ${ctx.items}. ` +
@@ -382,9 +439,14 @@ function genReverse(rng: Rng): GeneratedCore {
         { v: tp, why: `This is the number of **true positives**, $${pS} \\times ${predicted} = ${tp}$, which is only the first step.` },
         ...(new Frac(1).sub(r).mul(predicted).isInt() ? [{ v: new Frac(1).sub(r).mul(predicted).n, why: `This applies $1 - ${rS}$ to the ${predicted} **predicted** positives. Recall is about the **actual** positives ($\\text{TP} + \\text{FN}$), not the predicted ones.` }] : []),
       ];
-      solution =
-        `**Step 1 (precision gives TP).** Precision $= \\frac{\\text{TP}}{\\text{predicted positives}}$, so $\\text{TP} = ${pS} \\times ${predicted} = ${tp}$.\n\n` +
-        `**Step 2 (recall gives the actual positives).** Recall $= \\frac{\\text{TP}}{\\text{TP} + \\text{FN}}$, so $\\text{TP} + \\text{FN} = \\frac{${tp}}{${rS}} = ${actual}$, which gives $\\text{FN} = ${actual} - ${tp} = ${fn}$.`;
+      asking = `How many ${ctx.items} that really are ${ctx.pos} does the model miss?`;
+      solution = steps(
+        formulas,
+        `Use precision to find TP. The model predicted positive ${predicted} times, so $\\frac{\\text{TP}}{${predicted}} = ${pS}$. Multiply both sides by ${predicted} to get TP on its own: $\\text{TP} = ${pS} \\times ${predicted} = ${tp}$.`,
+        `Use recall to find all the actual positives. We know $\\frac{${tp}}{\\text{TP} + \\text{FN}} = ${rS}$. Multiply both sides by the bottom, then divide by ${rS}, to get the bottom on its own: $\\text{TP} + \\text{FN} = \\frac{${tp}}{${rS}} = ${actual}$.`,
+        `Of those ${actual} actual positives, the model found ${tp}. The rest were missed, so they are false negatives: $\\text{FN} = ${actual} - ${tp} = ${fn}$.`,
+      );
+      conclusion = `There are ${actual} actual positives and the model finds ${tp}, so it makes ${ans} false negatives.`;
     } else {
       stem =
         `${ctx.model} is tested on ${n} ${ctx.items}, of which ${actual} are actual positives (**${ctx.pos}**). ` +
@@ -396,9 +458,15 @@ function genReverse(rng: Rng): GeneratedCore {
         { v: tp + tn, why: `This is $\\text{TP} + \\text{TN} = ${tp + tn}$, all the correct predictions, not the true negatives alone.` },
         { v: tp, why: `This is the number of **true positives**, $${rS} \\times ${actual} = ${tp}$, not the true negatives.` },
       ];
-      solution =
-        `${step1}\n\n${step2}\n\n` +
-        `**Step 3.** $\\text{FN} = ${actual} - ${tp} = ${fn}$, so $\\text{TN} = ${n} - ${tp} - ${fp} - ${fn} = ${tn}$.`;
+      asking = `How many ${ctx.items} are correctly predicted as ${ctx.neg}?`;
+      solution = steps(
+        formulas,
+        tpFromRecall,
+        predictedFromPrecision,
+        `Subtract TP from each total to get the two kinds of mistake: $\\text{FP} = ${predicted} - ${tp} = ${fp}$ and $\\text{FN} = ${actual} - ${tp} = ${fn}$.`,
+        `Every one of the ${n} ${ctx.items} is exactly one of TP, FP, FN or TN (true negative, correctly predicted negative). So the true negatives are what is left: $\\text{TN} = ${n} - ${tp} - ${fp} - ${fn} = ${tn}$.`,
+      );
+      conclusion = `Taking TP, FP and FN away from the ${n} ${ctx.items} leaves ${ans} true negatives.`;
     }
 
     const out: ICand[] = [];
@@ -408,14 +476,15 @@ function genReverse(rng: Rng): GeneratedCore {
       out.push(d);
     }
     if (out.length < 3) continue;
-    const ans = m(String(answer));
     return {
       stem,
       answer: ans,
       answerValue: answer,
       distractors: out.map((d) => ({ text: m(String(d.v)), value: d.v, why: d.why })),
-      solution: `${solution}\n\nAnswer: ${ans}`,
-      keyIdea: 'Recall links TP to the actual positives (TP + FN); precision links TP to the predicted positives (TP + FP).',
+      asking,
+      solution,
+      conclusion,
+      keyIdea: 'Recall links TP to the actual positives, and precision links TP to the predicted positives. Use the total you are given to find TP, then the other metric to find the other total. Subtract TP from a total to get FN or FP.',
     };
   }
 }

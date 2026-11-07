@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 import { num, paren, signed } from '../../../lib/tex';
 
@@ -23,9 +24,15 @@ function pickDistinct(answer: number, answerText: string, pool: Cand[]): Cand[] 
   return out;
 }
 
-/** "w_1x_1 + w_2x_2 + b" written with the actual numbers, e.g. "1.5(2) + (-1)(4) + 1". */
+/** "w_1x_1 + w_2x_2 + b" written with the actual numbers, e.g. "1.5 x 2 + (-1) x 4 + 1". */
 function sumTex(w: number[], x: number[], b: number): string {
-  return w.map((wi, i) => `${i === 0 ? '' : ' + '}${paren(wi)}(${num(x[i])})`).join('') + signed(b);
+  return w.map((wi, i) => `${i === 0 ? '' : ' + '}${paren(wi)} \\times ${paren(x[i])}`).join('') + signed(b);
+}
+
+/** A sum of already-worked-out terms, e.g. "3 - 4 + 1". Zero terms add nothing, so they are left out. */
+function chain(terms: number[]): string {
+  const kept = terms.filter((t) => t !== 0);
+  return kept.map((t, i) => (i === 0 ? num(t) : signed(t))).join('');
 }
 
 // ---------------------------------------------------------------- single neuron
@@ -43,11 +50,26 @@ function actValue(a: Act, z: number): number {
   return r3(Math.tanh(z));
 }
 
-function actWorking(a: Act, z: number, out: number): string {
-  if (a === 'relu') return z >= 0 ? `$\\text{ReLU}(${num(z)}) = \\max(0, ${num(z)}) = ${num(out)}$ (a positive value passes straight through).` : `$\\text{ReLU}(${num(z)}) = \\max(0, ${num(z)}) = 0$ (ReLU turns every negative value into $0$).`;
+/** The steps that take the weighted sum z through the activation. The last one reaches the output. */
+function actSteps(a: Act, z: number, out: number): string[] {
+  if (a === 'relu')
+    return [
+      '**ReLU** means $\\max(0, z)$: take whichever is larger, 0 or $z$. So it keeps a positive $z$ and turns a negative $z$ into 0.',
+      `Here $\\max(0, ${num(z)}) = ${num(out)}$, because $z$ is ${z >= 0 ? 'positive, so it passes straight through' : 'negative'}.`,
+    ];
+  // Rounded first, so the sums shown on screen add up exactly as a student would key them in.
+  const pos = Math.round(Math.exp(z) * 10000) / 10000;
+  const inv = Math.round(Math.exp(-z) * 10000) / 10000;
   if (a === 'sigmoid')
-    return `$${expTex(-z)} \\approx ${num(Math.exp(-z), 4)}$, so $\\sigma(${num(z)}) = \\frac{1}{1 + ${expTex(-z)}} \\approx \\frac{1}{${num(1 + Math.exp(-z), 4)}} \\approx ${out.toFixed(3)}$ (to 3 decimal places).`;
-  return `Use $\\tanh(z) = \\frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}$ (or the tanh key on a calculator): $\\tanh(${num(z)}) \\approx ${out.toFixed(3)}$ (to 3 decimal places).`;
+    return [
+      `The **sigmoid** turns $z$ into a number between 0 and 1. First find the power. $e$ is a fixed number, about 2.718. With $z = ${num(z)}$, $e^{-z} = ${expTex(-z)} \\approx ${num(inv, 4)}$.`,
+      `Substitute: $\\sigma(${num(z)}) = \\frac{1}{1 + ${num(inv, 4)}} = \\frac{1}{${num(1 + inv, 4)}} \\approx ${out.toFixed(3)}$ to 3 decimal places.`,
+    ];
+  return [
+    '**tanh** turns $z$ into a number between $-1$ and 1, using $\\tanh(z) = \\frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}$, where $e$ is a fixed number, about 2.718. A calculator with a tanh key gives it directly.',
+    `With $z = ${num(z)}$, $e^{z} = ${expTex(z)} \\approx ${num(pos, 4)}$ and $e^{-z} = ${expTex(-z)} \\approx ${num(inv, 4)}$.`,
+    `Substitute: the top is $${num(pos, 4)} - ${num(inv, 4)} = ${num(pos - inv, 4)}$, and the bottom is $${num(pos, 4)} + ${num(inv, 4)} = ${num(pos + inv, 4)}$. So $\\tanh(${num(z)}) = \\frac{${num(pos - inv, 4)}}{${num(pos + inv, 4)}} \\approx ${out.toFixed(3)}$ to 3 decimal places.`,
+  ];
 }
 
 function genSingleNeuron(rng: Rng) {
@@ -97,19 +119,31 @@ function genSingleNeuron(rng: Rng) {
     const zDef = w.map((_, i) => `w_{${i + 1}}x_{${i + 1}}`).join(' + ') + ' + b';
     const dpNote = ACT_INFO[act].dp ? ', to 3 decimal places' : '';
     const stem = `A neuron with ${nameA} activation, ${ACT_INFO[act].formula}, has inputs ${xs}, weights ${ws} and bias $b = ${num(b)}$. What is its output${dpNote}?`;
-    const solution =
-      `**Step 1: weighted sum.** Multiply each input by its weight, add the products, then add the bias.\n\n` +
-      prods.map((p, i) => `- $w_{${i + 1}}x_{${i + 1}} = ${num(w[i])} \\times ${paren(x[i])} = ${num(p)}$`).join('\n') +
-      `\n\n$$z = ${zDef} = ${sumTex(w, x, b)} = ${num(z)}$$\n\n` +
-      `**Step 2: activation.** ${actWorking(act, z, ans)}\n\n` +
-      `Answer: ${ansText}`;
+    const solution = steps(
+      `A neuron works in two stages. First it calculates a **weighted sum** $z = ${zDef}$: each input $x$ times its **weight** $w$, plus the **bias** $b$. Then it puts $z$ through its **activation function**, here ${nameA}.`,
+      'Multiply each input by its weight, keeping the signs:\n\n' +
+        prods.map((p, i) => `- $w_{${i + 1}}x_{${i + 1}} = ${num(w[i])} \\times ${paren(x[i])} = ${num(p)}$`).join('\n'),
+      `Add the products, then add the bias: $z = ${chain([...prods, b])} = ${num(z)}$.`,
+      ...actSteps(act, z, ans),
+    );
+    const actRule =
+      act === 'relu'
+        ? 'ReLU keeps a positive $z$ and turns a negative $z$ into 0.'
+        : act === 'sigmoid'
+          ? 'The sigmoid gives $\\frac{1}{1 + e^{-z}}$, which is above 0.5 for positive $z$ and below 0.5 for negative $z$.'
+          : 'tanh has the same sign as $z$ and stays between $-1$ and 1.';
     return {
       stem,
       answer: ansText,
       answerValue: ans,
       distractors: ds.slice(0, 3).map((d) => ({ text: d.text, value: d.v, why: d.why })),
+      asking: `What number comes out of this ${nameA} neuron?`,
       solution,
-      keyIdea: `A neuron first computes $z = ${zDef}$, then outputs $f(z)$ for its activation function $f$.`,
+      conclusion:
+        act === 'relu'
+          ? `The weighted sum is $z = ${num(z)}$, which is ${z >= 0 ? 'positive, so ReLU keeps it and' : 'negative, so ReLU turns it into 0 and'} the output is ${ansText}.`
+          : `The weighted sum is $z = ${num(z)}$, and the ${nameA} function turns that into ${ansText}.`,
+      keyIdea: `For a neuron's output: multiply each input by its weight, keeping the signs, then add the products and the bias to get $z$. Then apply the activation. ${actRule}`,
     };
   }
 }
@@ -151,16 +185,15 @@ function genForwardPass(rng: Rng) {
       if (!ds.some((d) => d.v === y + k)) ds.push({ v: y + k, text: t(y + k), why: 'This comes from an arithmetic slip in the output neuron.' });
       k++;
     }
-    const note = (z: number) => (z < 0 ? ' (switched off: ReLU turns a negative value into $0$)' : '');
-    const solution =
-      'Work forwards one layer at a time (the **forward pass**), remembering $\\text{ReLU}(z) = \\max(0, z)$.\n\n' +
-      '**Hidden layer**\n\n' +
-      [0, 1]
-        .map((i) => `- $h_{${i + 1}}$: $z = ${sumTex(W[i], x, bh[i])} = ${num(zh[i])}$, so $h_{${i + 1}} = \\max(0, ${num(zh[i])}) = ${num(h[i])}$${note(zh[i])}.`)
-        .join('\n') +
-      `\n\n**Output layer** (inputs $h_1 = ${num(h[0])}$ and $h_2 = ${num(h[1])}$, no activation):\n\n` +
-      `$$y = ${sumTex(v, h, c)} = ${num(y)}$$\n\n` +
-      `Answer: ${t(y)}`;
+    const hiddenStep = (i: number) =>
+      `$h_${i + 1}$ takes $x_1 = ${num(x[0])}$ and $x_2 = ${num(x[1])}$, with weights $${num(W[i][0])}$ and $${num(W[i][1])}$ and bias $${num(bh[i])}$. So $z = ${sumTex(W[i], x, bh[i])} = ${chain([W[i][0] * x[0], W[i][1] * x[1], bh[i]])} = ${num(zh[i])}$. ` +
+      (zh[i] < 0 ? `That is negative, so ReLU turns it into 0: $h_${i + 1} = \\max(0, ${num(zh[i])}) = 0$.` : `That is not negative, so ReLU keeps it: $h_${i + 1} = \\max(0, ${num(zh[i])}) = ${num(h[i])}$.`);
+    const solution = steps(
+      'Work forwards one layer at a time. Each neuron multiplies each input by its weight, adds its **bias**, then applies its activation. **ReLU** means $\\max(0, z)$: keep $z$ if it is positive, otherwise output 0.',
+      hiddenStep(0),
+      hiddenStep(1),
+      `Now $h_1 = ${num(h[0])}$ and $h_2 = ${num(h[1])}$ are the inputs to $y$. Its weights are $${num(v[0])}$ and $${num(v[1])}$, its bias is $${num(c)}$, and it has no activation. So $y = ${sumTex(v, h, c)} = ${chain([v[0] * h[0], v[1] * h[1], c])} = ${num(y)}$.`,
+    );
     return {
       stem: `A network has inputs $x_1 = ${num(x[0])}$ and $x_2 = ${num(x[1])}$, hidden ReLU neurons $h_1$ and $h_2$, and an output $y$ with **no** activation. Using the weights and biases in the table, what is $y$?`,
       table: {
@@ -175,8 +208,10 @@ function genForwardPass(rng: Rng) {
       answer: t(y),
       answerValue: y,
       distractors: ds.slice(0, 3).map((d) => ({ text: d.text, value: d.v, why: d.why })),
+      asking: 'What number comes out at $y$ when these inputs pass through the network?',
       solution,
-      keyIdea: 'In a forward pass, compute each neuron\'s weighted sum plus bias, apply the activation, and feed the results into the next layer.',
+      conclusion: `$h_1 = ${num(h[0])}$ and $h_2 = ${num(h[1])}$ feed into the output neuron, which adds its bias and has no activation, so the answer is ${t(y)}.`,
+      keyIdea: 'For a forward pass, compute one neuron at a time, left to right: weighted sum plus bias, then activation. Write each result down, because those results are the inputs of the next layer.',
     };
   }
 }
@@ -211,21 +246,26 @@ function genParamCount(rng: Rng) {
     const hiddenDesc =
       hidden.length === 1 ? `one hidden layer of $${hidden[0]}$ neurons` : `two hidden layers with $${hidden[0]}$ and $${hidden[1]}$ neurons`;
     const stem = `A fully connected network has $${nIn}$ inputs, ${hiddenDesc} and $${nOut}$ output neuron${nOut === 1 ? '' : 's'}, with a bias on every hidden and output neuron. How many trainable parameters (weights plus biases) does it have?`;
-    const solution =
-      'For each pair of neighbouring layers: weights $= n_{\\text{in}} \\times n_{\\text{out}}$ and biases $= n_{\\text{out}}$ (one per receiving neuron).\n\n' +
-      '| Connection | Weights | Biases |\n| --- | --- | --- |\n' +
-      pairs.map((p) => `| $${p.a} \\to ${p.b}$ | $${p.a} \\times ${p.b} = ${num(p.a * p.b)}$ | $${p.b}$ |`).join('\n') +
-      `\n\nWeights: $${pairs.map((p) => num(p.a * p.b)).join(' + ')} = ${num(weights)}$.\n\n` +
-      `Biases: $${pairs.map((p) => num(p.b)).join(' + ')} = ${num(biases)}$.\n\n` +
-      `Total: $${num(weights)} + ${num(biases)} = ${num(total)}$. The input layer has no biases: it just holds the data.\n\n` +
-      `Answer: ${t(total)}`;
+    const solution = steps(
+      '**Fully connected** means every neuron in a layer links to every neuron in the next layer. Each link has one **weight**. A **bias** is one extra trainable number on each hidden or output neuron.',
+      'Go through each pair of neighbouring layers. The weights are left size times right size. The biases equal the right size, because each receiving neuron has one:\n\n' +
+        table(
+          ['Layers', 'Weights', 'Biases'],
+          pairs.map((p) => [`$${p.a} \\to ${p.b}$`, `$${p.a} \\times ${p.b} = ${num(p.a * p.b)}$`, `$${p.b}$`]),
+        ),
+      `Add up the weights: $${pairs.map((p) => num(p.a * p.b)).join(' + ')} = ${num(weights)}$.`,
+      `Add up the biases: $${pairs.map((p) => num(p.b)).join(' + ')} = ${num(biases)}$. The input layer has none, because inputs are just data.`,
+      `Add both totals: $${num(weights)} + ${num(biases)} = ${num(total)}$.`,
+    );
     return {
       stem,
       answer: t(total),
       answerValue: total,
       distractors: ds.slice(0, 3).map((d) => ({ text: d.text, value: d.v, why: d.why })),
+      asking: 'How many weights and biases does this network have altogether?',
       solution,
-      keyIdea: 'Total parameters $= \\sum (n_{\\text{in}} \\times n_{\\text{out}} + n_{\\text{out}})$ over every pair of neighbouring layers.',
+      conclusion: `There are ${num(weights)} weights and ${num(biases)} biases, which makes ${t(total)} trainable parameters.`,
+      keyIdea: 'For a fully connected network, use a table: for each neighbouring pair, weights $=$ left size $\\times$ right size, and biases $=$ right size. Add the columns. Never multiply all the layers together, and never give inputs a bias.',
     };
   }
 }

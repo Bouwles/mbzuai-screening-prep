@@ -30,18 +30,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'Why does this bar chart make the three battery lives look more different than they are?',
       solution:
-        'Look at where the vertical axis **starts**. It starts at 10 hours, not 0. This is called a **truncated axis**.\n\n' +
-        'Above the 10-hour line, the visible parts of the bars are $0.2$, $0.6$ and $1$ hour tall, so Gamma\'s bar *looks* $\\frac{1}{0.2} = 5$ times as tall as Alpha\'s.\n\n' +
-        'The real values are $10.2$ and $11$ hours. Gamma lasts only $0.8$ hours longer, which is only about 8% more (since $\\frac{0.8}{10.2} \\times 100 \\approx 7.8$), not 5 times as much.\n\n' +
-        'So the chart is misleading because the truncated axis makes a small difference look enormous.',
+        'A bar chart works by comparing heights. That is only fair if a bar twice as tall really means a value twice as big.\n\n' +
+        'Test that here. The real values for Alpha and Gamma are 10.2 and 11 hours. The difference is $11 - 10.2 = 0.8$ hours, which is only about $8\\%$ of 10.2.\n\n' +
+        'But Gamma\'s bar looks about 5 times as tall as Alpha\'s. So the picture and the numbers disagree, and we need to find out why.\n\n' +
+        'Look at the vertical axis (the scale up the side). Its lowest value is 10, not 0, so the first 10 hours of every bar are cut off. Only the parts above 10 are drawn: 0.2 for Alpha and 1 for Gamma.',
+      conclusion: 'Cutting off the bottom of the axis makes a small gap look huge. The vertical axis starts at 10, not 0.',
       whyWrong: [
         'A line graph is for data that changes over time or along an ordered scale. Brands are separate categories, so a bar chart is the right choice; the problem is the axis, not the type of chart.',
         null,
         'Sorting bars from shortest to tallest is a normal, honest way to make a chart easier to read. It does not change the heights of the bars.',
         'Changing the unit (hours to minutes) multiplies every value by 60, so the bars keep the same relative sizes. It would not fix the truncated axis.',
       ],
-      keyIdea: 'When a bar chart\'s vertical axis does not start at zero, the heights of the bars no longer show the true ratio between the values.',
+      keyIdea: 'For any bar chart, read the lowest number on the vertical axis first. If it isn\'t 0, the bar heights mislead, so compare the real values instead. Suspect this whenever small differences look huge.',
     },
   },
   {
@@ -57,17 +59,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 2,
     markScheme: {
+      asking: 'What can we honestly conclude from ice-cream sales and drownings rising together?',
       solution:
-        '**Correlation** means two variables tend to move together. It does **not** tell you that one causes the other.\n\n' +
-        'Here a third variable, **hot weather**, explains both: in hot months more people buy ice cream *and* more people go swimming, so there are more drownings. A hidden third variable like this is called a **confounding variable**.\n\n' +
-        'So the only safe conclusion is that the two variables are **associated**, most likely through the weather.',
+        'A **positive correlation** means two things tend to go up together. It does not tell us that one causes the other.\n\n' +
+        'So ask: is there a third thing that could push both up? Think about what kind of month has more ice-cream sales and more people swimming.\n\n' +
+        'Hot weather does both. In hot months, more people buy ice cream and more people swim, so more people drown. A hidden cause like this is called a **confounding variable**.',
+      conclusion: 'The honest statement describes the pattern and its likely hidden cause. The two rise together, probably because of hot weather.',
       whyWrong: [
         'This claims **causation** from a correlation. The data only show the two rise together; hot weather is a much more likely explanation for both.',
         'This assumes ice cream causes drownings, which the data cannot show. Banning ice cream would not stop people swimming on hot days.',
         null,
         'A strong correlation is not a perfect one. It describes the overall trend, so there can still be individual months where sales went up but drownings did not.',
       ],
-      keyIdea: 'Correlation does not imply causation: a confounding variable (here, hot weather) can make two things rise together.',
+      keyIdea: 'When two things are correlated, ask: "Could a third thing drive both?" Reject any option saying one causes the other, or any plan relying on that cause. Reject "every" as well, because a correlation is only a trend.',
     },
   },
   {
@@ -83,17 +87,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is wrong with using a website poll to describe all adults?',
       solution:
-        'Ask: **who could have been in the sample?** Only people who were on the website could answer the poll, and every one of them was using the internet at that moment.\n\n' +
-        'People who rarely go online had almost no chance of being included. The sample is therefore **biased** (not representative of all adults), and it is also **self-selected** because visitors chose whether to answer.\n\n' +
-        'A biased sample gives a biased answer, however many people respond.',
+        'A **sample** is the group of people actually asked. A **population** is the whole group we want to know about. Here the population is all adults.\n\n' +
+        'Ask who could answer this poll. It was on a website, so everyone who answered was online. Adults who rarely use the internet were very unlikely to see it.\n\n' +
+        'A sample like that doesn\'t fairly represent the population, so we call it **biased**. It leans towards heavy internet users, which pushes the $98\\%$ up.',
+      conclusion: '12,000 is plenty of people, but they are the wrong mix. The sample is biased towards internet users.',
       whyWrong: [
         '12,000 is actually a large sample. The problem is *who* was asked, not *how many*: a big biased sample is still biased.',
         'There is nothing wrong with a high percentage in itself. The issue is that the people asked were not representative of all adults.',
         'This goes too far. A well-designed **random** sample can be used to draw conclusions about a population; this particular poll is just badly designed.',
         null,
       ],
-      keyIdea: 'A sample is only useful if it represents the population; a large but biased sample still gives a biased result.',
+      keyIdea: 'For a survey question, ask "who could answer, and who was left out?" If the way of collecting answers is linked to what is being measured, the sample is biased. A bigger sample doesn\'t fix that.',
     },
   },
   {
@@ -104,19 +110,19 @@ export const questions: StaticQuestion[] = [
     options: ['$2$', '$3$', '$4$', '$8$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'If a picture doubles in both height and width, how many times bigger is its area?',
       solution:
-        'The area of a picture scales with **width** $\\times$ **height**.\n\n' +
-        '- Width is multiplied by $2$.\n' +
-        '- Height is multiplied by $2$.\n\n' +
-        'So the area is multiplied by $2 \\times 2 = 4$.\n\n' +
-        'If the data only doubled, the picture still looks **4 times** as big, because the eye judges size by area. This is a common way pictograms distort data: the picture should be scaled so its *area* doubles, or simply shown twice.',
+        'A picture\'s area is width $\\times$ height. Try a small example: a picture 3 wide and 2 tall has area $3 \\times 2 = 6$.\n\n' +
+        'Double both lengths. Now it is 6 wide and 4 tall, so its area is $6 \\times 4 = 24$.\n\n' +
+        'Compare the two areas: $24 \\div 6 = 4$. This works for any picture, because the area is multiplied by 2 for the width and by 2 again for the height: $2 \\times 2 = 4$.',
+      conclusion: 'Doubling the height and the width makes the area $4$ times as large.',
       whyWrong: [
         'This is the scale factor of just one dimension. Scaling both the width and the height by 2 multiplies the area by $2 \\times 2$.',
         'This adds the increases instead of multiplying the scale factors: "100% taller plus 100% wider = 200% bigger". Area scale factors multiply.',
         null,
         'This is $2^3$, which would be the change in **volume** of a 3D object scaled by 2 in every direction. A flat picture only has width and height.',
       ],
-      keyIdea: 'Scaling a picture by $k$ in both directions multiplies its area by $k^2$, so pictograms scaled by height exaggerate changes.',
+      keyIdea: 'If every length of a flat shape is scaled by $k$, its area is multiplied by $k^2$. Infographics can mislead this way: a value that only doubles gets a picture with 4 times the area.',
     },
     check: {
       optionValues: [2, 3, 4, 8],
@@ -140,18 +146,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which claim can we trust, comparing 5.0 stars from 2 reviews with 4.6 stars from 850 reviews?',
       solution:
-        'An average from a **small sample** is very unreliable: it can swing wildly when one more value is added.\n\n' +
-        'For Restaurant A, one 1-star review would change the average from $5.0$ to $\\frac{5 + 5 + 1}{3} \\approx 3.7$ stars.\n\n' +
-        'For Restaurant B, one 1-star review barely moves the average, because it is one review out of 851.\n\n' +
-        'So we cannot conclude that A is better. B\'s 4.6 is the more trustworthy figure.',
+        'An average from a few values can swing a lot. With only 2 reviews, it takes just two happy customers (maybe friends of the owner) to reach 5.0 stars.\n\n' +
+        'An average from many values is steady. One extra review hardly moves an average of 850 reviews, because it is just one value among hundreds.\n\n' +
+        'So the number of reviews (the **sample size**) tells us how much to trust each average. An average from 850 reviews is far more trustworthy than one from 2.',
+      conclusion: '5.0 looks higher, but it rests on only 2 reviews. B\'s rating is more reliable, because it has far more reviews.',
       whyWrong: [
         null,
         'This ignores **sample size**. Two reviews (possibly from friends of the owner) are far too few to be confident that A is better.',
         'An average from 2 values is much less reliable than an average from 850 values. Larger samples give more stable averages.',
         'More reviews does not lower the average by itself; it just makes the average more stable. B\'s 4.6 already includes all its good and bad reviews.',
       ],
-      keyIdea: 'Results from very small samples are unreliable, so always check how many data values a percentage or average is based on.',
+      keyIdea: 'When comparing averages, look at the sample size as well as the average. Very small samples can\'t support words like "definitely". Choose the option that talks about how reliable the figure is.',
     },
   },
 
@@ -174,19 +181,21 @@ export const questions: StaticQuestion[] = [
     options: ['200%', '4%', '300%', '5%'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Using the real numbers, not the bar heights, how much higher is App Y than App X in percent?',
       solution:
-        'Step 1: Read the real values: App X = 80 thousand, App Y = 84 thousand. (The axis starts at 78, which is why the bars look so different.)\n\n' +
-        'Step 2: Find the increase: $84 - 80 = 4$ thousand.\n\n' +
-        'Step 3: Divide by the **starting** value (App X) and multiply by 100:\n\n' +
-        '$$\\frac{4}{80} \\times 100 = 5\\%$$\n\n' +
-        'Check the visual effect: above 78 the bars are $80 - 78 = 2$ and $84 - 78 = 6$ units tall, so Y looks $\\frac{6}{2} = 3$ times as tall. The truncated axis turns a 5% difference into a bar that looks 200% taller.',
+        'The bars can mislead here, because the vertical axis starts at 78, not 0. Above 78, the visible heights are only $80 - 78 = 2$ and $84 - 78 = 6$. That is why one looks 3 times as tall as the other.\n\n' +
+        'So use the real values from the scale: App X has 80 thousand downloads and App Y has 84 thousand.\n\n' +
+        'Find the real difference: $84 - 80 = 4$ thousand.\n\n' +
+        'We are comparing App Y with App X, so App X is the starting value. Divide by it: $\\frac{4}{80} = 0.05$.\n\n' +
+        'Multiply by 100 to get a percentage: $0.05 \\times 100 = 5\\%$.',
+      conclusion: 'App Y is only 4 thousand above App X\'s 80 thousand, so it is really 5% higher.',
       whyWrong: [
         'This is how much taller the bar **looks** ($\\frac{6 - 2}{2} = 200\\%$), measured from 78 instead of 0. It describes the picture, not the data.',
         'This takes the difference of 4 thousand downloads and writes it as 4%. A percentage change must be divided by the starting value: $\\frac{4}{80} \\times 100$.',
         'This mixes up "3 times as tall" with "300% more". It is also based on the picture, not the real values.',
         null,
       ],
-      keyIdea: 'Always work from the numbers, not the bar heights: percentage change $= \\frac{\\text{new} - \\text{old}}{\\text{old}} \\times 100$.',
+      keyIdea: 'When the axis doesn\'t start at 0, ignore how the bars look. Read the real values and use $\\frac{\\text{difference}}{\\text{starting value}} \\times 100$. "Higher than X" means X is the starting value.',
     },
     check: { optionValues: [200, 4, 300, 5], compute: () => pct(80, 84) },
   },
@@ -207,22 +216,21 @@ export const questions: StaticQuestion[] = [
     options: ['An increase of 25%', 'A decrease of 33.3%', 'A decrease of 25%', 'A decrease of 37.5%'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Over the whole year, what was the percentage change in users from January to December?',
       solution:
-        'The advert has **cherry-picked** a short range (September to December) where the line goes up: $\\frac{1500 - 1200}{1200} \\times 100 = 25\\%$.\n\n' +
-        'For the whole year:\n\n' +
-        '- January: 2000 users\n' +
-        '- December: 1500 users\n' +
-        '- Change: $1500 - 2000 = -500$\n\n' +
-        'Divide by the **starting** (January) value:\n\n' +
-        '$$\\frac{-500}{2000} \\times 100 = -25\\%$$\n\n' +
-        'So users actually **fell by 25%** over the year. The recent rise is real, but it only recovers part of the earlier drop.',
+        'Ignore the advert\'s figure. It picked September and December because they show a rise. The question wants January to December, so read those two points.\n\n' +
+        'January is 2000 users and December is 1500 users. January comes first, so it is the starting value.\n\n' +
+        'Find the change: $1500 - 2000 = -500$. The minus sign means users went down by 500.\n\n' +
+        'A percentage change compares the change with where it started, so divide its size by 2000: $\\frac{500}{2000} = 0.25$.\n\n' +
+        'Multiply by 100: $0.25 \\times 100 = 25\\%$. Since users went down, this $25\\%$ is a fall.',
+      conclusion: 'Users fell by 500 from a start of 2000, so over the full year the change was A decrease of 25%.',
       whyWrong: [
         'This is the advert\'s cherry-picked figure from September (1200) to December (1500). Over the full year the number of users went down.',
         'This divides the drop of 500 by the December value (1500) instead of the January value (2000). Percentage change is always divided by the **starting** value.',
         null,
         'This measures the drop from the March peak (2400) to December: $\\frac{900}{2400} = 37.5\\%$. The question asks for January to December.',
       ],
-      keyIdea: 'A short, hand-picked time range can show the opposite of the overall trend, so always look at the full data before accepting a claim.',
+      keyIdea: 'To test a claim from a chart, use the full time range the question names, not the range the claim picked. Then use $\\frac{\\text{new} - \\text{old}}{\\text{old}} \\times 100$ and let the sign show rise or fall.',
     },
     check: {
       optionValues: [25, -100 / 3, -25, -37.5],
@@ -263,18 +271,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'What can the scatter graph honestly tell us about sleep and test scores?',
       solution:
-        'Step 1: Describe the pattern. As hours of sleep increase, scores generally increase, so there is a **positive correlation**.\n\n' +
-        'Step 2: Check for exceptions. One student slept 7 hours and scored 70, while another slept 8 hours and scored only 66. So the pattern is a **tendency**, not a rule for every student.\n\n' +
-        'Step 3: Think about causation. This is an **observational** study: nobody controlled how long anyone slept. Other factors (for example, students who revised earlier may also go to bed earlier) could explain the link.\n\n' +
-        'So the valid statement is that students who slept more **tended** to score higher.',
+        'Each dot is one student. Going right means more sleep, and going up means a higher score.\n\n' +
+        'Test the word "every". One student with 7 hours scored 70, but one with 8 hours scored only 66. So a claim about every student is false.\n\n' +
+        'Test the word "causes". The graph only records what happened, and nobody controlled how much anyone slept. Something else, such as being well organised, could explain both.\n\n' +
+        'Now look at the whole cloud of dots. At 5 hours the score is 52, and at 9 hours it is 78. The dots rise overall from left to right, which is a **positive correlation**: more sleep generally went with a higher score.',
+      conclusion: 'The graph shows a trend, with exceptions and no proof of cause. Students who slept more tended to score higher.',
       whyWrong: [
         'This claims **causation**. The data are observational, so a confounding variable (such as how organised a student is) could explain both more sleep and higher scores.',
         null,
         'Correlation describes the overall trend, not every pair of students. The chart has exceptions: 7 hours with a score of 70, but 8 hours with a score of 66.',
         'A correlation does not need perfect points on a line. The points clearly rise from left to right, which shows a positive (but not perfect) correlation.',
       ],
-      keyIdea: 'A scatter graph can show a tendency (correlation), but it does not prove cause and effect and does not apply to every individual.',
+      keyIdea: 'For scatter-graph conclusions, choose wording like "tended to". Reject "causes", because a graph shows a link only. Reject "every" or "always" if a single pair of dots goes against the trend.',
     },
   },
   {
@@ -290,17 +300,19 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'What is wrong with asking people outside a gym how much adults exercise?',
       solution:
-        'Ask: **who had a chance to be in the sample?** Only people who were at a gym. Adults who never go to a gym had no chance of being chosen.\n\n' +
-        'People leaving a gym obviously exercise more than average, so the sample is **biased** towards active people.\n\n' +
-        'Think about the **direction** of the bias: if the sample contains too many active people, their average exercise time will be **higher** than the true city average. So the estimate is likely to be **too high**.',
+        'Who is she trying to learn about? All adults in the city. Who did she actually ask? Only people leaving a gym at 7 am.\n\n' +
+        'People at a gym that early exercise more than a typical adult, and adults who never go to a gym can\'t be in her sample. So active people are over-represented, meaning there are too many of them compared with the city.\n\n' +
+        'Now decide which way this pushes the estimate. An average made mostly from active people comes out higher than the true city average.',
+      conclusion: 'The fault is where she sampled, not how many she asked. It over-represents active people, so the estimate is too high.',
       whyWrong: [
         'Sample size does not fix bias. 400 gym users still only represent gym users, not all adults in the city.',
         null,
         'The bias is identified correctly, but the direction is wrong. A sample full of active people gives an average that is too **high**, not too low.',
         'Changing the time of day still only samples gym users. The bias comes from **where** people were sampled, not when.',
       ],
-      keyIdea: 'Sampling bias pushes an estimate in a predictable direction: work out which group is over-represented and how that changes the answer.',
+      keyIdea: 'For a biased sample, ask two things. Who is over-represented, compared with the population? Then, which way does that push the average? A large sample, or sampling at another time in the same place, doesn\'t fix it.',
     },
   },
   {
@@ -323,20 +335,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which claim about the crime figures do the actual numbers support?',
       solution:
-        'Step 1: Work out the **actual** increases (the number of extra crimes).\n\n' +
-        '- Town A: $30 - 20 = 10$ more crimes\n' +
-        '- Town B: $440 - 400 = 40$ more crimes\n\n' +
-        'Step 2: Compare. Town B\'s increase (40) is 4 times Town A\'s (10). A big **percentage** in Town A comes from a very small starting number.\n\n' +
-        'Step 3: Check the combined change, for completeness: $\\frac{470 - 420}{420} \\times 100 \\approx 11.9\\%$, not 60%.\n\n' +
-        'So the supported conclusion is that Town B had the larger increase in the number of crimes.',
+        'A percentage rise can sound big just because the starting number is small. So work out the actual rise in crimes for each town.\n\n' +
+        'The actual rise is this year minus last year:\n\n| Town | Working | Extra crimes |\n|---|---|---|\n| Town A | $30 - 20$ | 10 |\n| Town B | $440 - 400$ | 40 |\n\n' +
+        'Town A\'s $+50\\%$ is only 10 extra crimes, because it started at just 20. Town B\'s $+10\\%$ is 40 extra crimes, because it started at 400.\n\n' +
+        'Compare the extra crimes: 40 is bigger than 10, so Town B\'s number of crimes went up by more.',
+      conclusion: 'A big percentage on a small number can still be a small rise. Town B had the larger increase in the number of crimes.',
       whyWrong: [
         'This confuses a **percentage** increase with an **actual** increase. 50% of 20 is only 10 crimes, while 10% of 400 is 40 crimes.',
         'Town A has 30 crimes this year and Town B has 440, so Town A has far fewer.',
         'Percentages from groups of different sizes cannot be added. The combined change is $\\frac{470 - 420}{420} \\times 100 \\approx 11.9\\%$.',
         null,
       ],
-      keyIdea: 'A large percentage change from a small starting value can be a small actual change, so always compare the actual numbers too.',
+      keyIdea: 'When a headline quotes a percentage, work out the actual change too: new minus old. A big percentage on a small base can mean fewer extra cases than a small percentage on a large base.',
     },
   },
   {
@@ -360,21 +372,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'How do the two hospitals compare within each severity group, and overall?',
       solution:
-        'Work out every survival rate (survived $\\div$ treated $\\times 100$).\n\n' +
-        '| | Mild | Severe | Overall |\n' +
-        '|---|---|---|---|\n' +
-        '| Hospital A | $\\frac{90}{100} = 90\\%$ | $\\frac{120}{400} = 30\\%$ | $\\frac{210}{500} = 42\\%$ |\n' +
-        '| Hospital B | $\\frac{320}{400} = 80\\%$ | $\\frac{20}{100} = 20\\%$ | $\\frac{340}{500} = 68\\%$ |\n\n' +
-        'Hospital A is better in **each** group (90% vs 80%, 30% vs 20%), yet Hospital B is better **overall** (68% vs 42%).\n\n' +
-        'Why? Hospital A treats mostly **severe** cases (400 of its 500), and severe cases rarely survive anywhere. Hospital B treats mostly **mild** cases. The overall rate is dragged down by the mix of patients, not by the quality of care. This reversal is called **Simpson\'s paradox**.',
+        'Each cell reads "survived / treated". The hospitals treat different numbers in each group, so counts can\'t be compared directly. We need survival rates: survived divided by treated.\n\n' +
+        'Turn every cell into a percentage:\n\n| Hospital | Mild | Severe | All patients |\n|---|---|---|---|\n| A | $\\frac{90}{100} = 90\\%$ | $\\frac{120}{400} = 30\\%$ | $\\frac{210}{500} = 42\\%$ |\n| B | $\\frac{320}{400} = 80\\%$ | $\\frac{20}{100} = 20\\%$ | $\\frac{340}{500} = 68\\%$ |\n\n' +
+        'Look at who each hospital treats. Most of A\'s patients are severe (400 of 500), while most of B\'s are mild (400 of 500). Severe cases survive less often, so that mix pulls A\'s overall figure down.\n\n' +
+        'Now compare column by column. Mild: A\'s $90\\%$ beats B\'s $80\\%$. Severe: A\'s $30\\%$ beats B\'s $20\\%$. All patients: B\'s $68\\%$ beats A\'s $42\\%$.',
+      conclusion: 'The reversal comes from the different mix of patients, so there is no error. Hospital A is better for both, but B is better overall.',
       whyWrong: [
         'Hospital B is lower in both groups: 80% vs 90% for mild cases and 20% vs 30% for severe cases. It only wins on the overall figure.',
         null,
         'Hospital A\'s overall rate is only $\\frac{210}{500} = 42\\%$, lower than Hospital B\'s 68%, because most of A\'s patients are severe cases.',
         'This reversal is possible and is called Simpson\'s paradox. It happens because the two hospitals treat very different mixes of patients: most of A\'s patients are severe cases, while most of B\'s are mild.',
       ],
-      keyIdea: "Simpson's paradox: one group can be better in every subgroup but worse overall, when the subgroups have very different sizes.",
+      keyIdea: 'When a table has subgroups and a total, find the percentage in every cell and compare column by column. A group can win every subgroup but lose overall if its mix differs. This is called **Simpson\'s paradox**.',
     },
   },
   {
@@ -385,19 +396,20 @@ export const questions: StaticQuestion[] = [
     options: ['70%', '48%', '60%', '40%'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What percentage of all 80 students passed, counting both classes together?',
       solution:
-        'Step 1: Total number who passed: $18 + 30 = 48$.\n\n' +
-        'Step 2: Total number of students: $20 + 60 = 80$.\n\n' +
-        'Step 3: Combined pass rate:\n\n' +
-        '$$\\frac{48}{80} \\times 100 = 60\\%$$\n\n' +
-        'You **cannot** just average 90% and 50%, because Class Y is three times as big as Class X, so its 50% counts three times as much.',
+        'Don\'t average $90\\%$ and $50\\%$. That would treat the classes as equal, but Class Y has 60 students and Class X has only 20.\n\n' +
+        'Instead, treat them as one big class. Add the passes: $18 + 30 = 48$.\n\n' +
+        'Add the students: $20 + 60 = 80$.\n\n' +
+        'Divide the passes by the students, then multiply by 100: $\\frac{48}{80} = 0.6$, and $0.6 \\times 100 = 60\\%$.',
+      conclusion: '48 of the 80 students passed, so the combined pass rate is 60%.',
       whyWrong: [
         'This averages the two percentages: $\\frac{90 + 50}{2} = 70\\%$. That only works if the classes are the same size; Class Y has three times as many students.',
         'This is the **number** of students who passed (48), not the percentage. Divide by the 80 students in total.',
         null,
         'This is the combined **fail** rate: $\\frac{2 + 30}{80} \\times 100 = 40\\%$. The question asks for the pass rate.',
       ],
-      keyIdea: 'To combine rates from groups of different sizes, add the counts first, then divide; never average the percentages.',
+      keyIdea: 'To combine rates, add the counts on top and the group sizes on the bottom, then divide. Never average percentages from groups of different sizes. The result must fall between the two rates, closer to the bigger group\'s.',
     },
     check: { optionValues: [70, 48, 60, 40], compute: () => rate(18 + 30, 20 + 60) },
   },
@@ -423,19 +435,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the true growth per year, given that the gaps between the plotted years aren\'t equal?',
       solution:
-        'The first gaps on the horizontal axis are **10 years** each, but the later gaps are **1 year** each, even though they are drawn the same width. This is a **distorted scale**.\n\n' +
-        'Work out the growth **per year** for each part:\n\n' +
-        '- 2000 to 2020: $\\frac{50 - 10}{20} = \\frac{40}{20} = 2$ thousand per year\n' +
-        '- 2020 to 2023: $\\frac{56 - 50}{3} = \\frac{6}{3} = 2$ thousand per year\n\n' +
-        'The rate is the same: 2 thousand members per year. The line only looks steeper early on because 10 years are squashed into the same width as 1 year.',
+        'Read the bottom axis: 2000, 2010, 2020, 2021, 2022, 2023. They are drawn evenly spaced, but the first two gaps are 10 years long and the others are only 1 year long.\n\n' +
+        'So the steepness of the line can\'t be trusted. To compare fairly, find the growth per year, which is the growth divided by the number of years.\n\n' +
+        'Do this for each gap:\n\n| Period | Growth (thousand) | Years | Growth per year (thousand) |\n|---|---|---|---|\n| 2000 to 2010 | $30 - 10 = 20$ | 10 | 2 |\n| 2010 to 2020 | $50 - 30 = 20$ | 10 | 2 |\n| 2020 to 2021 | $52 - 50 = 2$ | 1 | 2 |\n| 2021 to 2022 | $54 - 52 = 2$ | 1 | 2 |\n| 2022 to 2023 | $56 - 54 = 2$ | 1 | 2 |\n\n' +
+        'Every row gives the same rate. The line only looks flatter after 2020 because those gaps cover just 1 year each.',
+      conclusion: 'The rate is the same in every period, so the correct conclusion is this. Steady growth of 2 thousand per year throughout.',
       whyWrong: [
         null,
         'This treats each gap on the axis as one year. From 2000 to 2010 the increase of 20 thousand took **10 years**, so the rate was $\\frac{20}{10} = 2$ thousand per year.',
         'The line still rises by 2 thousand every year after 2020. It only looks flatter because each of those gaps is just one year wide.',
         'This compares totals over periods of different length (3 years against 10 years). Per year, both periods grew by 2 thousand.',
       ],
-      keyIdea: 'Check that the axis scale is even: unequal time gaps drawn the same width distort the slope of a line chart.',
+      keyIdea: 'Before judging how steep a line is, read the spacing of the time axis. If the time gaps differ, work out change divided by time for every gap, then compare those rates.',
     },
   },
 
@@ -461,23 +474,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 3,
     markScheme: {
+      asking: 'Once we look inside each department, do the figures really show bias against women?',
       solution:
-        'Step 1: Department rates.\n\n' +
-        '| | Men | Women |\n' +
-        '|---|---|---|\n' +
-        '| Department X | $\\frac{60}{80} = 75\\%$ | $\\frac{17}{20} = 85\\%$ |\n' +
-        '| Department Y | $\\frac{4}{20} = 20\\%$ | $\\frac{24}{80} = 30\\%$ |\n' +
-        '| Overall | $\\frac{64}{100} = 64\\%$ | $\\frac{41}{100} = 41\\%$ |\n\n' +
-        'Step 2: Compare within each department. Women do **better** in both: 85% vs 75% in X, and 30% vs 20% in Y.\n\n' +
-        'Step 3: Explain the overall figure. 80 of the 100 women applied to Department Y, which accepts very few people (20-30%). 80 of the 100 men applied to Department X, which accepts most people (75-85%). The overall gap comes from **where** people applied, not from how each department treated them.\n\n' +
-        'This is Simpson\'s paradox. The overall figures alone do not support the newspaper\'s claim.',
+        'Each cell reads "accepted / applied". The overall figures are 64 of 100 men and 41 of 100 women. To test the claim, look inside each department, where the decisions are made.\n\n' +
+        'Work out each department\'s acceptance rate:\n\n| Department | Men | Women |\n|---|---|---|\n| X | $\\frac{60}{80} = 75\\%$ | $\\frac{17}{20} = 85\\%$ |\n| Y | $\\frac{4}{20} = 20\\%$ | $\\frac{24}{80} = 30\\%$ |\n\n' +
+        'Look at where people applied. 80 of the 100 women applied to Department Y, which accepts few people. 80 of the 100 men applied to Department X, which accepts many. That pulls the women\'s overall figure down.\n\n' +
+        'Compare inside each department. In X, women\'s $85\\%$ is above men\'s $75\\%$. In Y, women\'s $30\\%$ is above men\'s $20\\%$.',
+      conclusion: 'The overall gap comes from which department people applied to. Women had the higher rate in each department.',
       whyWrong: [
         'This only looks at the combined figures. Inside each department women were accepted at a **higher** rate, so the gap is explained by which department people applied to.',
         'This is the opposite of the data: men were accepted at 75% vs women 85% in X, and 20% vs 30% in Y.',
         'Averaging $85\\%$ and $30\\%$ ignores that 80 women applied to Y but only 20 to X. The real overall rate is $\\frac{41}{100} = 41\\%$.',
         null,
       ],
-      keyIdea: "When combined data and subgroup data disagree (Simpson's paradox), look for a lurking variable, here the department applied to.",
+      keyIdea: 'When a headline gives an overall gap and a table has subgroups, work out the rate in each subgroup and compare inside them. Then see how each group is spread across the subgroups, which explains any reversal.',
     },
   },
   {
@@ -496,23 +506,20 @@ export const questions: StaticQuestion[] = [
     options: ['P: 75%, Q: 70%', 'P: 67.5%, Q: 79%', 'P: 79%, Q: 67.5%', 'P: 33.75%, Q: 39.5%'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What percentage of the 200 patients on each drug recovered?',
       solution:
-        'Step 1: Check the group rates.\n\n' +
-        '- P: under 50: $\\frac{45}{50} = 90\\%$; 50 and over: $\\frac{90}{150} = 60\\%$\n' +
-        '- Q: under 50: $\\frac{136}{160} = 85\\%$; 50 and over: $\\frac{22}{40} = 55\\%$\n\n' +
-        'So P is 5 percentage points better in each group.\n\n' +
-        'Step 2: Overall rate for P. Recovered: $45 + 90 = 135$ out of $50 + 150 = 200$.\n\n' +
-        '$$\\frac{135}{200} \\times 100 = 67.5\\%$$\n\n' +
-        'Step 3: Overall rate for Q. Recovered: $136 + 22 = 158$ out of $160 + 40 = 200$.\n\n' +
-        '$$\\frac{158}{200} \\times 100 = 79\\%$$\n\n' +
-        'Step 4: Interpret. Q looks better overall only because most of its patients were **under 50**, and younger patients recover more often whichever drug they get. Most of P\'s patients were 50 and over. (Simpson\'s paradox.)',
+        'Each cell reads "recovered / treated". An overall rate is the total recovered divided by the total treated. Don\'t average the age-group percentages, because the age groups are different sizes.\n\n' +
+        'Drug P: add the recoveries across both age groups, $45 + 90 = 135$. Add the patients too, $50 + 150 = 200$.\n\n' +
+        'Drug Q: add the recoveries, $136 + 22 = 158$. Add the patients too, $160 + 40 = 200$.\n\n' +
+        'Divide each by 200 and multiply by 100. Drug P: $\\frac{135}{200} \\times 100 = 67.5\\%$. Drug Q: $\\frac{158}{200} \\times 100 = 79\\%$.',
+      conclusion: 'Q wins overall because most of its patients were under 50, and they recover more often. The rates are P: 67.5%, Q: 79%.',
       whyWrong: [
         'This averages the two group rates for each drug: $\\frac{90 + 60}{2} = 75\\%$ and $\\frac{85 + 55}{2} = 70\\%$. The groups are different sizes, so you must add the counts and divide by 200.',
         null,
         'These are the correct two numbers but attached to the wrong drugs. P recovered $135$ patients and Q recovered $158$.',
         'This divides each drug\'s recoveries by all 400 patients in the study ($\\frac{135}{400}$ and $\\frac{158}{400}$) instead of the 200 patients who took that drug.',
       ],
-      keyIdea: 'Overall rate = total successes / total in the group; when group sizes differ, this can reverse the comparison seen in every subgroup.',
+      keyIdea: 'To get an overall rate from subgroups, add the counts on top and the totals on the bottom. Never average subgroup percentages. A treatment can win in each subgroup but lose overall if it had a harder mix of cases.',
     },
     check: {
       optionValues: ['75|70', '67.5|79', '79|67.5', '33.75|39.5'],
@@ -540,16 +547,18 @@ export const questions: StaticQuestion[] = [
     options: ['Confounding variable', 'Dependent variable', 'Outlier', 'Residual'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the name for a hidden third factor that affects both of two linked variables?',
       solution:
-        'A **confounding variable** (or confounder) affects both variables, which can make them move together even if neither causes the other.\n\n' +
-        'For example, hot weather raises both ice-cream sales and swimming accidents.',
+        'Sometimes two variables move together only because something else pushes both of them. Ice-cream sales and drownings both rise in hot weather, for example.\n\n' +
+        'Hot weather is a third variable that influences both, so it makes them look linked even though neither causes the other. A variable that does this is called a **confounding variable**.',
+      conclusion: 'A third variable that influences both is called a Confounding variable.',
       whyWrong: [
         null,
         'A dependent variable is the outcome being measured in an experiment. It does not describe a hidden third factor.',
         'An outlier is a single data value far from the others, not a variable that influences two others.',
         'A residual is the gap between an actual value and a predicted value on a fitted line.',
       ],
-      keyIdea: 'A confounding variable is a hidden third factor that can make two variables appear linked.',
+      keyIdea: 'If you see "third variable" or "influences both", think confounding. A dependent variable is the outcome being measured, an outlier is one odd value, and a residual is the gap from a fitted line.',
     },
   },
   {
@@ -560,16 +569,18 @@ export const questions: StaticQuestion[] = [
     options: ['Biased', 'Random', 'Large', 'Paired'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the word for a sample that doesn\'t match its population fairly?',
       solution:
-        'The **population** is the whole group you want to learn about; the **sample** is the part you actually measure.\n\n' +
-        'A sample that over-represents or under-represents some part of the population is **biased**, and it gives misleading results however big it is.',
+        'A **sample** is the group we actually collect data from, and the **population** is the whole group we want to know about. A good sample has the same mix as the population.\n\n' +
+        'If a sample leans one way, any result from it leans that way too. For example, asking only gym users about exercise gives figures that are too high. A sample like this is called **biased**.',
+      conclusion: 'A sample that doesn\'t fairly represent its population is described as Biased.',
       whyWrong: [
         null,
         'A random sample gives every member a chance of selection, which is how bias is usually avoided.',
         'Size is a separate issue. A large sample can still be biased, and a large biased sample is still misleading.',
         'Paired describes data collected in matched pairs. It says nothing about whether the sample is representative.',
       ],
-      keyIdea: 'A biased sample does not represent its population, and a bigger sample does not fix that.',
+      keyIdea: 'Ask whether some people were more likely to be included than others. If so, the sample is biased. Random selection is the usual way to avoid this, and a large sample can still be biased.',
     },
   },
   {
@@ -580,16 +591,19 @@ export const questions: StaticQuestion[] = [
     options: ['They tend to increase together', 'One causes the other', 'They always have equal values', 'Neither can ever decrease'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does a strong positive correlation between two variables actually tell us?',
       solution:
-        'A **positive correlation** means that as one variable increases, the other **tends** to increase too.\n\n' +
-        'It describes a pattern in the data. It does not show cause and effect, and it allows exceptions.',
+        '**Correlation** describes how two variables move relative to each other. **Positive** means that when one is higher, the other tends to be higher too. **Strong** means the points sit close to a straight line.\n\n' +
+        'For example, taller children tend to weigh more. That is a trend, not a rule: some tall children weigh less than some shorter ones, and height never has to equal weight.\n\n' +
+        'Correlation alone can\'t prove a cause, because a third variable might drive both. So the only safe conclusion describes the shared direction, as a general tendency.',
+      conclusion: 'Correlation describes a shared direction and nothing more. They tend to increase together.',
       whyWrong: [
         null,
         'Correlation does not imply causation. A third variable could be driving both.',
         'Correlation is about how two variables move together, not about their sizes. Their values can be very different.',
         'Both variables can rise and fall. Positive correlation only means that they tend to move in the same direction.',
       ],
-      keyIdea: 'Correlation describes a tendency to move together; it does not show cause and effect.',
+      keyIdea: 'Read correlation words like this. Positive: up together. Negative: one up, the other down. Strong: close to a line. Reject any option claiming a cause, or using "always" or "never".',
     },
   },
 ];

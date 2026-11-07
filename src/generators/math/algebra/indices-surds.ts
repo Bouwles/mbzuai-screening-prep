@@ -1,7 +1,8 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { Frac, gcd } from '../../../lib/frac';
 import { approxEqual } from '../../../lib/mathx';
-import { dm, m, sum } from '../../../lib/tex';
+import { m, sum } from '../../../lib/tex';
 
 /** LaTeX for a Frac used as a base: "8" or "\left(\frac{16}{81}\right)". */
 function baseTex(f: Frac): string {
@@ -130,34 +131,34 @@ export const generators: Generator[] = [
       }
 
       const rootName = q === 2 ? 'square root' : q === 3 ? 'cube root' : 'fourth root';
-      const steps: string[] = [];
-      steps.push(
-        `In ${m(`a^{\\frac{m}{n}}`)} the denominator ${m('n')} is the root and the numerator ${m('m')} is the power${neg ? ', and a minus sign means flip (reciprocal)' : ''}.`,
-      );
-      let current = base;
-      if (neg) {
-        steps.push(`1. The minus sign flips the base: ${m(`${question} = ${baseTex(flipped)}^{\\frac{${p}}{${q}}}`)}.`);
-        current = flipped;
-      }
+      const rootMeaning =
+        q === 2
+          ? 'The **square root** is the number that, multiplied by itself, gives the number inside.'
+          : q === 3
+            ? 'The **cube root** is the number that, multiplied by itself three times, gives the number inside.'
+            : 'The **fourth root** is the number that, multiplied by itself four times, gives the number inside.';
+      const current = neg ? flipped : base;
       const rootLine =
         current.d === 1
           ? `${rootTex(q, String(current.n))} = ${rootUsed.tex()}`
           : `${rootTex(q, current.tex())} = \\frac{${rootTex(q, String(current.n))}}{${rootTex(q, String(current.d))}} = ${rootUsed.tex()}`;
-      steps.push(
-        `${neg ? '2' : '1'}. The denominator ${q} means take the ${rootName}: ${m(rootLine)}, because ${m(`${baseTex(rootUsed)}^{${q}} = ${current.tex()}`)}.`,
+      const solution = steps(
+        `A fraction in the index (the raised power) does more than one job. The bottom number, ${q}, means take the ${rootName}. The top number, ${p}, ${p === 1 ? 'adds no extra power' : `means raise to the power ${p}`}.${neg ? ' The minus sign means flip the base upside down.' : ''}`,
+        neg && `Deal with the minus sign first. It does not make the value negative. Flip the base and make the index positive: ${m(`${question} = ${baseTex(flipped)}^{\\frac{${p}}{${q}}}`)}.`,
+        `${rootMeaning} Here ${m(`${baseTex(rootUsed)}^{${q}} = ${current.tex()}`)}, so ${m(rootLine)}.${p === 1 ? ' The top number of the index is 1, so nothing more is needed.' : ''}`,
+        p !== 1 && `Now raise that to the power ${p}: ${m(`${baseTex(rootUsed)}^{${p}} = ${answer.tex()}`)}.`,
       );
-      if (p === 1) steps.push(`${neg ? '3' : '2'}. The numerator is 1, so there is no further power to apply.`);
-      else steps.push(`${neg ? '3' : '2'}. The numerator ${p} means raise to the power ${p}: ${m(`${baseTex(rootUsed)}^{${p}} = ${answer.tex()}`)}.`);
-
       return {
         stem: `Evaluate ${m(question)}.`,
         answer: ans,
         answerValue: answer.value(),
         distractors,
-        solution: `${steps[0]}\n\n${steps.slice(1).join('\n')}\n\nAnswer: ${ans}`,
+        asking: `What number does ${m(question)} equal?`,
+        solution,
+        conclusion: `${neg ? `Flipping, then taking the ${rootName}` : `Taking the ${rootName}`}${p === 1 ? '' : `, then raising to the power ${p}`}, gives the answer, ${ans}.`,
         keyIdea: neg
-          ? `${m('a^{-\\frac{m}{n}}')}: flip for the minus sign, take the ${m('n')}th root, then raise to the power ${m('m')}.`
-          : `${m('a^{\\frac{m}{n}} = \\left(\\sqrt[n]{a}\\right)^{m}')}: the denominator is the root and the numerator is the power.`,
+          ? 'For a negative fractional index: flip the base to remove the minus sign, take the root given by the bottom of the index, then apply the power given by the top.'
+          : 'For a fractional index $a^{\\frac{m}{n}}$, take the $n$th root first, then raise to the power $m$. The bottom number is the root and the top number is the power.',
       };
     },
   },
@@ -244,24 +245,24 @@ export const generators: Generator[] = [
         [k * a, ''],
         [-s * k, `\\sqrt{${b}}`],
       ]);
-      const lines = [
-        `Multiply top and bottom by the **conjugate** ${m(conj)} (same terms, opposite sign):`,
-        dm(`\\frac{${k}}{${den}} \\times \\frac{${conj}}{${conj}}`),
-        `1. Denominator (difference of two squares): ${m(`(${den})(${conj}) = ${a}^{2} - (\\sqrt{${b}})^{2} = ${a * a} - ${b} = ${d}`)}.`,
-        `2. Numerator: ${m(`${k === 1 ? '1 \\times ' : kp}(${conj}) = ${numTop}`)}.`,
+      const solution = steps(
+        `**Rationalise the denominator** means remove the root from the bottom of the fraction. The trick is to multiply by the **conjugate**, which is the bottom with its middle sign changed: ${m(conj)}.`,
+        `Multiply top and bottom by it. That equals multiplying by 1, so the value stays the same: ${m(`\\frac{${k}}{${den}} \\times \\frac{${conj}}{${conj}}`)}.`,
+        `The bottom: use ${m('(x - y)(x + y) = x^{2} - y^{2}')}, where the middle terms cancel. So ${m(`(${den})(${conj}) = ${a}^{2} - (\\sqrt{${b}})^{2} = ${a * a} - ${b} = ${d}`)}. The root has gone.`,
+        `The top: ${m(`${k === 1 ? '1 \\times ' : kp}(${conj}) = ${numTop}`)}.`,
         d === 1
-          ? `3. Dividing by 1 changes nothing, so the result is ${m(numTop)}.`
-          : `3. Divide every term by ${m(String(d))}: ${m(`\\frac{${numTop}}{${d}} = ${ansF.tex}`)}.`,
-        '',
-        `Answer: ${ans}`,
-      ];
+          ? `Dividing by 1 changes nothing, so the fraction is just ${m(numTop)}.`
+          : `Divide every term on top by ${m(String(d))}${d < 0 ? ', which changes each sign' : ''}: ${m(`\\frac{${numTop}}{${d}} = ${ansF.tex}`)}.`,
+      );
       return {
         stem: `Rationalise the denominator and simplify ${m(`\\frac{${k}}{${den}}`)}.`,
         answer: ans,
         answerValue: ansF.value,
         distractors,
-        solution: lines.join('\n'),
-        keyIdea: 'Multiply by the conjugate: $(a + \\sqrt{b})(a - \\sqrt{b}) = a^{2} - b$ is a whole number, so the surd leaves the denominator.',
+        asking: 'Rewrite this fraction so that there is no square root on the bottom.',
+        solution,
+        conclusion: `Multiplying by the conjugate makes the bottom the plain number ${m(String(d))}, so the root is gone and the answer is ${ans}.`,
+        keyIdea: 'If the bottom is $a \\pm \\sqrt{b}$, multiply top and bottom by the same thing with the opposite sign. The bottom becomes $a^{2} - b$, a plain number. Then simplify.',
       };
     },
   },

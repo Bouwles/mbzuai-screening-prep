@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { m, num } from '../../../lib/tex';
 
 type Cand = { text: string; value: number; why: string };
@@ -18,6 +19,7 @@ function pickDistinct(answerText: string, answerValue: number, pool: Cand[]): Ca
 }
 
 const r2 = (x: number) => Math.round(x * 100) / 100;
+const cap = (t: string) => t[0].toUpperCase() + t.slice(1);
 
 // ---------------------------------------------------------------- percentage change contexts
 interface ChangeCtx {
@@ -137,14 +139,15 @@ export const generators: Generator[] = [
           answer,
           answerValue,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution:
-            `Read the chart: ${from} $= ${old}$, ${to} $= ${nw}$.\n\n` +
-            `Step 1. Change $= \\text{new} - \\text{old} = ${nw} - ${old} = ${nw - old}$` +
-            ` (${up ? 'positive, so an increase' : 'negative, so a decrease'}).\n\n` +
-            `Step 2. Divide the size of the change by the **original** value (${from}) and multiply by 100:\n\n` +
-            `$$\\frac{${diff}}{${old}} \\times 100 = ${num(p)}\\%$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Percentage change = (new - old) divided by the OLD value, times 100; the sign tells you increase or decrease.',
+          asking: `By what percentage did ${ctx.what} change from ${from} to ${to}, and was it up or down?`,
+          solution: steps(
+            `Find the two values on the chart: ${from} is ${old} and ${to} is ${nw}. ${from} comes first, so ${old} is the **original** value.`,
+            `Find the change, which is new minus original: $${nw} - ${old} = ${nw - old}$. ${up ? 'It is positive, so this is an increase.' : 'The minus sign shows this is a decrease.'}`,
+            `A percentage change compares the change with where it started, so divide its size by the original value: $\\frac{${diff}}{${old}} = ${num(p / 100)}$.`,
+            `Multiply by 100 to turn it into a percentage: $${num(p / 100)} \\times 100 = ${num(p)}\\%$.`,
+          ),
+          conclusion: `${cap(ctx.what)} went ${up ? 'up' : 'down'} by ${diff} from ${old}, which is a ${answer}.`,
+          keyIdea: 'Percentage change $= \\frac{\\text{new} - \\text{old}}{\\text{old}} \\times 100$. Divide by the earlier value, not the later one. A positive result is an increase, and a negative result is a decrease.',
         };
       }
     },
@@ -186,7 +189,7 @@ export const generators: Generator[] = [
         const distractors = pickDistinct(ans, meanV, pool);
         if (distractors.length < 3) continue;
 
-        const rows = f.map((fi, i) => `| ${m(`${lows[i]} \\le ${ctx.v} < ${lows[i] + w}`)} | ${num(mids[i])} | ${fi} | ${num(fi * mids[i])} |`);
+        const products = f.map((fi, i) => num(fi * mids[i]));
         return {
           stem: `${ctx.intro(N)} Estimate the mean ${ctx.label.toLowerCase()}. (Options to 2 decimal places where needed.)`,
           table: {
@@ -196,12 +199,18 @@ export const generators: Generator[] = [
           answer: ans,
           answerValue: meanV,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution:
-            'The exact values are unknown, so assume every value in a class sits at the class **midpoint** (halfway between the class limits).\n\n' +
-            `| Class | Midpoint ${m('x')} | ${m('f')} | ${m('fx')} |\n|---|---|---|---|\n${rows.join('\n')}\n| **Total** | | **${N}** | **${num(sumFx)}** |\n\n` +
-            `Estimated mean $= \\frac{\\sum fx}{\\sum f} = \\frac{${num(sumFx)}}{${N}} = ${num(meanV, 2)}$\n\n` +
-            `Answer: ${ans}`,
-          keyIdea: 'For grouped data use the class midpoints: estimated mean = (sum of f times midpoint) divided by (sum of f).',
+          asking: `What is the best estimate of the average ${ctx.label.toLowerCase()}, when we only know the groups?`,
+          solution: steps(
+            'The table only says how many values are in each range (each range is called a **class**), not their exact sizes. So we estimate: pretend every value sits at its class **midpoint**, halfway between the two ends.',
+            `Find a midpoint by adding the two ends and halving. For the first class: $\\frac{${lows[0]} + ${lows[0] + w}}{2} = ${num(mids[0])}$.`,
+            `Multiply each midpoint by its **frequency** (how many values are in that class). This estimates the total for each class:\n\n` +
+              table(['Class', 'Midpoint', 'Frequency', 'Midpoint times frequency'], f.map((fi, i) => [m(`${lows[i]} \\le ${ctx.v} < ${lows[i] + w}`), num(mids[i]), fi, products[i]])),
+            `Add the last column to get the estimated total: $${products.join(' + ')} = ${num(sumFx)}$.`,
+            `Add the frequencies to get how many values there are: $${f.join(' + ')} = ${N}$.`,
+            `The mean is the total divided by how many values there are: $\\frac{${num(sumFx)}}{${N}} = ${num(meanV, 2)}$.`,
+          ),
+          conclusion: `An estimated total of ${num(sumFx)} ${ctx.unit} shared across ${N} values gives an estimated mean of ${ans}.`,
+          keyIdea: 'For a grouped table, use the midpoints as the values. Multiply each midpoint by its frequency, add those products, then divide by the total frequency. Spot it by ranges in the table and the word "estimate".',
         };
       }
     },
@@ -227,7 +236,6 @@ export const generators: Generator[] = [
         if ((10 * total) % N !== 0) continue;
         const M = total / N;
         const [g1, g2] = ctx.groups;
-        const cap = (t: string) => t[0].toUpperCase() + t.slice(1);
         const u = ctx.unit;
         const missing = rng.bool();
 
@@ -239,7 +247,7 @@ export const generators: Generator[] = [
             {
               text: `${m(num(n1 > n2 ? m1 : m2))}${u}`,
               value: n1 > n2 ? m1 : m2,
-              why: `This is just the mean of the bigger group (${n1 > n2 ? g1 : g2}), as if the smaller group made no difference. The bigger group pulls the combined mean towards its own mean, but the ${Math.min(n1, n2)} ${ctx.member} in the smaller group still count, so the combined mean lies strictly between ${Math.min(m1, m2)} and ${Math.max(m1, m2)}.`,
+              why: `This is just the mean of the bigger group (${n1 > n2 ? g1 : g2}), as if the smaller group made no difference. The ${Math.min(n1, n2)} ${ctx.member} in the smaller group still count, so the combined mean lies strictly between ${Math.min(m1, m2)} and ${Math.max(m1, m2)}.`,
             },
             { text: `${m(num(total / 2, 2))}${u}`, value: r2(total / 2), why: `This divides the combined total ${total} by the 2 groups instead of by the ${N} ${ctx.member}.` },
             { text: `${m(num(total, 2))}${u}`, value: total, why: `This is the combined total, ${total}, before dividing by the ${N} ${ctx.member}.` },
@@ -251,14 +259,16 @@ export const generators: Generator[] = [
             answer: ans,
             answerValue: M,
             distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-            solution:
-              'Means cannot be averaged directly when the groups are different sizes. Convert each mean to a **total** (mean times number), add, then divide by the total number.\n\n' +
-              `- ${cap(g1)}: ${m(`${n1} \\times ${m1} = ${n1 * m1}`)}\n` +
-              `- ${cap(g2)}: ${m(`${n2} \\times ${m2} = ${n2 * m2}`)}\n\n` +
-              `Combined total $= ${n1 * m1} + ${n2 * m2} = ${total}$, shared between ${m(`${n1} + ${n2} = ${N}`)} ${ctx.member}.\n\n` +
-              `$$\\text{mean} = \\frac{${total}}{${N}} = ${num(M, 2)}$$\n\n` +
-              `Answer: ${ans}`,
-            keyIdea: 'Combined mean = (sum of each group size times its mean) divided by the total size: a weighted average.',
+            asking: `What is the average ${ctx.measure} when both groups are counted together?`,
+            solution: steps(
+              `A **mean** is a total shared out equally, so total $=$ mean $\\times$ number. We can't just average ${m1} and ${m2}, because the groups are different sizes and the bigger group must count for more.`,
+              `Find the total for ${g1}: $${n1} \\times ${m1} = ${n1 * m1}$.`,
+              `Find the total for ${g2}: $${n2} \\times ${m2} = ${n2 * m2}$.`,
+              `Add these to get the combined total: $${n1 * m1} + ${n2 * m2} = ${total}$. Add the group sizes too: $${n1} + ${n2} = ${N}$.`,
+              `Share the combined total among all ${N} ${ctx.member}: $\\frac{${total}}{${N}} = ${num(M, 2)}$.`,
+            ),
+            conclusion: `A combined total of ${total} shared among ${N} ${ctx.member} gives a mean of ${ans}.`,
+            keyIdea: 'To combine means from groups of different sizes, turn each mean into a total (mean $\\times$ number), add the totals, then divide by everyone. The answer must lie between the two means, closer to the bigger group.',
           };
         }
 
@@ -278,15 +288,16 @@ export const generators: Generator[] = [
           answer: ans,
           answerValue: m2,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution:
-            'Work with **totals** (mean times number), because totals can be subtracted but means cannot.\n\n' +
-            `- Total for all ${N}: ${m(`${N} \\times ${num(M, 2)} = ${total}`)}\n` +
-            `- Total for ${g1}: ${m(`${n1} \\times ${m1} = ${n1 * m1}`)}\n` +
-            `- Total for ${g2}: ${m(`${total} - ${n1 * m1} = ${left}`)}\n\n` +
-            `$$\\text{mean} = \\frac{${left}}{${n2}} = ${m2}$$\n\n` +
-            `Check: ${m(`\\frac{${n1 * m1} + ${left}}{${N}} = ${num(M, 2)}`)}.\n\n` +
-            `Answer: ${ans}`,
-          keyIdea: 'Turn means into totals (mean times count), subtract to find the missing total, then divide by that group\'s size.',
+          asking: `What is the average ${ctx.measure} of the ${n2} ${ctx.member} in ${g2}?`,
+          solution: steps(
+            'Means cannot be subtracted directly, but totals can. A **mean** is a total shared out equally, so total $=$ mean $\\times$ number.',
+            `Total for all ${N} ${ctx.member}: $${N} \\times ${num(M, 2)} = ${total}$.`,
+            `Total for the ${n1} in ${g1}: $${n1} \\times ${m1} = ${n1 * m1}$.`,
+            `The rest of the total must belong to ${g2}: $${total} - ${n1 * m1} = ${left}$.`,
+            `Share that among the ${n2} in ${g2}: $\\frac{${left}}{${n2}} = ${m2}$.`,
+          ),
+          conclusion: `${cap(g2)} has a total of ${left} shared among ${n2} ${ctx.member}, so its mean is ${ans}.`,
+          keyIdea: 'For a missing group mean, turn means into totals (mean $\\times$ number). Subtract the known group total from the overall total, then divide by the size of the missing group.',
         };
       }
     },

@@ -1,5 +1,6 @@
 import type { Generator, GeneratedCore } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 
 type B = boolean;
 type Op = 'and' | 'or' | 'xor';
@@ -138,27 +139,36 @@ const genCount: Generator = {
     }
     const answer = String(count);
 
-    // ---- solution with the full truth table
+    // ---- solution: the rules, one worked row, then the full truth table
     const opsUsed = [...new Set([s.op1, s.op2])];
-    const lines: string[] = [];
-    lines.push(
-      `There are 3 inputs, so the truth table has $2^3 = 8$ rows. Work out the bracket first${s.negOuter ? ' (including the NOT in front of it)' : ''}, then combine it with $${litTex(s, 2)}$.`,
+    const usesNot = s.negs.some(Boolean) || s.negOuter;
+    const eg = ROWS3[5]; // A = 1, B = 0, C = 1
+    const v0 = lit(s, 0, eg);
+    const v1 = lit(s, 1, eg);
+    const v2 = lit(s, 2, eg);
+    const inside = applyOp(s.op1, v0, v1);
+    const leftEg = leftVal(s, eg);
+    const qEg = evalSpec(s, eg);
+    const solution = steps(
+      'The inputs $A$, $B$ and $C$ can each be 0 or 1, so the truth table has $2 \\times 2 \\times 2 = 8$ rows.',
+      `Here is what the symbols do. ${opsUsed.map((o) => `${OP_RULE[o]}.`).join(' ')}${usesNot ? ' $\\neg$ (NOT) flips a value: 0 becomes 1, and 1 becomes 0.' : ''}`,
+      `Work from the inside out. Find the bracket first${s.negOuter ? ', including the NOT in front of it' : ''}. Then combine it with $${litTex(s, 2)}$ using ${OP_NAME[s.op2]}.`,
+      `Try one row: $A = 1$, $B = 0$, $C = 1$. Here $${litTex(s, 0)}$ is ${bit(v0)} and $${litTex(s, 1)}$ is ${bit(v1)}, so $${innerTex(s)}$ is $${bit(v0)} ${OP_TEX[s.op1]} ${bit(v1)} = ${bit(inside)}$.${s.negOuter ? ` The NOT in front flips that to ${bit(leftEg)}.` : ''} Also $${litTex(s, 2)}$ is ${bit(v2)}, so $Q = ${bit(leftEg)} ${OP_TEX[s.op2]} ${bit(v2)} = ${bit(qEg)}$.`,
+      `Do the same for all 8 rows, then count the 1s in the $Q$ column. There are ${count}:\n\n${table(
+        ['$A$', '$B$', '$C$', `$${leftTex(s)}$`, '$Q$'],
+        ROWS3.map((r) => [bit(r[0]), bit(r[1]), bit(r[2]), bit(leftVal(s, r)), bit(evalSpec(s, r))]),
+      )}`,
     );
-    lines.push(`Rules used: ${opsUsed.map((o) => OP_RULE[o]).join('; ')}${s.negs.some(Boolean) || s.negOuter ? '; $\\neg$ (NOT) flips 0 and 1' : ''}.`);
-    const head = `| $A$ | $B$ | $C$ | $${leftTex(s)}$ | $Q$ |`;
-    const sep = '| --- | --- | --- | --- | --- |';
-    const body = ROWS3.map((r) => `| ${bit(r[0])} | ${bit(r[1])} | ${bit(r[2])} | ${bit(leftVal(s, r))} | ${bit(evalSpec(s, r))} |`).join('\n');
-    lines.push(`${head}\n${sep}\n${body}`);
-    lines.push(`Counting the 1s in the $Q$ column gives ${count} rows out of 8.`);
-    lines.push(`Answer: ${answer}`);
 
     return {
       stem: `How many of the 8 rows of the truth table for $Q = ${exprTex(s)}$ give $Q = 1$? ($\\land$ = AND, $\\lor$ = OR, $\\oplus$ = XOR, $\\neg$ = NOT.)`,
       answer,
       answerValue: count,
       distractors: chosen.map((c) => ({ text: String(c.v), value: c.v, why: c.why })),
-      solution: lines.join('\n\n'),
-      keyIdea: 'Build the truth table one column at a time (NOTs, then the bracket, then the outer operation) and count the 1s.',
+      asking: 'In how many of the 8 rows does $Q$ come out as 1?',
+      solution,
+      conclusion: `Counting the 1s in the $Q$ column gives ${answer} out of the 8 rows.`,
+      keyIdea: 'Build the truth table one column at a time: list all the input rows, work out the NOTs, then the bracket, then the outer gate. Count the 1s in the last column. With $n$ inputs there are $2^n$ rows.',
     };
   },
 };
@@ -262,32 +272,34 @@ const genDeMorgan: Generator = {
     if (chosen.length < 3) throw new Error('de-morgan: not enough distractors');
 
     const doubleNeg = lits.some((l) => l.neg);
-    const steps: string[] = [];
-    if (mode === 'math') {
-      steps.push(
-        `**De Morgan's laws:** $\\neg(P \\land Q) = \\neg P \\lor \\neg Q$ and $\\neg(P \\lor Q) = \\neg P \\land \\neg Q$. To move a NOT inside a bracket, negate **every** part and swap AND with OR.`,
-      );
-      steps.push(`1. Start with $${original}$.`);
-      steps.push(`2. Change ${OP_NAME[op]} ($${OP_TEX[op]}$) to ${OP_NAME[flip]} ($${OP_TEX[flip]}$).`);
-      steps.push(
-        `3. Negate each part: ${lits
-          .map((l) => (l.neg ? `$\\neg\\neg ${names[l.v]} = ${names[l.v]}$` : `$${names[l.v]}$ becomes $\\neg ${names[l.v]}$`))
-          .join(', ')}.${doubleNeg ? ' (Two NOTs cancel out.)' : ''}`,
-      );
-    } else {
-      steps.push(
-        "**De Morgan's laws in code:** `not (p and q)` is the same as `not p or not q`, and `not (p or q)` is the same as `not p and not q`. Negate **every** part and swap `and` with `or`.",
-      );
-      steps.push(`1. Start with \`${original}\`.`);
-      steps.push(`2. Change \`${op}\` to \`${flip}\`.`);
-      steps.push(
-        `3. Negate each part: ${lits
-          .map((l) => (l.neg ? `\`not not ${names[l.v]}\` is just \`${names[l.v]}\`` : `\`${names[l.v]}\` becomes \`not ${names[l.v]}\``))
-          .join(', ')}.${doubleNeg ? ' (Two `not`s cancel out.)' : ''}`,
-      );
-    }
-    steps.push(`4. Result: ${answer}. Check one row: making every part of the original bracket ${op === 'and' ? 'true makes the original false, and it makes every negated part false, so the result is false too' : 'false makes the original true, and it makes every negated part true, so the result is true too'}.`);
-    steps.push(`Answer: ${answer}`);
+    const whyLaw =
+      op === 'and'
+        ? `Why? An ${opWord('and')} is false as soon as any one part is false. So the opposite of an ${opWord('and')} is an ${opWord('or')} of opposites.`
+        : `Why? An ${opWord('or')} is false only when every part is false. So the opposite of an ${opWord('or')} is an ${opWord('and')} of opposites.`;
+    const check =
+      op === 'and'
+        ? 'Test it: when every part of the original bracket is true, the original is false, and every flipped part is false, so this is false too.'
+        : 'Test it: when every part of the original bracket is false, the original is true, and every flipped part is true, so this is true too.';
+    const solution =
+      mode === 'math'
+        ? steps(
+            `$\\neg$ (NOT) in front of a bracket flips the whole result. To move it inside, use **De Morgan's laws**: $\\neg(P \\land Q) = \\neg P \\lor \\neg Q$ and $\\neg(P \\lor Q) = \\neg P \\land \\neg Q$.`,
+            whyLaw,
+            `First change: the ${OP_NAME[op]} ($${OP_TEX[op]}$) becomes ${OP_NAME[flip]} ($${OP_TEX[flip]}$).`,
+            `Second change: flip every part. ${lits
+              .map((l) => (l.neg ? `$\\neg\\neg ${names[l.v]}$ is just $${names[l.v]}$` : `$${names[l.v]}$ becomes $\\neg ${names[l.v]}$`))
+              .join(', ')}.${doubleNeg ? ' Two NOTs cancel out, because flipping twice returns the original value.' : ''}`,
+            `Join the flipped parts with ${OP_NAME[flip]}, which gives ${answer}. ${check}`,
+          )
+        : steps(
+            `\`not\` in front of a bracket flips the whole result. To move it inside, use **De Morgan's laws**: \`not (p and q)\` is the same as \`not p or not q\`, and \`not (p or q)\` is the same as \`not p and not q\`.`,
+            whyLaw,
+            `First change: the \`${op}\` becomes \`${flip}\`.`,
+            `Second change: flip every part. ${lits
+              .map((l) => (l.neg ? `\`not not ${names[l.v]}\` is just \`${names[l.v]}\`` : `\`${names[l.v]}\` becomes \`not ${names[l.v]}\``))
+              .join(', ')}.${doubleNeg ? ' Two `not`s cancel out, because flipping twice returns the original value.' : ''}`,
+            `Join the flipped parts with \`${flip}\`, which gives ${answer}. ${check}`,
+          );
 
     const stem =
       mode === 'math'
@@ -299,8 +311,10 @@ const genDeMorgan: Generator = {
       answer,
       answerValue,
       distractors: chosen,
-      solution: steps.join('\n\n'),
-      keyIdea: "De Morgan: the NOT of an AND is the OR of the NOTs, and the NOT of an OR is the AND of the NOTs.",
+      asking: mode === 'math' ? `Which expression gives the same result as ${wrap(original, mode)} for all values?` : `Which condition gives the same result as ${wrap(original, mode)} for all values?`,
+      solution,
+      conclusion: `Swapping ${opWord(op)} for ${opWord(flip)} and flipping every part gives ${answer}.`,
+      keyIdea: "De Morgan's law: to move a NOT inside a bracket, flip every part and swap AND with OR. Two NOTs on one letter cancel. To test an option, try one set of values in both expressions.",
     };
   },
 };

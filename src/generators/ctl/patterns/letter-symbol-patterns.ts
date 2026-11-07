@@ -1,5 +1,6 @@
 import type { Generator, GeneratedCore } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { signed } from '../../../lib/tex';
 
 // ---------------------------------------------------------------- alphabet helpers
@@ -43,8 +44,8 @@ function tryNextLetter(rng: Rng): GeneratedCore | null {
   let terms: number[];
   let answer: number;
   let pool: { p: number; why: string }[];
-  let ruleText: string;
   let gapLine: string;
+  let pattern: string;
 
   if (!growing) {
     const size = rng.int(2, 5);
@@ -56,8 +57,8 @@ function tryNextLetter(rng: Rng): GeneratedCore | null {
     const last = terms[3];
     const dir = forward ? 'forward' : 'back';
     const sgn = forward ? 1 : -1;
-    ruleText = forward ? `add ${size}` : `subtract ${size}`;
-    gapLine = `Each term is ${size} places ${dir} from the one before (the gaps are all $${forward ? '+' : '-'}${size}$).`;
+    gapLine = `So each letter is ${size} places ${dir} from the one before.`;
+    pattern = `The pattern moves ${size} places ${dir} each time`;
     pool = [
       {
         p: last + d - sgn,
@@ -75,8 +76,8 @@ function tryNextLetter(rng: Rng): GeneratedCore | null {
     const lastGap = g0 + 3;
     answer = terms[4] + lastGap + 1;
     const last = terms[4];
-    ruleText = `the gaps go up by 1 each time, so the next gap is ${lastGap + 1}`;
-    gapLine = `The gaps are ${[0, 1, 2, 3].map((i) => g0 + i).join(', ')}: they go up by 1 each time, so the next gap is ${lastGap + 1}.`;
+    gapLine = `The gaps themselves go up by 1 each time, so the next gap is ${lastGap + 1}.`;
+    pattern = `The gaps grow by 1 each time, which makes the next gap ${lastGap + 1}`;
     pool = [
       { p: last + lastGap, why: `This repeats the last gap of ${lastGap}. The gaps are growing, so the next gap is ${lastGap + 1}.` },
       { p: last + lastGap + 2, why: `This adds ${lastGap + 2}, jumping one gap too far.` },
@@ -101,25 +102,21 @@ function tryNextLetter(rng: Rng): GeneratedCore | null {
   const gapTex = gaps.map((g, i) => `$${terms[i + 1]} - ${terms[i]} = ${g}$`).join(', ');
   const lastT = terms[terms.length - 1];
   const step = answer - lastT;
-  const solution =
-    'Convert each letter to its position in the alphabet (A = 1, B = 2, ..., Z = 26; anchors E = 5, J = 10, O = 15, T = 20, Y = 25):\n\n' +
-    posRow +
-    '\n\n' +
-    `Gaps: ${gapTex}.\n\n` +
-    gapLine +
-    '\n\n' +
-    `Next position: $${lastT}${signed(step)} = ${answer}$. Position ${answer} is ${ansText}.\n\n` +
-    `Answer: ${ansText}`;
+  const solution = steps(
+    `Letters are hard to compare, so turn each one into its position in the alphabet: A = 1, B = 2, up to Z = 26. Anchors help you count: E = 5, J = 10, O = 15, T = 20, Y = 25.\n\n${posRow}`,
+    `Find the gap between neighbouring positions: ${gapTex}. ${gapLine}`,
+    `Use that for the next position: $${lastT}${signed(step)} = ${answer}$. Position ${answer} is ${ansText}.`,
+  );
 
   return {
     stem: `What letter comes next in the sequence?\n\n**${seq}**`,
     answer: ansText,
     answerValue: ansText,
     distractors,
+    asking: `Which letter comes after ${L(lastT)} in this list?`,
     solution,
-    keyIdea: growing
-      ? 'When the gaps between letter positions are not constant, look at how the gaps change (here they grow by 1 each time).'
-      : `Convert letters to positions, find the constant gap (${ruleText}) and apply it once more.`,
+    conclusion: `${pattern}, so the next letter is ${ansText}.`,
+    keyIdea: 'Turn letters into positions (A = 1) and find the gaps. Equal gaps mean you apply that gap once more. If the gaps change, write them in a row and look at how they change, then use the next gap.',
   };
 }
 
@@ -151,7 +148,9 @@ function shiftCipher(rng: Rng): GeneratedCore {
   let stem: string;
   let answer: string;
   let pool: Cand[];
+  let asking: string;
   let solution: string;
+  let conclusion: string;
   let keyIdea: string;
 
   if (mode === 'encode') {
@@ -162,8 +161,14 @@ function shiftCipher(rng: Rng): GeneratedCore {
       { text: shiftWord(w1, k - 1), value: shiftWord(w1, k - 1), why: `This shifts by ${k - 1} instead of ${k}: it happens if you count the starting letter as one of the steps.` },
       { text: shiftWord(w1, k + 1), value: shiftWord(w1, k + 1), why: `This shifts by ${k + 1} instead of ${k}, one place too far.` },
     ];
-    solution = `Move each letter ${k} places forward. If the new position is more than 26, subtract 26 to wrap round to the start of the alphabet.\n\n${letterTable(w1, k)}\n\nAnswer: ${answer}`;
-    keyIdea = 'A shift cipher adds the same number to every letter position; subtract 26 when you pass Z.';
+    asking = `What does ${w1} become when each letter moves ${k} places forward?`;
+    solution = steps(
+      `A **shift cipher** moves every letter by the same number of places. Here each letter moves ${k} places forward, towards Z.`,
+      `Use positions to do this: A = 1, up to Z = 26. Add ${k} to each letter's position. If a result is above 26, subtract 26 to wrap round to the start of the alphabet.`,
+      `Work through ${w1} one letter at a time. The last column spells ${answer}:\n\n${letterTable(w1, k)}`,
+    );
+    conclusion = `Moving each letter of ${w1} forward ${k} places gives ${answer}.`;
+    keyIdea = 'A shift cipher adds the same number to every letter position (A = 1). If the result is above 26, subtract 26 to wrap round to the start. To decode, subtract the number instead.';
   } else if (mode === 'decode') {
     const coded = shiftWord(w1, k);
     answer = w1;
@@ -173,10 +178,14 @@ function shiftCipher(rng: Rng): GeneratedCore {
       { text: shiftWord(coded, -(k - 1)), value: shiftWord(coded, -(k - 1)), why: `This moves back only ${places(k - 1)} instead of ${k}.` },
       { text: shiftWord(coded, -(k + 1)), value: shiftWord(coded, -(k + 1)), why: `This moves back ${k + 1} places instead of ${k}, one step too many.` },
     ];
-    solution =
-      `To **decode**, move each letter ${k} places **backwards**. If the position drops below 1, add 26 to wrap round to the end of the alphabet.\n\n${letterTable(coded, -k)}\n\n` +
-      `Check: shifting ${answer} forward by ${k} gives ${coded}.\n\nAnswer: ${answer}`;
-    keyIdea = 'Decoding a shift cipher means applying the opposite shift; add 26 when you go back past A.';
+    asking = `Which word did ${coded} come from, before each letter moved ${k} places forward?`;
+    solution = steps(
+      `The word was coded by moving forward ${k} places. To get back, we do the opposite: move each letter back ${k} places.`,
+      `Use positions to do this: A = 1, up to Z = 26. Subtract ${k} from each position. If a result is below 1, add 26 to wrap round to the end of the alphabet.`,
+      `Work through ${coded} one letter at a time. The last column spells ${answer}:\n\n${letterTable(coded, -k)}`,
+    );
+    conclusion = `Moving each letter back ${k} places gives ${answer}. To test it, moving ${answer} forward ${k} places gives ${coded}.`;
+    keyIdea = 'To decode a shift cipher, apply the opposite shift: subtract from each position (A = 1). If the result is below 1, add 26 to wrap round. Test your answer by encoding it again.';
   } else {
     const c1 = shiftWord(w1, k);
     answer = shiftWord(w2, k);
@@ -194,14 +203,18 @@ function shiftCipher(rng: Rng): GeneratedCore {
       pc > pf
         ? `The first letter ${f} (position ${pf}) became ${fc} (position ${pc}): $${pc} - ${pf} = ${k}$, so the shift is ${k} places forward.`
         : `The first letter ${f} (position ${pf}) became ${fc} (position ${pc}). Going forward past Z: $${pc} + 26 - ${pf} = ${k}$, so the shift is ${k} places forward.`;
-    solution =
-      `${findShift} Every other letter of ${w1} moves by the same amount, so this is a shift cipher with shift ${k}.\n\n` +
-      `Apply the same shift to ${w2} (subtract 26 if you pass Z):\n\n${letterTable(w2, k)}\n\nAnswer: ${answer}`;
-    keyIdea = 'Find the shift from the example by comparing positions, then apply the same shift to the new word.';
+    asking = `Work out the code from ${w1}, then use it on ${w2}.`;
+    solution = steps(
+      findShift,
+      `Test that on the second letter: ${w1[1]} moved ${k} places forward becomes ${c1[1]}, which matches. So this is a **shift cipher**, where every letter moves by the same amount.`,
+      `Apply the same shift to ${w2}. Add ${k} to each position, and if a result is above 26, subtract 26 to wrap round. The last column spells ${answer}:\n\n${letterTable(w2, k)}`,
+    );
+    conclusion = `The code moves each letter ${k} places forward, so ${w2} becomes ${answer}.`;
+    keyIdea = 'Find the shift by comparing the positions of one letter in the example (A = 1), and confirm it on a second letter. Then add that shift to each letter of the new word, subtracting 26 if you pass Z.';
   }
 
   const distractors = pickDistinct(answer, answer, pool);
-  return { stem, answer, answerValue: answer, distractors, solution, keyIdea };
+  return { stem, answer, answerValue: answer, distractors, asking, solution, conclusion, keyIdea };
 }
 
 // ---------------------------------------------------------------- 3. number grid: find the row rule
@@ -237,7 +250,7 @@ function gridRules(k: number, m: number): { rule: GridRule; alts: { r: GridRule;
     hint: (a, b, c, row) =>
       a + b === c || a * b === c
         ? null
-        : `In row ${row}, neither adding ($${a} + ${b} = ${a + b}$) nor multiplying ($${a} \\times ${b} = ${a * b}$) gives ${c}. Try squares: $${a}^2 = ${a * a}$ and $${b}^2 = ${b * b}$, and $${a * a} + ${b * b} = ${c}$.`,
+        : `In row ${row}, neither adding ($${a} + ${b} = ${a + b}$) nor multiplying ($${a} \\times ${b} = ${a * b}$) gives ${c}. Try squares (a number multiplied by itself): $${a}^2 = ${a * a}$ and $${b}^2 = ${b * b}$, and $${a * a} + ${b * b} = ${c}$.`,
     name: 'square both numbers and add',
   };
   const sqb: GridRule = {
@@ -248,7 +261,7 @@ function gridRules(k: number, m: number): { rule: GridRule; alts: { r: GridRule;
     hint: (a, b, c, row) =>
       a + b === c || a * b === c
         ? null
-        : `In row ${row}, neither adding ($${a} + ${b} = ${a + b}$) nor multiplying ($${a} \\times ${b} = ${a * b}$) gives ${c}. Try squaring the first number: $${a}^2 = ${a * a}$, and $${c} - ${a * a} = ${b}$, which is exactly the second number.`,
+        : `In row ${row}, neither adding ($${a} + ${b} = ${a + b}$) nor multiplying ($${a} \\times ${b} = ${a * b}$) gives ${c}. Try squaring the first number (multiplying it by itself): $${a}^2 = ${a * a}$, and $${c} - ${a * a} = ${b}$, which is exactly the second number.`,
     name: 'square the first number and add the second',
   };
   const sumM: GridRule = {
@@ -375,11 +388,12 @@ function gridRule(rng: Rng): GeneratedCore {
       const h = rule.hint(rows[i][0], rows[i][1], rows[i][2], i + 1);
       if (h) hint = `${h}\n\n`;
     }
-    const solution =
-      `Look for a rule that turns the first two numbers into the third, and test it on **every** complete row.\n\n` +
-      hint +
-      `The rule is: **${rule.name}**. Check it on every complete row:\n\n${checks}\n\n` +
-      `It works for all three complete rows, so apply it to the last row:\n\n$$${work(qa, qb)}$$\n\nAnswer: ${answer}`;
+    const solution = steps(
+      'Each row has two starting numbers and a result, and one rule must work for every row. So test simple ideas on one row, starting with adding and multiplying.',
+      hint.trim(),
+      `Written in full, the rule is: **${rule.name}**. Test it on every complete row:\n\n${checks}`,
+      `It works for all three complete rows, so apply it to the last row:\n\n$$${work(qa, qb)}$$`,
+    );
 
     return {
       stem: 'Every row of the table follows the same rule, which turns the first two numbers into the third. What number replaces the question mark?',
@@ -390,8 +404,10 @@ function gridRule(rng: Rng): GeneratedCore {
       answer,
       answerValue: ans,
       distractors,
+      asking: 'What rule turns the first two numbers into the third, and what does it give for the last row?',
       solution,
-      keyIdea: 'Guess a rule from one row, confirm it on every other complete row, then apply it to the incomplete row.',
+      conclusion: `The rule "${rule.name}" fits all three complete rows, and for the last row it gives ${answer}.`,
+      keyIdea: 'Try adding and multiplying on one row, then adjust by a small amount or try squares. Test your rule on every complete row, and reject it if one fails. Only then apply it to the incomplete row.',
     };
   }
 }

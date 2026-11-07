@@ -1,5 +1,6 @@
 import type { ChartSpec, Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { num } from '../../../lib/tex';
 
 type Cand = { text: string; value: number | string; why: string };
@@ -178,16 +179,13 @@ export const generators: Generator[] = [
       ];
       const distractors = pickDistinct({ text: answer, value: answer }, pool);
 
-      const rows = d
-        .map((x, i) => `| ${label(i)} | $${values[i + 1]} - ${values[i]} = ${x}$ |`)
-        .join('\n');
-      const solution =
-        `**Step 1: read every ${kind === 'bar' ? 'bar' : 'point'}** from the gridlines: ${values.join(', ')}.\n\n` +
-        `**Step 2: subtract each year's value from the next year's value.**\n\n` +
-        `| Interval | Change |\n| --- | --- |\n${rows}\n\n` +
-        `**Step 3: choose the biggest positive change.** The largest increase is ${d[R]} ${ctx.unit}, from ${values[R]} to ${values[R + 1]}.` +
-        (kind === 'line' ? ' On the graph this is the steepest upward segment.' : '') +
-        `\n\nAnswer: ${answer}`;
+      const withSign = (x: number) => (x > 0 ? `+${x}` : String(x));
+      const solution = steps(
+        `An increase between two neighbouring years is the later value minus the earlier value. Read every ${kind === 'bar' ? 'bar' : 'point'} against the scale on the left, then subtract:\n\n` +
+          table(['Years', 'Working', 'Change'], d.map((x, i) => [label(i), `$${values[i + 1]} - ${values[i]}$`, `$${withSign(x)}$`])),
+        `A minus sign means ${ctx.noun} fell. The fall of ${-d[F]} ${ctx.unit} is the biggest change in size, but it is not an increase, so ignore it.`,
+        `Among the plus numbers, the biggest is $+${d[R]}$. That is the change from ${values[R]} to ${values[R + 1]}, between ${years[R]} and ${years[R + 1]}.${kind === 'line' ? ' On the graph, it is the steepest climb.' : ''}`,
+      );
 
       return {
         stem:
@@ -197,8 +195,10 @@ export const generators: Generator[] = [
         answer,
         answerValue: answer,
         distractors,
+        asking: `Between which two neighbouring years did ${ctx.noun} go up by the most?`,
         solution,
-        keyIdea: 'The largest increase is the biggest positive difference between consecutive values (the steepest rise), not the highest value and not a fall.',
+        conclusion: `That rise of ${d[R]} ${ctx.unit} is larger than any other rise, so the answer is ${answer}.`,
+        keyIdea: 'For "largest increase", make a table of later minus earlier for each neighbouring pair and pick the biggest plus number. A big fall does not count, and the highest point is not the biggest rise.',
       };
     },
   },
@@ -244,15 +244,17 @@ export const generators: Generator[] = [
 
         const used = atLeast ? freq.slice(k) : freq.slice(0, k);
         const usedClasses = (atLeast ? edges.slice(k, 5) : edges.slice(0, k)).map((e) => `${e} to ${e + w}`);
-        const header = `| ${ctx.xLabel} | ${edges.slice(0, 5).map((e) => `${e} to ${e + w}`).join(' | ')} |`;
-        const sep = `| --- | ${freq.map(() => '---').join(' | ')} |`;
-        const row = `| Frequency | ${freq.join(' | ')} |`;
+        const single = usedClasses.length === 1;
+        const wanted = single ? 'only that class' : `the classes ${listAnd(usedClasses)}`;
         const answer = `$${ans}$`;
-        const solution =
-          `**Step 1: read the height of every bar** (gridlines every 5):\n\n${header}\n${sep}\n${row}\n\n` +
-          `**Step 2: decide which classes are needed.** Each class includes its lower boundary but not its upper one, so "${atLeast ? `at least ${B}` : `less than ${B}`}" means the ${usedClasses.length === 1 ? 'class' : 'classes'} ${listAnd(usedClasses)}.\n\n` +
-          `**Step 3: add their frequencies.** ${used.length === 1 ? `There is just one class: ${used[0]}.` : `$${used.join(' + ')} = ${ans}$`}\n\n` +
-          `Answer: ${answer}`;
+        const solution = steps(
+          `Each bar of a histogram covers one range of values, called a **class**. The bar's height is the **frequency**: how many ${ctx.things} are in that class. Read every bar:\n\n` +
+            table([ctx.xLabel, 'Frequency'], freq.map((fi, i) => [`${edges[i]} to ${edges[i] + w}`, fi])),
+          atLeast
+            ? `"At least ${B}" means ${B} or more. Each class includes its lower boundary, so exactly ${B} ${ctx.unit} belongs in the ${B} to ${edges[k + 1]} class. So we want ${wanted}.`
+            : `"Less than ${B}" means below ${B}, with ${B} itself left out. Each class leaves out its upper boundary, so the ${edges[k - 1]} to ${B} class stops just below ${B}. So we want ${wanted}.`,
+          single ? `With just one class, the count is its frequency: ${ans}.` : `Add their frequencies: $${used.join(' + ')} = ${ans}$.`,
+        );
 
         return {
           stem:
@@ -262,8 +264,12 @@ export const generators: Generator[] = [
           answer,
           answerValue: ans,
           distractors,
+          asking: `How many ${ctx.things} have ${aMeasure(ctx)} ${atLeast ? `of ${B} ${ctx.unit} or more` : `under ${B} ${ctx.unit}`}?`,
           solution,
-          keyIdea: 'On a histogram, each bar\'s height is the number in that class: decide exactly which classes satisfy the condition, then add their heights.',
+          conclusion: single
+            ? `Only the class on the correct side of ${B} ${ctx.unit} counts, and it holds ${answer} ${ctx.things}.`
+            : `Only the classes on the correct side of ${B} ${ctx.unit} count, and they hold ${answer} ${ctx.things}.`,
+          keyIdea: 'On a histogram, bar height is the count in that class. List the classes on the correct side of the boundary, using the rule for which end is included, then add only their heights.',
         };
       }
     },
@@ -306,12 +312,12 @@ export const generators: Generator[] = [
         const distractors = pickDistinct({ text: answer, value: angle }, pool);
         if (distractors.length < 3) continue;
 
-        const solution =
-          `**Step 1: find the total** by adding every slice: $${counts.join(' + ')} = ${N}$ ${ctx.people}.\n\n` +
-          `**Step 2: the whole circle (360 degrees) stands for all ${N} ${ctx.people}**, so each person gets $360 \\div ${N} = ${num(per)}$ degrees.\n\n` +
-          `**Step 3: angle of the ${ctx.labels[t]} sector.**\n\n` +
-          `$$\\frac{${cnt}}{${N}} \\times 360^\\circ = ${cnt} \\times ${num(per)}^\\circ = ${num(angle)}^\\circ$$\n\n` +
-          `Check: the four angles are ${listAnd(counts.map((x) => deg((x * 360) / N)))}, and $${counts.map((x) => num((x * 360) / N)).join(' + ')} = 360$, as they should be for a full circle.\n\nAnswer: ${answer}`;
+        const solution = steps(
+          `The chart shows numbers of ${ctx.people}, but a slice's angle is its share of a full circle. A full circle is $360^\\circ$, and it stands for all the ${ctx.people}.`,
+          `Find the total by adding every slice: $${counts.join(' + ')} = ${N}$.`,
+          `Share the circle out equally between them: $360 \\div ${N} = ${num(per)}$. So each person gets ${num(per)} degrees.`,
+          `The ${ctx.labels[t]} slice has ${cnt} ${ctx.people}, so multiply by the degrees for each person: $${cnt} \\times ${num(per)} = ${num(angle)}^\\circ$.`,
+        );
 
         return {
           stem: `${ctx.question(N)} The pie chart shows the results. What is the angle of the **${ctx.labels[t]}** sector?`,
@@ -319,8 +325,10 @@ export const generators: Generator[] = [
           answer,
           answerValue: angle,
           distractors,
+          asking: `How many degrees of the circle does the ${ctx.labels[t]} slice take up?`,
           solution,
-          keyIdea: 'A sector\'s angle is its share of the total times 360 degrees: $\\text{angle} = \\frac{\\text{count}}{\\text{total}} \\times 360^\\circ$.',
+          conclusion: `${cnt} of the ${N} ${ctx.people} chose ${ctx.labels[t]}, so that slice's angle is ${answer}.`,
+          keyIdea: 'For a pie chart angle, add the slices to get the total, then use $\\text{angle} = \\frac{\\text{count}}{\\text{total}} \\times 360^\\circ$. All the angles together must make $360^\\circ$, which tests your working.',
         };
       }
     },

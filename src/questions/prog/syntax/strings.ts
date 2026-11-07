@@ -15,15 +15,18 @@ export const questions: StaticQuestion[] = [
     options: ['A sequence of characters', 'A whole number', 'A true or false value', 'A list of numbers'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What kind of value does the word "string" mean in programming?',
       solution:
-        'A **string** is text: a sequence of characters such as letters, digits, spaces and punctuation, written in quotes. `"cat"` and `"7 up"` are both strings.',
+        'In programming, a **string** is a piece of text, such as `"cat"` or `"hi there"`.\n\n' +
+        'Each letter, digit, space or symbol in it is one **character**. A string keeps its characters in order, like beads on a thread. So `"cat"` is `c`, then `a`, then `t`.',
+      conclusion: 'A string is text kept in order, one character after another: A sequence of characters.',
       whyWrong: [
         null,
         'That is an integer. `"7"` in quotes is a string, while `7` is a number.',
         'That is a Boolean.',
         'That is an array of numbers. A string holds characters.',
       ],
-      keyIdea: 'A string is a sequence of characters.',
+      keyIdea: 'Look for the quote marks. `"7"` in quotes is a string of one character, but `7` with no quotes is a number. True or false values are Booleans, and lists of values are arrays.',
     },
   },
   {
@@ -34,15 +37,18 @@ export const questions: StaticQuestion[] = [
     options: ['Concatenation', 'Indexing', 'Iteration', 'Assignment'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the name for sticking two pieces of text together?',
       solution:
-        '**Concatenation** means joining strings end to end. In pseudocode it is written with `+`, so `"sun" + "day"` is `"sunday"`.',
+        'Joining end to end means one string is placed straight after the other. For example, `"sun" + "day"` gives `sunday`.\n\n' +
+        'The word for this is **concatenation**. Many languages write it with `+`.',
+      conclusion: 'Joining strings end to end has its own special name: Concatenation.',
       whyWrong: [
         null,
         'Indexing means picking out one character by its position, such as `s[1]`.',
         'Iteration means repeating, as a loop does.',
         'Assignment means storing a value in a variable.',
       ],
-      keyIdea: 'Concatenation is joining strings, written with `+`.',
+      keyIdea: 'Match each word to its action. Concatenation joins strings. Indexing picks a character by its position. Iteration repeats, as a loop does. Assignment stores a value in a variable.',
     },
   },
   {
@@ -53,16 +59,19 @@ export const questions: StaticQuestion[] = [
     options: ['`s[length(s)]`', '`s[length(s) - 1]`', '`s[1]`', '`s[0]`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How do you write the last character of a string when positions start at 1?',
       solution:
-        'With indexing from 1, the positions run from 1 to `length(s)`. So the last character is at position `length(s)`.\n\n' +
-        'For `s = "CAT"`, `length(s)` is 3 and `s[3]` is `T`.',
+        '`s[k]` means the character at position `k`. Indexed from 1 means the first character is at position 1, the next at position 2, and so on.\n\n' +
+        '`length(s)` is how many characters `s` has. Try `s = "CAT"`: the length is 3, and the positions are 1, 2 and 3.\n\n' +
+        'The last position is 3, which equals the length. So the last character is at position `length(s)`, written `s[length(s)]`.',
+      conclusion: 'When counting from 1, the last position always equals the length, so the answer is `s[length(s)]`.',
       whyWrong: [
         null,
         'This is the last position when indexing from 0. When indexing from 1 it gives the second-to-last character.',
         'This is the first character.',
         'Position 0 does not exist when indexing from 1.',
       ],
-      keyIdea: 'Indexed from 1, a string of length $n$ has positions 1 to $n$.',
+      keyIdea: 'Test position questions on a short word: write the word with its positions underneath. Counting from 1, the last position is `length(s)`. Counting from 0, it is `length(s) - 1`.',
     },
     check: {
       optionValues: ['T', 'A', 'C', null],
@@ -80,16 +89,19 @@ export const questions: StaticQuestion[] = [
     options: ['$m + n$', '$m \\times n$', 'The larger of $m$ and $n$', '$m + n - 1$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How long is the text you get by joining two strings?',
       solution:
-        'Concatenation (joining with `+`) keeps every character of both strings, so the lengths add.\n\n' +
-        'For example, `"abc" + "de"` is `"abcde"`, and $3 + 2 = 5$.',
+        '`length` counts the characters in a string. `s + t` puts all of `t` straight after all of `s`, and nothing is removed or overlapped.\n\n' +
+        'Try an example. `"sun"` has 3 characters and `"day"` has 3 characters. Joined, they make `sunday`, which has 6 characters, and $3 + 3 = 6$.\n\n' +
+        'Every character of both strings is kept, so the lengths add up to $m + n$.',
+      conclusion: 'Joining keeps all $m$ characters and all $n$ characters, so the new length is $m + n$.',
       whyWrong: [
         null,
         'This would repeat characters. Joining puts one string after the other, so the lengths add.',
         'This assumes one string overlaps the other. Nothing is overwritten when strings are joined.',
         'This loses a character at the join. Every character of both strings is kept.',
       ],
-      keyIdea: 'The length of a joined string is the sum of the two lengths.',
+      keyIdea: 'For a question in letters, try small real strings with different lengths, such as `"ab"` and `"cde"`. Joined, they have 5 characters, and only the sum of the two lengths gives 5.',
     },
     check: { optionValues: [5, 6, 3, 4], compute: () => ('abc' + 'de').length },
   },
@@ -102,16 +114,19 @@ export const questions: StaticQuestion[] = [
     options: ['`8`', '`7`', '`2`', '`10`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many characters are in the text `hi there`?',
       solution:
-        '`length` counts **every** character, including spaces: `hi` (2) + the space (1) + `there` (5) $= 8$.\n\n' +
-        'Output: `8`.',
+        '`length(s)` counts every character between the quote marks. The quote marks themselves don\'t count, but a space does.\n\n' +
+        'Count them one at a time:\n\n| Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |\n|---|---|---|---|---|---|---|---|---|\n| Character | h | i | (space) | t | h | e | r | e |\n\n' +
+        'The last position is 8, so `length(s)` is 8.',
+      conclusion: 'There are 7 letters and 1 space, so the answer is `8`.',
       whyWrong: [
         null,
         'This forgets the space. A space is a character too.',
         'This counts words. `length` counts characters.',
         'This also counts the two quote marks. They only mark where the string starts and ends.',
       ],
-      keyIdea: '`length(s)` counts every character, including spaces, but not the quotes.',
+      keyIdea: 'To find a length, write each character under a position number, leaving a box for every space. The last position number is the length.',
     },
     check: { optionValues: [8, 7, 2, 10], compute: () => 'hi there'.length },
   },
@@ -124,17 +139,19 @@ export const questions: StaticQuestion[] = [
     options: ['`O`', '`G`', '`R`', '`P`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which letter is third in `PROGRAM`, counting from 1?',
       solution:
-        'Write the positions under the characters:\n\n' +
-        '| position | 1 | 2 | 3 | 4 | 5 | 6 | 7 |\n|---|---|---|---|---|---|---|---|\n| character | P | R | O | G | R | A | M |\n\n' +
-        'Position 3 holds `O`.\n\nOutput: `O`.',
+        '`s[3]` means the character at position 3. The question says strings are indexed from 1, so the first character is at position 1.\n\n' +
+        'Write each letter under its position:\n\n| Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 |\n|---|---|---|---|---|---|---|---|\n| Character | P | R | O | G | R | A | M |\n\n' +
+        'Position 3 holds the letter `O`.',
+      conclusion: 'Counting from 1, the third character of `PROGRAM` is `O`.',
       whyWrong: [
         null,
         'This counts from 0, which makes `G` position 3. The stem says strings are indexed from 1.',
         'This is position 2, one place too early (or the third character counted from the end).',
         'This is position 1, the first character.',
       ],
-      keyIdea: 'Indexed from 1, `s[k]` is the $k$-th character counted from the left.',
+      keyIdea: 'For `s[k]`, write the string with position numbers underneath, starting from the number the question gives. Then read off the character below `k`.',
     },
     check: { optionValues: ['O', 'G', 'R', 'P'], compute: () => 'PROGRAM'[3 - 1] },
   },
@@ -147,16 +164,19 @@ export const questions: StaticQuestion[] = [
     options: ['`sunday`', '`daysun`', '`sun`', '`Error`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What do you get when you join the two words in `a` and `b`?',
       solution:
-        'With two strings, `+` joins them, keeping the left one first and adding no space.\n\n' +
-        '`"sun" + "day"` is `"sunday"`.\n\nOutput: `sunday`.',
+        '`a` and `b` hold text, because of the quote marks. Text in quotes is called a **string**.\n\n' +
+        'With strings, `+` means join: it puts the right string straight after the left one, with no space added.\n\n' +
+        '`a + b` has `a` on the left, so `sun` comes first and `day` follows. Line 3 prints `sunday`.',
+      conclusion: 'The two strings join with `a` first, so the output is `sunday`.',
       whyWrong: [
         null,
         'This joins them the wrong way round. `a + b` puts `a` first.',
         'This keeps only `a`. `+` joins both whole strings.',
         'Joining two strings with `+` is allowed, so there is no error.',
       ],
-      keyIdea: '`a + b` joins two strings with `a` first and nothing added between them.',
+      keyIdea: 'For `+` on strings, write the left string, then the right one straight after it. No space appears unless one of the strings contains it.',
     },
     check: { optionValues: ['sunday', 'daysun', 'sun', null], compute: () => 'sun' + 'day' },
   },
@@ -172,17 +192,20 @@ export const questions: StaticQuestion[] = [
     options: ['`3`', '`6`', '`2`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many times does the letter `a` appear in `banana`?',
       solution:
-        'The loop looks at each character in turn and adds 1 to `count` when it is `a`.\n\n' +
-        '| i | word[i] | count |\n|---|---|---|\n| 1 | b | 0 |\n| 2 | a | 1 |\n| 3 | n | 1 |\n| 4 | a | 2 |\n| 5 | n | 2 |\n| 6 | a | 3 |\n\n' +
-        'Output: `3`.',
+        '`length(word)` is 6, so line 3 makes `i` go from 1 to 6, one value per pass. `word[i]` is the letter at position `i`.\n\n' +
+        '`count` starts at 0 on line 2. Line 5 adds 1 only when the `if` on line 4 is true, which means the letter is `a`.\n\n' +
+        'Trace all six passes:\n\n| `i` | `word[i]` | Equal to `a`? | `count` |\n|---|---|---|---|\n| 1 | b | no | 0 |\n| 2 | a | yes | 1 |\n| 3 | n | no | 1 |\n| 4 | a | yes | 2 |\n| 5 | n | no | 2 |\n| 6 | a | yes | 3 |\n\n' +
+        'Line 8 prints the final `count`, which is 3.',
+      conclusion: 'The letter `a` is at positions 2, 4 and 6, so `count` ends at 3 and the answer is `3`.',
       whyWrong: [
         null,
         'This is `length(word)`, the total number of characters. The `if` counts only the matching ones.',
         'This is the position of the first `a`. The code counts how many there are.',
         'A `for` loop from 1 to 6 runs exactly 6 times and then stops.',
       ],
-      keyIdea: 'A loop over positions with an `if` inside counts the characters that match.',
+      keyIdea: 'A loop with an `if` that adds 1 is a counter: it counts the items that pass the test. Spot this pattern, then go through the string and tally each match.',
     },
     check: {
       optionValues: [3, 6, 2, INFINITE],
@@ -206,18 +229,19 @@ export const questions: StaticQuestion[] = [
     options: ['`same`', '`different`', '`Error`', '`Cat`'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Does the computer treat `Cat` and `cat` as the same text?',
       solution:
-        'Two strings are equal only if every character matches exactly, including capital letters.\n\n' +
-        '1. Compare the first characters: `C` and `c` are different characters.\n' +
-        '2. So `a == b` is false and the `else` branch runs.\n\n' +
-        'Output: `different`.',
+        '`==` compares two strings one character at a time. They are equal only if every character matches exactly.\n\n' +
+        'To a computer, a capital `C` and a small `c` are different characters. So the first characters don\'t match, and `a == b` is false.\n\n' +
+        'A false condition skips the `if` block and runs the `else` block, so line 6 prints `different`.',
+      conclusion: 'The strings differ in their first character, so the `else` branch prints `different`.',
       whyWrong: [
         'This ignores case. A capital `C` and a small `c` are different characters.',
         null,
         'Comparing two strings with `==` is allowed, so there is no error.',
         'The code prints one of the two words in quotes. It never prints `a`.',
       ],
-      keyIdea: 'String comparison is case-sensitive: every character must match exactly.',
+      keyIdea: 'To compare strings, check them character by character, including capitals and spaces. One mismatch makes `==` false, and capital and small letters count as different.',
     },
     check: {
       optionValues: ['same', 'different', null, 'Cat'],
@@ -252,17 +276,20 @@ export const questions: StaticQuestion[] = [
     options: ['`4`', '`7`', '`12`', '`2`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many small-letter vowels are in `Ice Age Area`?',
       solution:
-        'The loop adds 1 for every character that is a **lowercase** vowel. Capitals are different characters, so they do not match.\n\n' +
-        '| word | lowercase vowels | count so far |\n|---|---|---|\n| `Ice` | e | 1 |\n| `Age` | e | 2 |\n| `Area` | e, a | 4 |\n\n' +
-        'Spaces match nothing.\n\nOutput: `4`.',
+        'The loop visits every character. Line 5 tests whether the character equals `a`, `e`, `i`, `o` or `u`. `or` means the test passes if at least one of those comparisons is true.\n\n' +
+        'All five letters in the test are small letters. A capital such as `I` is a different character from `i`, so capitals fail the test.\n\n' +
+        'Consonants and spaces can\'t pass either, so only the vowels matter:\n\n| Position | Character | Passes? | `count` |\n|---|---|---|---|\n| 1 | I | no, capital | 0 |\n| 3 | e | yes | 1 |\n| 5 | A | no, capital | 1 |\n| 7 | e | yes | 2 |\n| 9 | A | no, capital | 2 |\n| 11 | e | yes | 3 |\n| 12 | a | yes | 4 |\n\n' +
+        'Line 9 prints the final `count`, which is 4.',
+      conclusion: 'Four characters pass the test, the three small `e`s and the small `a`, so the answer is `4`.',
       whyWrong: [
         null,
         'This also counts the capitals `I`, `A` and `A`. The comparisons are case-sensitive.',
         'This is `length(s)`, the number of characters. The `if` counts only lowercase vowels.',
         'This counts the different vowels (a and e). The loop adds 1 for every match, so repeats count each time.',
       ],
-      keyIdea: 'A loop visits each character in turn, and comparisons are case-sensitive.',
+      keyIdea: 'When a test compares characters, see whether it lists small letters, capitals or both, because comparison is case-sensitive. Then list only the candidates and tick the ones that match exactly.',
     },
     check: {
       optionValues: [4, 7, 12, 2],
@@ -286,17 +313,20 @@ export const questions: StaticQuestion[] = [
     options: ['`EDOC`', '`CODE`', '`E`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is in `t` after adding each letter of `CODE` to the front of it?',
       solution:
-        'Each new character goes in **front** of what is already in `t`.\n\n' +
-        '| i | s[i] | t |\n|---|---|---|\n| 1 | C | C |\n| 2 | O | OC |\n| 3 | D | DOC |\n| 4 | E | EDOC |\n\n' +
-        'Output: `EDOC`.',
+        '`t` starts as `""`, the **empty string**: text with no characters yet.\n\n' +
+        'Line 4 says `t = s[i] + t`. `s[i]` is the character at position `i`, and `+` joins text. The new character is on the left of the `+`, so it goes in **front** of what `t` already holds.\n\n' +
+        '`length(s)`, the number of characters, is 4. So trace four passes:\n\n| `i` | `s[i]` | Working | `t` becomes |\n|---|---|---|---|\n| 1 | C | `C` + nothing | `C` |\n| 2 | O | `O` + `C` | `OC` |\n| 3 | D | `D` + `OC` | `DOC` |\n| 4 | E | `E` + `DOC` | `EDOC` |\n\n' +
+        'Line 6 prints `t`, which is now `EDOC`.',
+      conclusion: 'Each letter goes in front of the earlier ones, which reverses the word, so the answer is `EDOC`.',
       whyWrong: [
         null,
         'This is `t = t + s[i]`, which adds each character at the end. Here the new character is on the left of the `+`.',
         'This is `t = s[i]`, which overwrites `t` each time. The line also keeps the old `t`.',
         'The loop runs exactly 4 times, once per character, and then stops.',
       ],
-      keyIdea: '`t = s[i] + t` builds the string in reverse, while `t = t + s[i]` copies it.',
+      keyIdea: 'Look at which side of `+` the new character is on. `t = s[i] + t` adds to the front and reverses the string. `t = t + s[i]` adds to the end and copies it.',
     },
     check: {
       optionValues: ['EDOC', 'CODE', 'E', INFINITE],
@@ -320,17 +350,20 @@ export const questions: StaticQuestion[] = [
     options: ['`ACEG`', '`BDF`', '`ACE`', INFINITE],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which letters of `ABCDEFG` does the loop collect when `i` goes up by 2?',
       solution:
-        '`i` goes up by 2 each pass, so the loop visits every second position.\n\n' +
-        '| i | s[i] | t |\n|---|---|---|\n| 1 | A | A |\n| 3 | C | AC |\n| 5 | E | ACE |\n| 7 | G | ACEG |\n\n' +
-        'Then `i` becomes 9, and $9 \\le 7$ is false, so the loop stops.\n\nOutput: `ACEG`.',
+        '`length(s)` is 7, so the loop runs while `i <= 7`, meaning `i` is 7 or less. The condition is checked at the top of each pass.\n\n' +
+        'Each pass joins `s[i]`, the letter at position `i`, to the end of `t`, then adds 2 to `i`. So it takes every second letter, starting from position 1.\n\n' +
+        'Trace it:\n\n| `i` at the check | `i <= 7`? | `s[i]` | `t` becomes |\n|---|---|---|---|\n| 1 | yes | A | `A` |\n| 3 | yes | C | `AC` |\n| 5 | yes | E | `ACE` |\n| 7 | yes | G | `ACEG` |\n| 9 | no, stop | | |\n\n' +
+        'Line 8 prints `t`, which is `ACEG`.',
+      conclusion: 'Positions 1, 3, 5 and 7 are collected, so the answer is `ACEG`.',
       whyWrong: [
         null,
         'This counts positions from 0, so position 1 would be `B`. The stem says strings are indexed from 1.',
         'This stops before position 7, as if the condition were `i < length(s)`. The condition uses `<=`, so 7 is included.',
         '`i` increases on every pass, so it passes 7 and the loop stops.',
       ],
-      keyIdea: 'Adding 2 to the position each pass visits every second character.',
+      keyIdea: 'With `i = i + 2` the loop visits every second position. List the values of `i` until the condition fails, and see whether the last one is still allowed by `<=` or `<`.',
     },
     check: {
       optionValues: ['ACEG', 'BDF', 'ACE', INFINITE],
@@ -370,19 +403,21 @@ export const questions: StaticQuestion[] = [
     options: [INFINITE, '`3`', '`6`', '`0`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Does this loop ever finish, and if so, what does it print?',
       solution:
-        'Look at where `i` changes: the line `i = i + 1` is **inside** the `if`.\n\n' +
-        '1. `i` is 1 and `s[1]` is `B`, so the `if` is false.\n' +
-        '2. `i` does not change, so the next pass looks at `s[1]` again.\n' +
-        '3. This repeats for ever, because `i <= length(s)` stays true.\n\n' +
-        'Answer: Infinite loop.',
+        '`length(s)` is 6, so the condition is `i <= 6`. The loop can only end if `i` grows past 6.\n\n' +
+        'Look at where `i` changes. Line 7, `i = i + 1`, is **inside** the `if` block, so it runs only when `s[i]`, the letter at position `i`, is `A`.\n\n' +
+        'Start tracing. `i` is 1 and `s[1]` is `B`. `B` is not `A`, so the `if` is false and lines 6 and 7 are skipped.\n\n' +
+        'Nothing has changed, so `i` is still 1. The next pass does exactly the same thing, and so does every pass after it.\n\n' +
+        'The condition `1 <= 6` stays true for ever, so the loop never ends and line 10 is never reached.',
+      conclusion: '`i` gets stuck at 1, on the letter `B`, so the answer is: Infinite loop.',
       whyWrong: [
         null,
         'This is what you would get with `i = i + 1` after the `end if`. As written, the loop never gets past the `B`.',
         'This is `length(s)`. It assumes the loop visits every character, but it never moves on from position 1.',
         'This assumes the loop ends with `count` still 0. `count` does stay 0, but the loop never ends, so `print` is never reached.',
       ],
-      keyIdea: 'If the counter only changes inside an `if`, the loop can get stuck on a value that fails the test.',
+      keyIdea: 'For any `while` loop, find the line that moves the loop variable. If it sits inside an `if`, ask whether that `if` can be false. If it can, the variable stops changing and the loop runs for ever.',
     },
     check: {
       optionValues: [INFINITE, 3, 6, 0],
@@ -413,17 +448,20 @@ export const questions: StaticQuestion[] = [
     options: ['`4`', '`3`', '`11`', '`2`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'At which position is the first `G` in `PROGRAMMING`?',
       solution:
-        'The loop stops at the first `G`, because `break` ends the loop at once.\n\n' +
-        '| position | 1 | 2 | 3 | 4 |\n|---|---|---|---|---|\n| character | P | R | O | G |\n\n' +
-        'At $i = 4$ the test is true, so `p` becomes 4 and the loop ends.\n\nOutput: `4`.',
+        'The loop looks at each position in turn. When the letter is `G`, line 5 stores the position in `p`, and `break` on line 6 ends the loop straight away.\n\n' +
+        'So later `G`s are never looked at. Only the first one matters.\n\n' +
+        'Trace from position 1:\n\n| `i` | `s[i]` | Equal to `G`? |\n|---|---|---|\n| 1 | P | no |\n| 2 | R | no |\n| 3 | O | no |\n| 4 | G | yes: `p = 4`, then `break` |\n\n' +
+        'Line 9 prints `p`, which holds 4.',
+      conclusion: 'The `break` stops the search at the first `G`, at position 4, so the answer is `4`.',
       whyWrong: [
         null,
         'This counts positions from 0. The stem says strings are indexed from 1.',
         'This is the position of the last `G`, which is what you would get without the `break`.',
         'This is how many times `G` appears. The code stores a position.',
       ],
-      keyIdea: 'A search with `break` keeps the first match; without `break` it would keep the last.',
+      keyIdea: 'A loop with `break` after a match is a search for the **first** match. Number the characters from 1 and stop at the first match. Without `break`, `p` would end up as the last match.',
     },
     check: {
       optionValues: [4, 3, 11, 2],
@@ -452,17 +490,20 @@ export const questions: StaticQuestion[] = [
     options: ['`2`', '`3`', '`5`', '`0`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'At how many positions do `CLASS` and `GLOSS` have different letters?',
       solution:
-        'The loop counts the positions where the two strings **differ**.\n\n' +
-        '| i | a[i] | b[i] | different? | d |\n|---|---|---|---|---|\n| 1 | C | G | yes | 1 |\n| 2 | L | L | no | 1 |\n| 3 | A | O | yes | 2 |\n| 4 | S | S | no | 2 |\n| 5 | S | S | no | 2 |\n\n' +
-        'Output: `2`.',
+        '`length(a)` is 5, so line 4 makes `i` go from 1 to 5. `!=` means "not equal".\n\n' +
+        'So line 6 adds 1 to `d` only when the two letters at the same position differ.\n\n' +
+        'Compare position by position:\n\n| `i` | `a[i]` | `b[i]` | Different? | `d` |\n|---|---|---|---|---|\n| 1 | C | G | yes | 1 |\n| 2 | L | L | no | 1 |\n| 3 | A | O | yes | 2 |\n| 4 | S | S | no | 2 |\n| 5 | S | S | no | 2 |\n\n' +
+        'Line 9 prints `d`, which holds 2.',
+      conclusion: 'The words differ only at positions 1 and 3, so the answer is `2`.',
       whyWrong: [
         null,
         'This counts the positions that match. `!=` counts the ones that differ.',
         'This is `length(a)`, the number of positions checked. `d` goes up only when the characters differ.',
         'This assumes the strings count as equal because they have the same length. Positions 1 and 3 hold different characters.',
       ],
-      keyIdea: 'Comparing two strings position by position counts how many characters differ.',
+      keyIdea: 'Write one string above the other and compare column by column. `!=` counts the columns that differ, and `==` counts the ones that match.',
     },
     check: {
       optionValues: [2, 3, 5, 0],
@@ -497,17 +538,21 @@ export const questions: StaticQuestion[] = [
     options: ['`1`', '`0`', '`2`', '`5`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does `ok` hold after comparing the letters of `RADAR` from both ends?',
       solution:
-        'The loop compares each character with its mirror image from the other end. `div(5,2)` is 2, so there are two passes.\n\n' +
-        '| i | s[i] | n - i + 1 | s[n - i + 1] | ok |\n|---|---|---|---|---|\n| 1 | R | 5 | R | 1 |\n| 2 | A | 4 | A | 1 |\n\n' +
-        'No pair differs, so `ok` stays 1. The string reads the same both ways (a palindrome).\n\nOutput: `1`.',
+        '`length(s)` is 5, so `n` is 5. `ok` starts at 1, and only line 6 can change it to 0, which happens if a pair of letters differs.\n\n' +
+        '`div` is integer division, which keeps only the whole-number part. $5 \\div 2 = 2.5$, so `div(5,2)` is 2 and the loop runs for `i` = 1 and 2. The middle letter has no partner, so it isn\'t checked.\n\n' +
+        '`s[i]` is the letter at position `i`, and `s[n - i + 1]` is the letter at the matching position from the other end. When `i` is 1, that is position $5 - 1 + 1 = 5$, the last letter.\n\n' +
+        'Compare the pairs:\n\n| `i` | `s[i]` | `n - i + 1` | `s[n - i + 1]` | Different? |\n|---|---|---|---|---|\n| 1 | R | 5 | R | no |\n| 2 | A | 4 | A | no |\n\n' +
+        'Neither pair differs, so line 6 never runs and `ok` keeps its value. Line 9 prints 1.',
+      conclusion: 'Both pairs match, so `ok` stays at 1 and the answer is `1`.',
       whyWrong: [
         null,
         'This compares `s[i]` with `s[n - i]`, one place off. The `+ 1` makes the first position pair with the last.',
         'This counts the matching pairs. `ok` only ever holds 1 or 0.',
         'This is `length(s)`. The code prints `ok`.',
       ],
-      keyIdea: 'Position $i$ pairs with position $n - i + 1$ when a string is indexed from 1.',
+      keyIdea: 'To test whether a word is a palindrome (reads the same both ways), compare the first and last letters, then move inwards. A flag such as `ok` starts at 1 and drops to 0 on any mismatch.',
     },
     check: {
       optionValues: [1, 0, 2, 5],
@@ -532,18 +577,20 @@ export const questions: StaticQuestion[] = [
     options: ['`apricot`', '`pear`', '`true`', '`Error`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which word comes first alphabetically, and which branch does that choose?',
       solution:
-        'Compare from the first character and stop at the first difference.\n\n' +
-        '1. The first characters are `p` and `a`. `p` comes after `a` in the alphabet.\n' +
-        '2. So `"pear" < "apricot"` is false, and the `else` branch runs.\n\n' +
-        'Output: `apricot`.',
+        'Alphabetical comparison starts with the first characters. If they differ, those two characters decide it. Length doesn\'t matter.\n\n' +
+        'Variable `a` holds `pear` and variable `b` holds `apricot`. Their first letters are p and a.\n\n' +
+        '`a < b` asks whether `pear` comes before `apricot` in the alphabet. The letter p comes after the letter a, so `a < b` is false.\n\n' +
+        'A false condition runs the `else` block, which is line 6, `print(b)`. `b` holds `apricot`.',
+      conclusion: '`pear` does not come before the other word, so the code prints `b`, and the answer is `apricot`.',
       whyWrong: [
         null,
         'This compares lengths, as `pear` is shorter. The comparison is alphabetical, so the first different character decides.',
         'The comparison only chooses the branch. The code then prints one of the two strings.',
         'Comparing two strings with `<` is allowed, as the stem says.',
       ],
-      keyIdea: 'Strings compare character by character from the left, and length matters only if one is the start of the other.',
+      keyIdea: 'To compare strings with `<`, find the first position where they differ and compare those two characters alphabetically. The rest of each string makes no difference. If one word runs out with no difference found, the shorter word comes first.',
     },
     check: {
       optionValues: ['apricot', 'pear', 'true', null],
@@ -566,18 +613,19 @@ export const questions: StaticQuestion[] = [
     options: ['`4`', '`3`', '`12`', '`9`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many spaces are in `to be or not`, and what does `c` hold after counting them?',
       solution:
-        'The loop adds 1 for every space, and `c` starts at 1.\n\n' +
-        '1. The string has 3 spaces: after `to`, after `be` and after `or`.\n' +
-        '2. So `c` is $1 + 3 = 4$, which is the number of words.\n\n' +
-        'Output: `4`.',
+        'Line 2 starts `c` at 1, and not at 0. Line 5 adds 1 every time the character at position `i` is a space, written `" "`.\n\n' +
+        'Other characters don\'t change `c`, so look only at the spaces:\n\n| Space after | Position | `c` becomes |\n|---|---|---|\n| `to` | 3 | 2 |\n| `be` | 6 | 3 |\n| `or` | 9 | 4 |\n\n' +
+        'Line 8 prints `c`, which holds 4.',
+      conclusion: 'There are 3 spaces and `c` starts at 1, so $1 + 3 = 4$ and the answer is `4`.',
       whyWrong: [
         null,
         'This counts the spaces but forgets that `c` starts at 1.',
         'This is `length(s)`, the number of characters.',
         'This counts the characters that are not spaces. The `if` is true only for spaces.',
       ],
-      keyIdea: 'With single spaces between words, the number of words is the number of spaces plus 1.',
+      keyIdea: 'With one space between words, the number of words is the number of spaces plus 1. Whenever a counter is used, look at its starting value: starting at 1 instead of 0 changes the result.',
     },
     check: {
       optionValues: [4, 3, 12, 9],
@@ -598,19 +646,20 @@ export const questions: StaticQuestion[] = [
     options: ['`TE`', '`ER`', '`UT`', '`ET`'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which two letters of `COMPUTER` are at positions `i` and `i + 1`, where `i` is 2 less than the length?',
       solution:
-        '| position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |\n|---|---|---|---|---|---|---|---|---|\n| character | C | O | M | P | U | T | E | R |\n\n' +
-        '1. `length(s)` is 8, so `i` is 6.\n' +
-        '2. `s[6]` is `T` and `s[7]` is `E`.\n' +
-        '3. Joining them gives `TE`.\n\n' +
-        'Output: `TE`.',
+        '`COMPUTER` has 8 characters, so `length(s)` is 8. Line 2 gives `i` the value $8 - 2 = 6$.\n\n' +
+        'Write the positions, counting from 1:\n\n| Position | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |\n|---|---|---|---|---|---|---|---|---|\n| Character | C | O | M | P | U | T | E | R |\n\n' +
+        '`s[k]` means the character at position `k`. So `s[i]` is `s[6]`, which is `T`. `s[i + 1]` is `s[7]`, which is `E`.\n\n' +
+        '`+` joins strings with the left one first, so line 3 prints `TE`.',
+      conclusion: 'Position 6 then position 7 gives `T` then `E`, so the answer is `TE`.',
       whyWrong: [
         null,
         'This counts positions from 0, moving both characters one place right. The stem says strings are indexed from 1.',
         'This takes the length as 7, which makes `i` equal to 5. `COMPUTER` has 8 characters.',
         'This joins the characters in the wrong order. `s[i]` comes first.',
       ],
-      keyIdea: 'Write the positions under the characters, work out the index, then read off the characters.',
+      keyIdea: 'Work out the index first, as a number. Write the word with positions under it, read the letters, and join them in the order they appear around `+`.',
     },
     check: {
       optionValues: ['TE', 'ER', 'UT', 'ET'],

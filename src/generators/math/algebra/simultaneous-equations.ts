@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { Frac, gcd } from '../../../lib/frac';
 import { m, num, paren, signed, sum, poly, term } from '../../../lib/tex';
 
@@ -100,35 +101,30 @@ export const generators: Generator[] = [
         const r1 = c * k1;
         const s2 = lin(d * k2a, e * k2a);
         const r2 = f * k2a;
-        const scaleIntro =
+        const sign = adding ? '+' : '-';
+        const v1 = (askX ? a : b) * k1;
+        const v2 = (askX ? d : e) * k2a;
+        const leftWork = `${term(v1, v, true)} ${sign} ${v2 < 0 ? `\\left(${term(v2, v, true)}\\right)` : term(v2, v, true)} = ${term(coef, v, true)}`;
+        const rightWork = r2 === 0 ? `The right side stays ${m(num(rhs))}` : `On the right, ${m(`${num(r1)} ${sign} ${paren(r2)} = ${num(rhs)}`)}`;
+        const solution = steps(
+          `**Simultaneous equations** must both be true for the same ${m('x')} and the same ${m('y')}. We want ${m(v)}, so we remove ${m(w)} by making its number the same size in both equations.`,
           k1 === 1 && k2a === 1
-            ? `The ${m(w)} terms already have the same size in both equations, so no scaling is needed:`
-            : `Make the ${m(w)} terms the same size: ${scaleText(k1, 'first')} and ${scaleText(k2a, 'second')} (every term, including the constant).`;
-        const combineText = adding
-          ? `The ${m(w)} terms now have opposite signs, so **add** the two equations:`
-          : `The ${m(w)} terms are now identical, so **subtract** the second equation from the first:`;
-        // "so 3y = 6 and y = 2"; when the coefficient is 1 just "so y = 2" (no repeated statement).
-        const finish = (cf: number, name: string, rhsVal: number, val: number) =>
-          cf === 1 ? `so ${m(`${name} = ${num(val)}`)}` : `so ${m(`${term(cf, name, true)} = ${num(rhsVal)}`)} and ${m(`${name} = ${num(val)}`)}`;
-        const backStep = askX
-          ? `Substitute ${m(`x = ${num(x0)}`)} into the first equation: ${m(`${prod(a, x0, true)}${term(b, 'y', false)} = ${num(c)}`)}, ${finish(b, 'y', c - a * x0, y0)}.`
-          : `Substitute ${m(`y = ${num(y0)}`)} into the first equation: ${m(`${term(a, 'x', true)}${prod(b, y0, false)} = ${num(c)}`)}, ${finish(a, 'x', c - b * y0, x0)}.`;
-        const solution =
-          scaleIntro +
-          `\n\n$$${s1} = ${num(r1)}$$\n\n$$${s2} = ${num(r2)}$$\n\n` +
-          combineText +
-          `\n\n$$${lhsTex}$$\n\n` +
-          `Divide by ${m(num(coef))}: ${m(`${v} = ${num(ans)}`)}.\n\n` +
-          `${backStep}\n\n` +
-          `Check in the second equation: ${m(`${prod(d, x0, true)}${prod(e, y0, false)} = ${num(f)}`)}.\n\n` +
-          `Answer: ${answerText}`;
+            ? `The ${m(w)} terms already have the same size in both equations, so no multiplying is needed:`
+            : `To match the ${m(w)} terms, ${scaleText(k1, 'first')} and ${scaleText(k2a, 'second')}. Multiply every term, including the number on the right:`,
+          `$$${s1} = ${num(r1)}$$`,
+          `$$${s2} = ${num(r2)}$$`,
+          `${adding ? `The ${m(w)} terms have opposite signs, so **adding** the equations cancels them.` : `The ${m(w)} terms are identical, so **subtracting** the second equation from the first cancels them.`} On the left, that leaves ${m(leftWork)}. ${rightWork}. So ${m(lhsTex)}.`,
+          `Divide both sides by ${m(num(coef))} to leave ${m(v)} alone: ${m(`${v} = ${num(rhs)} \\div ${paren(coef)} = ${num(ans)}`)}.`,
+        );
         return {
           stem: `Solve the simultaneous equations\n\n$$${eq1}$$\n\n$$${eq2}$$\n\nWhat is the value of ${m(v)}?`,
           answer: answerText,
           answerValue: ans,
           distractors: ds,
+          asking: `Which value of ${m(v)} fits both equations at the same time?`,
           solution,
-          keyIdea: 'Scale the equations so one unknown has the same size of coefficient in both, add (opposite signs) or subtract (same signs) to eliminate it, then back-substitute and check.',
+          conclusion: `Putting ${m(`${v} = ${num(ans)}`)} back into either equation gives ${m(`${w} = ${num(other)}`)}. Both equations then hold: ${m(`${prod(a, x0, true)}${prod(b, y0, false)} = ${num(c)}`)} and ${m(`${prod(d, x0, true)}${prod(e, y0, false)} = ${num(f)}`)}. So the answer is ${answerText}.`,
+          keyIdea: 'Multiply the equations so one letter has the same size in both. Add them if its signs are opposite, subtract if they match. That removes the letter, so you can solve for the other. Multiply every term, including the number on the right.',
         };
       }
     },
@@ -202,23 +198,24 @@ export const generators: Generator[] = [
           const mid = `${prod(mm, x, true)}${c === 0 ? '' : signed(c)}`;
           return mid === num(yOf(x)) ? `y = ${num(yOf(x))}` : `y = ${mid} = ${num(yOf(x))}`;
         };
-        const solution =
-          `At a meeting point the two ${m('y')} values are equal:\n\n$$${curve} = ${line}$$\n\n` +
-          `Bring every term to the left-hand side:\n\n$$${combined} = 0$$\n\n` +
-          `Factorise (two numbers that multiply to ${m(num(q - c))} and add to ${m(num(p - mm))}):\n\n` +
-          `$$(x${signed(-lo)})(x${signed(-hi)}) = 0$$\n\n` +
-          `So ${m(`x = ${num(lo)}`)} or ${m(`x = ${num(hi)}`)}.\n\n` +
-          `Find each ${m('y')} from the line ${m(`y = ${line}`)}:\n\n` +
-          `- ${m(`x = ${num(lo)}`)}: ${m(yWork(lo))}\n` +
-          `- ${m(`x = ${num(hi)}`)}: ${m(yWork(hi))}\n\n` +
-          `Answer: ${ans.text}`;
+        const moveTerms = `${mm > 0 ? 'Subtract' : 'Add'} ${m(term(Math.abs(mm), 'x', true))}${c === 0 ? '' : ` and ${c > 0 ? 'subtract' : 'add'} ${m(num(Math.abs(c)))}`} on both sides`;
+        const solution = steps(
+          `Where the line and curve meet, they share the same ${m('x')} and the same ${m('y')}. Both equations start with ${m('y =')}, so set their right sides equal: ${m(`${curve} = ${line}`)}.`,
+          `This has an ${m('x^{2}')}, so it is a quadratic. Get 0 on one side. ${moveTerms}: ${m(`${combined} = 0`)}.`,
+          `Factorise. We need two numbers that multiply to ${m(num(q - c))} and add to ${m(num(p - mm))}. They are ${m(num(-lo))} and ${m(num(-hi))}, so ${m(`(x${signed(-lo)})(x${signed(-hi)}) = 0`)}.`,
+          `If two brackets multiply to 0, one of them is 0. So ${m(`x = ${num(lo)}`)} or ${m(`x = ${num(hi)}`)}.`,
+          `Each point needs a ${m('y')} too. Put each ${m('x')} into the simpler equation, ${m(`y = ${line}`)}:`,
+          table([m('x'), m('y')], [[m(num(lo)), m(yWork(lo))], [m(num(hi)), m(yWork(hi))]]),
+        );
         return {
           stem: `Find the points where the line ${m(`y = ${line}`)} meets the curve ${m(`y = ${curve}`)}.`,
           answer: ans.text,
           answerValue: ans.value,
           distractors: ds,
+          asking: 'At which points are the line and the curve in the same place?',
           solution,
-          keyIdea: 'Substitute the line into the curve to get a quadratic, solve it, then find each $y$ from the line.',
+          conclusion: `The curve gives the same heights at these ${m('x')} values, ${m(num(yOf(lo)))} and ${m(num(yOf(hi)))}. So the answer is ${ans.text}.`,
+          keyIdea: 'To find where a line meets a curve, set the two expressions for $y$ equal. Make a quadratic equal to 0 and solve it. Put each $x$ into the line to get its $y$.',
         };
       }
     },
@@ -259,20 +256,20 @@ export const generators: Generator[] = [
         if (ds.length < 3) continue;
         const scale = new Frac(d, a);
         const answer = m(`k = ${num(k)}`);
-        const solution =
-          `Two linear equations have no unique solution when the ${m('x')} and ${m('y')} coefficients are in the same ratio (the lines are parallel):\n\n` +
-          `$$\\frac{${num(a)}}{${num(d)}} = \\frac{k}{${num(e)}}$$\n\n` +
-          `Equivalently the determinant is zero: ${m(`${num(a)}\\times${paren(e)}${term(-d, 'k', false)} = 0`)}, so ${m(`${term(d, 'k', true)} = ${num(a * e)}`)} and ${m(`k = ${num(k)}`)}.\n\n` +
-          `Check the constants: multiplying the first equation by ${m(scale.tex())} gives ${m(`${lin(d, e)} = ${new Frac(c).mul(scale).tex()}`)}, but the second equation says ${m(`${lin(d, e)} = ${num(f)}`)}. ` +
-          `These contradict each other, so there is no solution (not infinitely many).\n\n` +
-          `Answer: ${answer}`;
+        const solution = steps(
+          `Each equation is a straight line. No solution means the lines never meet, so they must be **parallel**. For parallel lines, the numbers in front of ${m('x')} and ${m('y')} must be in the same ratio.`,
+          `Match them up. The ${m('x')} numbers are ${m(num(a))} and ${m(num(d))}. The ${m('y')} numbers are ${m('k')} and ${m(num(e))}. So ${m(`\\frac{${num(a)}}{${num(d)}} = \\frac{k}{${num(e)}}`)}.`,
+          `Multiply both sides by ${m(num(e))} to find ${m('k')}: ${m(`k = \\frac{${num(a)}}{${num(d)}} \\times ${num(e)} = ${num(k)}`)}.`,
+        );
         return {
           stem: `For which value of ${m('k')} does the system\n\n$$${sum([[a, 'x'], [1, 'ky']])} = ${num(c)}$$\n\n$$${lin(d, e)} = ${num(f)}$$\n\nhave **no solution**?`,
           answer,
           answerValue: k,
           distractors: ds.map((x) => ({ text: m(`k = ${x.f.tex()}`), value: x.f.value(), why: x.why })),
+          asking: `Which value of ${m('k')} makes the two lines parallel, so that they never meet?`,
           solution,
-          keyIdea: 'No solution means parallel lines: the coefficients are proportional (determinant zero) but the constants are not in the same ratio.',
+          conclusion: `Multiplying the first equation by ${m(scale.tex())} then gives ${m(`${lin(d, e)} = ${new Frac(c).mul(scale).tex()}`)}, but the second says ${m(`${lin(d, e)} = ${num(f)}`)}. They contradict, so the answer is ${answer}.`,
+          keyIdea: 'For no solution, the $x$ and $y$ numbers must be in the same ratio, but the constants must not be. Write the ratio in the same order on both sides, solve it, then compare the constants.',
         };
       }
     },

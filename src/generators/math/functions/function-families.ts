@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { Frac, lcm } from '../../../lib/frac';
 import { m, num, paren, signed, sum } from '../../../lib/tex';
 
@@ -69,21 +70,23 @@ export const generators: Generator[] = [
           [A, 'x'],
           [B, 'y'],
         ])} = ${num(K)}`;
+        const movedX = `${A > 0 ? 'Subtract' : 'Add'} ${m(`${Math.abs(A) === 1 ? '' : Math.abs(A)}x`)} ${A > 0 ? 'from' : 'to'} both sides: ${m(`${B === -1 ? '-' : B === 1 ? '' : B}y = ${sum([[-A, 'x'], [K, '']])}`)}.`;
         gradStep =
-          `Rearrange the given line to make $y$ the subject: ${m(given)} becomes ${m(`y = ${sum([[m0, 'x'], [c0, '']])}`)}, ` +
-          `so its gradient is ${m(m0.tex())}.`;
+          `Find the **gradient** (steepness) of the given line by writing it as $y = mx + c$, where $m$ is the gradient. ${movedX} ` +
+          (B === 1 ? '' : `Divide every term by ${m(num(B))}: ${m(`y = ${sum([[m0, 'x'], [c0, '']])}`)}. `) +
+          `So its gradient is ${m(m0.tex())}.`;
       } else {
         given = `y = ${sum([
           [m0, 'x'],
           [c0, ''],
         ])}`;
-        gradStep = `The given line ${m(given)} is in the form $y = mx + c$, so its gradient is ${m(m0.tex())}.`;
+        gradStep = `The given line ${m(given)} is in the form $y = mx + c$, where $m$ is the **gradient** (steepness). So its gradient is ${m(m0.tex())}.`;
       }
 
       const relStep =
         rel === 'parallel'
-          ? `Parallel lines have the **same** gradient, so line $L$ has gradient ${m(mNew.tex())}.`
-          : `Perpendicular gradients multiply to $-1$, so the gradient of $L$ is the negative reciprocal: ${m(`-\\frac{1}{${paren(m0)}} = ${mNew.tex()}`)}.`;
+          ? `**Parallel** lines never meet, so they have the same gradient. Line $L$ also has gradient ${m(mNew.tex())}.`
+          : `**Perpendicular** lines cross at a right angle, and their gradients multiply to $-1$. So turn ${m(m0.tex())} upside down and change its sign, which gives ${m(mNew.tex())}. Testing: ${m(`${paren(m0)} \\times ${paren(mNew)} = -1`)}.`;
 
       const answer = m(ans.tex());
       const F = (f: Frac, why: string): Cand<Frac> => ({ v: f, text: m(f.tex()), why });
@@ -122,27 +125,28 @@ export const generators: Generator[] = [
       }
       const ds = pickDistractors(answer, (v) => v.equals(ans), pool, (a, b) => a.equals(b));
 
-      const pointForm = `${shifted('y', y1)} = ${mNew.equals(1) ? '' : mNew.equals(-1) ? '-' : mNew.tex()}\\left(${shifted('x', x1)}\\right)`;
-      const solution =
-        `1. ${gradStep}\n` +
-        `2. ${relStep}\n` +
-        `3. Use the point-gradient form ${m('y - y_1 = m(x - x_1)')} with the point ${m(`(${x1}, ${y1})`)}:\n\n` +
-        `$$${pointForm}$$\n\n` +
-        `4. The $y$-intercept is the value of $y$ when $x = 0$:\n\n` +
-        `$$y = ${num(y1)} - ${paren(mNew)} \\times ${paren(x1)} = ${num(y1)} - ${paren(mNew.mul(x1))} = ${ans.tex()}$$\n\n` +
-        `So line $L$ is ${m(`y = ${sum([[mNew, 'x'], [ans, '']])}`)}.\n\n` +
-        `Answer: ${answer}`;
+      const prod = mNew.mul(x1);
+      const solution = steps(
+        gradStep,
+        relStep,
+        `Write $L$ as ${m(`y = ${sum([[mNew, 'x'], [1, 'c']])}`)}, where $c$ is the $y$ value at which $L$ crosses the $y$-axis. That is the number we want.`,
+        `$L$ passes through ${m(`(${x1}, ${y1})`)}, so substitute ${m(`x = ${x1}`)} and ${m(`y = ${y1}`)}: ${m(`${num(y1)} = ${paren(mNew)} \\times ${paren(x1)} + c`)}.`,
+        `Do the multiplication: ${m(`${paren(mNew)} \\times ${paren(x1)} = ${prod.tex()}`)}. So ${m(`${num(y1)} = ${prod.tex()} + c`)}.`,
+        `${prod.n > 0 ? 'Subtract' : 'Add'} ${m(new Frac(Math.abs(prod.n), prod.d).tex())} ${prod.n > 0 ? 'from' : 'to'} both sides to get $c$ alone: ${m(`c = ${num(y1)}${signed(prod.neg())} = ${ans.tex()}`)}.`,
+      );
 
       return {
         stem: `Line $L$ passes through the point ${m(`(${x1}, ${y1})`)} and is **${rel}** to the line ${m(given)}. At what value of $y$ does $L$ cross the $y$-axis?`,
         answer,
         answerValue: ans.value(),
         distractors: ds.map((d) => ({ text: d.text, value: d.v.value(), why: d.why })),
+        asking: `What is the height of line $L$ where $x = 0$?`,
         solution,
+        conclusion: `So $L$ is ${m(`y = ${sum([[mNew, 'x'], [ans, '']])}`)}, and putting $x = 0$ into it gives ${answer}.`,
         keyIdea:
           rel === 'parallel'
-            ? 'Parallel lines share the same gradient; then use $y - y_1 = m(x - x_1)$ and set $x = 0$.'
-            : 'Perpendicular gradients are negative reciprocals (product $-1$); then use $y - y_1 = m(x - x_1)$ and set $x = 0$.',
+            ? 'For a parallel line, keep the same gradient $m$. Then put the given point into $y = mx + c$ and solve for $c$, which is where the line crosses the $y$-axis.'
+            : 'For a perpendicular line, flip the gradient and change its sign to get $m$. Then put the given point into $y = mx + c$ and solve for $c$, which is where the line crosses the $y$-axis.',
       };
     },
   },
@@ -192,25 +196,25 @@ export const generators: Generator[] = [
       const ds = pickDistractors(answer, (v) => v === key(h, k), pool, (x, y) => x === y);
 
       const aPart = a === 1 ? '' : a === -1 ? '-' : String(a);
-      const subst =
-        `y = ${aPart}\\left(${h}\\right)^{2}${signed(b)}\\left(${h}\\right)${c === 0 ? '' : signed(c)}` +
-        ` = ${num(a * h * h)}${signed(b * h)}${c === 0 ? '' : signed(c)} = ${num(k)}`;
-      const solution =
-        `Here $a = ${a}$, $b = ${b}$${c === 0 ? '' : `, $c = ${c}$`}.\n\n` +
-        `1. The vertex lies on the axis of symmetry: ${m(`x = -\\frac{b}{2a} = -\\frac{${b}}{2 \\times ${paren(a)}} = ${h}`)}.\n` +
-        `2. Substitute ${m(`x = ${h}`)} (in brackets) to find $y$:\n\n` +
-        `$$${subst}$$\n\n` +
-        `Since ${m(`a = ${a}`)} is ${a > 0 ? 'positive, the parabola opens upwards and the vertex is a **minimum** point' : 'negative, the parabola opens downwards and the vertex is a **maximum** point'}.\n\n` +
-        `Check by completing the square: ${m(`y = ${aPart}\\left(${shifted('x', h)}\\right)^{2}${k === 0 ? '' : signed(k)}`)}.\n\n` +
-        `Answer: ${answer}`;
+      const extreme = a > 0 ? 'lowest' : 'highest';
+      const subst = `y = ${aPart}\\left(${h}\\right)^{2}${signed(b)}\\left(${h}\\right)${c === 0 ? '' : signed(c)}`;
+      const solution = steps(
+        `The **vertex** (turning point) is the ${extreme} point of this parabola, because the number in front of ${m('x^2')} is ${a > 0 ? 'positive' : 'negative'}. For ${m('y = ax^2 + bx + c')}, its $x$-coordinate is ${m('x = -\\frac{b}{2a}')}. Here $a = ${a}$, $b = ${b}$ and $c = ${c}$.`,
+        `Substitute: ${m(`x = -\\frac{${b}}{2 \\times ${paren(a)}} = \\frac{${-b}}{${2 * a}} = ${h}`)}.`,
+        `Put ${m(`x = ${h}`)} into the equation to get the height, with brackets around the number: ${m(subst)}.`,
+        `Do the power first: ${m(`\\left(${h}\\right)^{2} = ${h * h}`)}, so the first term is ${m(`${paren(a)} \\times ${h * h} = ${num(a * h * h)}`)}. The middle term is ${m(`${paren(b)} \\times ${paren(h)} = ${num(b * h)}`)}.`,
+        `Add the parts: ${m(`y = ${num(a * h * h)}${signed(b * h)}${c === 0 ? '' : signed(c)} = ${num(k)}`)}.`,
+      );
 
       return {
         stem: `What are the coordinates of the vertex (turning point) of ${m(`y = ${sum([[a, 'x^{2}'], [b, 'x'], [c, '']])}`)}?`,
         answer,
         answerValue: key(h, k),
         distractors: ds.map((d) => ({ text: d.text, value: d.v, why: d.why })),
+        asking: `What are the $x$ and $y$ coordinates of the ${extreme} point of this curve?`,
         solution,
-        keyIdea: 'The vertex of $y = ax^2 + bx + c$ has $x = -\\frac{b}{2a}$; substitute that $x$ (in brackets) to get $y$.',
+        conclusion: `The turning point has ${m(`x = ${h}`)} and ${m(`y = ${k}`)}, so the vertex is ${answer}.`,
+        keyIdea: 'For the vertex of $y = ax^2 + bx + c$, find $x = -\\frac{b}{2a}$, then substitute that $x$ in brackets to get $y$. If $a > 0$ it is the lowest point. If $a < 0$ it is the highest.',
       };
     },
   },
@@ -318,29 +322,32 @@ export const generators: Generator[] = [
       const ds = pickDistractors(answer, (v) => Math.abs(v - ans.value()) < 1e-9, pool, (x, y) => Math.abs(x - y) < 1e-9);
 
       const multN = num(mult.value());
-      const powVal = num(pow(mult, n).value(), 8);
-      const steps: string[] = [];
+      const remain = up ? 100 + r : 100 - r;
+      const rows: (string | number)[][] = [];
       let cur = new Frac(P);
       for (let i = 1; i <= n; i++) {
         const next = cur.mul(mult);
-        steps.push(`- After ${ctx.period} ${i}: ${m(`${num(cur.value(), 6)} \\times ${multN} = ${num(next.value(), 6)}`)}`);
+        rows.push([i, m(`${num(cur.value(), 6)} \\times ${multN}`), num(next.value(), 6)]);
         cur = next;
       }
-      const solution =
-        `A ${r}% ${up ? 'increase' : 'decrease'} means the amount is multiplied by ${m(`1 ${up ? '+' : '-'} ${num(rate.value())} = ${multN}`)} every ${ctx.period}. ` +
-        `This is exponential ${up ? 'growth' : 'decay'}:\n\n` +
-        `$$A = ${P} \\times ${multN}^{t}$$\n\n` +
-        `Step by step:\n\n${steps.join('\n')}\n\n` +
-        `Or in one go: ${m(`${P} \\times ${multN}^{${n}} = ${P} \\times ${powVal} = ${num(ans.value(), 4)}`)}.\n\n` +
-        `Answer: ${answer}`;
+      const periodCap = ctx.period[0].toUpperCase() + ctx.period.slice(1);
+      const solution = steps(
+        up
+          ? `A ${r}% rise means the new amount is ${remain}% of the old one, since ${m(`100\\% + ${r}\\% = ${remain}\\%`)}. So each ${ctx.period} we multiply by ${m(multN)}. This number is called the **multiplier**.`
+          : `A ${r}% fall means ${remain}% of the amount remains, since ${m(`100\\% - ${r}\\% = ${remain}\\%`)}. So each ${ctx.period} we multiply by ${m(multN)}. This number is called the **multiplier**.`,
+        `Each ${r}% is worked out on the latest amount, not the original one. So we can't just ${up ? 'add' : 'take off'} ${r * n}% in one go.`,
+        `Multiply once for each ${ctx.period}, always starting from the latest amount:\n\n${table([periodCap, 'Working', ctx.money ? 'Value (AED)' : `Amount (${ctx.unit})`], rows)}`,
+      );
 
       return {
         stem: ctx.stem(show(P), r, n),
         answer,
         answerValue: Math.round(ans.value() * 100) / 100,
         distractors: ds.map((d) => ({ text: d.text, value: d.v, why: d.why })),
+        asking: `What do we get if ${show(P)} ${up ? 'grows' : 'falls'} by ${r}% each ${ctx.period} for ${n} ${ctx.period}s?`,
         solution,
-        keyIdea: `A change of $r$% per period multiplies the amount by $\\left(1 \\pm \\frac{r}{100}\\right)$ each period, so after $n$ periods $A = A_0\\left(1 \\pm \\frac{r}{100}\\right)^n$.`,
+        conclusion: `${n} multiplications by ${m(multN)} are the same as ${m(`${P} \\times ${multN}^{${n}}`)}, so the answer is ${answer}.`,
+        keyIdea: 'For repeated percentage change, use $\\text{final} = \\text{start} \\times \\text{multiplier}^{n}$, where $n$ is the number of periods. The multiplier is $1 + \\frac{r}{100}$ for growth of $r$%, and $1 - \\frac{r}{100}$ for decay.',
       };
     },
   },

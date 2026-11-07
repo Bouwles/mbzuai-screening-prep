@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { m, num, paren, power, signed, sum } from '../../../lib/tex';
 
 // A polynomial in x and y as terms [coefficient, power of x, power of y].
@@ -98,20 +99,28 @@ export const generators: Generator[] = [
 
       const fyNumbers = prodTerm(b, p, true) + prodTerm(2 * c, q, false) + (e !== 0 ? signed(e) : '');
       const answer = vecTex(gx, gy);
+      const termRows = [
+        [m(polyTex([[a, 2, 0]])), m(polyTex([[2 * a, 1, 0]])), '$0$'],
+        [m(polyTex([[b, 1, 1]])), m(polyTex([[b, 0, 1]])), m(polyTex([[b, 1, 0]]))],
+        [m(polyTex([[c, 0, 2]])), '$0$', m(polyTex([[2 * c, 0, 1]]))],
+        ...(e !== 0 ? [[m(polyTex([[e, 0, 1]])), '$0$', m(num(e))]] : []),
+      ];
       return {
         stem: `Let ${m(`f(x, y) = ${fTex}`)}. What is the gradient $\\nabla f$ at the point ${m(`(${p}, ${q})`)}?`,
         answer,
         answerValue: vecKey(gx, gy),
         distractors,
-        solution:
-          `**Step 1: partial derivatives.** For $\\frac{\\partial f}{\\partial x}$ treat $y$ as a constant; for $\\frac{\\partial f}{\\partial y}$ treat $x$ as a constant.\n\n` +
-          `- ${m(`\\frac{\\partial f}{\\partial x} = ${fxTex}`)}\n` +
-          `- ${m(`\\frac{\\partial f}{\\partial y} = ${fyTex}`)}\n\n` +
-          `**Step 2: substitute** $x = ${p}$, $y = ${q}$.\n\n` +
-          `- ${m(`\\frac{\\partial f}{\\partial x} = ${prodTerm(2 * a, p, true)}${prodTerm(b, q, false)} = ${num(gx)}`)}\n` +
-          `- ${m(`\\frac{\\partial f}{\\partial y} = ${fyNumbers} = ${num(gy)}`)}\n\n` +
-          `So ${m(`\\nabla f(${p}, ${q}) = \\left(${num(gx)}, ${num(gy)}\\right)`)}.\n\nAnswer: ${answer}`,
-        keyIdea: 'The gradient is the vector of partial derivatives $\\left(f_x, f_y\\right)$: differentiate each way holding the other variable constant, then substitute the point.',
+        asking: `At the point ${m(`(${p}, ${q})`)}, how fast does $f$ change with $x$ alone, and with $y$ alone?`,
+        solution: steps(
+          'The **gradient** $\\nabla f$ is the pair of partial derivatives $\\left(\\frac{\\partial f}{\\partial x}, \\frac{\\partial f}{\\partial y}\\right)$. A **partial derivative** differentiates with one letter while the other stays fixed, like a number.',
+          `Go through each term. A term without your letter is just a fixed number, so it gives 0. A fixed letter that multiplies your letter stays as a multiplier.\n\n` +
+            table(['Term', '$x$ part ($y$ fixed)', '$y$ part ($x$ fixed)'], termRows),
+          `Add up each column: ${m(`\\frac{\\partial f}{\\partial x} = ${fxTex}`)} and ${m(`\\frac{\\partial f}{\\partial y} = ${fyTex}`)}.`,
+          `Substitute $x = ${p}$ and $y = ${q}$ into the first: ${m(`${prodTerm(2 * a, p, true)}${prodTerm(b, q, false)} = ${sum([[2 * a * p, ''], [b * q, '']])} = ${num(gx)}`)}.`,
+          `Substitute them into the second: ${m(`${fyNumbers} = ${sum([[b * p, ''], [2 * c * q, ''], [e, '']])} = ${num(gy)}`)}. Written as a pair, $x$ part first, the gradient is ${answer}.`,
+        ),
+        conclusion: `The $x$ part is ${m(num(gx))} and the $y$ part is ${m(num(gy))}, so the gradient at this point is ${answer}.`,
+        keyIdea: 'Gradient at a point: find each partial derivative with the other variable fixed, substitute the point into both, and write them as a pair, $x$ part first. A mixed term like $xy$ feeds both parts.',
       };
     },
   },
@@ -146,20 +155,25 @@ export const generators: Generator[] = [
         if (chosen.length < 3) continue;
 
         const answer = m(num(ans));
-        const inner = byW ? `the derivative of the inside with respect to ${m('w')} is ${m('x')}` : `the derivative of the inside with respect to ${m('b')} is ${m('1')}`;
-        const formula = byW ? '2(wx + b - y)x' : '2(wx + b - y)';
         const working = byW ? `2 \\times ${paren(e)} \\times ${paren(x)}` : `2 \\times ${paren(e)}`;
         return {
           stem: `For the squared-error loss ${m('L = (wx + b - y)^{2}')} with ${m(`x = ${x}`)}, ${m(`y = ${y}`)}, ${m(`w = ${w}`)} and ${m(`b = ${b}`)}, find ${m(`\\frac{\\partial L}{\\partial ${v}}`)}.`,
           answer,
           answerValue: ans,
           distractors: chosen.map((c) => ({ text: m(num(c.n)), value: c.n, why: c.why })),
-          solution:
-            `Use the chain rule, treating every letter except ${m(v)} as a constant. Since ${inner}:\n\n` +
-            `$$\\frac{\\partial L}{\\partial ${v}} = ${formula}$$\n\n` +
-            `The error is ${m(`wx + b - y = ${paren(w)} \\times ${paren(x)}${signed(b)}${signed(-y)} = ${num(e)}`)}.\n\n` +
-            `So ${m(`\\frac{\\partial L}{\\partial ${v}} = ${working} = ${num(ans)}`)}.\n\nAnswer: ${answer}`,
-          keyIdea: 'For $L = (wx + b - y)^{2}$, the chain rule gives $\\frac{\\partial L}{\\partial w} = 2(\\text{error}) \\times x$ and $\\frac{\\partial L}{\\partial b} = 2(\\text{error})$.',
+          asking: `How fast does the loss change when only ${m(v)} changes?`,
+          solution: steps(
+            `${m('L')} is the square of the error between the prediction ${m('wx + b')} and the true value ${m('y')}. ${m(`\\frac{\\partial L}{\\partial ${v}}`)} asks how ${m('L')} changes when only ${m(v)} changes, so every other letter stays fixed.`,
+            `A squared bracket is a function inside a function, so use the **chain rule**. Call the inside ${m('e = wx + b - y')}, the **error**, so ${m('L = e^{2}')}. The outside, ${m('e^{2}')}, gives ${m('2e')}.`,
+            byW
+              ? `Now differentiate the inside with respect to ${m('w')}. In ${m('wx')}, ${m('x')} is the fixed number multiplying ${m('w')}, so it gives ${m('x')}. ${m('b')} and ${m('y')} are fixed, so they give 0.`
+              : `Now differentiate the inside with respect to ${m('b')}. ${m('wx')} and ${m('y')} are fixed, so they give 0, and ${m('b')} gives 1.`,
+            `Multiply outside by inside: ${m(`\\frac{\\partial L}{\\partial ${v}} = ${byW ? '2e \\times x' : '2e \\times 1 = 2e'}`)}.`,
+            `Work out the error with the given numbers: ${m(`e = ${paren(w)} \\times ${paren(x)}${signed(b)} - ${paren(y)} = ${sum([[w * x, ''], [b, ''], [-y, '']])} = ${num(e)}`)}.`,
+            `Substitute it in: ${m(`${working} = ${num(ans)}`)}.`,
+          ),
+          conclusion: `With an error of ${m(num(e))}, the formula ${m(byW ? '2ex' : '2e')} gives ${answer}.`,
+          keyIdea: 'For $L = (wx + b - y)^{2}$: find the error $e = wx + b - y$ first. Then $\\frac{\\partial L}{\\partial w} = 2ex$ and $\\frac{\\partial L}{\\partial b} = 2e$, because the inside differentiates to $x$ and to 1.',
         };
       }
     },

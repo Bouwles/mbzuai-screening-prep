@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps } from '../../../lib/explanation';
 import { num } from '../../../lib/tex';
 
 type Cand = { value: number; text: string; why: string };
@@ -121,13 +122,13 @@ export const generators: Generator[] = [
       const stem =
         `The chart compares ${ctx.what}: ${nA} ${a}, ${nB} ${b}. Its vertical axis starts at ${yMin}, so ${nB}'s bar looks ${kWord} as tall as ${nA}'s. ` +
         `By what percentage is ${nB}'s value **actually** higher?`;
-      const solution =
-        `Step 1: Read the real values: ${nA} = ${a}, ${nB} = ${b}.\n\n` +
-        `Step 2: Difference: $${b} - ${a} = ${d}$.\n\n` +
-        `Step 3: Divide by the **starting** value (${nA}) and multiply by 100:\n\n` +
-        `$$\\frac{${d}}{${a}} \\times 100 = ${p}\\%$$\n\n` +
-        `Why the chart misleads: above ${yMin} the visible bar heights are $${a} - ${yMin} = ${h}$ and $${b} - ${yMin} = ${h + d}$, so ${nB}'s bar looks $\\frac{${h + d}}{${h}} = ${k}$ times as tall, even though the real difference is only ${p}%.\n\n` +
-        `Answer: ${answer.text}`;
+      const solution = steps(
+        `The bars can mislead here, because the vertical axis starts at ${yMin}, not 0. Above ${yMin}, the visible heights are only $${a} - ${yMin} = ${h}$ and $${b} - ${yMin} = ${h + d}$. That is why ${nB}'s bar looks ${kWord} as tall.`,
+        `So ignore the heights and use the real values: ${nA} is ${a} and ${nB} is ${b}.`,
+        `Find the real difference: $${b} - ${a} = ${d}$.`,
+        `We are comparing ${nB} with ${nA}, so ${nA} is the starting value. Divide by it: $\\frac{${d}}{${a}} = ${num(p / 100)}$.`,
+        `Multiply by 100 to get a percentage: $${num(p / 100)} \\times 100 = ${p}\\%$.`,
+      );
       return {
         stem,
         chart: {
@@ -142,9 +143,11 @@ export const generators: Generator[] = [
         answer: answer.text,
         answerValue: answer.value,
         distractors: distractors.map((x) => ({ text: x.text, value: x.value, why: x.why })),
+        asking: `Using the real values, not the bar heights, how much higher is ${nB} than ${nA} in percent?`,
         solution,
+        conclusion: `${nB} is ${d} above ${nA}'s ${a}, so it is really ${answer.text} higher.`,
         keyIdea:
-          'Ignore the bar heights when the axis is truncated: use the real values, percentage change $= \\frac{\\text{new} - \\text{old}}{\\text{old}} \\times 100$.',
+          'When the axis does not start at 0, ignore the bar heights and read the real values. Percentage higher $= \\frac{\\text{difference}}{\\text{starting value}} \\times 100$, and "higher than X" means X is the starting value.',
       };
     },
   },
@@ -212,13 +215,12 @@ export const generators: Generator[] = [
       ];
       const distractors = pickDistinct(answer, pool);
       const stem = `The table gives the results for two groups of ${ctx.item}. What is the ${ctx.rateWord} for the two groups **combined**?`;
-      const solution =
-        `Step 1: Add the successes: $${k1} + ${k2} = ${K}$.\n\n` +
-        `Step 2: Add the group sizes: $${n1} + ${n2} = ${N}$.\n\n` +
-        `Step 3: Divide and multiply by 100:\n\n` +
-        `$$\\frac{${K}}{${N}} \\times 100 = ${combined}\\%$$\n\n` +
-        `The simple average of ${r1p}% and ${r2p}% would be ${pctText(avg)}, which is wrong here because the bigger group (${n1 > n2 ? g1 : g2}) counts for more.\n\n` +
-        `Answer: ${answer.text}`;
+      const solution = steps(
+        `It is tempting to average $${r1p}\\%$ and $${r2p}\\%$, but that only works if the groups are the same size. Here they have ${n1} and ${n2} ${ctx.item}, so the bigger group must count for more.`,
+        `Instead, treat them as one big group. Add the counts in the "${ctx.success}" column: $${k1} + ${k2} = ${K}$.`,
+        `Add the group sizes to get the total: $${n1} + ${n2} = ${N}$.`,
+        `Divide, then multiply by 100: $\\frac{${K}}{${N}} = ${num(combined / 100)}$, and $${num(combined / 100)} \\times 100 = ${combined}\\%$.`,
+      );
       return {
         stem,
         table: {
@@ -231,8 +233,10 @@ export const generators: Generator[] = [
         answer: answer.text,
         answerValue: answer.value,
         distractors: distractors.map((x) => ({ text: x.text, value: x.value, why: x.why })),
+        asking: `If the two groups are treated as one big group, what is the ${ctx.rateWord}?`,
         solution,
-        keyIdea: 'To combine rates from groups of different sizes, add the counts and divide by the total; never average the percentages.',
+        conclusion: `${K} of the ${N} ${ctx.item} count as successes, so the combined ${ctx.rateWord} is ${answer.text}.`,
+        keyIdea: 'To combine rates from groups of different sizes, add the success counts, add the group sizes, then divide. Never average the percentages. The result always lies between the two rates, closer to the bigger group.',
       };
     },
   },

@@ -28,19 +28,20 @@ export const questions: StaticQuestion[] = [
     options: ['$7$', '$3$', '$14$', '$6$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which value of $x$ fits both equations at the same time?',
       solution:
-        'The $y$ terms are $+y$ and $-y$, so **adding** the two equations makes $y$ disappear:\n\n' +
-        '$$(x + y) + (x - y) = 10 + 4$$\n\n' +
-        '$$2x = 14$$\n\n' +
-        'Divide both sides by 2: $x = 7$.\n\n' +
-        'Check: from $x + y = 10$ we get $y = 3$, and $7 - 3 = 4$, which matches the second equation.',
+        '**Simultaneous equations** must both be true at the same time, for the same $x$ and the same $y$. Our plan is to remove one letter so that only one remains.\n\n' +
+        'The first equation has $+y$ and the second has $-y$. If we add the equations, these cancel, because $y + (-y)$ is nothing.\n\n' +
+        'Add the left sides and the right sides: $(x + y) + (x - y) = 10 + 4$, which gives $2x = 14$.\n\n' +
+        'Divide both sides by 2: $x = 14 \\div 2 = 7$.',
+      conclusion: 'Then $y = 10 - 7 = 3$, and $7 - 3 = 4$ fits the second equation too. So the answer is $7$.',
       whyWrong: [
         null,
         '$3$ is the value of $y$, not $x$. Read the question carefully: it asks for $x$.',
         '$14$ is $2x$. After adding the equations you still have to divide both sides by 2.',
         '$6$ is what you get by **subtracting** the equations: $(x + y) - (x - y) = 2y = 6$. That is $2y$, not $x$.',
       ],
-      keyIdea: 'When one unknown has opposite signs in the two equations, add the equations to eliminate it.',
+      keyIdea: 'Look for a letter with the same number in both equations. If its signs are opposite, add the equations. If its signs match, subtract them. That leaves one letter to solve for.',
     },
     check: { optionValues: [7, 3, 14, 6], compute: () => solve2(1, 1, 10, 1, -1, 4).x.value() },
   },
@@ -52,20 +53,20 @@ export const questions: StaticQuestion[] = [
     options: ['$(2, 3)$', '$(5, 3)$', '$(3, 1)$', '$(1, 3)$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which pair of numbers makes both equations true together?',
       solution:
-        'Add the equations to eliminate $y$:\n\n' +
-        '$$(2x + y) + (x - y) = 7 + 2$$\n\n' +
-        '$$3x = 9 \\quad\\Rightarrow\\quad x = 3$$\n\n' +
-        'Then $y = x - 2 = 1$.\n\n' +
-        'Check $(3, 1)$ in both: $2(3) + 1 = 7$ and $3 - 1 = 2$. Both work.\n\n' +
-        'Exam shortcut: you can also test each option in **both** equations; only $(3, 1)$ passes both tests.',
+        'A pair $(x, y)$ is a solution only if it makes **both** equations true. We can solve directly, then test the result.\n\n' +
+        'One equation has $+y$ and the other has $-y$, so adding them cancels $y$: $(2x + y) + (x - y) = 7 + 2$, which gives $3x = 9$.\n\n' +
+        'Divide both sides by 3: $x = 3$.\n\n' +
+        'Put $x = 3$ into $x - y = 2$: $3 - y = 2$. Subtract 3 from both sides: $-y = -1$, so $y = 1$.',
+      conclusion: 'Testing $(3, 1)$ gives $2 \\times 3 + 1 = 7$ and $3 - 1 = 2$. Both are true, so the answer is $(3, 1)$.',
       whyWrong: [
         '$(2, 3)$ works in the first equation ($4 + 3 = 7$) but not the second: $2 - 3 = -1$, not $2$. A solution must satisfy both equations.',
         '$(5, 3)$ works in the second equation ($5 - 3 = 2$) but not the first: $2(5) + 3 = 13$, not $7$.',
         null,
         '$(1, 3)$ has the right numbers in the wrong order. Check: $2(1) + 3 = 5$, not $7$.',
       ],
-      keyIdea: 'A solution of a system must make every equation true at the same time, so always check both.',
+      keyIdea: 'With pairs to choose from, substitute each pair into both equations. A pair that fits only one equation is wrong. Keep the order straight: the first number is $x$, the second is $y$.',
     },
     check: { optionValues: ['2,3', '5,3', '3,1', '1,3'], compute: () => pairStr(solve2(2, 1, 7, 1, -1, 2)) },
   },
@@ -77,18 +78,19 @@ export const questions: StaticQuestion[] = [
     options: ['Exactly one solution', 'Infinitely many solutions', 'Exactly two solutions', 'No solution'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many pairs $(x, y)$ make both equations true?',
       solution:
-        'Multiply the first equation by 2:\n\n' +
-        '$$4x + 6y = 12$$\n\n' +
-        'But the second equation says $4x + 6y = 15$. The same expression $4x + 6y$ cannot equal both $12$ and $15$, so there is a contradiction: **no solution**.\n\n' +
-        'Graph view: rearranged, the lines are $y = 2 - \\frac{2}{3}x$ and $y = \\frac{5}{2} - \\frac{2}{3}x$. Same gradient $-\\frac{2}{3}$, different $y$-intercepts, so they are parallel and never meet.',
+        'Each equation is a straight line, and a solution is a point on both lines. Compare the left sides: $4x + 6y$ is exactly double $2x + 3y$.\n\n' +
+        'Multiply every term of the first equation by 2: $2(2x + 3y) = 2 \\times 6$, so $4x + 6y = 12$.\n\n' +
+        'But the second equation says $4x + 6y = 15$. The same expression cannot equal both 12 and 15, so no pair of numbers can make both true.',
+      conclusion: 'The lines have the same slope (steepness) but different positions, so they are parallel and never meet. The answer is No solution.',
       whyWrong: [
         'Exactly one solution needs the lines to have different gradients. Here both lines have gradient $-\\frac{2}{3}$, so they are parallel.',
         'Infinitely many solutions would need the second equation to be an exact multiple of the first, i.e. $4x + 6y = 12$. The constant is $15$, so the lines are parallel but different.',
         'Two straight lines can never meet at exactly two points: they meet once, never, or they are the same line.',
         null,
       ],
-      keyIdea: 'If the left-hand sides are multiples of each other but the right-hand sides are not in the same ratio, the lines are parallel and there is no solution.',
+      keyIdea: 'Compare the equations first. If the left sides are multiples of each other, scale one to match. Different constants mean no solution (parallel lines). The same constants mean infinitely many (the same line).',
     },
     check: {
       optionValues: ['one', 'infinite', 'two', 'none'],
@@ -107,16 +109,18 @@ export const questions: StaticQuestion[] = [
     options: ['Exactly one', 'None', 'Exactly two', 'Infinitely many'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many points can two lines with different steepness share?',
       solution:
-        'Each linear equation is a straight line, and a solution is a point on both lines.\n\n' +
-        'Lines with different slopes are not parallel, so they cross at exactly one point.',
+        'A solution of a pair of line equations is a point on both lines. So the number of solutions is the number of crossing points.\n\n' +
+        'Lines with different slopes have different steepness, so they must meet somewhere. Being straight, they meet only once, and after crossing they just move further apart.',
+      conclusion: 'Two straight lines with different slopes cross at one point, so the answer is Exactly one.',
       whyWrong: [
         null,
         'No solution needs parallel lines, and parallel lines have **equal** slopes.',
         'Two different straight lines can never meet at exactly two points.',
         'Infinitely many solutions needs both equations to describe the same line, which would have equal slopes.',
       ],
-      keyIdea: 'Different slopes mean the lines cross once, so there is exactly one solution.',
+      keyIdea: 'Compare slopes (steepness) and intercepts (where each line crosses the $y$-axis). Different slopes: one solution. Same slope with different intercepts: no solution. Same slope with the same intercept: infinitely many.',
     },
   },
   {
@@ -127,16 +131,18 @@ export const questions: StaticQuestion[] = [
     options: ['The point where the lines cross', 'Where each line meets the $y$-axis', 'The slope of each line', 'Where each line meets the $x$-axis'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Where on a graph do you find the $x$ and $y$ that fit both equations?',
       solution:
-        'A solution is a pair $(x, y)$ that makes **both** equations true, so it lies on both lines.\n\n' +
-        'The only point on both lines is the point where they cross.',
+        'Each equation draws a straight line. Every point on a line is a pair $(x, y)$ that makes that equation true.\n\n' +
+        'A solution must make **both** equations true, so its point must lie on both lines. The only such place is where they meet. For example, $y = x$ and $y = 2 - x$ meet at $(1, 1)$, and $(1, 1)$ fits both.',
+      conclusion: 'A point on both lines fits both equations, so the answer is the point where the lines cross.',
       whyWrong: [
         null,
         'A $y$-intercept lies on its own line, but usually not on the other line, so it does not satisfy both equations.',
         'A slope measures how steep a line is. A solution is a pair of values $(x, y)$.',
         'An $x$-intercept lies on its own line, but usually not on the other line, so it does not satisfy both equations.',
       ],
-      keyIdea: 'The solution of two linear equations is the point where their lines cross.',
+      keyIdea: 'Picture each equation as a line. One crossing means one solution, parallel lines mean none, and the same line twice means infinitely many. Read the solution from the crossing point\'s coordinates.',
     },
   },
   {
@@ -147,16 +153,18 @@ export const questions: StaticQuestion[] = [
     options: ['Inconsistent', 'Consistent', 'Dependent', 'Homogeneous'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the name for a set of equations with no solution?',
       solution:
-        'An **inconsistent** system has no solution: its equations contradict each other, as parallel lines do.\n\n' +
-        'For example, $x + y = 1$ and $x + y = 2$ cannot both be true.',
+        'A **system** means a set of equations that must all be true together. If no values can make them all true, they contradict each other.\n\n' +
+        '**Inconsistent** means contradicting. For example, $x + y = 1$ and $x + y = 2$ cannot both be true, so this system has no solution.',
+      conclusion: 'The equations contradict each other, so the word is Inconsistent.',
       whyWrong: [
         null,
         'A consistent system has at least one solution.',
         'A dependent system has one equation that follows from the others, so it has infinitely many solutions in the two-line case.',
         'A homogeneous system has every constant equal to 0, so it always has the solution where all the unknowns are 0.',
       ],
-      keyIdea: 'Inconsistent means no solution; consistent means at least one solution.',
+      keyIdea: 'Match each name to its count. Consistent: at least one solution. Inconsistent: none. Dependent: one equation follows from the others, giving infinitely many. Homogeneous: every constant is 0.',
     },
   },
   {
@@ -167,16 +175,19 @@ export const questions: StaticQuestion[] = [
     options: ['add the equations', 'subtract the equations', 'multiply the equations', 'divide one equation by the other'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What should you do to the two equations to make $y$ disappear?',
       solution:
-        'The $y$ terms are $+3y$ and $-3y$: the same size with opposite signs.\n\n' +
-        'Adding the equations gives $7x = 8$, and $y$ has gone.',
+        '**Eliminate** means remove. Look at the $y$ terms: the first equation has $+3y$ and the second has $-3y$.\n\n' +
+        'These are the same size with opposite signs, so together they make nothing: $3y - 3y$ cancels.\n\n' +
+        'So adding does it: $(2x + 3y) + (5x - 3y) = 7 + 1$ gives $7x = 8$, with no $y$ left.',
+      conclusion: 'Opposite signs cancel when combined, so you should add the equations.',
       whyWrong: [
         null,
         'Subtracting gives $-3x + 6y = 6$, so the $y$ terms double instead of cancelling. Subtract only when the signs are the same.',
         'Multiplying the equations creates terms such as $xy$ and $y^2$, which makes the system harder.',
         'Dividing one equation by the other gives a fraction with both unknowns in it, so $y$ does not disappear.',
       ],
-      keyIdea: 'Opposite signs: add. Same signs: subtract.',
+      keyIdea: 'To eliminate a letter, make its number the same size in both equations, multiplying if needed. Opposite signs: add the equations. Same signs: subtract them.',
     },
   },
   {
@@ -187,16 +198,18 @@ export const questions: StaticQuestion[] = [
     options: ['Infinitely many', 'Exactly one', 'Exactly two', 'None'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many solutions are there when both equations draw the same line?',
       solution:
-        'Every point on the line satisfies both equations, and a line has infinitely many points.\n\n' +
-        'For example, $x + y = 2$ and $2x + 2y = 4$ describe the same line.',
+        'A solution is a point that lies on both lines. If the two equations describe the same line, every point on that line is on both.\n\n' +
+        'For example, $x + y = 2$ and $2x + 2y = 4$ are the same line, because the second is the first doubled. The points $(0, 2)$, $(1, 1)$ and $(2, 0)$ all work, and so does every other point on the line. A line has endless points.',
+      conclusion: 'Every one of the line\'s endless points is a solution, so the answer is Infinitely many.',
       whyWrong: [
         null,
         'Exactly one solution is the case of two lines with different slopes, which cross once.',
         'Two straight lines can never share exactly two points: if they share two, they are the same line.',
         'No solution is the case of parallel lines with different intercepts, which never meet.',
       ],
-      keyIdea: 'The same line means infinitely many solutions; parallel lines mean none; different slopes mean one.',
+      keyIdea: 'If one equation is an exact multiple of the other, including the number on the right, they are the same line and there are infinitely many solutions. Test by scaling one equation to match the other.',
     },
   },
 
@@ -209,21 +222,21 @@ export const questions: StaticQuestion[] = [
     options: ['$(7, 3)$', '$(3, 7)$', '$(3, 6)$', '$\\left(\\frac{17}{5}, \\frac{39}{5}\\right)$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which pair of values for $x$ and $y$ fits both equations?',
       solution:
-        'The first equation already tells us what $y$ is, so substitute $y = 2x + 1$ into the second equation:\n\n' +
-        '$$3x + (2x + 1) = 16$$\n\n' +
-        '$$5x + 1 = 16$$\n\n' +
-        '$$5x = 15$$\n\n' +
-        '$$x = 3$$\n\n' +
-        'Now find $y$ from $y = 2x + 1$: $y = 2(3) + 1 = 7$.\n\n' +
-        'Check in the second equation: $3(3) + 7 = 16$. So the solution is $(3, 7)$.',
+        'The first equation tells us exactly what $y$ is: $y = 2x + 1$. So **substitution** works: wherever we see $y$ in the other equation, we can write $2x + 1$ instead.\n\n' +
+        'Replace $y$ in $3x + y = 16$: $3x + (2x + 1) = 16$. Now there is only one letter.\n\n' +
+        'Collect the $x$ terms: $3x + 2x = 5x$, so $5x + 1 = 16$.\n\n' +
+        'Subtract 1 from both sides: $5x = 15$. Divide both sides by 5: $x = 3$.\n\n' +
+        'Put $x = 3$ back into $y = 2x + 1$: $y = 2 \\times 3 + 1 = 7$.',
+      conclusion: 'In the other equation, $3 \\times 3 + 7 = 16$, which is true. So the answer is $(3, 7)$.',
       whyWrong: [
         'This has $x$ and $y$ the wrong way round. Check it: $y = 2(7) + 1 = 15$, not $3$.',
         null,
         'This forgets the $+1$ when finding $y$: $y = 2(3) + 1 = 7$, not $2(3) = 6$.',
         'This moves the $+1$ across without changing its sign, giving $5x = 16 + 1 = 17$. It should be $5x = 16 - 1 = 15$.',
       ],
-      keyIdea: 'If one equation gives $y$ in terms of $x$, substitute that whole expression (in brackets) into the other equation.',
+      keyIdea: 'If one equation already says what $y$ equals, put that expression in place of $y$ in the other equation. Solve for $x$, then substitute back to get $y$.',
     },
     check: {
       optionValues: ['7,3', '3,7', '3,6', '17/5,39/5'],
@@ -241,21 +254,21 @@ export const questions: StaticQuestion[] = [
     options: ['$2$', '$-3$', '$3$', '$6$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What value of $y$ fits both equations?',
       solution:
-        'The $y$ terms are $+2y$ and $-2y$, so **add** the equations:\n\n' +
-        '$$8x = 16 \\quad\\Rightarrow\\quad x = 2$$\n\n' +
-        'Substitute $x = 2$ into the first equation:\n\n' +
-        '$$3(2) + 2y = 12$$\n\n' +
-        '$$6 + 2y = 12$$\n\n' +
-        '$$2y = 6 \\quad\\Rightarrow\\quad y = 3$$\n\n' +
-        'Check in the second equation: $5(2) - 2(3) = 10 - 6 = 4$.',
+        'The $y$ terms are $+2y$ and $-2y$: the same size, with opposite signs. Adding the equations cancels them, leaving only $x$.\n\n' +
+        'Add the left sides and the right sides: $(3x + 2y) + (5x - 2y) = 12 + 4$, which gives $8x = 16$.\n\n' +
+        'Divide both sides by 8: $x = 2$. But the question asks for $y$, so we are not finished.\n\n' +
+        'Put $x = 2$ into the first equation: $3 \\times 2 + 2y = 12$, so $6 + 2y = 12$.\n\n' +
+        'Subtract 6 from both sides: $2y = 6$. Divide both sides by 2: $y = 3$.',
+      conclusion: 'In the second equation, $5 \\times 2 - 2 \\times 3 = 4$, which is true. So the answer is $3$.',
       whyWrong: [
         '$2$ is the value of $x$; the question asks for $y$.',
         'Sign slip when finding $y$ from the second equation: $5(2) - 2y = 4$ gives $-2y = -6$, and a negative divided by a negative is **positive**, so $y = 3$, not $-3$. (Checking $y = -3$ in the first equation gives $6 - 6 = 0$, not $12$.)',
         null,
         '$6$ is $2y$. Divide by 2 to get $y = 3$.',
       ],
-      keyIdea: 'Same sign: subtract the equations. Different signs: add them.',
+      keyIdea: 'When a letter has the same size with opposite signs, add the equations to remove it. Solve for the other letter, then substitute back. Note which letter the question asks for.',
     },
     check: { optionValues: [2, -3, 3, 6], compute: () => solve2(3, 2, 12, 5, -2, 4).y.value() },
   },
@@ -267,22 +280,22 @@ export const questions: StaticQuestion[] = [
     options: ['$(2, 1)$', '$(2, -1)$', '$\\left(\\frac{18}{11}, -\\frac{5}{11}\\right)$', '$(-1, 2)$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which pair $(x, y)$ fits both equations?',
       solution:
-        'Make the $y$ coefficients match: multiply **every term** of the first equation by 2.\n\n' +
-        '$$6x + 4y = 8$$\n\n' +
-        'Now the $y$ terms are $+4y$ and $-4y$, so add this to the second equation:\n\n' +
-        '$$(6x + 4y) + (5x - 4y) = 8 + 14$$\n\n' +
-        '$$11x = 22 \\quad\\Rightarrow\\quad x = 2$$\n\n' +
-        'Substitute into $3x + 2y = 4$:\n\n' +
-        '$$6 + 2y = 4 \\quad\\Rightarrow\\quad 2y = -2 \\quad\\Rightarrow\\quad y = -1$$\n\n' +
-        'Check in the second equation: $5(2) - 4(-1) = 10 + 4 = 14$. So $(x, y) = (2, -1)$.',
+        'We want one letter to cancel when we add. The $y$ terms are $+2y$ and $-4y$. If the first were $+4y$, they would be the same size with opposite signs.\n\n' +
+        'So multiply every term of the first equation by 2, including the number on the right: $6x + 4y = 8$.\n\n' +
+        'Add this to the second equation: $(6x + 4y) + (5x - 4y) = 8 + 14$, which gives $11x = 22$.\n\n' +
+        'Divide both sides by 11: $x = 2$.\n\n' +
+        'Put $x = 2$ into the first equation: $3 \\times 2 + 2y = 4$, so $6 + 2y = 4$.\n\n' +
+        'Subtract 6 from both sides: $2y = -2$. Divide both sides by 2: $y = -1$.',
+      conclusion: 'In the second equation, $5 \\times 2 - 4 \\times (-1) = 10 + 4 = 14$, which is true. So the answer is $(2, -1)$.',
       whyWrong: [
         'Sign slip in the last step: $6 + 2y = 4$ gives $2y = 4 - 6 = -2$, not $+2$. Checking $(2, 1)$ in the second equation gives $10 - 4 = 6$, not $14$.',
         null,
         'This multiplies only the left side of the first equation by 2, writing $6x + 4y = 4$. Then $11x = 18$. You must multiply **every** term, including the constant: $6x + 4y = 8$.',
         'These are the right numbers in the wrong order. Check: $3(-1) + 2(2) = 1$, not $4$.',
       ],
-      keyIdea: 'Scale one equation (every term, including the constant) so that one unknown has matching coefficients, then add or subtract.',
+      keyIdea: 'When no letter cancels straight away, multiply one equation (every term) so one letter has the same size in both. Add if the signs are opposite, subtract if they match, then substitute back.',
     },
     check: { optionValues: ['2,1', '2,-1', '18/11,-5/11', '-1,2'], compute: () => pairStr(solve2(3, 2, 4, 5, -4, 14)) },
   },
@@ -294,19 +307,20 @@ export const questions: StaticQuestion[] = [
     options: ['$4$', '$30$', '$6$', '$5$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What do $x$ and $y$ add up to?',
       solution:
-        'You do not need $x$ and $y$ separately. **Add** the two equations:\n\n' +
-        '$$(3x + 2y) + (2x + 3y) = 17 + 13$$\n\n' +
-        '$$5x + 5y = 30$$\n\n' +
-        'Divide by 5: $x + y = 6$.\n\n' +
-        '(Full solution, if you want it: subtracting the equations gives $x - y = 4$; together with $x + y = 6$ this gives $x = 5$, $y = 1$. Check: $15 + 2 = 17$ and $10 + 3 = 13$, and $5 + 1 = 6$.)',
+        'The question wants $x + y$, not $x$ and $y$ separately. Look at the numbers: in front of $x$ they are 3 and 2, and in front of $y$ they are 2 and 3. They swap, which suggests adding.\n\n' +
+        'Add the two equations: $(3x + 2y) + (2x + 3y) = 17 + 13$. This gives $5x + 5y = 30$.\n\n' +
+        'Both terms on the left have a 5, so take it out: $5(x + y) = 30$.\n\n' +
+        'Divide both sides by 5: $x + y = 30 \\div 5 = 6$.',
+      conclusion: 'Adding made $x + y$ appear directly, with no need to find $x$ or $y$ alone. So the answer is $6$.',
       whyWrong: [
         '$4$ is $x - y$, which you get by **subtracting** the equations. The question asks for $x + y$.',
         '$30$ is $5x + 5y = 5(x + y)$. You still need to divide by 5.',
         null,
         '$5$ is the value of $x$ alone; the question asks for $x + y = 5 + 1$.',
       ],
-      keyIdea: 'When the coefficients are "swapped" between the equations, adding (or subtracting) them gives $x + y$ (or $x - y$) directly.',
+      keyIdea: 'If asked for a combination such as $x + y$, try adding or subtracting the equations before solving. Numbers that swap between the equations, such as 3, 2 and 2, 3, are a strong sign this shortcut works.',
     },
     check: {
       optionValues: [4, 30, 6, 5],
@@ -324,22 +338,21 @@ export const questions: StaticQuestion[] = [
     options: ['$4$', '$3$', '$17$', '$1$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many of the 7 tickets were adult tickets?',
       solution:
-        'Let $a$ = number of adult tickets and $c$ = number of child tickets.\n\n' +
-        '- Number of tickets: $a + c = 7$\n' +
-        '- Total cost: $45a + 30c = 255$\n\n' +
-        'From the first equation, $c = 7 - a$. Substitute into the second:\n\n' +
-        '$$45a + 30(7 - a) = 255$$\n\n' +
-        '$$45a + 210 - 30a = 255$$\n\n' +
-        '$$15a = 45 \\quad\\Rightarrow\\quad a = 3$$\n\n' +
-        'So $c = 4$. Check: $45(3) + 30(4) = 135 + 120 = 255$.',
+        'Use letters for what we do not know. Let $a$ be the number of adult tickets and $c$ the number of child tickets.\n\n' +
+        'Two facts give two equations. There are 7 tickets: $a + c = 7$. The cost is 45 per adult plus 30 per child: $45a + 30c = 255$.\n\n' +
+        'From the first equation, $c = 7 - a$. Put this into the second equation: $45a + 30(7 - a) = 255$.\n\n' +
+        'Expand the bracket: $30 \\times 7 = 210$ and $30 \\times (-a) = -30a$. So $45a + 210 - 30a = 255$, which simplifies to $15a + 210 = 255$.\n\n' +
+        'Subtract 210 from both sides: $15a = 45$. Divide both sides by 15: $a = 3$.',
+      conclusion: '3 adult tickets cost AED 135 and 4 child tickets cost AED 120, which totals AED 255. So the answer is $3$.',
       whyWrong: [
         '$4$ is the number of **child** tickets. The question asks for adult tickets.',
         null,
         'This drops the $210$ when expanding $30(7 - a)$, giving $15a = 255$ and $a = 17$, which is impossible as only 7 tickets were bought.',
         'This divides the extra AED 45 by the adult price (45) instead of by the price **difference** $45 - 30 = 15$. Each swap from child to adult adds only AED 15.',
       ],
-      keyIdea: 'Turn each sentence of a word problem into one equation (count and total value), then solve the pair.',
+      keyIdea: 'In "two prices, total count, total cost" problems: write one equation for the count and one for the cost. Rewrite one letter using the count equation, substitute it into the cost equation, and solve.',
     },
     check: {
       optionValues: [4, 3, 17, 1],
@@ -357,21 +370,21 @@ export const questions: StaticQuestion[] = [
     options: ['$(1, 2)$ and $(3, 4)$', '$(1, 0)$ and $(3, 0)$', '$(-1, 0)$ and $(-3, -2)$', 'They do not meet'],
     correctIndex: 0,
     markScheme: {
+      asking: 'At which points are the line and the curve in the same place?',
       solution:
-        'At a meeting point both $y$ values are equal, so set the right-hand sides equal:\n\n' +
-        '$$x^2 - 3x + 4 = x + 1$$\n\n' +
-        'Bring everything to one side (subtract $x$ and subtract 1):\n\n' +
-        '$$x^2 - 4x + 3 = 0$$\n\n' +
-        'Factorise: $(x - 1)(x - 3) = 0$, so $x = 1$ or $x = 3$.\n\n' +
-        'Find each $y$ from the line $y = x + 1$: $x = 1$ gives $y = 2$, and $x = 3$ gives $y = 4$.\n\n' +
-        'Check in the curve: $1 - 3 + 4 = 2$ and $9 - 9 + 4 = 4$. The points are $(1, 2)$ and $(3, 4)$.',
+        'Where the line and curve meet, they share the same $x$ and the same $y$. Both equations start with $y =$, so set their right sides equal: $x^2 - 3x + 4 = x + 1$.\n\n' +
+        'This has an $x^2$, so it is a quadratic. Get 0 on one side by subtracting $x$ and subtracting 1 from both sides: $x^2 - 4x + 3 = 0$.\n\n' +
+        'Factorise. We need two numbers that multiply to 3 and add to $-4$. They are $-1$ and $-3$, so $(x - 1)(x - 3) = 0$.\n\n' +
+        'If two brackets multiply to 0, one of them is 0. So $x = 1$ or $x = 3$.\n\n' +
+        'Each point needs a $y$ too. Use the simpler equation, $y = x + 1$. When $x = 1$, $y = 2$. When $x = 3$, $y = 4$.',
+      conclusion: 'Both fit the curve as well: $1 - 3 + 4 = 2$ and $9 - 9 + 4 = 4$. So the answer is $(1, 2)$ and $(3, 4)$.',
       whyWrong: [
         null,
         'These use the correct $x$ values but put $y = 0$. Those are where $x^2 - 4x + 3$ crosses the $x$-axis, not where the line meets the curve; substitute back to find $y$.',
         'Sign error when reading the roots: $(x - 1)(x - 3) = 0$ gives $x = 1$ and $x = 3$, not $-1$ and $-3$.',
         'This comes from a sign slip when moving $x$ across, giving $x^2 - 2x + 3 = 0$, whose discriminant $4 - 12$ is negative. The correct equation $x^2 - 4x + 3 = 0$ has two real roots.',
       ],
-      keyIdea: 'For a line and a curve, substitute the line into the curve to get a quadratic, solve it, then find each $y$ from the line.',
+      keyIdea: 'To find where a line meets a curve, set the two expressions for $y$ equal. Make a quadratic equal to 0 and solve it. Put each $x$ into the line to get its $y$.',
     },
     check: {
       optionValues: ['1,2;3,4', '1,0;3,0', '-1,0;-3,-2', 'none'],
@@ -394,22 +407,22 @@ export const questions: StaticQuestion[] = [
     options: ['$(3, 3, 0)$', '$(1, 2, 3)$', '$(4, 0, 2)$', '$(2, -1, -2)$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which set of three numbers makes all three equations true?',
       solution:
-        'Eliminate $z$ twice, then solve the 2 by 2 system that is left.\n\n' +
-        '- First + third: $(x + y + z) + (x + 2y - z) = 6 + 2$, so $2x + 3y = 8$.\n' +
-        '- Second + third: $(2x - y + z) + (x + 2y - z) = 3 + 2$, so $3x + y = 5$.\n\n' +
-        'From $3x + y = 5$: $y = 5 - 3x$. Substitute into $2x + 3y = 8$:\n\n' +
-        '$$2x + 3(5 - 3x) = 8 \\quad\\Rightarrow\\quad 2x + 15 - 9x = 8 \\quad\\Rightarrow\\quad -7x = -7 \\quad\\Rightarrow\\quad x = 1$$\n\n' +
-        'Then $y = 5 - 3 = 2$ and $z = 6 - 1 - 2 = 3$.\n\n' +
-        'Check all three: $1 + 2 + 3 = 6$, $2 - 2 + 3 = 3$, $1 + 4 - 3 = 2$.\n\n' +
-        'Exam shortcut: substitute each option into **all three** equations; every wrong option fails one of them.',
+        'With three unknowns, remove one letter to leave two equations in two letters. Look at $z$: the first equation has $+z$ and the third has $-z$, so adding them removes it.\n\n' +
+        'Add the first and third: $(x + y + z) + (x + 2y - z) = 6 + 2$, which gives $2x + 3y = 8$.\n\n' +
+        'Add the second and third too, as the second also has $+z$: $(2x - y + z) + (x + 2y - z) = 3 + 2$, which gives $3x + y = 5$.\n\n' +
+        'From $3x + y = 5$ we get $y = 5 - 3x$. Substitute into $2x + 3y = 8$: $2x + 3(5 - 3x) = 8$, so $2x + 15 - 9x = 8$, so $-7x = -7$, and $x = 1$.\n\n' +
+        'Then $y = 5 - 3 \\times 1 = 2$.\n\n' +
+        'Put $x = 1$ and $y = 2$ into the first equation: $1 + 2 + z = 6$, so $z = 3$.',
+      conclusion: 'The second and third equations also work: $2 - 2 + 3 = 3$ and $1 + 4 - 3 = 2$. So the answer is $(1, 2, 3)$.',
       whyWrong: [
         '$(3, 3, 0)$ satisfies the first two equations but fails the third: with $z = 0$ it gives $3 + 2(3) = 9$, not $2$. You must check every equation.',
         null,
         '$(4, 0, 2)$ satisfies the first and third equations but fails the second: with $y = 0$ it gives $2(4) + 2 = 10$, not $3$.',
         '$(2, -1, -2)$ satisfies the second and third equations but fails the first: $2 - 1 - 2 = -1$, not $6$.',
       ],
-      keyIdea: 'With three unknowns, eliminate the same variable from two different pairs of equations to get a 2 by 2 system, and always check the answer in all three.',
+      keyIdea: 'With three unknowns and answer choices, substituting each choice into all three equations is often quickest. To solve from scratch, use pairs of equations to remove the same letter, then solve the two left.',
     },
     check: {
       optionValues: ['3,3,0', '1,2,3', '4,0,2', '2,-1,-2'],
@@ -432,19 +445,19 @@ export const questions: StaticQuestion[] = [
     options: ['$9$', '$-4$', '$4$', '$6$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which $k$ makes the two lines parallel, so that they never meet?',
       solution:
-        'There is no solution when the lines are parallel, i.e. when the $x$ and $y$ coefficients are in the same ratio.\n\n' +
-        'Set the two ratios equal, comparing $x$-coefficients with each other and $y$-coefficients with each other:\n\n' +
-        '$$\\frac{2}{3} = \\frac{k}{6} \\quad\\Rightarrow\\quad 3k = 12 \\quad\\Rightarrow\\quad k = 4$$\n\n' +
-        '(Equivalently, the determinant $2 \\times 6 - 3k$ must be $0$.)\n\n' +
-        'Check the constants: with $k = 4$, multiplying the first equation by $\\frac{3}{2}$ gives $3x + 6y = 6$, but the second equation says $3x + 6y = 7$. Contradiction, so there is no solution (not infinitely many).',
+        'Each equation is a straight line. No solution means the lines never meet, so they must be **parallel**. For parallel lines, the numbers in front of $x$ and $y$ must be in the same ratio.\n\n' +
+        'Match them up. The $x$ numbers are 2 and 3. The $y$ numbers are $k$ and 6. So $\\frac{2}{3} = \\frac{k}{6}$.\n\n' +
+        'Multiply both sides by 6 to find $k$: $k = \\frac{2}{3} \\times 6 = 4$.',
+      conclusion: 'With $k = 4$, multiplying the first equation by $\\frac{3}{2}$ gives $3x + 6y = 6$, but the second says $3x + 6y = 7$. They contradict, so the answer is $4$.',
       whyWrong: [
         'This sets the ratio up upside down: $\\frac{2}{3} = \\frac{6}{k}$ gives $k = 9$. Compare $x$-coefficient with $x$-coefficient and $y$ with $y$, in the same order: $\\frac{2}{3} = \\frac{k}{6}$.',
         'Sign error: the determinant condition is $12 - 3k = 0$, so $k = 4$. Writing $12 + 3k = 0$ gives $-4$.',
         null,
         'This just copies the $y$-coefficient of the second equation. The $x$-coefficients are $2$ and $3$, so the $y$-coefficients must be in the same ratio: $4$ and $6$.',
       ],
-      keyIdea: 'Two linear equations have no unique solution exactly when $ae - bd = 0$; then check the constants to decide between none and infinitely many.',
+      keyIdea: 'For no solution, the $x$ and $y$ numbers must be in the same ratio, but the constants must not be. Write the ratio with the same order on both sides, solve, then compare the constants.',
     },
     check: {
       optionValues: [9, -4, 4, 6],
@@ -464,21 +477,21 @@ export const questions: StaticQuestion[] = [
     options: ['AED 5', 'AED 8', 'AED 6', 'AED 3'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is the price of a single notebook?',
       solution:
-        'Let $p$ = price of a pen and $n$ = price of a notebook (in AED).\n\n' +
-        '$$3p + 2n = 21$$\n\n' +
-        '$$5p + 4n = 37$$\n\n' +
-        'Double the first equation so the $n$ terms match: $6p + 4n = 42$.\n\n' +
-        'Subtract the second equation: $(6p + 4n) - (5p + 4n) = 42 - 37$, so $p = 5$.\n\n' +
-        'Substitute into $3p + 2n = 21$: $15 + 2n = 21$, so $2n = 6$ and $n = 3$.\n\n' +
-        'Check: $5(5) + 4(3) = 25 + 12 = 37$. One notebook costs AED 3.',
+        'Let $p$ be the price of a pen and $n$ the price of a notebook, in AED. The two facts give $3p + 2n = 21$ and $5p + 4n = 37$.\n\n' +
+        'Make the notebook terms match. Doubling the first equation gives $4n$, the same as the second: $2 \\times (3p + 2n) = 2 \\times 21$, so $6p + 4n = 42$.\n\n' +
+        'Both now have $+4n$, so subtracting cancels them. Take the second from the doubled one: $(6p + 4n) - (5p + 4n) = 42 - 37$, which gives $p = 5$. So a pen costs AED 5.\n\n' +
+        'Put $p = 5$ into the first equation: $3 \\times 5 + 2n = 21$, so $15 + 2n = 21$.\n\n' +
+        'Subtract 15 from both sides: $2n = 6$. Divide both sides by 2: $n = 3$.',
+      conclusion: '5 pens and 4 notebooks then cost $25 + 12 = 37$, which is right. So one notebook costs AED 3.',
       whyWrong: [
         'AED 5 is the price of a **pen**, not a notebook.',
         'This subtracts the equations without scaling first: $(5p + 4n) - (3p + 2n) = 2p + 2n = 16$, so $p + n = 8$. That is the price of one pen **plus** one notebook.',
         'AED 6 is $2n$, the price of two notebooks. Divide by 2.',
         null,
       ],
-      keyIdea: 'Scale an equation so one unknown has the same coefficient in both, then subtract to eliminate it.',
+      keyIdea: 'Turn each sentence into an equation, using a letter for each price. Multiply one equation so that one letter matches, subtract to remove it, then substitute back.',
     },
     check: { optionValues: [5, 8, 6, 3], compute: () => solve2(3, 2, 21, 5, 4, 37).y.value() },
   },
@@ -490,20 +503,20 @@ export const questions: StaticQuestion[] = [
     options: ['$c = 10$', '$c = 5$', '$c = 20$', 'Any value of $c$ except $5$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What must $c$ be for both equations to describe the same line?',
       solution:
-        'Divide the second equation by 2:\n\n' +
-        '$$3x - y = 5$$\n\n' +
-        'This has exactly the same left-hand side as the first equation $3x - y = c$.\n\n' +
-        '- If $c = 5$, the two equations describe the **same line**, so every point on it is a solution: infinitely many solutions.\n' +
-        '- If $c \\ne 5$, the lines are parallel and distinct: no solution.\n\n' +
-        'So $c = 5$.',
+        'Two equations have **infinitely many** solutions when they describe the same line. Then every point on that line fits both.\n\n' +
+        'Compare the left sides. $6x - 2y$ is exactly twice $3x - y$, because $2 \\times 3x = 6x$ and $2 \\times (-y) = -2y$.\n\n' +
+        'So the right side must also double. Doubling the first equation gives $6x - 2y = 2c$, and this must match $6x - 2y = 10$. So $2c = 10$.\n\n' +
+        'Divide both sides by 2: $c = 5$.',
+      conclusion: 'With $c = 5$, the second equation is just the first doubled, so they are the same line. The answer is $c = 5$.',
       whyWrong: [
         'This copies the constant without scaling. The second equation is **twice** the first, so its constant $10$ must be twice $c$.',
         null,
         'This doubles $10$ instead of halving it. The second equation is twice the first, so its constant is twice $c$: $2c = 10$, which gives $c = 5$, not $2 \\times 10 = 20$.',
         'This is the condition for **no** solution: when $c \\ne 5$ the lines are parallel but different, so they never meet.',
       ],
-      keyIdea: 'Infinitely many solutions means one equation is an exact multiple of the other, constants included.',
+      keyIdea: 'For infinitely many solutions, one whole equation must be a multiple of the other, including the constant. Find the multiplier from the $x$ or $y$ terms, then apply it to the constant.',
     },
     check: {
       optionValues: [10, 5, 20, null],
@@ -521,22 +534,22 @@ export const questions: StaticQuestion[] = [
     options: ['$5$', '$2$', '$-5$', '$3$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What must $k$ be for the line to touch the curve at just one point?',
       solution:
-        'Set the two expressions for $y$ equal:\n\n' +
-        '$$x^2 + 4x + 6 = 2x + k$$\n\n' +
-        'Bring everything to one side:\n\n' +
-        '$$x^2 + 2x + (6 - k) = 0$$\n\n' +
-        'Exactly one meeting point means this quadratic has exactly one (repeated) root, so the discriminant is zero:\n\n' +
-        '$$b^2 - 4ac = 2^2 - 4(1)(6 - k) = 0$$\n\n' +
-        '$$4 - 24 + 4k = 0 \\quad\\Rightarrow\\quad 4k = 20 \\quad\\Rightarrow\\quad k = 5$$\n\n' +
-        'Check: with $k = 5$ the quadratic is $x^2 + 2x + 1 = (x + 1)^2 = 0$, so $x = -1$ and $y = 2(-1) + 5 = 3$. The curve gives $1 - 4 + 6 = 3$ too: one touching point $(-1, 3)$.',
+        'Where the line and curve meet, their $y$ values are equal: $2x + k = x^2 + 4x + 6$.\n\n' +
+        'Get 0 on one side to make a quadratic. Subtract $2x$ and subtract $k$ from both sides: $0 = x^2 + 2x + 6 - k$.\n\n' +
+        'Each solution of this quadratic is a meeting point. One meeting point means exactly one solution. That happens when the **discriminant**, $b^2 - 4ac$, equals 0. It is the part under the root in the quadratic formula, $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$, so when it is 0, adding or subtracting the root changes nothing and only one value of $x$ comes out.\n\n' +
+        'Read the numbers from $x^2 + 2x + (6 - k) = 0$: $a = 1$, $b = 2$, and $c = 6 - k$, which is everything without an $x$.\n\n' +
+        'Set the discriminant to 0: $2^2 - 4 \\times 1 \\times (6 - k) = 0$, so $4 - 24 + 4k = 0$, so $4k - 20 = 0$.\n\n' +
+        'Add 20 to both sides: $4k = 20$. Divide both sides by 4: $k = 5$.',
+      conclusion: 'With $k = 5$ the quadratic is $x^2 + 2x + 1 = (x + 1)^2 = 0$, which has just one solution. So the answer is $5$.',
       whyWrong: [
         null,
         'This forgets to subtract the $2x$ from the line, using $b = 4$: $16 - 4(6 - k) = 0$ gives $k = 2$. After moving $2x$ across, $b = 4 - 2 = 2$.',
         'Sign error when moving $k$ across: writing $x^2 + 2x + 6 + k = 0$ gives $4 - 4(6 + k) = 0$ and $k = -5$. Subtracting $k$ from both sides gives $6 - k$.',
         '$3$ is the $y$-coordinate of the touching point $(-1, 3)$, not the value of $k$.',
       ],
-      keyIdea: 'A line touches a curve (one meeting point) exactly when the quadratic you get after substituting has discriminant $0$.',
+      keyIdea: 'When a line meets a curve at exactly one point (it touches), set the expressions equal, make a quadratic equal to 0, then set $b^2 - 4ac = 0$ and solve for the unknown.',
     },
     check: {
       optionValues: [5, 2, -5, 3],
@@ -555,20 +568,20 @@ export const questions: StaticQuestion[] = [
     options: ['$23$ kg', '$30$ kg', '$7$ kg', '$6$ kg'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How heavy is box B by itself?',
       solution:
-        'Let the weights be $a$, $b$ and $c$ (in kg):\n\n' +
-        '$$a + b = 13, \\quad b + c = 17, \\quad a + c = 16$$\n\n' +
-        'Add all three equations: each letter appears twice, so\n\n' +
-        '$$2a + 2b + 2c = 46 \\quad\\Rightarrow\\quad a + b + c = 23$$\n\n' +
-        'Box B is the total minus A and C: $b = 23 - (a + c) = 23 - 16 = 7$.\n\n' +
-        '(Also $a = 23 - 17 = 6$ and $c = 23 - 13 = 10$. Check: $6 + 7 = 13$, $7 + 10 = 17$, $6 + 10 = 16$.) Box B weighs 7 kg.',
+        'Let $a$, $b$ and $c$ be the weights of boxes A, B and C in kg. The facts are $a + b = 13$, $b + c = 17$ and $a + c = 16$.\n\n' +
+        'Each box appears in exactly two equations, so adding all three counts each box twice: $(a + b) + (b + c) + (a + c) = 13 + 17 + 16$. This gives $2a + 2b + 2c = 46$.\n\n' +
+        'Divide both sides by 2 to get the weight of all three: $a + b + c = 23$.\n\n' +
+        'We know A and C together are 16. Taking those away from the total leaves B alone: $b = 23 - 16 = 7$.',
+      conclusion: 'Then $a = 13 - 7 = 6$ and $c = 17 - 7 = 10$, and those add to 16 as stated. So the answer is $7$ kg.',
       whyWrong: [
         '$23$ kg is the total weight of all three boxes, $a + b + c$, not box B on its own.',
         'This forgets to halve: adding the three equations gives $2(a + b + c) = 46$, so the total is $23$, not $46$. Then $46 - 16 = 30$.',
         null,
         '$6$ kg is box A: it comes from subtracting the B and C pair ($23 - 17$) instead of the A and C pair.',
       ],
-      keyIdea: 'In a symmetric system, adding all the equations often gives the total at once; then subtract a pair to find each unknown.',
+      keyIdea: 'When equations give sums of pairs, add them all. Each unknown appears the same number of times, so you can find the total. Subtract the pair that leaves out the unknown you want.',
     },
     check: {
       optionValues: [23, 30, 7, 6],

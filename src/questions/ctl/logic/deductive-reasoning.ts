@@ -119,25 +119,20 @@ Which conclusion follows **logically** from these two statements?`,
     ],
     correctIndex: 1,
     markScheme: {
-      solution: `Statement 1 has the shape "If $P$, then $Q$" with
-
-- $P$: the number is divisible by 6 (the **if** part, called the *antecedent*)
-- $Q$: the number is divisible by 3 (the **then** part, called the *consequent*)
-
-Statement 2 tells us that $P$ is true for the number 84.
-
-A rule "if $P$ then $Q$" promises that **whenever** $P$ happens, $Q$ happens too. So for 84, $Q$ must be true: 84 is divisible by 3.
-
-This pattern ("If $P$ then $Q$. $P$. Therefore $Q$.") is called **modus ponens**, and it is always valid.
-
-Quick check: $84 \\div 3 = 28$, a whole number.`,
+      asking: 'Using only the two statements, what do we now know for certain about 84?',
+      solution:
+        'Statement 1 is an if-then rule. The "if" part is the condition: divisible by 6, meaning it divides by 6 with nothing left over. The "then" part is what the rule promises: divisible by 3.\n\n' +
+        'An if-then rule says: whenever the "if" part is true, the "then" part must be true as well.\n\n' +
+        'Statement 2 says that 84 is divisible by 6. So 84 meets the "if" part of the rule.\n\n' +
+        'So the rule applies to 84, and its "then" part must be true: 84 is divisible by 3. You can confirm this: $84 \\div 3 = 28$.',
+      conclusion: 'The rule\'s condition is met, so its promise holds, which gives exactly: 84 is divisible by 3.',
       whyWrong: [
         `This is the **converse** of statement 1 (the two parts swapped). The converse is not implied, and here it is actually false: 9 is divisible by 3 but not by 6.`,
         null,
         `This contradicts statement 1. Since 84 meets the "if" part (divisible by 6), the rule forces the "then" part (divisible by 3) to be true.`,
         `A general "if-then" rule applies to **every** case that meets its condition. Applying it to one particular number (84) is exactly what modus ponens does.`,
       ],
-      keyIdea: `Modus ponens: from "If $P$ then $Q$" and "$P$", you may conclude "$Q$".`,
+      keyIdea: 'Spot a rule plus a fact that matches its "if" part. Then the "then" part must be true. This pattern is called modus ponens: if $P$ then $Q$; $P$ is true; so $Q$ is true.',
     },
   },
   {
@@ -153,24 +148,20 @@ Quick check: $84 \\div 3 = 28$, a whole number.`,
     ],
     correctIndex: 2,
     markScheme: {
-      solution: `Write the rule as "If $P$, then $Q$" with $P$ = "is a square" and $Q$ = "has four sides". There are three related statements:
-
-| Name | Form | This example |
-| --- | --- | --- |
-| Converse | If $Q$ then $P$ | If four sides, then square |
-| Inverse | If not $P$ then not $Q$ | If not a square, then not four sides |
-| Contrapositive | If not $Q$ then not $P$ | If not four sides, then not a square |
-
-Only the **contrapositive** always has the same truth value as the original. Think of it this way: every square has four sides, so if a shape does **not** have four sides it cannot possibly be a square.
-
-The converse and the inverse can both fail here: a rectangle has four sides but is not a square.`,
+      asking: 'Which sentence says exactly the same thing as the rule about squares?',
+      solution:
+        'Call the two parts $P$ = "it is a square" and $Q$ = "it has four sides". The rule is "If $P$ then $Q$".\n\n' +
+        '**Logically equivalent** means the two statements are true in exactly the same situations. They say the same thing in different words.\n\n' +
+        'Think about a shape that does not have four sides, such as a triangle. Could it be a square? No, because the rule would then give it four sides.\n\n' +
+        'So if $Q$ is false, $P$ must be false too. That means we swap the two parts and make both negative: "If a shape does not have four sides, then it is not a square." This form is called the **contrapositive**.',
+      conclusion: 'Swapping the parts and negating both keeps the meaning, so the equivalent statement is: If a shape does not have four sides, then it is not a square.',
       whyWrong: [
         `This is the **converse** (the two parts swapped). It is false: a rectangle has four sides but is not a square.`,
         `This is the **inverse** (both parts negated, order kept). It is false: a rectangle is not a square but still has four sides.`,
         null,
         `This is the **negation** of the original rule: it says the rule is broken. A negation always has the opposite truth value, so it can never be equivalent.`,
       ],
-      keyIdea: `"If $P$ then $Q$" is equivalent to its contrapositive "If not $Q$ then not $P$", but not to its converse or inverse.`,
+      keyIdea: 'For "If $P$ then $Q$", the form that always means the same is the contrapositive: "If not $Q$ then not $P$" (swap the parts and negate both). Swapping alone or negating alone can change the meaning, so test those with an example like a rectangle.',
     },
     check: {
       optionValues: ['converse', 'inverse', 'contrapositive', 'negation'],
@@ -203,23 +194,20 @@ Which description of the argument is correct?`,
     ],
     correctIndex: 3,
     markScheme: {
-      solution: `Label the rule "If $P$, then $Q$":
-
-- $P$ (antecedent): the battery is flat
-- $Q$ (consequent): the car will not start
-
-The second premise says "the car will not start", which is $Q$. The conclusion is $P$.
-
-So the argument is: If $P$ then $Q$. $Q$. Therefore $P$. This is **affirming the consequent**, a classic fallacy.
-
-Why it fails: the rule only tells us what happens when the battery is flat. A car can fail to start for other reasons (no fuel, a broken starter motor). So both premises can be true while the conclusion is false, which means the argument is **invalid**.`,
+      asking: 'Does the conclusion about the battery have to be true, and what is this reasoning called?',
+      solution:
+        'Split the rule into two parts. The "if" part, called the **antecedent**, is "the battery is flat". The "then" part, called the **consequent**, is "the car will not start".\n\n' +
+        'The next sentence says "the car will not start". That matches the "then" part. So the argument starts from the "then" part and works backwards to the "if" part.\n\n' +
+        'Does that have to work? No. The car could fail to start because it has no fuel, even with a good battery. The rule would still be true in that situation.\n\n' +
+        'So the starting facts can be true while the conclusion is false, which makes the argument **invalid**. Stating that the "then" part is true is called affirming it, so this mistake is called **affirming the consequent**.',
+      conclusion: 'The conclusion can be false, and the argument starts from the "then" part, so the correct description is Invalid: it affirms the consequent.',
       whyWrong: [
         `Modus ponens needs the **if** part (the battery is flat) as the second premise and concludes the **then** part. Here it runs the other way: it starts from the then part.`,
         `Modus tollens needs the **then** part to be denied (the car **does** start) and concludes the if part is false (the battery is not flat). Here the then part is affirmed, not denied.`,
         `Denying the antecedent would be: "The battery is not flat, therefore the car will start." This argument starts from the then part, not from denying the if part.`,
         null,
       ],
-      keyIdea: `Knowing the "then" part is true does not tell you the "if" part is true: that mistake is called affirming the consequent.`,
+      keyIdea: 'Label the rule $P$ then $Q$, then see which part the next sentence uses. $P$ so $Q$ and not $Q$ so not $P$ are valid. $Q$ so $P$ (affirming the consequent) and not $P$ so not $Q$ (denying the antecedent) are invalid.',
     },
     check: {
       optionValues: ['MP', 'MT', 'DA', 'AC'],
@@ -250,21 +238,20 @@ Which statement **must** also be true?`,
     ],
     correctIndex: 0,
     markScheme: {
-      solution: `Picture the groups as circles (a Venn diagram):
-
-- "All roses are flowers": the roses circle sits **inside** the flowers circle.
-- "All flowers need water": the flowers circle sits **inside** the needs-water circle.
-
-So roses are inside flowers, which are inside needs-water. Therefore every rose is inside the needs-water circle: **all roses need water**.
-
-This chain "All $A$ are $B$, all $B$ are $C$, so all $A$ are $C$" is always valid.`,
+      asking: 'What do the two statements together force to be true?',
+      solution:
+        'Think of each group as a circle. "All roses are flowers" puts the roses circle completely inside the flowers circle.\n\n' +
+        '"All flowers need water" puts the flowers circle completely inside the needs-water circle.\n\n' +
+        'A circle inside a circle inside a third circle is still inside the third one. So pick any rose: it is a flower, and every flower needs water, so that rose needs water.\n\n' +
+        'That works for every rose, so all roses need water.',
+      conclusion: 'The circles nest as roses, flowers, needs water, so the statement that must be true is: All roses need water.',
       whyWrong: [
         null,
         `This reverses the chain. The premises put roses inside the needs-water group, not the other way round. Trees need water but are not roses.`,
         `This is the converse of the first statement. "All roses are flowers" does not mean "all flowers are roses": tulips are flowers too.`,
         `This is true in real life, but it does not follow from the two statements. They would both still be true if roses were the only flowers. A conclusion must be **forced** by the premises.`,
       ],
-      keyIdea: `"All $A$ are $B$" and "All $B$ are $C$" force "All $A$ are $C$": nested circles stay nested.`,
+      keyIdea: 'For "All $A$ are $B$" and "All $B$ are $C$", draw nested circles to get "All $A$ are $C$". The direction matters: "All $A$ are $B$" never tells you that all $B$ are $A$.',
     },
     check: {
       optionValues: ['all R W', 'all W R', 'all F R', 'some F not R'],
@@ -299,20 +286,20 @@ Which statement means the same thing?`,
     ],
     correctIndex: 1,
     markScheme: {
-      solution: `"$X$ is **necessary** for $Y$" means you cannot have $Y$ without $X$. In if-then form:
-
-$$\\text{If } Y \\text{, then } X.$$
-
-Here $X$ = "is a citizen" and $Y$ = "votes". So the statement says: **if a person votes, then they are a citizen**.
-
-Compare with "sufficient": "$X$ is **sufficient** for $Y$" means "If $X$, then $Y$" (having $X$ is enough to guarantee $Y$). The original sentence does **not** say citizenship is enough: plenty of citizens do not vote.`,
+      asking: 'Which if-then sentence says that you must be a citizen in order to vote?',
+      solution:
+        'A **necessary** condition is something you must have, or the thing cannot happen. A ticket is necessary for a train ride: no ticket, no ride.\n\n' +
+        'A necessary condition is a requirement, not a guarantee. Having a ticket does not force you to travel.\n\n' +
+        'In the same way, every voter must be a citizen, but a citizen does not have to vote.\n\n' +
+        'So the voter goes in the "if" part and the requirement goes in the "then" part: if a person votes, then they must have met the requirement of being a citizen.',
+      conclusion: 'Anyone who votes must have met the requirement, so the matching statement is: If a person votes in the national election, then they are a citizen.',
       whyWrong: [
         `This treats "necessary" as "sufficient". Being a citizen is required to vote, but it does not guarantee that a person votes.`,
         null,
         `This adds the extra claim that every citizen votes. "Necessary" gives only one direction; "if and only if" would mean necessary **and** sufficient.`,
         `This contradicts the statement. If citizenship is necessary, then a non-citizen cannot vote at all.`,
       ],
-      keyIdea: `"$X$ is necessary for $Y$" means "If $Y$ then $X$"; "$X$ is sufficient for $Y$" means "If $X$ then $Y$".`,
+      keyIdea: '"$X$ is necessary for $Y$" becomes "If $Y$ then $X$": the requirement goes after "then". Test it with an everyday case: a ticket is necessary for a ride, so if you ride, you have a ticket.',
     },
     check: {
       optionValues: ['C->V', 'V->C', 'V<->C', null],
@@ -340,23 +327,19 @@ Compare with "sufficient": "$X$ is **sufficient** for $Y$" means "If $X$, then $
     ],
     correctIndex: 0,
     markScheme: {
-      solution: `**Validity is about the link** between the premises and the conclusion, not about whether the statements are actually true.
-
-An argument is **valid** when it is impossible for all the premises to be true while the conclusion is false. In other words: *if* the premises were true, the conclusion would be guaranteed.
-
-Two examples:
-
-- "All fish can fly. A salmon is a fish. So a salmon can fly." This is **valid** (the conclusion is forced by the premises), even though the first premise and the conclusion are false.
-- "Paris is in France. So $2 + 2 = 4$." Everything here is true, but the argument is **invalid**: the premise gives no reason for the conclusion.
-
-An argument that is valid **and** has true premises is called **sound**.`,
+      asking: 'What does the word "valid" mean when we describe an argument?',
+      solution:
+        'An argument has **premises** (the statements it starts from) and a **conclusion** (what it claims from them).\n\n' +
+        'Take this one: "All fish can fly. A salmon is a fish. So a salmon can fly." The first premise is false, and so is the conclusion. Yet the reasoning itself works: if the premises were true, a salmon would have to be able to fly.\n\n' +
+        'Logicians call that argument **valid**. Validity is only about the link: if all the premises were true, the conclusion would have to be true.',
+      conclusion: 'Validity tests the link rather than real-life truth, so it means: If all of its premises were true, its conclusion would have to be true.',
       whyWrong: [
         null,
         `A valid argument can have a false conclusion if one of its premises is false (for example "All fish can fly, a salmon is a fish, so a salmon can fly"). Validity is about the link, not the truth of the conclusion.`,
         `True premises are part of being **sound**, not valid. A valid argument can have false premises.`,
         `True premises plus a true conclusion is not enough: "Paris is in France, so $2 + 2 = 4$" has both, yet the conclusion does not follow from the premise.`,
       ],
-      keyIdea: `Valid means the conclusion is guaranteed whenever the premises are true; it says nothing about whether the premises actually are true.`,
+      keyIdea: 'To test validity, pretend the premises are true even if they sound silly, then try to imagine the conclusion being false. If you can, it is invalid. If you cannot, it is valid. A valid argument with true premises is called sound.',
     },
   },
 
@@ -380,20 +363,19 @@ What can be concluded?`,
     ],
     correctIndex: 2,
     markScheme: {
-      solution: `Let $S$ = studies, $P$ = passes, $G$ = graduates. The facts are: if $S$ then $P$; if $P$ then $G$; not $G$.
-
-**Step 1.** Use the second rule with "not $G$". If she had passed, she would have graduated. She did not graduate, so she **did not pass** (modus tollens).
-
-**Step 2.** Use the first rule with "not $P$". If she had studied, she would have passed. She did not pass, so she **did not study** (modus tollens again).
-
-Shortcut: chain the rules first. "If $S$ then $P$" and "if $P$ then $G$" give "if $S$ then $G$". Its contrapositive is "if not $G$ then not $S$", so Sara did not study.`,
+      asking: 'Given that Sara did not graduate, what else do we know about her?',
+      solution:
+        'Write the rules as a chain: studies $\\to$ passes $\\to$ graduates. Each arrow means "if this happens, the next thing happens".\n\n' +
+        'We know Sara did not graduate. Could she have passed? No, because passing would have made her graduate by the second rule. So she did not pass.\n\n' +
+        'Now use the first rule the same way. Could she have studied? No, because studying would have made her pass, and we have just found that she did not pass.',
+      conclusion: '"Not graduated" travels back along the chain through "not passed", which gives: Sara did not study.',
       whyWrong: [
         `The first half is impossible: if she had studied, the first rule says she would have passed. "Did not pass" is right, but the chain then also rules out studying.`,
         `If she had passed, the second rule says she would have graduated, but she did not. Passing is ruled out by modus tollens.`,
         null,
         `This is what you get if you think a "not" result cannot travel backwards through a rule. Modus tollens does exactly that: applied twice, it takes "not graduated" back to "not studied".`,
       ],
-      keyIdea: `Modus tollens: from "If $P$ then $Q$" and "not $Q$", conclude "not $P$"; it can be chained back through several rules.`,
+      keyIdea: 'Chain the if-then rules with arrows. When the last thing in a chain is false, every earlier thing must be false too, so go backwards one arrow at a time. This backwards step is called modus tollens: if $P$ then $Q$; not $Q$; so not $P$.',
     },
     check: {
       optionValues: ['S and not P', 'P', 'not S', 'none'],
@@ -423,20 +405,20 @@ Which statement **must** be true?`,
     ],
     correctIndex: 1,
     markScheme: {
-      solution: `**Step 1.** "Some students are athletes" means there is at least one person who is both a student and an athlete. Call her Mona.
-
-**Step 2.** "All athletes are early risers": Mona is an athlete, so Mona is an early riser.
-
-**Step 3.** So Mona is a student **and** an early riser. That proves at least one student is an early riser: **some students are early risers**.
-
-The other options cannot be proved, because the premises say nothing about students who are not athletes, or about early risers who are not athletes.`,
+      asking: 'What must be true about students and early risers?',
+      solution:
+        'In logic, **some** means at least one. So "Some students are athletes" means there is at least one person who is both a student and an athlete.\n\n' +
+        'Give that person a name: Sam. So Sam is a student and an athlete.\n\n' +
+        '"All athletes are early risers" covers every athlete, including Sam. So Sam is an early riser.\n\n' +
+        'Sam is a student and also an early riser. One such person is enough to say "some" here.',
+      conclusion: 'Sam alone proves the link, so the statement that must be true is: Some students are early risers.',
       whyWrong: [
         `This upgrades "some" to "all". Only some students are known to be athletes; the other students might not be early risers.`,
         null,
         `This is the converse of the second statement. "All athletes are early risers" does not mean every early riser is an athlete.`,
         `This could be false: if every early riser happened to be a student, both statements would still be true. Nothing forces an early riser outside the student group.`,
       ],
-      keyIdea: `"Some $A$ are $B$" plus "All $B$ are $C$" gives "Some $A$ are $C$": follow the one known member through the chain.`,
+      keyIdea: 'With a "some" premise and an "all" premise, name one person from the "some" group and follow them through the "all" rule. Only what is true of that person is forced. Never upgrade "some" to "all".',
     },
     check: {
       optionValues: ['all S E', 'some S E', 'all E A', 'some E not S'],
@@ -471,21 +453,19 @@ Which statement **must** be true?`,
     ],
     correctIndex: 3,
     markScheme: {
-      solution: `Draw the groups:
-
-- "No reptiles are warm-blooded": the reptiles circle and the warm-blooded circle do **not** overlap at all.
-- "All snakes are reptiles": the snakes circle sits **inside** the reptiles circle.
-
-A circle inside the reptiles circle cannot reach the warm-blooded circle, because the reptiles circle never touches it. So **no snakes are warm-blooded**.
-
-Pattern: "No $B$ are $C$" and "All $A$ are $B$" give "No $A$ are $C$".`,
+      asking: 'What must be true about snakes and warm-blooded animals?',
+      solution:
+        'Draw a circle for reptiles and a circle for warm-blooded animals. "No reptiles are warm-blooded" means the two circles do not touch at all.\n\n' +
+        '"All snakes are reptiles" puts a snakes circle completely inside the reptiles circle.\n\n' +
+        'Everything inside the reptiles circle stays away from the warm-blooded circle. So the snakes circle cannot touch the warm-blooded circle either.',
+      conclusion: 'Snakes sit inside a group that never overlaps warm-blooded animals, so the statement that must be true is: No snakes are warm-blooded.',
       whyWrong: [
         `This misreads the second statement. Snakes sit inside the reptile group, so (as long as there are any snakes) some reptiles **are** snakes.`,
         `This contradicts the premises: snakes are reptiles and no reptile is warm-blooded, so no snake can be warm-blooded.`,
         `True in real life, but not forced by the statements: they would both still hold if snakes were the only reptiles.`,
         null,
       ],
-      keyIdea: `If group $A$ sits inside group $B$, and $B$ has no overlap with $C$, then $A$ has no overlap with $C$ either.`,
+      keyIdea: 'For "No $B$ are $C$" and "All $A$ are $B$", draw $A$ inside $B$ with $C$ separate, which gives "No $A$ are $C$". Reject any option that is only true in real life: a conclusion must come from the statements alone.',
     },
     check: {
       optionValues: ['no R S', 'some W S', 'some R not S', 'no S W'],
@@ -518,25 +498,19 @@ Pattern: "No $B$ are $C$" and "All $A$ are $B$" give "No $A$ are $C$".`,
     options: [`1`, `2`, `3`, `4`],
     correctIndex: 1,
     markScheme: {
-      solution: `Match each argument to its pattern.
-
-| Argument | Pattern | Valid? |
-| --- | --- | --- |
-| 1 | $P$, so $Q$ | Valid (modus ponens) |
-| 2 | $Q$, so $P$ | Invalid (affirming the consequent) |
-| 3 | not $Q$, so not $P$ | Valid (modus tollens) |
-| 4 | not $P$, so not $Q$ | Invalid (denying the antecedent) |
-
-For example, with the rule "If a phone is in flight mode, then it cannot make calls", a phone may be unable to call because it has no signal. So argument 2 fails, and a phone not in flight mode might still be unable to call, so argument 4 fails.
-
-So exactly **2** arguments are valid.`,
+      asking: 'How many of the four ways of using the rule are correct reasoning?',
+      solution:
+        'The rule says only this: whenever $P$ happens, $Q$ happens. Take an example, with $P$ = it rains and $Q$ = the ground is wet. The ground could also get wet from a hose.\n\n' +
+        '**Valid** means the conclusion cannot be false when the starting facts are true. Test each argument with the example:\n\n| Argument | In the example | Is it forced? |\n|---|---|---|\n| 1. $P$, so $Q$ | It rains, so the ground is wet | Yes: the rule says so |\n| 2. $Q$, so $P$ | The ground is wet, so it rained | No: a hose could have done it |\n| 3. Not $Q$, so not $P$ | The ground is dry, so it did not rain | Yes: rain would have made it wet |\n| 4. Not $P$, so not $Q$ | It did not rain, so the ground is dry | No: a hose could still wet it |\n\n' +
+        'Count the rows marked Yes. They are arguments 1 and 3, so the count is 2.',
+      conclusion: 'Only arguments 1 and 3 are forced, so the number of valid arguments is 2.',
       whyWrong: [
         `This accepts only argument 1 and misses that argument 3 is **modus tollens**: if $Q$ fails, $P$ cannot have happened, otherwise the rule would be broken.`,
         null,
         `This accepts one of the two fallacies as well, usually argument 2 (affirming the consequent). $Q$ can be true for some other reason.`,
         `This accepts every argument, including both fallacies. Argument 4 denies the antecedent: the rule says nothing about what happens when $P$ is false.`,
       ],
-      keyIdea: `Of the four "if-then" patterns, only modus ponens and modus tollens are valid; affirming the consequent and denying the antecedent are fallacies.`,
+      keyIdea: 'Know the four forms for "If $P$ then $Q$". Valid: $P$ so $Q$ (modus ponens) and not $Q$ so not $P$ (modus tollens). Invalid: $Q$ so $P$, and not $P$ so not $Q$. If unsure, test with rain and a wet ground.',
     },
     check: {
       optionValues: [1, 2, 3, 4],
@@ -568,24 +542,20 @@ Assuming this statement is true, which statement must also be true?`,
     ],
     correctIndex: 0,
     markScheme: {
-      solution: `"$A$ only if $B$" means $B$ is **necessary** for $A$, which in if-then form is "If $A$, then $B$".
-
-Here: "If you get the job, then you passed the interview."
-
-Now take the **contrapositive** (swap the parts and negate both), which is always equivalent:
-
-"If you did **not** pass the interview, then you did **not** get the job."
-
-That is the same as "If you fail the interview, you will not get the job."
-
-Note that passing is **not** said to be enough: you could pass the interview and still not get the job (another candidate might be better).`,
+      asking: 'If passing the interview is a requirement for the job, what else must be true?',
+      solution:
+        '"Only if" sets a requirement. "You will get the job only if you pass the interview" means nobody gets the job without passing.\n\n' +
+        'As an if-then rule, it reads: if you get the job, then you passed the interview. It does not promise that passing gets you the job, because another candidate might do better.\n\n' +
+        'Now think about what the rule forbids: someone who failed the interview and still got the job. That cannot happen.\n\n' +
+        'So failing the interview means you cannot get the job. This swaps the rule\'s two parts and negates both, which always keeps the meaning.',
+      conclusion: 'Failing means the requirement is missing, so the statement that must be true is: If you fail the interview, you will not get the job.',
       whyWrong: [
         null,
-        `This reads "only if" as plain "if". Passing the interview is necessary for the job, not a guarantee of it.`,
-        `This is the inverse of "If you get the job, you passed", which is equivalent to "If you pass, you get the job". That is the same mistake of treating a necessary condition as sufficient.`,
-        `This adds the extra direction "passing guarantees the job". "Only if" gives just one direction; "if and only if" would need both.`,
+        'This reads "only if" as plain "if". Passing the interview is necessary for the job, not a guarantee of it.',
+        'This treats passing as a guarantee. You could pass the interview and still not get the job, for example if another candidate did better.',
+        'This adds the extra direction "passing guarantees the job". "Only if" gives just one direction; "if and only if" would need both.',
       ],
-      keyIdea: `"$A$ only if $B$" means "If $A$ then $B$", so its contrapositive "If not $B$ then not $A$" is also true.`,
+      keyIdea: 'Rewrite "$A$ only if $B$" as "If $A$ then $B$": $B$ is the requirement. Its contrapositive, "If not $B$ then not $A$", is also true. "If $B$ then $A$" is not: meeting a requirement is no guarantee.',
     },
     check: {
       optionValues: ['notP->notJ', 'P->J', 'notJ->notP', 'J<->P'],
@@ -615,29 +585,20 @@ What **must** be true?`,
     options: [`Ali owns the fish.`, `Bea owns the rabbit.`, `Dana owns the cat.`, `Chen owns the rabbit.`],
     correctIndex: 2,
     markScheme: {
-      solution: `Write down what each person **could** own:
-
-| Person | Possible pets |
-| --- | --- |
-| Ali | fish, rabbit (not cat, not dog) |
-| Bea | fish, rabbit |
-| Chen | dog, fish, rabbit (not cat) |
-| Dana | cat, dog, fish, rabbit |
-
-**Step 1.** Ali and Bea can only have the fish or the rabbit, and there is one of each. So between them they take **both** the fish and the rabbit.
-
-**Step 2.** That leaves the cat and the dog for Chen and Dana.
-
-**Step 3.** Chen does not own the cat, so Chen owns the **dog** and Dana owns the **cat**.
-
-Ali and Bea could be either way round (Ali fish and Bea rabbit, or Ali rabbit and Bea fish), so only "Dana owns the cat" is certain.`,
+      asking: 'Which fact about the pets is forced by the clues?',
+      solution:
+        'Draw a grid of people and pets, and cross out what each clue rules out. A question mark means still possible:\n\n| Person | Cat | Dog | Fish | Rabbit |\n|---|---|---|---|---|\n| Ali | ✗ | ✗ | ? | ? |\n| Bea | ✗ | ✗ | ? | ? |\n| Chen | ✗ | ? | ? | ? |\n| Dana | ? | ? | ? | ? |\n\n' +
+        'Ali can only have the fish or the rabbit, and so can Bea. Those two people use up those two pets between them, although we cannot tell who has which.\n\n' +
+        'So Chen and Dana must share the cat and the dog. Chen does not own the cat, so Chen owns the dog.\n\n' +
+        'That leaves one pet for Dana: the cat.',
+      conclusion: 'However Ali and Bea share the fish and rabbit, the cat is left for Dana, so what must be true is: Dana owns the cat.',
       whyWrong: [
         `This is possible but not forced. Ali and Bea share the fish and the rabbit between them, and no clue says which way round.`,
         `This is possible but not forced: Bea could just as well have the fish, with Ali taking the rabbit.`,
         null,
         `Impossible: Ali and Bea between them must take the fish and the rabbit, so Chen is left with the dog.`,
       ],
-      keyIdea: `In a "must be true" clue puzzle, list every possibility and keep only facts that hold in all remaining cases.`,
+      keyIdea: 'For matching puzzles, draw a grid of people against items and cross out what each clue rules out. If two people share the same two choices, remove those items from everyone else. "Must be true" means true however the undecided items are shared.',
     },
     check: {
       optionValues: ['Ali fish', 'Bea rabbit', 'Dana cat', 'Chen rabbit'],
@@ -672,30 +633,20 @@ Ali and Bea could be either way round (Ali fish and Bea rabbit, or Ali rabbit an
     ],
     correctIndex: 1,
     markScheme: {
-      solution: `The negation must be true in **exactly** the situations where the original is false.
-
-"All the students passed" is false as soon as **one** student failed. It does not need everybody to fail. So the negation is:
-
-**"At least one student did not pass."** (also written "Not all the students passed".)
-
-Check with a class of 10:
-
-| Situation | "All passed" | "At least one did not pass" |
-| --- | --- | --- |
-| 10 passed | true | false |
-| 9 passed, 1 failed | false | true |
-| 0 passed | false | true |
-
-The two columns are always opposite, which is exactly what a negation needs.
-
-Rule: the negation of "all are" is "some are not"; the negation of "some are" is "none are".`,
+      asking: 'Which statement is true exactly when "All the students passed" is false?',
+      solution:
+        'The **negation** of a statement is true exactly when the statement is false, and false exactly when the statement is true.\n\n' +
+        'So ask: what makes "All the students passed" false? One student not passing is enough, because then it is no longer all of them. More students not passing also makes it false.\n\n' +
+        'Imagine a class of 10, and write what the negation must do:\n\n| Number who passed | "All passed" is | The negation must be |\n|---|---|---|\n| 10 | true | false |\n| 9 | false | true |\n| 0 | false | true |\n\n' +
+        'We need a statement that is false only when everyone passed, and true for 9 passing and for 0 passing. "At least one student did not pass" fits all three rows.',
+      conclusion: 'It is true whenever not everyone passed and false only when everyone did, so the negation is: At least one student did not pass the test.',
       whyWrong: [
         `This is too strong: "not all" is not the same as "none". If 9 out of 10 passed, the original is false, but this statement is also false.`,
         null,
         `This can be true at the same time as the original (when everyone passes), so it cannot be its opposite.`,
         `This misses the case where nobody passed. Then the original is false, but this statement is also false, because nobody passed.`,
       ],
-      keyIdea: `The negation of "All $A$ are $B$" is "Some $A$ are not $B$" (at least one is not), not "No $A$ are $B$".`,
+      keyIdea: 'The negation of "All $X$ are $Y$" is "At least one $X$ is not $Y$". The negation of "Some $X$ are $Y$" is "No $X$ are $Y$". Test a candidate: exactly one of the statement and its negation is true in every case.',
     },
     check: {
       optionValues: ['none passed', 'at least one failed', 'at least one passed', 'mixed'],
@@ -728,21 +679,21 @@ Rule: the negation of "all are" is "some are not"; the negation of "some are" is
     ],
     correctIndex: 0,
     markScheme: {
-      solution: `Test each argument by asking: *could the premises be true while the conclusion is false?* If yes, it is invalid.
-
-- **Pilots:** pilots sit inside the trained group, and the trained group has no overlap with the careless group. So pilots cannot overlap with careless people. The conclusion is forced: **valid**.
-- **Cats:** the black mammals could all be dogs or horses. Both premises stay true while "some cats are black" fails, so it is invalid. The middle group (mammals) never links cats to black things.
-- **Cars:** the red cars and the fast red things could be completely different objects (red cars that are slow, fast red motorbikes). Invalid: two "some" premises never give a conclusion.
-- **Fish/dogs:** the conclusion happens to be true, but it is not forced. The same pattern "No cats are birds. No birds are mammals. So no cats are mammals." has true premises and a false conclusion. Invalid: two "no" premises never give a conclusion.
-
-Only the pilots argument is valid.`,
+      asking: 'Which argument\'s conclusion cannot be false when its first two sentences are true?',
+      solution:
+        'A valid argument has a forced conclusion. To test one, try to build a situation where the premises (the first two sentences) are true but the conclusion is false. If you can, the argument is invalid.\n\n' +
+        '**Cats:** some mammals are black, but those could all be dogs. Every premise can be true with no black cats, so the conclusion is not forced.\n\n' +
+        '**Cars:** some red things are fast, but those could all be red bikes, while the red cars are slow. So the conclusion is not forced.\n\n' +
+        '**Fish:** two "no" premises do not link the outer groups. The same pattern, "No cats are birds. No birds are mammals. So no cats are mammals", has true premises and a false conclusion.\n\n' +
+        '**Pilots:** every pilot is inside the trained group, and the trained group does not touch the careless group. So no pilot can be careless, and no counterexample can be built.',
+      conclusion: 'Only the pilots argument has no counterexample, so the valid one is: All pilots are trained. No trained people are careless. So no pilots are careless.',
       whyWrong: [
         null,
         `Invalid: the black mammals might all be other animals, such as black dogs, so both premises can be true while no cat is black. Knowing "some mammals" does not tell you which mammals.`,
         `Invalid: two "some" premises can talk about different objects. The red things that are fast might not be cars at all.`,
         `The conclusion is true in real life, but it does not follow. The same form "No cats are birds. No birds are mammals. So no cats are mammals." has true premises and a false conclusion.`,
       ],
-      keyIdea: `An argument is valid only if no situation makes all premises true and the conclusion false; a true conclusion alone does not make it valid.`,
+      keyIdea: 'To test an argument, hunt for a counterexample: true premises with a false conclusion. Watch for the traps: two "some" premises or two "no" premises never force a conclusion, and "some" may refer to different members. A chain joined by "all" is safe.',
     },
     check: {
       optionValues: ['pilots', 'cats', 'cars', 'fish'],
@@ -777,20 +728,19 @@ Which statement, used as the missing premise, makes the argument **valid**?`,
     ],
     correctIndex: 3,
     markScheme: {
-      solution: `The first premise is a rule: "If a person is a manager, then they attend the meeting".
-
-To conclude that Layla attends using **modus ponens**, we need the "if" part to be true for Layla: **Layla is a manager**.
-
-Then the argument reads: All managers attend. Layla is a manager. Therefore Layla attends. The conclusion is forced, so the argument is valid.
-
-None of the other statements puts Layla inside the managers group, so with any of them Layla could still be absent from the meeting.`,
+      asking: 'Which extra fact lets us say for certain that Layla attends?',
+      solution:
+        'The first premise is a rule: if someone is a manager, then they attend the Monday meeting.\n\n' +
+        'We want to conclude that Layla attends. That is the rule\'s "then" part. To reach it, we need the rule\'s "if" part to be true for Layla.\n\n' +
+        'The "if" part, applied to Layla, is that she is a manager. With that fact added, the rule covers her and forces her to attend.',
+      conclusion: 'With this premise the rule applies to her directly, so the missing premise is: Layla is a manager.',
       whyWrong: [
         `This is the converse of the first premise. It tells us about people who already attend; it never says that Layla attends.`,
         `Sharing an office with the managers does not make Layla a manager, so the rule about managers does not apply to her.`,
         `This only talks about other people at the meeting. Layla could still be absent.`,
         null,
       ],
-      keyIdea: `To apply a rule "All $A$ are $B$" to one individual, you need the premise that the individual is an $A$.`,
+      keyIdea: 'To find a missing premise, write the rule as "If $A$ then $B$" and compare it with the conclusion. If the conclusion is $B$ for one person, the missing premise is $A$ for that person. Then test that the two premises force the conclusion.',
     },
     check: {
       optionValues: ['attendees are managers', 'same office', 'some non-managers attend', 'Layla is a manager'],
@@ -818,24 +768,20 @@ None of the other statements puts Layla inside the managers group, so with any o
     options: [`$R$ is true.`, `$R$ is false and $S$ is true.`, `$S$ is false.`, `$Q$ is true, but nothing can be said about $S$.`],
     correctIndex: 1,
     markScheme: {
-      solution: `Here $A \\Rightarrow B$ means "if $A$ then $B$", and $\\neg A$ means "not $A$". Work forwards from the one fact you know for certain.
-
-**Step 1.** $P$ is true, and "if $P$ then $Q$", so $Q$ is **true** (modus ponens).
-
-**Step 2.** "If $R$ then not $Q$". We know $Q$ is true, so "not $Q$" is false. By modus tollens, $R$ is **false**. (If $R$ were true, $Q$ would have to be false.)
-
-**Step 3.** "If not $S$ then $R$". We know $R$ is false. By modus tollens, "not $S$" is false, so $S$ is **true**.
-
-Result: $P$ true, $Q$ true, $R$ false, $S$ true. Check every rule: rule 1 ($P$ and $Q$ both true) holds; rule 2 has a false "if" part so it holds; rule 3 has a false "if" part so it holds.
-
-So "$R$ is false and $S$ is true" must be true.`,
+      asking: 'Using all the facts, what must be true of $R$ and $S$?',
+      solution:
+        'The arrow $\\Rightarrow$ means "if ... then", and $\\neg$ means "not". So $R \\Rightarrow \\neg Q$ reads "if $R$ is true, then $Q$ is false".\n\n' +
+        'Start from what we know: $P$ is true. The rule $P \\Rightarrow Q$ then makes $Q$ true.\n\n' +
+        'Look at $R \\Rightarrow \\neg Q$. If $R$ were true, $Q$ would be false. But $Q$ is true, so $R$ cannot be true. So $R$ is false.\n\n' +
+        'Look at $\\neg S \\Rightarrow R$. If $S$ were false, $\\neg S$ would be true, and that would make $R$ true. But $R$ is false, so $S$ cannot be false. So $S$ is true.',
+      conclusion: '$Q$ being true rules out $R$, and $R$ being false rules out $S$ being false, so $R$ is false and $S$ is true.',
       whyWrong: [
         `This reads the second rule backwards (as "if $Q$ then $R$"). In fact, $R$ true would force $Q$ false, but $Q$ is true, so $R$ must be false.`,
         null,
         `If $S$ were false, the third rule would make $R$ true, and then the second rule would make $Q$ false. But $Q$ is true, so $S$ cannot be false.`,
         `$Q$ is true, but stopping there misses two modus tollens steps: $Q$ true forces $R$ false, and $R$ false forces $S$ true. So $S$ **is** determined.`,
       ],
-      keyIdea: `Chain modus ponens and modus tollens one step at a time from the known fact; a false "then" part sends "false" back to the "if" part.`,
+      keyIdea: 'Start with the known fact and apply one rule at a time, writing down each letter\'s value. When a rule\'s "then" part is false, its "if" part must be false too (modus tollens). Continue until every letter in the options has a value.',
     },
     check: {
       optionValues: ['R', 'not R and S', 'not S', null],
@@ -858,14 +804,18 @@ So "$R$ is false and $S$ is true" must be true.`,
     options: [`If not $Q$ then not $P$`, `If $Q$ then $P$`, `If not $P$ then not $Q$`, `$P$ and not $Q$`],
     correctIndex: 0,
     markScheme: {
-      solution: `The contrapositive swaps the two parts **and** negates both: "If not $Q$ then not $P$". It always has the same truth value as the original rule.`,
+      asking: 'What do you get when you build the contrapositive of this rule?',
+      solution:
+        'The **contrapositive** is made in two moves: swap the two parts, then make both negative by putting "not" on each.\n\n' +
+        'Swapping "If $P$ then $Q$" gives "If $Q$ then $P$". Putting "not" on each part then gives "If not $Q$ then not $P$".',
+      conclusion: 'Swapping and negating gives exactly this form: If not $Q$ then not $P$.',
       whyWrong: [
         null,
         `This is the **converse**: it swaps the parts but does not negate them.`,
         `This is the **inverse**: it negates both parts but does not swap them.`,
         `This is the **negation** of the rule, which describes the one situation where the rule is broken.`,
       ],
-      keyIdea: `Contrapositive = swap and negate both; it is the only one of these forms equivalent to the rule.`,
+      keyIdea: 'There are three related forms of "If $P$ then $Q$". The converse swaps the parts, the inverse negates both, and the contrapositive does both. Only the contrapositive always means the same as the original.',
     },
     check: {
       optionValues: ['contrapositive', 'converse', 'inverse', 'negation'],
@@ -886,14 +836,18 @@ So "$R$ is false and $S$ is true" must be true.`,
     options: [`At least one $A$ is a $B$`, `Most $A$ are $B$`, `Not every $A$ is a $B$`, `Every $A$ is a $B$`],
     correctIndex: 0,
     markScheme: {
-      solution: `In logic "some" simply means **at least one**. It does not say how many, and it does not rule out the possibility that all of them are.`,
+      asking: 'How much does the word "some" claim when it is used in logic?',
+      solution:
+        'In everyday speech, "some" often hints at "several, but not all". Logic is stricter: "some" makes the smallest possible claim.\n\n' +
+        '"Some cats are black" is true if there is even one black cat, and it stays true if every cat is black. In the same way, "Some $A$ are $B$" claims only that at least one $A$ is a $B$.',
+      conclusion: 'One example is enough, so "Some $A$ are $B$" means: At least one $A$ is a $B$.',
       whyWrong: [
         null,
         `"Some" says nothing about a majority. One is enough.`,
         `This is the everyday meaning of "some", which suggests "but not all". In logic, "some" is still true when every $A$ is a $B$.`,
         `This upgrades "some" to "all". One $A$ that is a $B$ is enough for "some".`,
       ],
-      keyIdea: `In logic, "some" means "at least one", and it does not exclude "all".`,
+      keyIdea: 'In logic questions, read "some" as "at least one, possibly all". It never means "most" and never means "but not all", so do not conclude that some are not unless a premise says so.',
     },
   },
   {
@@ -904,14 +858,18 @@ So "$R$ is false and $S$ is true" must be true.`,
     options: [`Modus tollens`, `Affirming the consequent`, `Denying the antecedent`, `Assuming the converse`],
     correctIndex: 0,
     markScheme: {
-      solution: `Modus tollens is the pattern "If $P$ then $Q$. Not $Q$. Therefore not $P$." If $P$ had been true, $Q$ would have been true as well, so the conclusion is forced.`,
+      asking: 'Which pattern of reasoning always gives a correct conclusion?',
+      solution:
+        'Take the rule "If it rains ($P$), the ground is wet ($Q$)". The antecedent is the "if" part and the consequent is the "then" part. Test the forms on this rule:\n\n| Form | Pattern | Example | Forced? |\n|---|---|---|---|\n| Affirming the consequent | $Q$, so $P$ | Wet ground, so it rained | No: a hose could do it |\n| Denying the antecedent | Not $P$, so not $Q$ | No rain, so dry ground | No: a hose could do it |\n| Assuming the converse | If $Q$ then $P$ | Wet ground always means rain | No: a rule does not work backwards |\n\n' +
+        'The remaining form goes: not $Q$, so not $P$. If the ground is dry, it cannot have rained, because rain would have made it wet. That reasoning is always forced, and it is called **modus tollens**.',
+      conclusion: 'It is the only form here that can never go from true facts to a false conclusion, so the answer is Modus tollens.',
       whyWrong: [
         null,
         `"If $P$ then $Q$. $Q$. Therefore $P$." is a fallacy: $Q$ might be true for another reason.`,
         `"If $P$ then $Q$. Not $P$. Therefore not $Q$." is a fallacy: the rule says nothing about what happens when $P$ is false.`,
         `A rule does not imply its converse: "If $P$ then $Q$" does not give "If $Q$ then $P$".`,
       ],
-      keyIdea: `Modus ponens and modus tollens are valid; affirming the consequent and denying the antecedent are not.`,
+      keyIdea: 'Know the two valid forms for "If $P$ then $Q$": modus ponens ($P$, so $Q$) and modus tollens (not $Q$, so not $P$). Going from $Q$ to $P$, or from not $P$ to not $Q$, is a fallacy (a mistake in reasoning).',
     },
     check: {
       optionValues: ['MT', 'AC', 'DA', null],
@@ -936,14 +894,18 @@ So "$R$ is false and $S$ is true" must be true.`,
     options: [`If $P$ then $Q$`, `If $Q$ then $P$`, `If not $P$ then not $Q$`, `$P$ if and only if $Q$`],
     correctIndex: 0,
     markScheme: {
-      solution: `"Sufficient" means enough: having $P$ guarantees $Q$. In if-then form this is "If $P$ then $Q$".`,
+      asking: 'Which if-then rule says that $P$ alone is enough to guarantee $Q$?',
+      solution:
+        '**Sufficient** means "enough". If something is sufficient, having it is all you need. Scoring 90% is sufficient to pass a test with a pass mark of 50%.\n\n' +
+        'So $P$ being sufficient for $Q$ says: once $P$ happens, $Q$ is guaranteed. In the scoring example, if you score 90%, then you pass. In letters, that is "If $P$ then $Q$".',
+      conclusion: '$P$ is enough to guarantee $Q$, and that is what this rule says: If $P$ then $Q$.',
       whyWrong: [
         null,
         `This is "$P$ is **necessary** for $Q$". You cannot have $Q$ without $P$.`,
         `This is the inverse, which has the same meaning as "If $Q$ then $P$", so it also describes "necessary".`,
         `This says necessary **and** sufficient, which is more than the statement claims.`,
       ],
-      keyIdea: `"$P$ is sufficient for $Q$" means "If $P$ then $Q$"; "$P$ is necessary for $Q$" means "If $Q$ then $P$".`,
+      keyIdea: 'Translate before choosing. "$P$ is sufficient for $Q$" becomes "If $P$ then $Q$". "$P$ is necessary for $Q$" becomes "If $Q$ then $P$". So the sufficient thing goes after "if", and the necessary thing goes after "then".',
     },
     check: {
       optionValues: ['P->Q', 'Q->P', 'notP->notQ', 'P<->Q'],

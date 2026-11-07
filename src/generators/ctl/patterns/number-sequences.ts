@@ -1,4 +1,5 @@
 import type { Generator } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, num, poly, sum } from '../../../lib/tex';
 
@@ -92,25 +93,33 @@ export const generators: Generator[] = [
         ]);
         const leftoverText =
           b === 0
-            ? `These are all ${c}, a constant.\n\n`
-            : `This leftover ${b > 0 ? `goes up by ${b}` : `goes down by ${-b}`} each time, so it is linear. ` +
-              `${m(sum([[b, 'n']]))} gives ${m(list([1, 2, 3, 4, 5].map((n) => b * n)))}, and the leftover is ` +
-              (c === 0 ? 'exactly that' : `${Math.abs(c)} ${c > 0 ? 'more' : 'less'} each time`) +
-              `, so its ${m('n')}th term is ${m(linPart)}.\n\n`;
+            ? `The left-over values are all ${m(num(c))}, so nothing else changes with ${m('n')}. The whole formula is ${m(`u_n = ${nth}`)}, where ${m('u_n')} means the term in position ${m('n')}.`
+            : `The left-over values ${b > 0 ? `go up by ${b}` : `go down by ${-b}`} each time, so they follow ${m(sum([[b, 'n']]))}, which gives ${m(list([1, 2, 3, 4, 5].map((n) => b * n)))}. ` +
+              (c === 0 ? 'That is exactly the left-over list' : `The left-over list is ${Math.abs(c)} ${c > 0 ? 'more' : 'less'} each time`) +
+              `, so it is ${m(linPart)}. The whole formula is ${m(`u_n = ${nth}`)}, where ${m('u_n')} means the term in position ${m('n')}.`;
         return {
           stem: `The sequence ${m(`${list(terms)}, \\dots`)} continues with the same pattern. What is its ${ordinal(k)} term?`,
           answer: m(num(answer)),
           answerValue: answer,
           distractors: distractors.map((d) => ({ text: m(num(d.v)), value: d.v, why: d.why })),
-          solution:
-            `First differences: ${m(list(d1))}. Second differences: ${m(list(d2))}.\n\n` +
-            `The second difference is constant (${d2[0]}), so the sequence is **quadratic**. The coefficient of ${m('n^2')} is half of it: ${m(`\\frac{${d2[0]}}{2} = ${a}`)}.\n\n` +
-            `Subtract ${m(aTerm)} from each term: ${m(list(leftover))}. ` +
-            leftoverText +
-            `So ${m(`u_n = ${nth}`)}. (Check: ${m('n = 1')} gives ${m(num(terms[0]))} and ${m('n = 2')} gives ${m(num(terms[1]))}.)\n\n` +
-            `Substitute ${m(`n = ${k}`)}: ${m(`u_{${k}} = ${subst}${parts === subst ? '' : ` = ${parts}`} = ${num(answer)}`)}.\n\n` +
-            `Answer: ${m(num(answer))}`,
-          keyIdea: 'A constant second difference means a quadratic $n$th term; the coefficient of $n^2$ is half the second difference.',
+          asking: `What is the term in position ${k} of this sequence?`,
+          solution: steps(
+            `Find the gaps between neighbouring terms, called the **first differences**: ${m(list(d1))}. They are not all equal, so this is not a simple adding pattern.`,
+            `Find the gaps between those gaps, called the **second differences**: ${m(list(d2))}. They are all ${d2[0]}. A constant second difference means the formula is **quadratic**: it contains ${m('n^2')}, where ${m('n')} is the position.`,
+            `The number in front of ${m('n^2')} is half the second difference: ${m(`\\frac{${d2[0]}}{2} = ${a}`)}. So the formula starts with ${m(aTerm)}.`,
+            `Subtract ${m(aTerm)} from each term to see what is left:\n\n${table(
+              ['$n$', 1, 2, 3, 4, 5],
+              [
+                ['Term', ...terms.map((t) => m(num(t)))],
+                [m(aTerm), ...[1, 2, 3, 4, 5].map((n) => m(num(sq(n))))],
+                ['Left over', ...leftover.map((t) => m(num(t)))],
+              ],
+            )}`,
+            `${leftoverText} As a test, ${m('n = 1')} gives ${m(num(terms[0]))} and ${m('n = 2')} gives ${m(num(terms[1]))}.`,
+            `Put in ${m(`n = ${k}`)}: ${m(`u_{${k}} = ${subst}${parts === subst || parts === num(answer) ? '' : ` = ${parts}`} = ${num(answer)}`)}.`,
+          ),
+          conclusion: `The formula ${m(`u_n = ${nth}`)} gives the listed terms, and at ${m(`n = ${k}`)} it gives ${m(num(answer))}.`,
+          keyIdea: 'If the second differences are constant, the sequence is quadratic. The number in front of $n^2$ is half the second difference. Subtract that part from each term, find the linear rule for what is left, then substitute the position.',
         };
       }
     },
@@ -160,19 +169,21 @@ export const generators: Generator[] = [
 
         const rTex = r.n < 0 || r.d !== 1 ? `\\left(${r.tex()}\\right)` : r.tex();
         const ansTex = num(answer);
+        const walk = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].slice(0, k).map((n) => num(term(n).value())).join(', ');
         return {
           stem: `The sequence ${m(`${list(shown)}, \\dots`)} is geometric. What is its ${ordinal(k)} term?`,
           answer: m(ansTex),
           answerValue: answer,
           distractors: distractors.map((x) => ({ text: m(num(x.v)), value: x.v, why: x.why })),
-          solution:
-            `Divide a term by the one before to get the common ratio: ${m(`r = ${num(shown[1])} \\div ${shown[0] < 0 ? `(${num(shown[0])})` : num(shown[0])} = ${r.tex()}`)}` +
-            (r.n < 0 ? ', so the signs alternate.\n\n' : '.\n\n') +
-            `The ${m('n')}th term of a geometric sequence is ${m('u_n = ar^{n-1}')}, with first term ${m(`a = ${a}`)}. From the 1st term to the ${ordinal(k)} you multiply by ${m('r')} exactly ${k - 1} times:\n\n` +
-            `$$u_{${k}} = ${a} \\times ${rTex}^{${k - 1}} = ${a} \\times ${paren(powF(r, k - 1))} = ${ansTex}$$\n\n` +
-            `Check by continuing the sequence: ${m([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].slice(0, k).map((n) => num(term(n).value())).join(', '))}.\n\n` +
-            `Answer: ${m(ansTex)}`,
-          keyIdea: 'The $n$th term of a geometric sequence is $u_n = ar^{n-1}$: the first term times the ratio to the power $n - 1$.',
+          asking: `What is the term in position ${k} of this sequence?`,
+          solution: steps(
+            `**Geometric** means each term is the one before multiplied by a fixed number, called the **common ratio**, ${m('r')}. Find it by dividing a term by the one before: ${m(`r = ${num(shown[1])} \\div ${shown[0] < 0 ? `(${num(shown[0])})` : num(shown[0])} = ${r.tex()}`)}.`,
+            r.n < 0 && 'The ratio is negative, so each multiplication flips the sign and the signs alternate.',
+            `From the 1st term to the ${ordinal(k)}, we multiply by ${m('r')} exactly ${k - 1} times, because the first term needs no multiplying. So we use ${m('u_n = ar^{n-1}')}, where ${m('u_n')} is the term in position ${m('n')} and ${m(`a = ${a}`)} is the first term.`,
+            `Substitute ${m(`n = ${k}`)} and work it out. Writing out every term agrees: ${m(walk)}.\n\n$$u_{${k}} = ${a} \\times ${rTex}^{${k - 1}} = ${a} \\times ${paren(powF(r, k - 1))} = ${ansTex}$$`,
+          ),
+          conclusion: `Multiplying the first term by ${m('r')} a total of ${k - 1} times gives ${m(ansTex)}.`,
+          keyIdea: 'For a geometric sequence, $u_n = ar^{n-1}$, where $a$ is the first term, $r$ is the ratio and $n$ is the position. Find $r$ by dividing neighbours. From term 1 to term $n$ there are $n - 1$ multiplications.',
         };
       }
     },
@@ -221,18 +232,21 @@ export const generators: Generator[] = [
 
         const answer = fmtLin(d, c);
         const timesTable = [1, 2, 3, 4].map((n) => d * n);
+        const dn = m(sum([[d, 'n']]));
         return {
           stem: `Which expression gives the ${m('n')}th term of the sequence ${m(`${list(shown)}, \\dots`)}?`,
           answer,
           distractors,
-          solution:
-            `The common difference is ${m(`${num(shown[1])} - ${shown[0] < 0 ? `(${shown[0]})` : shown[0]} = ${d}`)}, so the ${m('n')}th term starts with ${m(sum([[d, 'n']]))}.\n\n` +
-            `${m(sum([[d, 'n']]))} gives ${m(list(timesTable))}. ` +
-            (c === 0 ? 'That is exactly the sequence, so no constant is needed.\n\n' : `Each term of the sequence is ${c > 0 ? `${c} more` : `${-c} less`} (${m(`${a} - ${d < 0 ? `(${d})` : d} = ${c}`)}).\n\n`) +
-            `So the ${m('n')}th term is ${answer}.\n\n` +
-            `Check: ${m('n = 1')} gives ${m(num(a))} and ${m('n = 2')} gives ${m(num(a + d))}, matching the sequence.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'For a linear sequence the $n$th term is $dn + (a - d)$: the difference times $n$, adjusted to fit the first term.',
+          asking: `Which formula turns a position ${m('n')} into the term at that position?`,
+          solution: steps(
+            `${m('n')} is the position in the list: ${m('n = 1')} for the first term, ${m('n = 2')} for the second, and so on. We want a formula that turns ${m('n')} into the term.`,
+            `The gap between neighbours is ${m(`${num(shown[1])} - ${shown[0] < 0 ? `(${shown[0]})` : shown[0]} = ${d}`)}, the same each time. So the sequence is linked to the ${m(num(d))} times table, and the formula starts with ${dn}.`,
+            `${dn} gives ${m(list(timesTable))}. Compare with the sequence, ${m(list(shown))}: ` +
+              (c === 0 ? 'they are the same, so nothing needs to be added.' : `every term is ${c > 0 ? `${c} more` : `${-c} less`}, which is the first term minus the gap: ${m(`${a} - ${d < 0 ? `(${d})` : d} = ${c}`)}.`),
+            `${c === 0 ? 'So the formula is just that' : `So we ${c > 0 ? 'add' : 'subtract'} ${Math.abs(c)}`}. Test the result: ${m('n = 1')} gives ${m(num(a))} and ${m('n = 2')} gives ${m(num(a + d))}, matching the sequence.`,
+          ),
+          conclusion: `It has the right gap of ${m(num(d))} and gives the right first term, so the expression is ${answer}.`,
+          keyIdea: 'For a linear sequence the $n$th term is $dn + (a - d)$, where $d$ is the gap and $a$ is the first term. In practice, write the times table of the gap, then see what to add or subtract to match the sequence.',
         };
       }
     },

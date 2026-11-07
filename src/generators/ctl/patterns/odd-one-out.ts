@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
 import { m, paren, signed, sum } from '../../../lib/tex';
 
@@ -45,14 +46,13 @@ function linearMachine(rng: Rng) {
 
   // ----- solution: find the rule
   const di = ys[0] !== 0 ? 0 : 1; // avoid writing "- 0"
-  let sol = '**Step 1: find the multiplier.** ';
-  sol +=
+  const findRule = [
     step === 1
-      ? `Each time the input goes up by $1$, the output goes up by ${m(String(a))} (${m(`${ys[di + 1]} - ${paren(ys[di])} = ${a}`)}). So the rule starts with "multiply by ${a}".\n\n`
-      : `The inputs go up in steps of $2$ and the outputs go up by ${m(String(2 * a))} each time (${m(`${ys[di + 1]} - ${paren(ys[di])} = ${2 * a}`)}). So for each $1$ of input the output goes up by ${m(`${2 * a} \\div 2 = ${a}`)}: the rule starts with "multiply by ${a}".\n\n`;
-  sol += `**Step 2: find the fixed number.** For input ${m(String(xs[0]))}: ${m(`${a} \\times ${xs[0]} = ${a * xs[0]}`)}, but the output is ${m(String(ys[0]))}, so the machine ${addVerb} (${m(`${ys[0]} - ${a * xs[0]} = ${b}`)}).`;
-  sol += `${dmLine(rule)}`;
-  sol += `**Step 3: check on the last row.** ${m(`${a} \\times ${xs[3]}${signed(b)} = ${ys[3]}`)}, which matches the table.\n\n`;
+      ? `Find the multiplier. Each time the input goes up by $1$, the output goes up by ${m(String(a))}: ${m(`${ys[di + 1]} - ${paren(ys[di])} = ${a}`)}. So the rule starts with "multiply by ${a}".`
+      : `Find the multiplier. The inputs go up in steps of $2$ and the outputs go up by ${m(String(2 * a))} each time: ${m(`${ys[di + 1]} - ${paren(ys[di])} = ${2 * a}`)}. So each $1$ of input adds ${m(`${2 * a} \\div 2 = ${a}`)}, and the rule starts with "multiply by ${a}".`,
+    `Find the fixed number. For input ${m(String(xs[0]))}, multiplying gives ${m(`${a} \\times ${xs[0]} = ${a * xs[0]}`)}, but the output is ${m(String(ys[0]))}. The difference is ${m(`${ys[0]} - ${a * xs[0]} = ${b}`)}, so the machine ${addVerb}.\n\n$$${rule}$$`,
+    `Test the rule on the last row: ${m(`${a} \\times ${xs[3]}${signed(b)} = ${ys[3]}`)}, which matches the table.`,
+  ];
 
   const table = { headers: ['Input', 'Output'], rows: xs.map((x, i) => [x, ys[i]]) };
   const intro = 'A function machine applies the same rule to every input. The table shows four examples.';
@@ -84,8 +84,10 @@ function linearMachine(rng: Rng) {
       answer: show(answer),
       answerValue: answer.value(),
       distractors: ds.map((d) => ({ text: show(d.v), value: d.v.value(), why: d.why })),
-      solution: sol + `**Step 4: apply the rule.** Input ${m(String(N))}: ${m(`${a} \\times ${N}${signed(b)} = ${Y}`)}.\n\nAnswer: ${show(answer)}`,
-      keyIdea: 'Find the multiplier from how fast the output changes per 1 of input, then the fixed number from one row, and check the rule on another row before using it.',
+      asking: `What rule links each input to its output, and what does it give for input ${N}?`,
+      solution: steps(...findRule, `Apply the rule to input ${m(String(N))}: ${m(`${a} \\times ${N}${signed(b)} = ${a * N}${signed(b)} = ${Y}`)}.`),
+      conclusion: `The rule fits every row of the table, and input ${m(String(N))} gives ${show(answer)}.`,
+      keyIdea: 'Find the multiplier from how much the output changes for each 1 of input. Find the fixed number from one row, then test the rule on another row before using it.',
     };
   }
 
@@ -109,19 +111,15 @@ function linearMachine(rng: Rng) {
     answer: show(answer),
     answerValue: answer.value(),
     distractors: ds.map((d) => ({ text: show(d.v), value: d.v.value(), why: d.why })),
-    solution:
-      sol +
-      `**Step 4: work backwards from ${m(String(Y))}**, undoing the steps in reverse order.\n\n` +
-      `1. Undo "${addTxt}": ${undo}, ${m(`${Y}${signed(-b)} = ${Y - b}`)}.\n` +
-      `2. Undo "multiply by ${a}": divide, ${m(`${Y - b} \\div ${a} = ${N}`)}.\n\n` +
-      `Check: ${m(`${a} \\times ${N}${signed(b)} = ${Y}`)}.\n\nAnswer: ${show(answer)}`,
-    keyIdea: 'Find the rule from the table, then reverse the machine: undo the last step first, using inverse operations.',
+    asking: `What rule links each input to its output, and which input gives ${m(String(Y))}?`,
+    solution: steps(
+      ...findRule,
+      `Now work backwards from ${m(String(Y))}, undoing the steps in reverse order. The last thing the machine did was "${addTxt}", so undo that first: ${undo}, which gives ${m(`${Y}${signed(-b)} = ${Y - b}`)}.`,
+      `Then undo "multiply by ${a}" by dividing: ${m(`${Y - b} \\div ${a} = ${N}`)}. Test it by running forwards: ${m(`${a} \\times ${N}${signed(b)} = ${Y}`)}.`,
+    ),
+    conclusion: `Undoing the machine's steps from ${m(String(Y))} gives the input ${show(answer)}.`,
+    keyIdea: 'Find the rule from the table, then reverse the machine: undo the last step first, using the opposite operation. So undo the fixed number, then divide by the multiplier. Test by running your answer forwards.',
   };
-}
-
-/** Display maths as its own paragraph. */
-function dmLine(tex: string): string {
-  return `\n\n$$${tex}$$\n\n`;
 }
 
 // ---------------------------------------------------------------- generator 2: which pair breaks the rule?
@@ -216,22 +214,24 @@ function pairRule(rng: Rng) {
   const xmin = Math.min(...xs);
   const regular = [0, 1, 2, 3].filter((i) => i !== k);
 
-  let howTo: string;
+  let howTo: string[];
   if (F.kind === 'lin') {
     const [p, q] = regular.slice().sort((i, j) => xs[i] - xs[j]);
-    howTo =
-      `Find a straight-line rule from two of the pairs, say ${pairTex(p)} and ${pairTex(q)} (if the rule you get fails on both of the other pairs, you happened to pick the odd one out, so try a different two). ` +
+    howTo = [
+      `We do not know the rule yet, so find one from two of the pairs, say ${pairTex(p)} and ${pairTex(q)}. If a rule fails on both of the other pairs, you picked the odd one out by accident, so try two different pairs.`,
       (xs[q] - xs[p] === 1
-        ? `When ${m('x')} goes up by $1$, ${m('y')} goes up by ${m(String(F.a))}, so the multiplier is ${m(String(F.a))}. `
-        : `When ${m('x')} goes up by ${m(String(xs[q] - xs[p]))}, ${m('y')} goes up by ${m(String(ys[q] - ys[p]))}, which is ${m(`${ys[q] - ys[p]} \\div ${xs[q] - xs[p]} = ${F.a}`)} for each $1$ of ${m('x')}. `) +
-      `Then ${m(`${F.a} \\times ${xs[p]} = ${F.a * xs[p]}`)} and ${m(`${ys[p]} - ${F.a * xs[p]} = ${F.c}`)}, so the rule looks like ${m(F.tex)}.`;
+        ? `When ${m('x')} goes up by $1$, ${m('y')} goes up by ${m(String(F.a))}. So the rule starts with "multiply ${m('x')} by ${F.a}".`
+        : `When ${m('x')} goes up by ${m(String(xs[q] - xs[p]))}, ${m('y')} goes up by ${m(String(ys[q] - ys[p]))}. That is ${m(`${ys[q] - ys[p]} \\div ${xs[q] - xs[p]} = ${F.a}`)} for each $1$ of ${m('x')}, so the rule starts with "multiply ${m('x')} by ${F.a}".`),
+      `Find the fixed number from the first of those pairs: ${m(`${F.a} \\times ${xs[p]} = ${F.a * xs[p]}`)}, and ${m(`${ys[p]} - ${F.a * xs[p]} = ${F.c}`)}. So the rule looks like ${m(F.tex)}.`,
+    ];
   } else {
     const p = F.kind === 'sq' ? 2 : 3;
-    const name = F.kind === 'sq' ? 'squares' : 'cubes';
-    howTo =
-      `The ${m('y')}-values grow quickly, so compare each one with the ${name} of the ${m('x')}-values, ${m(`y - x^{${p}}`)}:\n\n` +
-      xs.map((x, i) => `- ${pairTex(i)}: ${m(`${ys[i]} - ${x}^{${p}} = ${ys[i] - x ** p}`)}`).join('\n') +
-      `\n\nThree pairs give the same difference ${m(String(F.c))}, so the rule is ${m(F.tex)}.`;
+    const name = F.kind === 'sq' ? `${m('x^{2}')} (${m('x')} times itself)` : `${m('x^{3}')} (${m('x')} multiplied by itself three times)`;
+    howTo = [
+      `We do not know the rule yet. The ${m('y')}-values grow quickly, which points to a power, so subtract ${name} from each ${m('y')}:\n\n` +
+        xs.map((x, i) => `- ${pairTex(i)}: ${m(`${ys[i]} - ${x}^{${p}} = ${ys[i] - x ** p}`)}`).join('\n'),
+      `Three pairs give the same difference, ${m(String(F.c))}. So the rule is ${m(F.tex)}.`,
+    ];
   }
   const tests = xs
     .map((x, i) => (i === k ? `- ${pairTex(i)}: ${m(`${F.calc(x)} = ${F.f(x)} \\ne ${ys[i]}`)}. Does **not** fit.` : `- ${pairTex(i)}: ${m(`${F.calc(x)} = ${ys[i]}`)}. Fits.`))
@@ -250,8 +250,10 @@ function pairRule(rng: Rng) {
     answer,
     answerValue: `${xs[k]},${ys[k]}`,
     distractors,
-    solution: `${howTo}\n\nNow test every pair against ${m(F.tex)}:\n\n${tests}\n\nOnly one pair breaks the rule. Answer: ${answer}`,
-    keyIdea: 'Find a rule from pairs that agree, test it on every pair, and the single pair that fails is the odd one out.',
+    asking: 'Which pair does not fit the rule that the other three follow?',
+    solution: steps(...howTo, `Now test every pair against ${m(F.tex)}. The one pair that fails is ${answer}:\n\n${tests}`),
+    conclusion: `Three pairs fit ${m(F.tex)}, and the pair that breaks it is ${answer}.`,
+    keyIdea: 'Find a rule that fits most of the pairs: compare $y$ with $x^2$ or $x^3$ if $y$ grows quickly, and otherwise use the change in $y$ for each 1 of $x$. Test every pair. The one that fails is the odd one out.',
   };
 }
 

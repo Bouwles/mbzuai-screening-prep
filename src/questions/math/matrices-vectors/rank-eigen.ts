@@ -38,20 +38,20 @@ export const questions: StaticQuestion[] = [
     options: ['$3$ and $5$', '$-3$ and $2$', '$3$ and $-2$', '$5$ and $0$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which two numbers are the eigenvalues of this matrix?',
       solution:
-        'The matrix is **upper triangular**: the entry below the main diagonal is $0$.\n\n' +
-        'Characteristic equation:\n\n' +
-        `$$\\det(A - \\lambda I) = \\begin{vmatrix} 3 - \\lambda & 5 \\\\ 0 & -2 - \\lambda \\end{vmatrix} = (3 - \\lambda)(-2 - \\lambda) - 5 \\times 0 = (3 - \\lambda)(-2 - \\lambda)$$\n\n` +
-        'Setting this to $0$ gives $\\lambda = 3$ or $\\lambda = -2$.\n\n' +
-        'Shortcut: for a triangular (or diagonal) matrix the eigenvalues are simply the **diagonal entries**, here $3$ and $-2$.\n\n' +
-        'Check: sum $3 + (-2) = 1$ = trace $3 + (-2)$, product $3 \\times (-2) = -6 = \\det A$.',
+        'An **eigenvalue** of $A$ is a number $\\lambda$ (the Greek letter lambda) with $A\\mathbf{v} = \\lambda\\mathbf{v}$ for some non-zero vector $\\mathbf{v}$. In words, $A$ only stretches $\\mathbf{v}$, by a factor of $\\lambda$.\n\n' +
+        'To find eigenvalues, solve $\\det(A - \\lambda I) = 0$. Here $A - \\lambda I$ means subtract $\\lambda$ from each entry on the main diagonal (top left to bottom right), and $\\det$ means the determinant, $ad - bc$.\n\n' +
+        'That gives $\\begin{vmatrix} 3 - \\lambda & 5 \\\\ 0 & -2 - \\lambda \\end{vmatrix} = (3 - \\lambda)(-2 - \\lambda) - 5 \\times 0$. The 0 below the diagonal removes the second part, leaving $(3 - \\lambda)(-2 - \\lambda) = 0$.\n\n' +
+        'A product is 0 only if one bracket is 0. $3 - \\lambda = 0$ gives $\\lambda = 3$, and $-2 - \\lambda = 0$ gives $\\lambda = -2$.',
+      conclusion: 'With a 0 below the diagonal, the eigenvalues are the diagonal entries, $3$ and $-2$.',
       whyWrong: [
         'This reads along the **top row** instead of down the main diagonal. The eigenvalues of a triangular matrix are the diagonal entries $3$ and $-2$.',
         'This is a sign slip in the characteristic equation: writing $\\lambda^2 + \\lambda - 6 = 0$ instead of $\\lambda^2 - \\lambda - 6 = 0$ flips both roots.',
         null,
         'These are the off-diagonal entries. Off-diagonal entries do not give eigenvalues; the diagonal entries of a triangular matrix do.',
       ],
-      keyIdea: 'For a triangular or diagonal matrix, the eigenvalues are exactly the entries on the main diagonal.',
+      keyIdea: 'If all the entries below (or all above) the main diagonal are 0, the matrix is triangular: read the eigenvalues straight off the diagonal. For any other $2 \\times 2$ matrix, solve $\\det(A - \\lambda I) = 0$.',
     },
     check: {
       optionValues: ['3,5', '-3,2', '-2,3', '0,5'],
@@ -66,20 +66,19 @@ export const questions: StaticQuestion[] = [
     options: ['$1$', '$2$', '$3$', '$0$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many rows of $B$ give genuinely new information?',
       solution:
-        'The **rank** is the number of linearly independent rows (equivalently, columns).\n\n' +
-        '- Row 2 is $(2, 4, 6) = 2 \\times (1, 2, 3)$, so row 2 is just a multiple of row 1.\n' +
-        '- Row 1 is not all zeros, so it counts as one independent row.\n\n' +
-        'Row reduce to confirm: $R_2 \\to R_2 - 2R_1$ gives' +
-        `$$${M([[1, 2, 3], [0, 0, 0]])}$$` +
-        'One non-zero row remains, so the rank is $1$.',
+        'The **rank** of a matrix is the number of **independent** rows. A row is independent if it can\'t be built from the other rows by multiplying them by numbers and adding.\n\n' +
+        'Compare the two rows. Doubling row 1, which is $(1, 2, 3)$, gives $(2, 4, 6)$. That is exactly row 2.\n\n' +
+        'So row 2 adds nothing new. Row 1 isn\'t all zeros, so it counts. That leaves 1 independent row.',
+      conclusion: 'Row 2 is just double row 1, so only one row is independent and the rank is $1$.',
       whyWrong: [
         null,
         'This counts the **rows**, assuming they are independent. Row 2 is twice row 1, so it adds nothing new.',
         'This counts the **columns**. The rank can never exceed the number of rows ($2$ here), and in fact it is only $1$.',
         'Rank $0$ belongs only to the zero matrix. Having a dependent row lowers the rank, but row 1 is non-zero so the rank is at least $1$.',
       ],
-      keyIdea: 'Rank = number of linearly independent rows; a row that is a multiple of another row does not add to the rank.',
+      keyIdea: 'To find a rank, look for rows that are multiples or combinations of other rows and cross them out. Count the non-zero rows that remain.',
     },
     check: {
       optionValues: [1, 2, 3, 0],
@@ -99,20 +98,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'Given the two eigenvalues, what are the trace and determinant of the matrix?',
       solution:
-        'Two facts that hold for every square matrix:\n\n' +
-        '- trace (sum of the diagonal entries) = **sum** of the eigenvalues\n' +
-        '- determinant = **product** of the eigenvalues\n\n' +
-        'Trace: $3 + (-5) = -2$.\n\n' +
-        'Determinant: $3 \\times (-5) = -15$.\n\n' +
-        'So trace $= -2$ and $\\det A = -15$.',
+        'An **eigenvalue** of $A$ is a number $\\lambda$ (lambda) with $A\\mathbf{v} = \\lambda\\mathbf{v}$ for some non-zero vector $\\mathbf{v}$: $A$ only stretches $\\mathbf{v}$ by that factor. The **trace** is the sum of the entries on the main diagonal (top left to bottom right). The **determinant** is the number $ad - bc$ for a $2 \\times 2$ matrix.\n\n' +
+        'Two rules connect them. The trace equals the **sum** of the eigenvalues. The determinant equals the **product** of the eigenvalues.\n\n' +
+        'Add the eigenvalues to get the trace: $3 + (-5) = 3 - 5 = -2$.\n\n' +
+        'Multiply them to get the determinant: $3 \\times (-5) = -15$.',
+      conclusion: 'The sum gives the trace and the product gives the determinant, so the answer is trace $-2$, determinant $-15$.',
       whyWrong: [
         'The two rules are swapped: the trace is the **sum** of the eigenvalues and the determinant is the **product**.',
         null,
         'This drops the minus sign on $-5$, using $3 + 5$ and $3 \\times 5$.',
         'This reads the trace off the characteristic equation $\\lambda^2 + 2\\lambda - 15 = 0$ without the minus sign. The equation is $\\lambda^2 - (\\text{trace})\\lambda + \\det = 0$, so the trace is $-2$.',
       ],
-      keyIdea: 'Trace = sum of eigenvalues, determinant = product of eigenvalues.',
+      keyIdea: 'Eigenvalues link to a matrix by two rules: sum of eigenvalues = trace, product of eigenvalues = determinant. Use them in either direction, and bracket negative eigenvalues.',
     },
     check: {
       optionValues: ['-15,-2', '-2,-15', '8,15', '2,-15'],
@@ -130,21 +129,19 @@ export const questions: StaticQuestion[] = [
     options: [`$${V([1, 0])}$`, `$${V([0, 0])}$`, `$${V([1, 2])}$`, `$${V([1, 1])}$`],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which of these vectors does $A$ only stretch, without changing its direction?',
       solution:
-        'A non-zero vector $\\mathbf{v}$ is an eigenvector if $A\\mathbf{v} = \\lambda\\mathbf{v}$: multiplying by $A$ only **stretches** it (no change of direction).\n\n' +
-        'Test each candidate:\n\n' +
-        `- $A${V([1, 1])} = ${V([2 + 1, 1 + 2])} = 3${V([1, 1])}$: a multiple of the vector, so it **is** an eigenvector (eigenvalue $3$).\n` +
-        `- $A${V([1, 0])} = ${V([2, 1])}$: not a multiple of $${V([1, 0])}$.\n` +
-        `- $A${V([1, 2])} = ${V([4, 5])}$: not a multiple of $${V([1, 2])}$ ($4 = 4 \\times 1$ but $5 \\ne 4 \\times 2$).\n` +
-        '- The zero vector is **never** called an eigenvector, by definition.\n\n' +
-        `So the eigenvector is $${V([1, 1])}$.`,
+        'An **eigenvector** of $A$ is a non-zero vector that keeps its direction when multiplied by $A$. So $A\\mathbf{v}$ must be a number times $\\mathbf{v}$. That number is called the **eigenvalue**.\n\n' +
+        'The zero vector can\'t count, because the definition needs a non-zero vector.\n\n' +
+        'Test the other three by multiplying by $A$, each row times the vector:\n\n| $\\mathbf{v}$ | $A\\mathbf{v}$ | A multiple of $\\mathbf{v}$? |\n|---|---|---|\n| $\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$ | $\\begin{bmatrix} 2 \\times 1 + 1 \\times 0 \\\\ 1 \\times 1 + 2 \\times 0 \\end{bmatrix} = \\begin{bmatrix} 2 \\\\ 1 \\end{bmatrix}$ | No: 0 can\'t be multiplied up to 1 |\n| $\\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}$ | $\\begin{bmatrix} 2 \\times 1 + 1 \\times 2 \\\\ 1 \\times 1 + 2 \\times 2 \\end{bmatrix} = \\begin{bmatrix} 4 \\\\ 5 \\end{bmatrix}$ | No: top is times 4, bottom isn\'t |\n| $\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$ | $\\begin{bmatrix} 2 \\times 1 + 1 \\times 1 \\\\ 1 \\times 1 + 2 \\times 1 \\end{bmatrix} = \\begin{bmatrix} 3 \\\\ 3 \\end{bmatrix}$ | Yes: both are times 3 |',
+      conclusion: 'Only one vector comes back as a multiple of itself, with eigenvalue 3, so the eigenvector is $\\begin{bmatrix} 1 \\\\ 1 \\end{bmatrix}$.',
       whyWrong: [
         `This assumes the standard basis vectors are always eigenvectors. That is only true for diagonal matrices; here $A${V([1, 0])} = ${V([2, 1])}$, which points in a different direction.`,
         'The zero vector satisfies $A\\mathbf{0} = \\lambda\\mathbf{0}$ for every $\\lambda$, which is exactly why the definition requires an eigenvector to be **non-zero**.',
         `Multiplying gives $A${V([1, 2])} = ${V([4, 5])}$, which is not a scalar multiple of $${V([1, 2])}$, so its direction changes.`,
         null,
       ],
-      keyIdea: 'Test a candidate eigenvector by computing $A\\mathbf{v}$ and checking it is a scalar multiple of $\\mathbf{v}$ (and $\\mathbf{v} \\ne \\mathbf{0}$).',
+      keyIdea: 'To test for an eigenvector, multiply it by the matrix. If the result is the same number times the original vector, it is an eigenvector and that number is its eigenvalue. Reject the zero vector.',
     },
     check: {
       optionValues: ['1,0', '0,0', '1,2', '1,1'],
@@ -163,19 +160,19 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$2$', '$7$', '$0$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many independent rows does this matrix have?',
       solution:
-        'For a **diagonal** matrix the rank is the number of **non-zero** diagonal entries.\n\n' +
-        '- Row 1 $(2, 0, 0)$ and row 3 $(0, 0, 5)$ are non-zero and point in different directions, so they are independent.\n' +
-        '- Row 2 is all zeros, and a zero row never counts.\n\n' +
-        'So there are $2$ independent rows: the rank is $2$.\n\n' +
-        'Note: $\\det(D) = 2 \\times 0 \\times 5 = 0$, which tells you the rank is **less than** $3$, but not that it is $0$.',
+        'The **rank** is the number of **independent** rows: rows that can\'t be built from the others by multiplying them by numbers and adding.\n\n' +
+        'A row of all zeros gives no information, so it never counts. Row 2 is all zeros, so cross it out.\n\n' +
+        'Rows 1 and 3 are $(2, 0, 0)$ and $(0, 0, 5)$. Each has its non-zero number in a different column, so no multiple of one can ever make the other. That leaves 2 independent rows.',
+      conclusion: 'One row is all zeros and the other two are independent, so the rank is $2$.',
       whyWrong: [
         'This is the size of the matrix. The zero row means only two rows are independent, so the rank is less than $3$.',
         null,
         'This is the trace, the sum of the diagonal entries $2$, $0$ and $5$. The rank counts independent rows, it is not a sum of entries.',
         'This confuses "determinant is $0$" with "rank is $0$". A zero determinant only says the rank is less than full; two rows are still non-zero.',
       ],
-      keyIdea: 'The rank of a diagonal matrix is the number of non-zero entries on its diagonal.',
+      keyIdea: 'For a diagonal matrix, the rank is the number of non-zero diagonal entries. In general, cross out zero rows and rows built from others, then count what is left.',
     },
     check: {
       optionValues: [3, 2, 7, 0],
@@ -191,20 +188,21 @@ export const questions: StaticQuestion[] = [
     options: ['$5$ and $4$', '$3$ and $6$', '$-3$ and $-6$', '$9$ and $18$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What are the two eigenvalues of $A$?',
       solution:
-        'Solve the characteristic equation $\\det(A - \\lambda I) = 0$.\n\n' +
-        `$$\\begin{vmatrix} 5 - \\lambda & 2 \\\\ 1 & 4 - \\lambda \\end{vmatrix} = (5 - \\lambda)(4 - \\lambda) - 2 \\times 1$$\n\n` +
-        'Expand: $(5 - \\lambda)(4 - \\lambda) = 20 - 9\\lambda + \\lambda^2$, so the equation is\n\n' +
-        '$$\\lambda^2 - 9\\lambda + 18 = 0$$\n\n' +
-        'Factorise: $(\\lambda - 3)(\\lambda - 6) = 0$, so $\\lambda = 3$ or $\\lambda = 6$.\n\n' +
-        'Check: $3 + 6 = 9$ = trace $5 + 4$, and $3 \\times 6 = 18 = 5 \\times 4 - 2 \\times 1 = \\det A$.',
+        'An **eigenvalue** is a number $\\lambda$ (lambda) with $A\\mathbf{v} = \\lambda\\mathbf{v}$ for some non-zero vector $\\mathbf{v}$. To find them, solve the **characteristic equation** $\\det(A - \\lambda I) = 0$, where $I$ is the identity matrix.\n\n' +
+        '$A - \\lambda I$ means subtract $\\lambda$ from each entry on the main diagonal (top left to bottom right): $\\begin{bmatrix} 5 - \\lambda & 2 \\\\ 1 & 4 - \\lambda \\end{bmatrix}$.\n\n' +
+        'Its determinant, $ad - bc$, is $(5 - \\lambda)(4 - \\lambda) - 2 \\times 1$.\n\n' +
+        'Multiply out the bracket: $20 - 5\\lambda - 4\\lambda + \\lambda^{2} = \\lambda^{2} - 9\\lambda + 20$. Take away the 2 to get $\\lambda^{2} - 9\\lambda + 18 = 0$.\n\n' +
+        'Factorise. We need two numbers that multiply to 18 and add to $-9$, which are $-3$ and $-6$. So $(\\lambda - 3)(\\lambda - 6) = 0$, giving $\\lambda = 3$ or $\\lambda = 6$.',
+      conclusion: 'The eigenvalues are $3$ and $6$. They add to 9, the sum of the diagonal, and multiply to 18, the determinant.',
       whyWrong: [
         'These are the diagonal entries. Reading eigenvalues off the diagonal only works for triangular or diagonal matrices, and this one has non-zero entries on both sides of the diagonal.',
         null,
         'This is a sign slip: using $\\lambda^2 + 9\\lambda + 18 = 0$ (adding the trace term instead of subtracting it) flips both roots.',
         'These are the trace and the determinant, which are the **sum** and **product** of the eigenvalues, not the eigenvalues themselves.',
       ],
-      keyIdea: 'For a $2 \\times 2$ matrix, the eigenvalues solve $\\lambda^2 - (\\text{trace})\\lambda + \\det = 0$.',
+      keyIdea: 'For a $2 \\times 2$ matrix, use $\\lambda^{2} - (\\text{trace})\\lambda + \\det = 0$, where the trace is the sum of the diagonal and $\\det$ is $ad - bc$. Factorise, then test that the roots add to the trace.',
     },
     check: {
       optionValues: ['4,5', '3,6', '-6,-3', '9,18'],
@@ -219,21 +217,20 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$1$', '$0$', '$2$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many rows of $C$ give genuinely new information?',
       solution:
-        'Row reduce, using row 1 to clear the first column:\n\n' +
-        '- $R_2 \\to R_2 - 4R_1$: $(4, 5, 6) - (4, 8, 12) = (0, -3, -6)$\n' +
-        '- $R_3 \\to R_3 - 7R_1$: $(7, 8, 9) - (7, 14, 21) = (0, -6, -12)$\n\n' +
-        'Now $R_3 \\to R_3 - 2R_2$: $(0, -6, -12) - (0, -6, -12) = (0, 0, 0)$.\n\n' +
-        `$$${M([[1, 2, 3], [0, -3, -6], [0, 0, 0]])}$$\n\n` +
-        'Two non-zero rows remain, so the rank is $2$.\n\n' +
-        'Quick check: $R_1 + R_3 = (8, 10, 12) = 2R_2$, so one row is a combination of the other two, while $R_1$ and $R_2$ are clearly not multiples of each other.',
+        'The **rank** is the number of **independent** rows: rows that can\'t be built from the others by multiplying them by numbers and adding.\n\n' +
+        'Rows 1 and 2 aren\'t multiples of each other. Multiplying $(1, 2, 3)$ by 4 gives $(4, 8, 12)$, which isn\'t $(4, 5, 6)$. So those two are independent.\n\n' +
+        'Can row 3 be built from them? Look at the pattern: each entry goes up by 3 from row 1 to row 2, and up by 3 again from row 2 to row 3. That suggests row 2 doubled, minus row 1.\n\n' +
+        'Try it: $2(4, 5, 6) - (1, 2, 3) = (8 - 1, 10 - 2, 12 - 3) = (7, 8, 9)$. That is exactly row 3, so it adds nothing new and only rows 1 and 2 remain.',
+      conclusion: 'Row 3 can be built from rows 1 and 2, which are independent, so the rank is $2$.',
       whyWrong: [
         'This assumes three rows must be independent because none is a multiple of another. But $R_3 = 2R_2 - R_1$, so row 3 adds nothing new (and $\\det C = 0$).',
         'Rank $1$ would need every row to be a multiple of a single row. $(4, 5, 6)$ is not a multiple of $(1, 2, 3)$, so the rank is at least $2$.',
         'This confuses $\\det C = 0$ with rank $0$. A zero determinant only means the rank is less than $3$; only the zero matrix has rank $0$.',
         null,
       ],
-      keyIdea: 'Row reduce and count the non-zero rows that remain: that count is the rank.',
+      keyIdea: 'For a $3 \\times 3$ matrix: if two rows aren\'t multiples, the rank is at least 2. Then test whether the third row is a mix of them. A determinant of 0 confirms that it is.',
     },
     check: {
       optionValues: [3, 1, 0, 2],
@@ -248,19 +245,21 @@ export const questions: StaticQuestion[] = [
     options: [`$${V([1, 0])}$`, `$${V([1, -1])}$`, `$${V([1, 1])}$`, `$${V([0, 1])}$`],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which vector gets multiplied by exactly 2 when $A$ acts on it?',
       solution:
-        'Solve $(A - 2I)\\mathbf{v} = \\mathbf{0}$.\n\n' +
-        `$$A - 2I = ${M([[3 - 2, 1], [0, 2 - 2]])} = ${M([[1, 1], [0, 0]])}$$\n\n` +
-        'With $\\mathbf{v} = (x, y)$, the first row gives $x + y = 0$, so $y = -x$. The second row gives $0 = 0$ (no information).\n\n' +
-        `Choose $x = 1$: $\\mathbf{v} = ${V([1, -1])}$.\n\n` +
-        `Check: $A${V([1, -1])} = ${V([3 - 1, -2])} = 2${V([1, -1])}$.`,
+        'An **eigenvector** for $\\lambda = 2$ is a non-zero vector $\\mathbf{v}$ with $A\\mathbf{v} = 2\\mathbf{v}$. So $A$ only stretches it, by a factor of 2.\n\n' +
+        'Write $\\mathbf{v} = \\begin{bmatrix} x \\\\ y \\end{bmatrix}$ and multiply each row of $A$ by it: $A\\mathbf{v} = \\begin{bmatrix} 3x + y \\\\ 2y \\end{bmatrix}$. We need this to equal $2\\mathbf{v} = \\begin{bmatrix} 2x \\\\ 2y \\end{bmatrix}$.\n\n' +
+        'The bottom row says $2y = 2y$, which is always true and tells us nothing.\n\n' +
+        'The top row says $3x + y = 2x$. Take $2x$ from both sides to get $x + y = 0$, so $y = -x$.\n\n' +
+        'Any non-zero pair with $y = -x$ works. Choosing $x = 1$ gives $y = -1$, so $\\mathbf{v} = \\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$.',
+      conclusion: '$A$ turns this vector into $\\begin{bmatrix} 2 \\\\ -2 \\end{bmatrix}$, which is 2 times it. So the eigenvector is $\\begin{bmatrix} 1 \\\\ -1 \\end{bmatrix}$.',
       whyWrong: [
         `This is an eigenvector for the **other** eigenvalue: $A${V([1, 0])} = ${V([3, 0])} = 3${V([1, 0])}$, so its eigenvalue is $3$, not $2$.`,
         null,
         `This is a sign slip when solving $x + y = 0$ (taking $y = x$). Check: $A${V([1, 1])} = ${V([4, 2])}$, not a multiple of $${V([1, 1])}$.`,
         `This assumes the second diagonal entry goes with the second standard basis vector, which is only true for diagonal matrices. Here $A${V([0, 1])} = ${V([1, 2])}$.`,
       ],
-      keyIdea: 'To find an eigenvector for $\\lambda$, solve $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$ and pick any non-zero solution.',
+      keyIdea: 'To find an eigenvector, write $\\mathbf{v}$ with entries $x$ and $y$, set $A\\mathbf{v} = \\lambda\\mathbf{v}$ and find how $y$ relates to $x$. With options given, you can also multiply each one by $A$ and see which is stretched by $\\lambda$.',
     },
     check: {
       optionValues: ['1,0', '1,-1', '1,1', '0,1'],
@@ -279,19 +278,20 @@ export const questions: StaticQuestion[] = [
     options: ['$6$', '$10$', '$2$', '$3$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What must $k$ be for 4 to be an eigenvalue of this matrix?',
       solution:
-        'If $4$ is an eigenvalue then $\\det(A - 4I) = 0$.\n\n' +
-        `$$A - 4I = ${M([['k - 4', 2], [3, -3]])}$$\n\n` +
-        '$$\\det(A - 4I) = (k - 4)(-3) - 2 \\times 3 = -3k + 12 - 6 = -3k + 6$$\n\n' +
-        'Set it to $0$: $-3k + 6 = 0$, so $k = 2$.\n\n' +
-        'Check with $k = 2$: trace $= 3$, det $= 2 - 6 = -4$, so $\\lambda^2 - 3\\lambda - 4 = (\\lambda - 4)(\\lambda + 1) = 0$. Yes, $4$ is an eigenvalue.',
+        'An **eigenvalue** $\\lambda$ of $A$ must satisfy $\\det(A - \\lambda I) = 0$, where $A - \\lambda I$ means subtract $\\lambda$ from each entry on the main diagonal. We are told $\\lambda = 4$ works, so put in 4.\n\n' +
+        'Subtract 4 from the two diagonal entries: $A - 4I = \\begin{bmatrix} k - 4 & 2 \\\\ 3 & 1 - 4 \\end{bmatrix} = \\begin{bmatrix} k - 4 & 2 \\\\ 3 & -3 \\end{bmatrix}$.\n\n' +
+        'Find its determinant, $ad - bc$: $(k - 4)(-3) - 2 \\times 3 = -3k + 12 - 6 = -3k + 6$.\n\n' +
+        'Set it to 0: $-3k + 6 = 0$. Add $3k$ to both sides to get $6 = 3k$, then divide by 3 to get $k = 2$.',
+      conclusion: 'With $k = 2$ the matrix has sum of diagonal 3 and determinant $-4$, which fit eigenvalues 4 and $-1$. So $k$ is $2$.',
       whyWrong: [
         'This adds $bc$ instead of subtracting it: $(k - 4)(-3) + 6 = 0$ gives $k = 6$. The determinant is $ad - bc$.',
         'This subtracts $\\lambda$ from the top-left entry only, solving $(k - 4)(1) - 6 = 0$. You must subtract $\\lambda$ from **every** diagonal entry.',
         null,
         'This sets the trace $k + 1$ equal to $4$. The trace is the **sum of both** eigenvalues, not one eigenvalue.',
       ],
-      keyIdea: '$\\lambda$ is an eigenvalue exactly when $\\det(A - \\lambda I) = 0$; substitute $\\lambda$ and solve for the unknown.',
+      keyIdea: 'When you are given one eigenvalue and asked for an unknown entry: subtract the eigenvalue from the diagonal, set the determinant to 0 and solve. You don\'t need the other eigenvalue.',
     },
     check: {
       optionValues: [6, 10, 2, 3],
@@ -306,18 +306,19 @@ export const questions: StaticQuestion[] = [
     options: ['$A$ is invertible', '$A$ is the zero matrix', '$\\det A = 0$', '$\\operatorname{tr}(A) = 0$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'If 0 is an eigenvalue of $A$, what has to be true about $A$?',
       solution:
-        'The determinant is the **product** of the eigenvalues: $\\det A = \\lambda_1 \\lambda_2 \\lambda_3$.\n\n' +
-        'If one eigenvalue is $0$, the product is $0$, so $\\det A = 0$.\n\n' +
-        'Equivalently: an eigenvalue $0$ means $A\\mathbf{v} = 0\\mathbf{v} = \\mathbf{0}$ for some non-zero $\\mathbf{v}$, so the columns of $A$ are linearly dependent, the rank is less than $3$, and $A$ has no inverse.\n\n' +
-        'The others need not hold, e.g. $A = \\begin{bmatrix} 1 & 0 & 0 \\\\ 0 & 2 & 0 \\\\ 0 & 0 & 0 \\end{bmatrix}$ has eigenvalues $1, 2, 0$, is not the zero matrix and has trace $3$.',
+        'An **eigenvalue** is a number $\\lambda$ with $A\\mathbf{v} = \\lambda\\mathbf{v}$ for some non-zero vector $\\mathbf{v}$. A useful rule: the **determinant** of a square matrix, which is a single number worked out from it, equals the product of all its eigenvalues.\n\n' +
+        'A $3 \\times 3$ matrix has three eigenvalues. Call them $0$, $\\lambda_{2}$ and $\\lambda_{3}$. Then $\\det A = 0 \\times \\lambda_{2} \\times \\lambda_{3}$.\n\n' +
+        'Anything multiplied by 0 is 0, so this product must be 0, whatever the other two eigenvalues are.',
+      conclusion: 'One eigenvalue of 0 makes the whole product 0, so the statement that must be true is $\\det A = 0$.',
       whyWrong: [
         'This is the opposite of the truth: $\\det A = 0$, and a matrix with zero determinant has **no** inverse.',
         'Only one eigenvalue is $0$. The diagonal matrix with entries $1, 2, 0$ has eigenvalue $0$ but is not the zero matrix.',
         null,
         'The trace is the **sum** of the eigenvalues; one of them being $0$ does not make the sum $0$ (for $1, 2, 0$ the trace is $3$). It is the **product** that becomes $0$.',
       ],
-      keyIdea: 'Eigenvalue $0$ $\\iff$ $\\det A = 0$ $\\iff$ rank less than full $\\iff$ $A$ is not invertible.',
+      keyIdea: 'Product of eigenvalues = determinant, and sum of eigenvalues = trace. To reject a "must be true" claim, try one example, such as a diagonal matrix with entries 1, 2, 0.',
     },
   },
   {
@@ -328,18 +329,19 @@ export const questions: StaticQuestion[] = [
     options: ['$\\frac{2}{3}$', '$-6$', '$4$', '$6$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which value of $k$ leaves this matrix with just one independent row?',
       solution:
-        'A $2 \\times 2$ matrix has rank $1$ (rather than $2$) when its rows are multiples of each other, i.e. when its determinant is $0$ (and it is not the zero matrix).\n\n' +
-        '$$\\det A = 1 \\times k - 2 \\times 3 = k - 6$$\n\n' +
-        'Set $k - 6 = 0$, so $k = 6$.\n\n' +
-        'Check: row 2 is $(3, 6) = 3 \\times (1, 2)$, a multiple of row 1.',
+        'The **rank** is the number of **independent** rows: rows that can\'t be built from the others. Rank 1 means only one row is independent, so row 2 must be a multiple of row 1.\n\n' +
+        'Find the multiplier from the first column, which has no unknown. Row 1 starts with 1 and row 2 starts with 3, so row 2 must be 3 times row 1.\n\n' +
+        'Apply the same multiplier to the second column. Row 1 has 2 there, so row 2 must have $3 \\times 2 = 6$. That entry is $k$, so $k = 6$.',
+      conclusion: 'With $k = 6$ row 2 is $(3, 6)$, exactly 3 times $(1, 2)$. So the rank is 1 when $k$ is $6$.',
       whyWrong: [
         'This cross-multiplies the wrong pair, solving $1 \\times 2 = 3k$. Row 2 must be $3$ times row 1, so $k = 3 \\times 2 = 6$.',
         'This uses $\\det A = ad + bc$, giving $k + 6 = 0$. The determinant is $ad - bc$.',
         'This makes row 2 equal to row 1 **plus** $2$: $(1 + 2, 2 + 2) = (3, 4)$. Dependent rows must be scalar **multiples**, not shifted by adding a number.',
         null,
       ],
-      keyIdea: 'A non-zero $2 \\times 2$ matrix has rank $1$ exactly when its determinant is $0$.',
+      keyIdea: 'For rank 1, every row must be a multiple of one row. Find the multiplier from a column with no unknown, then apply it to the unknown. For a $2 \\times 2$ matrix, $ad - bc = 0$ also works.',
     },
     check: {
       optionValues: [2 / 3, -6, 4, 6],
@@ -354,18 +356,20 @@ export const questions: StaticQuestion[] = [
     options: ['$4$', '$-30$', '$30$', '$0$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What is the determinant of this matrix, worked out from its eigenvalues?',
       solution:
-        '$A$ is **upper triangular** (all zeros below the main diagonal), so its eigenvalues are the diagonal entries: $2$, $-3$ and $5$.\n\n' +
-        'The determinant is the product of the eigenvalues:\n\n' +
-        '$$\\det A = 2 \\times (-3) \\times 5 = -30$$\n\n' +
-        'The entries above the diagonal ($7$, $-1$, $4$) do not affect the eigenvalues or the determinant of a triangular matrix.',
+        'An **eigenvalue** is a number $\\lambda$ with $A\\mathbf{v} = \\lambda\\mathbf{v}$ for some non-zero vector $\\mathbf{v}$. This matrix has only zeros below the main diagonal, so it is **triangular**, and its eigenvalues are its diagonal entries.\n\n' +
+        'Read them off the diagonal: $2$, $-3$ and $5$.\n\n' +
+        'The **determinant**, a single number worked out from a square matrix, equals the **product** of the eigenvalues, so $\\det A = 2 \\times (-3) \\times 5$.\n\n' +
+        'Multiply in two stages: $2 \\times (-3) = -6$, then $-6 \\times 5 = -30$.',
+      conclusion: 'The eigenvalues are 2, $-3$ and 5, and their product gives $\\det A$ as $-30$.',
       whyWrong: [
         'This is the **sum** of the eigenvalues, $2 - 3 + 5 = 4$, which is the trace. The determinant is the **product**.',
         null,
         'This drops the negative sign of $-3$. An odd number of negative factors makes the product negative.',
         'This assumes the zeros below the diagonal make the determinant $0$. A determinant is $0$ only if an eigenvalue (here a diagonal entry) is $0$.',
       ],
-      keyIdea: 'For a triangular matrix, eigenvalues = diagonal entries and determinant = their product.',
+      keyIdea: 'For a triangular matrix, the eigenvalues are the diagonal entries and the determinant is their product. Count the negative numbers: an odd count means a negative result.',
     },
     check: {
       optionValues: [4, -30, 30, 0],
@@ -380,20 +384,21 @@ export const questions: StaticQuestion[] = [
     options: ['$-5$ and $1$', '$2$ and $3$', '$5$ and $-1$', '$11$ and $-7$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What are the two eigenvalues of $S$?',
       solution:
-        `$$\\det(S - \\lambda I) = \\begin{vmatrix} 2 - \\lambda & 3 \\\\ 3 & 2 - \\lambda \\end{vmatrix} = (2 - \\lambda)^2 - 9$$\n\n` +
-        'Set to $0$: $(2 - \\lambda)^2 = 9$, so $2 - \\lambda = 3$ or $2 - \\lambda = -3$.\n\n' +
-        '- $2 - \\lambda = 3 \\Rightarrow \\lambda = -1$\n' +
-        '- $2 - \\lambda = -3 \\Rightarrow \\lambda = 5$\n\n' +
-        '(Or expand: $\\lambda^2 - 4\\lambda - 5 = (\\lambda - 5)(\\lambda + 1) = 0$.)\n\n' +
-        'Check: $5 + (-1) = 4$ = trace, $5 \\times (-1) = -5 = 4 - 9 = \\det(S)$.',
+        'An **eigenvalue** is a number $\\lambda$ (lambda) that solves $\\det(S - \\lambda I) = 0$. Here $S - \\lambda I$ means subtract $\\lambda$ from each entry on the main diagonal: $\\begin{bmatrix} 2 - \\lambda & 3 \\\\ 3 & 2 - \\lambda \\end{bmatrix}$.\n\n' +
+        'Its determinant, $ad - bc$, is $(2 - \\lambda)(2 - \\lambda) - 3 \\times 3 = (2 - \\lambda)^{2} - 9$.\n\n' +
+        'Set it to 0 and add 9 to both sides: $(2 - \\lambda)^{2} = 9$.\n\n' +
+        'Take the square root. A number squared gives 9 if it is 3 or $-3$, so $2 - \\lambda = 3$ or $2 - \\lambda = -3$.\n\n' +
+        'Solve each one for $\\lambda$. $2 - \\lambda = 3$ gives $\\lambda = -1$, and $2 - \\lambda = -3$ gives $\\lambda = 5$.',
+      conclusion: 'The eigenvalues are $5$ and $-1$. They add to 4, the sum of the diagonal, and multiply to $-5$, the determinant.',
       whyWrong: [
         'This is a sign slip on the trace term: $\\lambda^2 + 4\\lambda - 5 = 0$ gives $-5$ and $1$. The characteristic equation is $\\lambda^2 - (\\text{trace})\\lambda + \\det = 0$.',
         'These are just the two different entries of the matrix. The matrix is not triangular, so the eigenvalues must come from the characteristic equation.',
         null,
         'This forgets to square root: from $(2 - \\lambda)^2 = 9$ it uses $2 - \\lambda = \\pm 9$ instead of $\\pm 3$.',
       ],
-      keyIdea: 'Set $\\det(S - \\lambda I) = 0$; with equal diagonal entries it becomes $(a - \\lambda)^2 = b^2$, so $\\lambda = a \\pm b$.',
+      keyIdea: 'For a matrix of the form $\\begin{bmatrix} a & b \\\\ b & a \\end{bmatrix}$, the determinant step gives $(a - \\lambda)^{2} = b^{2}$. So the eigenvalues are $a + b$ and $a - b$.',
     },
     check: {
       optionValues: ['-5,1', '2,3', '-1,5', '-7,11'],
@@ -408,19 +413,21 @@ export const questions: StaticQuestion[] = [
     options: [`$${V([1, 4])}$`, `$${V([2, 1])}$`, `$${V([1, -1])}$`, `$${V([1, 2])}$`],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which vector gets multiplied by exactly 5 when $A$ acts on it?',
       solution:
-        'Solve $(A - 5I)\\mathbf{v} = \\mathbf{0}$.\n\n' +
-        `$$A - 5I = ${M([[1 - 5, 2], [4, 3 - 5]])} = ${M([[-4, 2], [4, -2]])}$$\n\n` +
-        'Row 1 gives $-4x + 2y = 0$, so $y = 2x$. (Row 2, $4x - 2y = 0$, says the same thing.)\n\n' +
-        `Take $x = 1$, $y = 2$: $\\mathbf{v} = ${V([1, 2])}$.\n\n` +
-        `Check: $A${V([1, 2])} = ${V([1 + 4, 4 + 6])} = ${V([5, 10])} = 5${V([1, 2])}$.`,
+        'An **eigenvector** for the eigenvalue 5 is a non-zero vector $\\mathbf{v}$ with $A\\mathbf{v} = 5\\mathbf{v}$. Rearranging gives $(A - 5I)\\mathbf{v} = \\mathbf{0}$, where $I$ is the identity matrix.\n\n' +
+        '$A - 5I$ means subtract 5 from each entry on the main diagonal: $\\begin{bmatrix} 1 - 5 & 2 \\\\ 4 & 3 - 5 \\end{bmatrix} = \\begin{bmatrix} -4 & 2 \\\\ 4 & -2 \\end{bmatrix}$.\n\n' +
+        'Multiply this by $\\mathbf{v} = \\begin{bmatrix} x \\\\ y \\end{bmatrix}$. The first row gives $-4x + 2y = 0$. The second row gives $4x - 2y = 0$, the same equation with the signs flipped, so one is enough.\n\n' +
+        'Solve it. Add $4x$ to both sides to get $2y = 4x$, then divide by 2 to get $y = 2x$.\n\n' +
+        'Any non-zero pair with $y = 2x$ works. Choosing $x = 1$ gives $y = 2$, so $\\mathbf{v} = \\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}$.',
+      conclusion: '$A$ turns this vector into $\\begin{bmatrix} 5 \\\\ 10 \\end{bmatrix}$, which is 5 times it. So the eigenvector is $\\begin{bmatrix} 1 \\\\ 2 \\end{bmatrix}$.',
       whyWrong: [
         `This is the first column of $A$. A column of $A$ is not an eigenvector in general: $A${V([1, 4])} = ${V([9, 16])}$, not a multiple of $${V([1, 4])}$.`,
         `This swaps $x$ and $y$ when solving $y = 2x$. Check: $A${V([2, 1])} = ${V([4, 11])}$, not a multiple of $${V([2, 1])}$.`,
         `This is the eigenvector for the **other** eigenvalue: $A${V([1, -1])} = ${V([-1, 1])} = -1 \\times ${V([1, -1])}$.`,
         null,
       ],
-      keyIdea: 'Each eigenvalue has its own eigenvectors: substitute that $\\lambda$ into $(A - \\lambda I)\\mathbf{v} = \\mathbf{0}$.',
+      keyIdea: 'To find an eigenvector: subtract the eigenvalue from the main diagonal, write one row as an equation equal to 0, and find how $y$ relates to $x$. Pick a simple $x$. Any non-zero multiple is also correct.',
     },
     check: {
       optionValues: ['1,4', '2,1', '1,-1', '1,2'],
@@ -439,21 +446,20 @@ export const questions: StaticQuestion[] = [
     options: ['$4$ and $9$', '$5$ and $10$', '$5$ and $-8$', '$3$ and $-2$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'If $A$ has eigenvalues 2 and $-3$, what are the eigenvalues of $A^{2} + I$?',
       solution:
-        'If $A\\mathbf{v} = \\lambda\\mathbf{v}$, then\n\n' +
-        '- $A^2\\mathbf{v} = A(\\lambda\\mathbf{v}) = \\lambda A\\mathbf{v} = \\lambda^2\\mathbf{v}$\n' +
-        '- $(A^2 + I)\\mathbf{v} = \\lambda^2\\mathbf{v} + \\mathbf{v} = (\\lambda^2 + 1)\\mathbf{v}$\n\n' +
-        'So each eigenvalue $\\lambda$ of $A$ becomes $\\lambda^2 + 1$:\n\n' +
-        '- $\\lambda = 2$: $2^2 + 1 = 5$\n' +
-        '- $\\lambda = -3$: $(-3)^2 + 1 = 9 + 1 = 10$\n\n' +
-        'The eigenvalues of $A^2 + I$ are $5$ and $10$.',
+        'An **eigenvalue** $\\lambda$ goes with a non-zero vector $\\mathbf{v}$ such that $A\\mathbf{v} = \\lambda\\mathbf{v}$. In other words, $A$ acting on $\\mathbf{v}$ just multiplies it by $\\lambda$.\n\n' +
+        'Apply $A$ twice: $A^{2}\\mathbf{v} = A(\\lambda\\mathbf{v}) = \\lambda(A\\mathbf{v}) = \\lambda^{2}\\mathbf{v}$. So $A^{2}$ multiplies $\\mathbf{v}$ by $\\lambda^{2}$.\n\n' +
+        '$I$ is the identity matrix, so $I\\mathbf{v} = \\mathbf{v}$. Adding gives $(A^{2} + I)\\mathbf{v} = \\lambda^{2}\\mathbf{v} + \\mathbf{v} = (\\lambda^{2} + 1)\\mathbf{v}$. So each eigenvalue $\\lambda$ becomes $\\lambda^{2} + 1$.\n\n' +
+        'Put in each eigenvalue, with brackets around the negative one: $2^{2} + 1 = 4 + 1 = 5$, and $(-3)^{2} + 1 = 9 + 1 = 10$.',
+      conclusion: 'Each eigenvalue $\\lambda$ becomes $\\lambda^{2} + 1$, so the new eigenvalues are $5$ and $10$.',
       whyWrong: [
         'These are the eigenvalues of $A^2$; the $+I$ adds $1$ to every eigenvalue, which was forgotten.',
         null,
         'This squares $-3$ as $-3^2 = -9$ instead of $(-3)^2 = 9$. Always bracket a negative number before squaring.',
         'These are the eigenvalues of $A + I$: the squaring step was skipped.',
       ],
-      keyIdea: 'If $\\lambda$ is an eigenvalue of $A$, then $\\lambda^2$ is an eigenvalue of $A^2$ and $\\lambda + c$ is an eigenvalue of $A + cI$.',
+      keyIdea: 'Whatever you do to the matrix, do to each eigenvalue: $A^{2}$ squares them and $A + kI$ adds $k$. So replace $A$ with $\\lambda$ in the expression and calculate. Bracket negative values before squaring.',
     },
     check: {
       optionValues: ['4,9', '5,10', '-8,5', '-2,3'],
@@ -472,18 +478,21 @@ export const questions: StaticQuestion[] = [
     options: ['$r(A) = m$, $r(B) = m$', '$r(A) = m$, $r(B) = n$', '$r(A) = n$, $r(B) = m$', '$r(A) = n$, $r(B) = n$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What are the ranks of $A$ and $B$, if multiplying them gives the unit matrix?',
       solution:
-        'The **unit matrix of order $m$**, $I_{m}$, is the $m \\times m$ identity matrix, and $r(X)$ means the rank of $X$. All $m$ rows of $I_{m}$ are independent, so $r(I_{m}) = m$.\n\n' +
-        '1. The rank of a product is at most the rank of each factor, so $m = r(AB) \\le r(A)$ and $m \\le r(B)$.\n' +
-        '2. A rank cannot exceed the smaller dimension. $A$ has $m$ rows and $B$ has $m$ columns, so $r(A) \\le m$ and $r(B) \\le m$.\n' +
-        '3. Both bounds together give $r(A) = m$ and $r(B) = m$.',
+        'The **rank** $r(X)$ counts the independent rows of $X$: rows that can\'t be built from the others. This always equals the number of independent columns. So a rank can\'t be more than the number of rows or the number of columns.\n\n' +
+        'Find an upper limit. $A$ has $m$ rows and $B$ has $m$ columns, so $r(A) \\le m$ and $r(B) \\le m$.\n\n' +
+        'Now find a lower limit. A product can\'t have a higher rank than either factor, so $r(AB) \\le r(A)$ and $r(AB) \\le r(B)$.\n\n' +
+        '$AB$ equals $I_{m}$, the unit matrix (1s on the main diagonal, 0s elsewhere). Each of its $m$ rows has its 1 in a different column, so all are independent and $r(AB) = m$. So $m \\le r(A)$ and $m \\le r(B)$.\n\n' +
+        'Each rank is at most $m$ and at least $m$, so each must be exactly $m$.',
+      conclusion: 'Both ranks are squeezed between the two limits, so $r(A) = m$, $r(B) = m$.',
       whyWrong: [
         null,
         'This takes the rank of $B$ to be $n$ because $B$ has $n$ rows. But $B$ has only $m$ columns, so its rank is at most $m$, which is less than $n$.',
         'This takes the rank of $A$ to be $n$ because $A$ has $n$ columns. But $A$ has only $m$ rows, so its rank is at most $m$, which is less than $n$.',
         'This uses the larger dimension for both. A rank can never exceed the smaller dimension, which is $m$ for each matrix.',
       ],
-      keyIdea: 'If $AB = I_{m}$ then $m \\le r(A)$ and $m \\le r(B)$, and the size limits then force $r(A) = r(B) = m$.',
+      keyIdea: 'For rank questions with products, find two limits. The smaller dimension gives an upper limit. $r(AB) \\le \\min(r(A), r(B))$ gives a lower limit when you know $r(AB)$. If they agree, you have the rank.',
     },
     check: {
       optionValues: ['m,m', 'm,n', 'n,m', 'n,n'],
@@ -506,19 +515,20 @@ export const questions: StaticQuestion[] = [
     options: ['$r(PQ) \\le q$', '$r(PQ) = p$', '$PQ$ is invertible', '$r(PQ) = p - q$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What can we always say about the rank of $PQ$, given that $q$ is smaller than $p$?',
       solution:
-        'Here $r(X)$ means the rank of $X$.\n\n' +
-        '1. $PQ$ is $(p \\times q)(q \\times p)$, which is a $p \\times p$ matrix.\n' +
-        '2. $Q$ has only $q$ rows, so $r(Q) \\le q$.\n' +
-        '3. The rank of a product is at most the rank of each factor: $r(PQ) \\le r(Q) \\le q$.\n\n' +
-        'Since $q < p$, the $p \\times p$ matrix $PQ$ never has full rank, so it is never invertible.',
+        'The **rank** $r(X)$ counts the independent rows of $X$: rows that can\'t be built from the others. This always equals the number of independent columns. So a rank can\'t be more than the number of rows or the number of columns.\n\n' +
+        '$P$ is $p \\times q$, so it has only $q$ columns. That means $r(P) \\le q$.\n\n' +
+        'A product can\'t have a higher rank than either of its factors, so $r(PQ) \\le r(P)$.\n\n' +
+        'Put the two together: $r(PQ) \\le r(P) \\le q$.',
+      conclusion: '$PQ$ is $p \\times p$, but its rank can never pass $q$. So the statement that is always true is $r(PQ) \\le q$.',
       whyWrong: [
         null,
         'This picks $p$ because $PQ$ is $p \\times p$. The size only gives an upper limit; here the rank is at most $q$, which is less than $p$.',
         'A $p \\times p$ matrix is invertible only when its rank is $p$, but here the rank is at most $q < p$.',
         'Rank does not come from subtracting dimensions. If $P$ and $Q$ are zero matrices then $r(PQ) = 0$, while $p - q > 0$.',
       ],
-      keyIdea: 'A product can never have a higher rank than either of its factors, whatever the size of the result.',
+      keyIdea: 'The rank of a product is limited by the smallest dimension of its factors, even if the product itself is bigger. Write down each factor\'s dimensions and take the smallest.',
     },
   },
   {
@@ -529,16 +539,19 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$5$', '$8$', '$15$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the largest rank a matrix with 3 rows and 5 columns can have?',
       solution:
-        'A rank cannot exceed the number of rows or the number of columns, so it is at most the smaller of the two.\n\n' +
-        'For a $3 \\times 5$ matrix the maximum is $\\min(3, 5) = 3$.',
+        'The **rank** is the number of **independent** rows: rows that can\'t be built from the others by multiplying them by numbers and adding. It also equals the number of independent columns.\n\n' +
+        'So a rank can\'t be more than the number of rows, and it can\'t be more than the number of columns. Here those limits are 3 and 5.\n\n' +
+        'The smaller limit wins, which is 3. It can be reached: the rows $(1, 0, 0, 0, 0)$, $(0, 1, 0, 0, 0)$ and $(0, 0, 1, 0, 0)$ are all independent.',
+      conclusion: 'With only 3 rows, at most 3 can be independent, so the maximum rank is $3$.',
       whyWrong: [
         null,
         'This uses the larger dimension. There are only $3$ rows, so at most $3$ rows can be independent.',
         'This adds the dimensions. The rank is limited by the smaller dimension, not their sum.',
         'This is the number of entries, $3 \\times 5$. The rank counts independent rows, not entries.',
       ],
-      keyIdea: 'A $p \\times q$ matrix has rank at most $\\min(p, q)$.',
+      keyIdea: 'The largest possible rank of any matrix is the smaller of its two dimensions: $\\min(\\text{rows}, \\text{columns})$.',
     },
     check: {
       optionValues: [3, 5, 8, 15],
@@ -553,16 +566,19 @@ export const questions: StaticQuestion[] = [
     options: ['$p$', '$q$', '$p + q$', '$pq$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the biggest rank a matrix with fewer rows than columns can have?',
       solution:
-        'Here $r(A)$ means the rank of $A$. The rank is at most the smaller dimension: $r(A) \\le \\min(p, q)$.\n\n' +
-        'Since $p < q$, the largest possible value is $p$.',
+        'The **rank** $r(A)$ is the number of **independent** rows of $A$: rows that can\'t be built from the others. It also equals the number of independent columns.\n\n' +
+        '$A$ is $p \\times q$, meaning $p$ rows and $q$ columns. So the rank can\'t be more than $p$, and it can\'t be more than $q$.\n\n' +
+        'We are told $p < q$, so $p$ is the tighter limit. For example, a $2 \\times 3$ matrix has at most rank 2, which is $p$.',
+      conclusion: 'There are only $p$ rows and $p$ is the smaller dimension, so the largest possible value of $r(A)$ is $p$.',
       whyWrong: [
         null,
         'This picks $q$ because $A$ has $q$ columns. With only $p$ rows, at most $p$ rows can be independent, and $p < q$.',
         'This adds the dimensions. The rank is limited by the smaller dimension, not their sum.',
         'This is the number of entries in $A$. The rank counts independent rows, not entries.',
       ],
-      keyIdea: 'The rank of a matrix is at most its smaller dimension.',
+      keyIdea: 'The largest rank is the smaller of the two dimensions. With letters, use the given inequality to see which is smaller, and try small numbers such as $2 \\times 3$ to test your choice.',
     },
   },
   {
@@ -573,15 +589,18 @@ export const questions: StaticQuestion[] = [
     options: ['The maximum number of linearly independent rows', 'The total number of rows', 'The number of non-zero entries', 'The value of its determinant'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does the word rank mean for a matrix?',
       solution:
-        'The rank is the largest number of rows you can pick so that none of the picked rows can be built from the others (**linearly independent** rows). Counting columns the same way always gives the same number.',
+        'A row is **linearly independent** if you can\'t build it by multiplying the other rows by numbers and adding them. In $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$, row 2 is twice row 1, so it isn\'t independent of row 1.\n\n' +
+        'The **rank** counts how many rows are left once you remove any that can be built from others. That example has two rows but rank 1.',
+      conclusion: 'So the rank is the maximum number of linearly independent rows.',
       whyWrong: [
         null,
         'This counts every row. A row that is a multiple of another row adds nothing, so it does not raise the rank.',
         'This counts entries. $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$ has four non-zero entries but rank $1$.',
         'The determinant is a different number, and it exists only for square matrices. It tells you whether a square matrix has full rank, not what the rank is.',
       ],
-      keyIdea: 'Rank = maximum number of linearly independent rows = maximum number of linearly independent columns.',
+      keyIdea: 'Think of rank as the number of rows that carry new information. Cross out any row that is a multiple or a mix of others, then count what is left.',
     },
   },
   {
@@ -592,16 +611,19 @@ export const questions: StaticQuestion[] = [
     options: ['$m$', '$1$', '$0$', '$m^{2}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the rank of the $m \\times m$ matrix with 1s on its diagonal and 0s elsewhere?',
       solution:
-        'The **unit matrix of order $m$**, $I_{m}$, is the $m \\times m$ identity matrix: $1$s on the main diagonal and $0$s elsewhere.\n\n' +
-        'Its $m$ rows are all independent, because each has its single $1$ in a different column. So $r(I_{m}) = m$.',
+        'The **rank** is the number of **independent** rows: rows that can\'t be built from the others. The unit matrix $I_{m}$ has $m$ rows, with 1s on the main diagonal and 0s elsewhere.\n\n' +
+        'Each row has its 1 in a different column. Row 1 has it in column 1, row 2 in column 2, and so on.\n\n' +
+        'To build a row from the others, you would need to make that 1. Every other row has 0 in that column, so they can\'t. All $m$ rows are independent.',
+      conclusion: 'No row can be built from the others, so all of them count and $r(I_{m})$ is $m$.',
       whyWrong: [
         null,
         'This reads "unit" as "rank one". Each row of $I_{m}$ has its $1$ in a different column, so all $m$ rows count.',
         'Only the zero matrix has rank $0$. Having many zero entries does not make the rank zero.',
         'This is the number of entries in $I_{m}$. The rank counts independent rows, and there are only $m$ rows.',
       ],
-      keyIdea: 'The unit matrix of order $m$ has full rank: $r(I_{m}) = m$.',
+      keyIdea: 'If each row has a non-zero entry in a column where all the other rows have 0, every row is independent. So the rank equals the number of rows.',
     },
     check: {
       optionValues: [4, 1, 0, 16],
@@ -616,15 +638,18 @@ export const questions: StaticQuestion[] = [
     options: ['An eigenvalue of $A$', 'An eigenvector of $A$', 'The rank of $A$', 'The trace of $A$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the name of the number $\\lambda$ in the equation $A\\mathbf{v} = \\lambda\\mathbf{v}$?',
       solution:
-        'In $A\\mathbf{v} = \\lambda\\mathbf{v}$, the matrix only stretches $\\mathbf{v}$. The number $\\lambda$ is the stretch factor, called an **eigenvalue**, and the vector $\\mathbf{v}$ is an **eigenvector**.',
+        'Read the equation in words. Multiplying the vector $\\mathbf{v}$ by the matrix $A$ gives the same vector multiplied by an ordinary number, $\\lambda$ (lambda). So $A$ only stretches $\\mathbf{v}$.\n\n' +
+        'That stretch number $\\lambda$ is called an **eigenvalue**, and the vector $\\mathbf{v}$ is called an **eigenvector**. For example, $\\begin{bmatrix} 2 & 0 \\\\ 0 & 3 \\end{bmatrix}\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix} = 2\\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$, so 2 is an eigenvalue.',
+      conclusion: '$\\lambda$ is the stretch factor in the equation, which makes it an eigenvalue of $A$.',
       whyWrong: [
         null,
         'The eigenvector is the vector $\\mathbf{v}$. Here $\\lambda$ is a number, the stretch factor.',
         'The rank counts independent rows. It does not appear in the equation $A\\mathbf{v} = \\lambda\\mathbf{v}$.',
         'The trace is the sum of the diagonal entries, which equals the sum of **all** the eigenvalues, not one of them.',
       ],
-      keyIdea: 'In $A\\mathbf{v} = \\lambda\\mathbf{v}$, $\\mathbf{v}$ is the eigenvector and $\\lambda$ is the eigenvalue.',
+      keyIdea: 'In $A\\mathbf{v} = \\lambda\\mathbf{v}$, the bold letter is a vector, called the eigenvector, and the plain letter is a number, called the eigenvalue. Use that to match each name to its symbol.',
     },
   },
   {
@@ -635,17 +660,19 @@ export const questions: StaticQuestion[] = [
     options: ['$2$', '$3$', '$5$', '$6$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the biggest rank the product $AB$ could have?',
       solution:
-        'Here $r(X)$ means the rank of $X$. The rank of a product is limited by both factors:\n\n' +
-        '$$r(AB) \\le \\min(r(A), r(B))$$\n\n' +
-        'So $r(AB) \\le \\min(3, 2) = 2$.',
+        'The **rank** $r(X)$ counts the independent rows of $X$: rows that can\'t be built from the others. This always equals the number of independent columns.\n\n' +
+        'Multiplying can\'t create new independent rows or columns. Every row of $AB$ is built from the rows of $B$, and every column of $AB$ is built from the columns of $A$. So $r(AB) \\le r(B)$ and $r(AB) \\le r(A)$.\n\n' +
+        'Both limits hold, so the smaller rank is the limit: $r(AB) \\le \\min(3, 2)$, which is 2. It can be reached: if $A$ is the $3 \\times 3$ unit matrix, then $AB = B$, which has rank 2.',
+      conclusion: 'The rank of a product can\'t pass the smaller rank, so the largest possible value of $r(AB)$ is $2$.',
       whyWrong: [
         null,
         'This uses the larger rank. The product is limited by **both** factors, so the smaller rank is the limit.',
         'This adds the ranks. Multiplying matrices can never increase the rank beyond that of either factor.',
         'This multiplies the ranks. The limit is the smaller rank, not the product of the ranks.',
       ],
-      keyIdea: '$r(AB) \\le \\min(r(A), r(B))$.',
+      keyIdea: 'The rank of a product is at most the smaller rank: $r(AB) \\le \\min(r(A), r(B))$. Like a chain, it is only as strong as its weakest link. Ranks never add or multiply.',
     },
     check: {
       optionValues: [2, 3, 5, 6],
@@ -665,15 +692,20 @@ export const questions: StaticQuestion[] = [
     options: ['$r(AB) \\le \\min(r(A), r(B))$', '$r(AB) = r(A) + r(B)$', '$r(AB) = r(A) \\times r(B)$', '$r(AB) \\ge \\max(r(A), r(B))$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What rule always links the rank of $AB$ to the ranks of $A$ and $B$?',
       solution:
-        'Here $r(X)$ means the rank of $X$. Multiplying matrices can keep or lose independent rows and columns, but it cannot create new ones, so the rank of $AB$ is at most the smaller of $r(A)$ and $r(B)$.',
+        'The **rank** $r(X)$ counts the independent rows of $X$: rows that can\'t be built from the others. It always equals the number of independent columns too.\n\n' +
+        'Each row of $AB$ is made by adding multiples of the rows of $B$. So $AB$ can\'t have more independent rows than $B$, which gives $r(AB) \\le r(B)$.\n\n' +
+        'Each column of $AB$ is made by adding multiples of the columns of $A$. So $AB$ can\'t have more independent columns than $A$, which gives $r(AB) \\le r(A)$.\n\n' +
+        'Both limits hold at once, so $r(AB)$ is at most the smaller of the two ranks.',
+      conclusion: 'That is the rule $r(AB) \\le \\min(r(A), r(B))$.',
       whyWrong: [
         null,
         'Ranks do not add under multiplication. With $A = B = I_{2}$, $r(AB) = 2$, not $4$.',
         'Ranks do not multiply either. With $A = B = I_{3}$, $r(AB) = 3$, not $9$.',
         'This has the inequality the wrong way round. A zero matrix times any matrix has rank $0$.',
       ],
-      keyIdea: 'A product cannot have a higher rank than either factor.',
+      keyIdea: 'Test rank rules on simple cases. $A = B = I_{2}$, the $2 \\times 2$ unit matrix (1s on the main diagonal, 0s elsewhere), gives $r(AB) = 2$, which rules out adding and multiplying ranks. A zero matrix for $A$ rules out any rule with $\\ge$.',
     },
   },
   {
@@ -684,17 +716,19 @@ export const questions: StaticQuestion[] = [
     options: ['$\\det(A) \\ne 0$', '$\\det(A) = 0$', '$A$ is the unit matrix of order $n$', '$A$ has no inverse'],
     correctIndex: 0,
     markScheme: {
+      asking: 'If an $n \\times n$ matrix has rank $n$, what must be true about it?',
       solution:
-        'Here $r(A)$ means the rank of $A$, and $r(A) = n$ is called **full rank**. For a square matrix these three statements go together:\n\n' +
-        '$$r(A) = n \\iff A \\text{ is invertible} \\iff \\det(A) \\ne 0$$\n\n' +
-        'So $\\det(A) \\ne 0$.',
+        'The **rank** is the number of **independent** rows: rows that can\'t be built from the others. $r(A) = n$ means all $n$ rows are independent, which is called **full rank**.\n\n' +
+        'The **determinant** is a single number worked out from a square matrix. It is 0 exactly when some row can be built from the others. For example, $\\begin{bmatrix} 1 & 2 \\\\ 2 & 4 \\end{bmatrix}$ has determinant $4 - 4 = 0$.\n\n' +
+        'Here no row can be built from the others, so the determinant can\'t be 0.',
+      conclusion: 'All $n$ rows are independent, so the determinant is non-zero: $\\det(A) \\ne 0$.',
       whyWrong: [
         null,
         'A zero determinant means the rank is **less** than $n$, which is the opposite of what is given.',
         'The unit matrix of order $n$ (the $n \\times n$ identity) has rank $n$, but so do many other matrices, such as $2I_{n}$.',
         'This reverses the fact. A square matrix of full rank always has an inverse.',
       ],
-      keyIdea: 'For a square matrix: full rank, invertible and non-zero determinant all mean the same thing.',
+      keyIdea: 'For a square matrix, these all mean the same thing: full rank, $\\det \\ne 0$, has an inverse. Given any one of them, you can state the others.',
     },
   },
   {
@@ -705,16 +739,19 @@ export const questions: StaticQuestion[] = [
     options: ['$r(A) < 4$', '$r(A) = 0$', '$r(A) = 4$', '$A$ is the zero matrix'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What does a zero determinant tell us about the rank of a $4 \\times 4$ matrix?',
       solution:
-        'Here $r(A)$ means the rank of $A$. A square matrix has full rank exactly when its determinant is non-zero.\n\n' +
-        'Since $\\det(A) = 0$, the rank is less than full: $r(A) < 4$. It could still be $1$, $2$ or $3$.',
+        'The **rank** $r(A)$ is the number of **independent** rows: rows that can\'t be built from the others. A $4 \\times 4$ matrix has rank 4 only if all 4 rows are independent.\n\n' +
+        'The **determinant** is a single number worked out from a square matrix. It is 0 exactly when at least one row can be built from the others. So here, not all 4 rows are independent.\n\n' +
+        'That means the rank is below 4. It could be 0, 1, 2 or 3, and the determinant alone can\'t tell us which.',
+      conclusion: 'A zero determinant only rules out full rank, so the statement that must be true is $r(A) < 4$.',
       whyWrong: [
         null,
         'A zero determinant does not mean rank $0$. It only means the rank is less than $4$; only the zero matrix has rank $0$.',
         'Rank $4$ would need $\\det A \\ne 0$, which is the opposite of what is given.',
         'Many non-zero matrices have determinant $0$, for example any matrix with two equal rows.',
       ],
-      keyIdea: '$\\det(A) = 0$ means the rank is less than full, not that the rank is zero.',
+      keyIdea: '$\\det = 0$ means not full rank, and says nothing more. To reject a "must be true" claim, try an example: a matrix with two equal rows has determinant 0, yet it isn\'t the zero matrix.',
     },
   },
   {
@@ -725,16 +762,20 @@ export const questions: StaticQuestion[] = [
     options: ['No, because the rank is at most $4$', 'Yes, always', 'Yes, if the rank is $6$', 'Yes, if no column is all zeros'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Can all 6 columns of a $4 \\times 6$ matrix be independent of each other?',
       solution:
-        'Six independent columns would need rank $6$.\n\n' +
-        'But the rank is at most the smaller dimension: $\\min(4, 6) = 4$. So at most $4$ of the $6$ columns can be independent, and the columns are always dependent.',
+        'Columns are **linearly independent** if none of them can be built from the others by multiplying them by numbers and adding. Here that would take 6 independent columns.\n\n' +
+        'The **rank** of a matrix is its number of independent rows, and this always equals its number of independent columns.\n\n' +
+        'A $4 \\times 6$ matrix has only 4 rows, so its rank can\'t be more than 4. So at most 4 columns can be independent.\n\n' +
+        'There are 6 columns, so at least 2 of them can always be built from the others.',
+      conclusion: 'Six columns can\'t all be independent when only 4 can be, so the answer is: No, because the rank is at most $4$.',
       whyWrong: [
         null,
         'More columns does not mean more independence. Each column has only $4$ entries, and at most $4$ such vectors can be independent.',
         'A $4 \\times 6$ matrix can never have rank $6$, because the rank is at most the smaller dimension, $4$.',
         'Non-zero columns can still depend on each other. With $6$ columns and rank at most $4$, some column is always a combination of the others.',
       ],
-      keyIdea: 'A matrix with more columns than rows always has dependent columns.',
+      keyIdea: 'More columns than rows means the columns can\'t all be independent, because rank is at most the smaller dimension. Likewise, more rows than columns means the rows can\'t all be independent.',
     },
     check: {
       optionValues: ['no', 'always', 'rank 6', 'non-zero columns'],
@@ -753,18 +794,20 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$5$', '$2$', '$15$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the rank of $A$, given that $AB$ is the $3 \\times 3$ unit matrix?',
       solution:
-        'The **unit matrix of order $3$**, $I_{3}$, is the $3 \\times 3$ identity matrix, and it has rank $3$. Here $r(A)$ means the rank of $A$.\n\n' +
-        '1. $3 = r(AB) \\le r(A)$, because a product cannot have a higher rank than its factors.\n' +
-        '2. $r(A) \\le 3$, because $A$ has only $3$ rows.\n\n' +
-        'So $r(A) = 3$.',
+        'The **rank** $r(X)$ counts the independent rows of $X$: rows that can\'t be built from the others. Start with an upper limit: $A$ has only 3 rows, so $r(A) \\le 3$.\n\n' +
+        '$I_{3}$ has 1s on the main diagonal and 0s elsewhere, so each row has its 1 in a different column. All 3 rows are independent, so $r(AB) = r(I_{3}) = 3$.\n\n' +
+        'A product can\'t have a higher rank than either factor, so $r(AB) \\le r(A)$. That gives a lower limit: $3 \\le r(A)$.\n\n' +
+        '$r(A)$ is at most 3 and at least 3, so it must be exactly 3.',
+      conclusion: 'The two limits meet, so $r(A)$ is $3$.',
       whyWrong: [
         null,
         'This picks $5$ because $A$ has $5$ columns. With only $3$ rows, the rank of $A$ cannot exceed $3$.',
         'This subtracts the dimensions, $5 - 3$. Rank does not come from subtracting, and a rank of $2$ would limit $AB$ to rank $2$, so it could not be $I_{3}$.',
         'This is the number of entries in $A$. The rank counts independent rows.',
       ],
-      keyIdea: 'If $AB$ is the unit matrix of order $m$, then $A$ and $B$ both have rank at least $m$.',
+      keyIdea: 'Squeeze the rank between two limits. The smaller dimension gives the upper limit. $r(AB) \\le r(A)$ gives the lower limit when you know $r(AB)$.',
     },
     check: {
       optionValues: [3, 5, 2, 15],
@@ -783,17 +826,20 @@ export const questions: StaticQuestion[] = [
     options: ['$r(A) = n$ and $\\det(A) \\ne 0$', '$r(A) < n$', '$\\det(A) = 0$', '$A = B$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'If $AB$ is the unit matrix, what must be true about $A$?',
       solution:
-        'The **unit matrix of order $n$**, $I_{n}$, is the $n \\times n$ identity matrix, whose determinant is $1$. Here $r(A)$ means the rank of $A$.\n\n' +
-        '1. $\\det(A)\\det(B) = \\det(AB) = \\det(I_{n}) = 1$, so $\\det(A) \\ne 0$.\n' +
-        '2. A square matrix with a non-zero determinant has full rank, so $r(A) = n$.',
+        '$I_{n}$ is the unit matrix: 1s on the main diagonal and 0s elsewhere. Its **determinant** (the single number worked out from a square matrix) is 1.\n\n' +
+        'Take the determinant of both sides of $AB = I_{n}$. The determinant of a product is the product of the determinants, so $\\det(A) \\times \\det(B) = 1$.\n\n' +
+        'If $\\det(A)$ were 0, the left side would be 0, not 1. So $\\det(A) \\ne 0$.\n\n' +
+        'The **rank** $r(A)$ is the number of independent rows: rows that can\'t be built from the others. A square matrix with a non-zero determinant has all its rows independent, so $r(A) = n$.',
+      conclusion: 'Both facts hold, so the true statement is $r(A) = n$ and $\\det(A) \\ne 0$.',
       whyWrong: [
         null,
         'A rank below $n$ would make $\\det A = 0$, and then $\\det A \\det B$ could not equal $1$.',
         'If $\\det A = 0$ then $\\det(AB) = 0$, but $\\det(I_{n}) = 1$.',
         '$AB = I_{n}$ says $B$ is the inverse of $A$, which is usually a different matrix. For example, $A = 2I_{n}$ has $B = \\frac{1}{2}I_{n}$.',
       ],
-      keyIdea: 'If $AB = I_{n}$ for square matrices, then $A$ is invertible, so it has full rank and a non-zero determinant.',
+      keyIdea: 'When a product of square matrices equals $I$, take determinants of both sides. Neither factor can have determinant 0, so both have full rank and an inverse.',
     },
   },
 ];

@@ -1,6 +1,7 @@
 import type { Generator } from '../../../types';
-import { Frac } from '../../../lib/frac';
-import { m, num, paren, poly } from '../../../lib/tex';
+import { steps, table } from '../../../lib/explanation';
+import { Frac, lcm } from '../../../lib/frac';
+import { m, num, paren, poly, signed } from '../../../lib/tex';
 
 type FCand = { f: Frac; why: string };
 
@@ -52,16 +53,48 @@ function subLine(coeffs: Frac[], x0: number): string {
   return out === '' ? '0' : out;
 }
 
-/** "$F(x0) = ... = value$" line (just "$F(0) = 0$" at zero, avoiding "- 0" terms). */
+/** The value of each term of F at x0, before adding them up. */
+function termVals(coeffs: Frac[], x0: number): Frac[] {
+  const n = coeffs.length - 1;
+  return coeffs.map((c, i) => c.mul(x0 ** (n - i))).filter((v) => v.n !== 0);
+}
+
+/** A list of values written as a sum: "\frac{8}{3} + 6". */
+const sumTex = (vals: Frac[]): string => vals.map((v, i) => (i === 0 ? v.tex() : signed(v))).join('');
+
+/**
+ * The extra working for adding fractions, as " = ..." links to go before the result:
+ * everything over a common denominator, then the total before it is reduced.
+ */
+function fracWorking(vals: Frac[], result: Frac): string {
+  const parts = vals.filter((v) => v.n !== 0);
+  if (parts.length < 2 || parts.every((v) => v.d === 1)) return '';
+  const L = parts.reduce((acc, v) => lcm(acc, v.d), 1);
+  const tops = parts.map((v) => v.n * (L / v.d));
+  const over = (t: number) => `\\frac{${Math.abs(t)}}{${L}}`;
+  const common = tops.map((t, i) => (i === 0 ? (t < 0 ? `-${over(t)}` : over(t)) : t < 0 ? ` - ${over(t)}` : ` + ${over(t)}`)).join('');
+  const total = tops.reduce((a, t) => a + t, 0);
+  const same = parts.every((v) => v.d === L);
+  return `${same ? '' : ` = ${common}`}${result.d === L ? '' : ` = ${total < 0 ? '-' : ''}${over(total)}`}`;
+}
+
+/** "$F(x0) = ... = value$" line, showing each term's value (just "$F(0) = 0$" at zero, avoiding "- 0" terms). */
 function subEq(FC: Frac[], x0: number, val: Frac): string {
   if (x0 === 0) return '$F(0) = 0$';
-  return `$F(${num(x0)}) = ${subLine(FC, x0)} = ${val.tex()}$`;
+  const vals = termVals(FC, x0);
+  const mid = sumTex(vals);
+  return `$F(${num(x0)}) = ${subLine(FC, x0)}${mid === val.tex() ? '' : ` = ${mid}`}${fracWorking(vals, val)} = ${val.tex()}$`;
+}
+
+/** A sentence for putting one limit into F: at 0 it says why the value is 0. */
+function limitLine(name: string, FC: Frac[], x0: number, val: Frac): string {
+  return `${name} limit, $x = ${num(x0)}$: ${subEq(FC, x0, val)}${x0 === 0 ? ', because every term has an $x$ in it' : ''}.`;
 }
 
 /** "A - B = " for the final subtraction, or "" when B is 0. */
 function minus(A: Frac, B: Frac): string {
   if (B.n === 0) return '';
-  return `${A.tex()} - ${paren(B)} = `;
+  return `${A.tex()} - ${paren(B)}${fracWorking([A, B.neg()], A.sub(B))} = `;
 }
 
 /** Integral limit: a limit of exactly 1 is written "{1 }" (renders identically) so it is not read as a power of 1. */
@@ -138,33 +171,32 @@ export const generators: Generator[] = [
 
         const fTex = poly(fC);
         const FTex = poly(FC);
-        const termLines = fC
-          .map((c, i) => {
-            const p = deg - i;
-            if (c.n === 0) return '';
-            const from = poly([c, ...Array(p).fill(0)]);
-            const to = poly([c.div(p + 1), ...Array(p + 1).fill(0)]);
-            return `- ${m(from)} becomes ${m(to)}\n`;
-          })
-          .join('');
+        const termRows = fC.flatMap((c, i) => {
+          const p = deg - i;
+          if (c.n === 0) return [];
+          const from = poly([c, ...Array(p).fill(0)]);
+          const to = poly([c.div(p + 1), ...Array(p + 1).fill(0)]);
+          return [[m(from), p + 1, m(`${c.tex()} \\div ${p + 1} = ${c.div(p + 1).tex()}`), m(to)]];
+        });
         const answer = m(ans.tex());
-        const solution =
-          '**Step 1: integrate term by term** (add 1 to each power, then divide by the new power):\n\n' +
-          termLines +
-          `\nSo $F(x) = ${FTex}$ (no $+C$ needed, it cancels in a definite integral).\n\n` +
-          '**Step 2: substitute the limits.**\n\n' +
-          `- ${subEq(FC, hi, Fhi)}\n` +
-          `- ${subEq(FC, lo, Flo)}\n\n` +
-          '**Step 3: upper minus lower.**\n\n' +
-          `$$${intTex(lo, hi, fTex)} = ${minus(Fhi, Flo)}${ans.tex()}$$\n\n` +
-          `Answer: ${answer}`;
+        const solution = steps(
+          `The numbers on the integral sign are **limits**, with $${num(hi)}$ at the top and $${num(lo)}$ at the bottom. We integrate first, then work out the value at the top limit minus the value at the bottom limit.`,
+          'Integrate each term: add 1 to the power, then divide the number in front by the new power. A plain number counts as power 0, so it gains an $x$.\n\n' +
+            table(['Term', 'New power', 'Number in front', 'Result'], termRows),
+          `Call the result $F(x) = ${FTex}$. We can leave out $+ C$, because it would cancel when we subtract.`,
+          limitLine('Top', FC, hi, Fhi),
+          limitLine('Bottom', FC, lo, Flo),
+          `Subtract, top minus bottom:\n\n$$${intTex(lo, hi, fTex)} = ${minus(Fhi, Flo)}${ans.tex()}$$`,
+        );
         return {
           stem: `Evaluate $${intTex(lo, hi, fTex)}$.`,
           answer,
           answerValue: ans.value(),
           distractors: ds.map((d) => ({ text: m(d.f.tex()), value: d.f.value(), why: d.why })),
+          asking: `What number do you get by integrating this and using the limits $${num(lo)}$ and $${num(hi)}$?`,
           solution,
-          keyIdea: 'Integrate with the reverse power rule, then work out $F(\\text{upper}) - F(\\text{lower})$.',
+          conclusion: `The top limit gives $${Fhi.tex()}$ and the bottom limit gives $${Flo.tex()}$, and subtracting leaves ${answer}.`,
+          keyIdea: 'Definite integral: integrate each term (add 1 to the power, divide by the new power), then work out $F(\\text{top}) - F(\\text{bottom})$. Put brackets around negative limits when you substitute them.',
         };
       }
     },
@@ -200,13 +232,15 @@ export const generators: Generator[] = [
           stem: `Find $\\int ${integrand}\\,dx$.`,
           answer,
           distractors: pool,
-          solution:
-            `The bracket is linear, ${m(`${inner}`)}, with coefficient of $x$ equal to ${m(num(a))}. Use $\\int (ax + b)^{n}\\,dx = \\frac{(ax + b)^{n+1}}{a(n+1)} + C$.\n\n` +
-            `**Step 1:** treat the bracket like $x$: raise the power from ${m(num(n))} to ${m(num(n + 1))} and divide by ${m(num(n + 1))}.\n\n` +
-            `**Step 2:** divide by the coefficient of $x$, ${m(num(a))}. The number in front becomes ${m(`${num(c)} \\div \\left(${num(n + 1)} \\times ${paren(a)}\\right) = ${ansC.tex()}`)}.\n\n` +
-            `**Check:** differentiating ${m(`${lead(ansC)}${br}^{${n + 1}}`)} gives ${m(`${ansC.tex()} \\times ${num(n + 1)} \\times ${paren(a)}${br}^{${n}}`)}, which is ${m(integrand)}.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'For a function of $ax + b$, integrate as if the bracket were $x$, then divide by $a$.',
+          asking: `Which function has $${integrand}$ as its derivative?`,
+          solution: steps(
+            `The bracket holds ${m(inner)}: just a number times $x$, plus a number. Multiplying it out would be slow. Instead, treat the bracket like $x$, then correct the result.`,
+            `Use the reverse power rule on the bracket: raise the power from ${m(num(n))} to ${m(num(n + 1))} and divide by ${m(num(n + 1))}. ${c === 1 ? '' : `The ${m(num(c))} in front stays too. `}That gives a first guess of ${m(`${lead(C.div(n + 1))}${br}^{${n + 1}}`)}.`,
+            `Test the guess by differentiating it. The chain rule multiplies by the derivative of the inside, which is ${m(num(a))}. So the guess gives ${m(num(a))} times what we want.`,
+            `To fix that, divide by ${m(num(a))} as well. The number in front becomes ${m(`${num(c)} \\div \\left(${num(n + 1)} \\times ${paren(a)}\\right) = ${ansC.tex()}`)}. So the integral is ${answer}.`,
+          ),
+          conclusion: `Differentiating ${answer} gives back $${integrand}$, the expression we started with, so this is the integral.`,
+          keyIdea: 'For $\\int (ax + b)^{n}\\,dx$: treat the bracket like $x$ (raise the power, divide by the new power), then also divide by $a$, the number multiplying $x$. This only works when the inside is $ax + b$.',
         };
       }
 
@@ -227,13 +261,14 @@ export const generators: Generator[] = [
           stem: `Find $\\int ${integrand}\\,dx$.`,
           answer,
           distractors: pool,
-          solution:
-            `Use $\\int e^{kx}\\,dx = \\frac{1}{k}e^{kx} + C$ with $k = ${num(k)}$.\n\n` +
-            `**Step 1:** $e^{x}$ integrates to itself, so start with ${m(ex)}.\n\n` +
-            `**Step 2:** the chain rule would bring down a factor ${m(num(k))} when differentiating, so divide by ${m(num(k))}: ${m(`${num(c)} \\div ${paren(k)} = ${ansC.tex()}`)}.\n\n` +
-            `**Check:** ${m(`\\frac{d}{dx}\\left(${lead(ansC)}${ex}\\right) = ${ansC.tex()} \\times ${paren(k)}${ex} = ${integrand}`)}.\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: '$\\int e^{kx}\\,dx = \\frac{1}{k}e^{kx} + C$: divide by the number multiplying $x$.',
+          asking: `Which function has $${integrand}$ as its derivative?`,
+          solution: steps(
+            `$e^{x}$ is special: its derivative is itself, so it also integrates to itself. That suggests a first guess of $${integrand}$, keeping the power of $e$ the same.`,
+            `Test the guess by differentiating it. The chain rule brings down ${m(num(k))}, the number multiplying $x$: ${m(`\\frac{d}{dx}${ex} = ${num(k)}${ex}`)}. So the guess gives ${m(num(k))} times what we want.`,
+            `To fix that, divide by ${m(num(k))}. The number in front becomes ${m(`${num(c)} \\div ${paren(k)} = ${ansC.tex()}`)}. So the integral is ${answer}.`,
+          ),
+          conclusion: `Differentiating ${answer} brings down ${m(num(k))} and gives back $${integrand}$, so this is the integral.`,
+          keyIdea: '$\\int e^{kx}\\,dx = \\frac{1}{k}e^{kx} + C$: keep the $e^{kx}$ and divide by $k$, the number multiplying $x$. Keep the sign of $k$.',
         };
       }
 
@@ -268,16 +303,18 @@ export const generators: Generator[] = [
           stem: `Find $\\int ${integrand}\\,dx$.`,
           answer,
           distractors: pool,
-          solution:
-            (isCos
-              ? `Use $\\int \\cos kx\\,dx = \\frac{1}{k}\\sin kx + C$ with $k = ${num(k)}$.\n\n**Step 1:** $\\cos$ integrates to $\\sin$ (no sign change).\n\n`
-              : `Use $\\int \\sin kx\\,dx = -\\frac{1}{k}\\cos kx + C$ with $k = ${num(k)}$.\n\n**Step 1:** $\\sin$ integrates to $-\\cos$ (because $\\frac{d}{dx}\\cos x = -\\sin x$).\n\n`) +
-            `**Step 2:** divide by ${m(num(k))}, the number multiplying $x$: ${m(isCos ? `${num(c)} \\div ${num(k)} = ${ansC.tex()}` : `-\\left(${num(c)} \\div ${num(k)}\\right) = ${ansC.tex()}`)}.\n\n` +
-            `**Check:** ${m(`\\frac{d}{dx}\\left(${lead(ansC)}${other} ${arg}\\right) = ${ansC.tex()} \\times ${isCos ? num(k) : `\\left(-${num(k)}\\right)`}${fn} ${arg} = ${integrand}`)}.\n\n` +
-            `Answer: ${answer}`,
+          asking: `Which function has $${integrand}$ as its derivative?`,
+          solution: steps(
+            isCos
+              ? `Integrating reverses differentiating, so ask what differentiates to a cosine. The derivative of $\\sin x$ is $\\cos x$, so we start from $\\sin ${arg}$.`
+              : `Integrating reverses differentiating, so ask what differentiates to a sine. The derivative of $\\cos x$ is $-\\sin x$, which has an unwanted minus sign. So $-\\cos x$ differentiates to $\\sin x$, and we start from $-\\cos ${arg}$.`,
+            `Differentiating that with the chain rule would bring down ${m(num(k))}, the number multiplying $x$. That makes it ${m(num(k))} times too big, so we must divide by ${m(num(k))}.`,
+            `${c === 1 ? '' : `The ${m(num(c))} in the question stays in front too. `}The number in front becomes ${m(isCos ? `${num(c)} \\div ${num(k)} = ${ansC.tex()}` : `-\\left(${num(c)} \\div ${num(k)}\\right) = ${ansC.tex()}`)}. So the integral is ${answer}.`,
+          ),
+          conclusion: `Differentiating ${answer} gives back $${integrand}$, so this is the integral.`,
           keyIdea: isCos
-            ? '$\\int \\cos kx\\,dx = \\frac{1}{k}\\sin kx + C$: divide by the number multiplying $x$.'
-            : '$\\int \\sin kx\\,dx = -\\frac{1}{k}\\cos kx + C$: watch the minus sign and divide by $k$.',
+            ? '$\\int \\cos kx\\,dx = \\frac{1}{k}\\sin kx + C$: cosine becomes sine with no sign change, then divide by $k$, the number multiplying $x$.'
+            : '$\\int \\sin kx\\,dx = -\\frac{1}{k}\\cos kx + C$: sine becomes minus cosine, then divide by $k$, the number multiplying $x$.',
         };
       }
 
@@ -301,13 +338,15 @@ export const generators: Generator[] = [
         stem: `Find $\\int ${integrand}\\,dx$.`,
         answer,
         distractors: pool,
-        solution:
-          `Use $\\int \\frac{1}{ax + b}\\,dx = \\frac{1}{a}\\ln|ax + b| + C$ with $a = ${num(a)}$.\n\n` +
-          `**Step 1:** $\\frac{1}{x}$ integrates to $\\ln|x|$, so start with ${m(`${c === 1 ? '' : num(c)}${lnT}`)}.\n\n` +
-          `**Step 2:** divide by the coefficient of $x$, ${m(num(a))}: ${m(`${num(c)} \\div ${paren(a)} = ${ansC.tex()}`)}.\n\n` +
-          `**Check:** ${m(`\\frac{d}{dx}\\left(${lead(ansC)}${lnT}\\right) = ${ansC.tex()} \\times \\frac{${num(a)}}{${inner}} = ${integrand}`)}.\n\n` +
-          `Answer: ${answer}`,
-        keyIdea: '$\\int \\frac{1}{ax + b}\\,dx = \\frac{1}{a}\\ln|ax + b| + C$: a logarithm, divided by the coefficient of $x$.',
+        asking: `Which function has $${integrand}$ as its derivative?`,
+        solution: steps(
+          `This looks like $\\frac{1}{x}$, which integrates to $\\ln|x|$. So expect a logarithm. The bars mean the size of the number, since a logarithm needs a positive input.`,
+          `Make a first guess by treating the whole bottom like $x$: ${m(`${c === 1 ? '' : num(c)}${lnT}`)}.`,
+          `Test the guess by differentiating. The chain rule says a logarithm gives the derivative of its inside divided by the inside. So we get ${m(`${num(c)} \\times \\frac{${num(a)}}{${inner}}`)}, which is ${m(num(a))} times what we want.`,
+          `To fix that, divide by ${m(num(a))}. The number in front becomes ${m(`${num(c)} \\div ${paren(a)} = ${ansC.tex()}`)}. So the integral is ${answer}.`,
+        ),
+        conclusion: `Differentiating ${answer} gives back $${integrand}$, so this is the integral.`,
+        keyIdea: '$\\int \\frac{1}{ax + b}\\,dx = \\frac{1}{a}\\ln|ax + b| + C$. Spot a number on top and $ax + b$ on the bottom. Use a logarithm, keep the number on top, then divide by $a$.',
       };
     },
   },
@@ -367,22 +406,31 @@ export const generators: Generator[] = [
         const mid = (p + q) / 2;
         const fmid = (mid - p) * (mid - q);
         const answer = m(area.tex());
-        const solution =
-          `**Step 1: find where the curve meets the $x$-axis.** $${fTex} = ${fact} = 0$, so $x = ${num(p)}$ and $x = ${num(q)}$.\n\n` +
-          `**Step 2: above or below?** At $x = ${num(mid)}$, $y = ${num(fmid)} < 0$, so the region between the roots is **below** the axis.\n\n` +
-          `**Step 3: integrate between the roots.** $F(x) = ${poly(FC)}$.\n\n` +
-          `- ${subEq(FC, q, Fq)}\n` +
-          `- ${subEq(FC, p, Fp)}\n\n` +
-          `$$${intTex(p, q, fTex)} = ${minus(Fq, Fp)}${net.tex()}$$\n\n` +
-          `**Step 4:** the integral is negative because the region is below the axis. The area is its size: ${answer} square units.\n\n` +
-          `Answer: ${answer}`;
+        const intTerms = [
+          '$x^{2}$ becomes $\\frac{x^{3}}{3}$',
+          B !== 0 && `${m(poly([B, 0]))} becomes ${m(poly([new Frac(B, 2), 0, 0]))}`,
+          D !== 0 && `${m(num(D))} becomes ${m(poly([D, 0]))}`,
+        ].filter(Boolean);
+        const solution = steps(
+          `The region lies between the points where the curve meets the $x$-axis, so set $y = 0$. ${
+            D === 0 ? 'Both terms contain $x$, so take it out as a factor' : `Two numbers that multiply to ${m(num(D))} and add to ${m(num(B))} are ${m(num(-p))} and ${m(num(-q))}`
+          }: $${fTex} = ${fact} = 0$.`,
+          `A product is 0 only when one of its factors is 0, so $x = ${num(p)}$ or $x = ${num(q)}$. The area comes from a **definite integral**, with these two values as its **limits**.`,
+          `Is the region above or below the axis? Test halfway between them, at $x = ${num(mid)}$: $y = ${num(mid - p)} \\times ${paren(mid - q)} = ${num(fmid)}$. That is negative, so the region is **below** the axis.`,
+          `Integrate: add 1 to each power, then divide by the new power. So ${intTerms.join(', and ')}. That gives $F(x) = ${poly(FC)}$, where $F$ is our name for the integrated function.`,
+          limitLine('Top', FC, q, Fq),
+          limitLine('Bottom', FC, p, Fp),
+          `Subtract, top minus bottom: $${intTex(p, q, fTex)} = ${minus(Fq, Fp)}${net.tex()}$. The minus sign only says the region is below the axis. An area can't be negative, so drop the sign: the area is ${answer}.`,
+        );
         return {
           stem: `Find the area of the region enclosed by the curve $y = ${fTex}$ and the $x$-axis.`,
           answer,
           answerValue: area.value(),
           distractors: ds.map((d) => ({ text: m(d.f.tex()), value: d.f.value(), why: d.why })),
+          asking: 'How big is the region trapped between this curve and the $x$-axis?',
           solution,
-          keyIdea: 'Find the roots, integrate between them, and take the absolute value: a region below the $x$-axis gives a negative integral.',
+          conclusion: `The integral comes to $${net.tex()}$ because the region is below the axis, so the area is its size, ${answer}.`,
+          keyIdea: 'Area enclosed by a curve and the $x$-axis: set $y = 0$ to find the limits, integrate, and subtract top minus bottom. If the result is negative, the region is below the axis, so drop the minus sign.',
         };
       }
     },

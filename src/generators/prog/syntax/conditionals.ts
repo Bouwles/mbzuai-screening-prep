@@ -1,4 +1,5 @@
 import type { Generator, GeneratedCore } from '../../../types';
+import { steps, table } from '../../../lib/explanation';
 import type { Rng } from '../../../lib/rng';
 
 type Cand = { text: string; value: string | number; why: string };
@@ -128,21 +129,12 @@ function elifBranch(rng: Rng): GeneratedCore {
   const answer = code(correct);
   const distractors = pickDistinct(answer, correct, pool);
 
-  const steps: string[] = [];
-  let i = 1;
-  for (const k of conds) {
-    if (passes(x, op, k.t)) {
-      steps.push(`${i}. ${code(`${th.v} ${op} ${k.t}`)}: ${code(`${x} ${op} ${k.t}`)} is true, so ${code(k.label)} is printed and the matching ${code('else')} is skipped.`);
-      break;
-    }
-    steps.push(`${i}. ${code(`${th.v} ${op} ${k.t}`)}: ${code(`${x} ${op} ${k.t}`)} is false, so move on to the ${code('else')}.`);
-    i++;
-  }
-  if (!firstTrue) steps.push(`${i}. None of the tests is true, so the final ${code('else')} prints ${code(L0)}.`);
+  // The tests the code really reaches: from the top, up to the first true one.
+  const reached = firstTrue ? conds.slice(0, conds.indexOf(firstTrue) + 1) : conds;
   const later = trueConds.slice(1);
-  const note = later.length
-    ? `\n\nLater tests such as ${code(`${th.v} ${op} ${later[0].t}`)} are also true, but they are never reached.`
-    : '';
+  const lastStep = firstTrue
+    ? `The first true test is ${code(`${x} ${op} ${firstTrue.t}`)}, so its branch prints ${answer}.${later.length ? ` ${code(`${x} ${op} ${later[0].t}`)} is also true, but it is never reached.` : ''}`
+    : `All three tests are false, so the final ${code('else')} prints ${answer}.`;
 
   return {
     stem: 'What does this pseudocode print? Output lines are shown separated by a space.',
@@ -150,13 +142,18 @@ function elifBranch(rng: Rng): GeneratedCore {
     answer,
     answerValue: correct,
     distractors,
-    solution:
-      'The tests run **from the top down**, and each later test is reached only if the ones above it are false. ' +
-      `Here ${code(th.v)} is ${x} and every test uses ${code(op)}${op === '>=' ? ' (the boundary value counts)' : ' (strict: the boundary value does not count)'}.\n\n` +
-      steps.join('\n') +
-      note +
-      `\n\nAnswer: ${answer}`,
-    keyIdea: 'In a chain of nested if/else, only the first true branch from the top runs; the final else runs only if every test is false.',
+    asking: `Which word gets printed when ${code(th.v)} is ${x}?`,
+    solution: steps(
+      'The tests run from the top down. Each later `if` sits inside the `else` of the one above it, so it is reached only if every test above it was false.',
+      `Here ${code(th.v)} is ${x}. ${op === '>=' ? '`>=` means "greater than or equal to", so a value equal to the limit passes.' : '`>` means "strictly greater than", so a value equal to the limit does not pass.'}`,
+      'Try the tests in order, stopping at the first true one:',
+      table(['Test', 'Result'], reached.map((k) => [code(`${x} ${op} ${k.t}`), passes(x, op, k.t) ? 'true, stop here' : `false, go to the ${code('else')}`])),
+      lastStep,
+    ),
+    conclusion: firstTrue
+      ? `${code(`${x} ${op} ${firstTrue.t}`)} is the first true test, so only its branch runs and the output is ${answer}.`
+      : `Every test is false, so only the final ${code('else')} runs and the output is ${answer}.`,
+    keyIdea: 'Go down a nested `if`/`else` from the top and stop at the first true test. Only that branch runs, and the final `else` runs only if every test is false. At the limit, `>=` passes and `>` does not.',
   };
 }
 
@@ -168,6 +165,8 @@ interface CountSetup {
   nums: number[];
   cond: string;
   usesMod: boolean;
+  /** The divisor in the mod test (0 when there is none). */
+  k: number;
   correct: (n: number) => boolean;
   pool: { f: (n: number) => boolean | number; why: string }[];
   /** Columns of the trace table: header + evaluator. */
@@ -192,6 +191,7 @@ function countSetup(rng: Rng): CountSetup {
       nums,
       cond,
       usesMod: false,
+      k: 0,
       correct: (n) => lo < n && n <= hi,
       pool: [
         { f: (n) => lo <= n && n <= hi, why: `This counts ${lo} itself, treating the strict ${code('>')} as ${code('>=')}.` },
@@ -216,6 +216,7 @@ function countSetup(rng: Rng): CountSetup {
       nums,
       cond: `mod(n,${k}) == 0 and n > ${t}`,
       usesMod: true,
+      k,
       correct: (n) => div(n) && n > t,
       pool: [
         { f: (n) => div(n) || n > t, why: 'This reads `and` as `or`, counting numbers that pass either test. `and` needs both tests to be true.' },
@@ -235,6 +236,7 @@ function countSetup(rng: Rng): CountSetup {
       nums,
       cond: `mod(n,${k}) == 0 or n > ${t}`,
       usesMod: true,
+      k,
       correct: (n) => div(n) || n > t,
       pool: [
         { f: (n) => div(n) && n > t, why: 'This reads `or` as `and`, counting only numbers that pass both tests. `or` needs just one of them to be true.' },
@@ -257,6 +259,7 @@ function countSetup(rng: Rng): CountSetup {
     nums,
     cond: `not mod(n,${k}) == 0 and n < ${t}`,
     usesMod: true,
+    k,
     correct: (n) => !div(n) && n < t,
     pool: [
       {
@@ -301,7 +304,7 @@ function countCompound(rng: Rng): GeneratedCore {
     });
   }
 
-  const { nums, cond, cols, correct, usesMod } = setup;
+  const { nums, cond, cols, correct, usesMod, k } = setup;
   const src = [
     `A = [${nums.join(', ')}]`,
     'count = 0',
@@ -315,17 +318,16 @@ function countCompound(rng: Rng): GeneratedCore {
   ].join('\n');
   const tf = (b: boolean) => (b ? 'true' : 'false');
   let running = 0;
-  const rows = nums.map((n) => {
+  const rows = nums.map((n, pos) => {
     const ok = correct(n);
     if (ok) running++;
-    return `| ${n} | ${cols.map((c) => tf(c.f(n))).join(' | ')} | ${tf(ok)} | ${running} |`;
+    return [pos + 1, n, ...cols.map((c) => tf(c.f(n))), tf(ok), running];
   });
-  const header = `| n | ${cols.map((c) => c.h).join(' | ')} | condition | count |\n|${'---|'.repeat(cols.length + 3)}`;
   const intro: Record<Form, string> = {
-    and: '`and` is true only when **both** tests are true.',
-    or: '`or` is true when **at least one** test is true.',
-    between: 'Both parts must hold: `n` must be above the lower limit (strictly) and at most the upper limit.',
-    not: `${code('not')} is done before ${code('and')} (but after ${code('==')}), so it negates only the test next to it: n must **not** be a multiple and must be below the limit.`,
+    and: '`and` needs **both** tests to be true.',
+    or: '`or` needs **at least one** test to be true.',
+    between: '`and` needs **both** tests to be true, so `n` must be above the lower limit and no more than the upper limit.',
+    not: `${code('not')} applies only to the test right after it, so the condition says ${code('n')} is **not** a multiple of ${k} and is below the limit. ${code('and')} needs both of those to be true.`,
   };
   const answer = code(String(ans));
 
@@ -335,12 +337,17 @@ function countCompound(rng: Rng): GeneratedCore {
     answer,
     answerValue: ans,
     distractors,
-    solution:
-      `The loop adds 1 to ${code('count')} for every number that makes ${code(cond)} true. ${intro[setup.form]}\n\n` +
-      `${header}\n${rows.join('\n')}\n\n` +
-      `The condition is true for ${ans} of the ${nums.length} numbers, so ${code('count')} ends at ${ans}.\n\n` +
-      `Answer: ${answer}`,
-    keyIdea: 'Check every item against the whole condition, in the order comparisons, `not`, `and`, `or`, and add 1 only when the full condition is true.',
+    asking: `How many numbers in the array make ${code(cond)} true?`,
+    solution: steps(
+      `${code('length(A)')} is ${nums.length}, so line 3 makes ${code('i')} go from 1 to ${nums.length}. Line 4 puts the item at position ${code('i')} into ${code('n')}. So ${code('n')} takes each number in the array, in order.`,
+      usesMod && `${code(`mod(n,${k})`)} is the remainder after dividing ${code('n')} by ${k}. For example, ${code(`mod(${k + 1},${k})`)} is 1 and ${code(`mod(${2 * k},${k})`)} is 0. A remainder of 0 means ${code('n')} is a multiple of ${k}.`,
+      `Line 6 adds 1 to ${code('count')} only when the test on line 5 is true. ${intro[setup.form]}`,
+      'Test each number in turn:',
+      table(['`i`', '`n`', ...cols.map((c) => c.h), 'Whole test', '`count`'], rows),
+      `Line 9 prints ${code('count')}, which holds ${ans}.`,
+    ),
+    conclusion: `${ans} of the ${nums.length} numbers ${ans === 1 ? 'passes' : 'pass'} the whole test, so ${code('count')} ends at ${ans} and the answer is ${answer}.`,
+    keyIdea: 'For a counter with a compound test, make one row per item and one column per small test. Work out comparisons first, then `not`, then `and`, then `or`. Add 1 only when the whole test is true.',
   };
 }
 

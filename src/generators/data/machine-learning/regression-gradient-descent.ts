@@ -1,5 +1,6 @@
 import type { GeneratedCore, Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table as mdTable } from '../../../lib/explanation';
 import { dm, m, num, paren, signed } from '../../../lib/tex';
 
 const SUB = 'regression-gradient-descent';
@@ -41,7 +42,7 @@ function gdStep(rng: Rng): GeneratedCore {
     let grad: number;
     let gradNo2: number; // derivative without the factor 2
     let gradNoX: number | null; // derivative without the chain-rule factor x
-    let workGrad: string;
+    let gradSteps: string[];
     if (kind === 'example') {
       const x = rng.int(1, 4);
       w = rng.int(-2, 4);
@@ -53,12 +54,12 @@ function gdStep(rng: Rng): GeneratedCore {
       stem =
         `A model $\\hat{y} = wx$ is trained on the single example $(x, y) = (${num(x)}, ${num(y)})$ with loss $L = (wx - y)^2$. ` +
         `If $w = ${num(w)}$ and the learning rate is $\\eta = ${num(eta)}$, what is $w$ after one gradient descent step?`;
-      workGrad =
-        'Differentiate with the chain rule (outside "squared", inside $wx - y$ whose derivative with respect to $w$ is $x$):' +
-        dm('\\frac{dL}{dw} = 2(wx - y)x') +
-        `Prediction: $wx = ${paren(w)} \\times ${num(x)} = ${num(w * x)}$.\n\n` +
-        (y === 0 ? `Error: $wx - y = ${num(e)}$ (because $y = 0$).\n\n` : `Error: $wx - y = ${num(w * x)} - ${paren(y)} = ${num(e)}$.\n\n`) +
-        `Gradient: $\\frac{dL}{dw} = 2 \\times ${paren(e)} \\times ${num(x)} = ${num(grad)}$.\n\n`;
+      gradSteps = [
+        'We need the gradient first. $L = (wx - y)^2$ is a bracket squared, so use the **chain rule**: 2 times the bracket, times the derivative of the inside. The inside $wx - y$ differentiates to $x$, because only $w$ changes. So $\\frac{dL}{dw} = 2(wx - y)x$.',
+        `Work out the bracket. The prediction is $wx = ${paren(w)} \\times ${num(x)} = ${num(w * x)}$. ` +
+          (y === 0 ? `Since $y = 0$, the bracket is just that: $wx - y = ${num(e)}$.` : `Taking away $y$ gives $wx - y = ${num(w * x)} - ${paren(y)} = ${num(e)}$.`),
+        `Multiply by 2 and by $x$: $\\frac{dL}{dw} = 2 \\times ${paren(e)} \\times ${num(x)} = ${num(grad)}$.`,
+      ];
     } else {
       const c = rng.int(-3, 6);
       const k = rng.int(0, 5);
@@ -72,10 +73,12 @@ function gdStep(rng: Rng): GeneratedCore {
       stem =
         `A loss is $L(w) = ${lossTex}$. Gradient descent is at $w = ${num(w)}$ with learning rate $\\eta = ${num(eta)}$. ` +
         'What is $w$ after one step?';
-      workGrad =
-        (k ? `Differentiate. The constant $${num(k)}$ has derivative $0$, so` : 'Differentiate:') +
-        dm(`L'(w) = 2${c === 0 ? 'w' : `(${inside})`}`) +
-        `At $w = ${num(w)}$: $L'(${num(w)}) = 2${c === 0 ? ` \\times ${paren(w)}` : `(${num(w)}${signed(-c)})`} = ${num(grad)}$.\n\n`;
+      gradSteps = [
+        (c === 0 ? 'We need the gradient first, which is the derivative $L\'(w)$. $w^2$ differentiates to $2w$: the power 2 comes down in front, and the power drops by 1.' : `We need the gradient first, which is the derivative $L'(w)$. A squared bracket differentiates to 2 times the bracket, times the derivative of the inside. The inside $${inside}$ differentiates to 1, so $(${inside})^2$ gives $2(${inside})$.`) +
+          (k ? ` The constant ${num(k)} doesn't change when $w$ changes, so it disappears.` : '') +
+          ` So $L'(w) = 2${c === 0 ? 'w' : `(${inside})`}$.`,
+        `Put in the current weight, $w = ${num(w)}$: $L'(${num(w)}) = 2${c === 0 ? ` \\times ${paren(w)}` : `(${num(w)}${signed(-c)}) = 2 \\times ${paren(w - c)}`} = ${num(grad)}$.`,
+      ];
     }
     const step = eta * grad;
     const ans = r4(w - step);
@@ -113,21 +116,24 @@ function gdStep(rng: Rng): GeneratedCore {
     ];
     const ds = pickDistinct(ans, answer, pool);
     if (ds.length < 3) continue;
-    const solution =
-      workGrad +
-      'Update rule (step **against** the gradient):' +
-      dm(`w_{\\text{new}} = w - \\eta \\frac{dL}{dw} = ${num(w)} - ${num(eta)} \\times ${paren(grad)} = ${num(w)} - ${paren(r4(step))} = ${num(ans)}`) +
-      (grad < 0
-        ? 'The gradient is negative, so the loss decreases as $w$ increases, and $w$ goes up.'
-        : 'The gradient is positive, so the loss increases with $w$, and $w$ goes down.') +
-      `\n\nAnswer: ${answer}`;
+    const solution = steps(
+      '**Gradient descent** changes a weight $w$ to make the loss $L$ (the model\'s error) smaller. The rule is $w_{\\text{new}} = w - \\eta \\times \\text{gradient}$. The gradient says how the loss changes as $w$ rises, and $\\eta$ (the learning rate) sets the step size.',
+      ...gradSteps,
+      `Multiply the gradient by the learning rate: $${num(eta)} \\times ${paren(grad)} = ${num(r4(step))}$.`,
+      `Subtract that from the current weight${grad < 0 ? '. Taking away a negative means adding, so $w$ goes up' : ', so $w$ goes down'}: $${num(w)} - ${paren(r4(step))} = ${num(ans)}$.`,
+    );
     return {
       stem,
       answer,
       answerValue: ans,
       distractors: ds.map((d) => ({ text: d.text, value: r4(d.v), why: d.why })),
+      asking: 'What is the new value of $w$ after one gradient descent step?',
       solution,
-      keyIdea: 'Gradient descent: work out the derivative of the loss with respect to the weight, then $w_{\\text{new}} = w - \\eta \\times \\text{gradient}$.',
+      conclusion: `The gradient is $${num(grad)}$, so $w$ moves ${grad < 0 ? 'up' : 'down'} by ${num(Math.abs(r4(step)))} from ${m(num(w))}, which gives ${answer}.`,
+      keyIdea:
+        kind === 'example'
+          ? 'For a loss $(wx - y)^2$ the gradient is $2(wx - y)x$. Find the bracket, multiply by 2 and by $x$, multiply by $\\eta$, then subtract from $w$. A negative gradient makes $w$ rise.'
+          : 'For a loss like $(w - c)^2$ the gradient is $2(w - c)$. Put in the current $w$, multiply by $\\eta$, then subtract from $w$. The loss is lowest at $c$, so $w$ must move towards $c$.',
     };
   }
 }
@@ -199,26 +205,28 @@ function mseTable(rng: Rng): GeneratedCore {
       rows: [[ctx.yh, ...ys.map((y) => num(y))]] as (string | number)[][],
     };
     const nonZeroSq = sq.filter((s) => s !== 0);
-    const rows = xs
-      .map((x, i) => `| ${num(x)} | ${num(ys[i])} | $${num(preds[i])}$ | $${num(es[i])}$ | ${num(sq[i])} |`)
-      .join('\n');
-    const solution =
-      `Use the model to predict each point, find the error $y - \\hat{y}$, square it, then average.\n\n` +
-      '| $x$ | $y$ | $\\hat{y}$ | $y - \\hat{y}$ | $(y - \\hat{y})^2$ |\n|---|---|---|---|---|\n' +
-      rows +
-      '\n\n' +
-      `Sum of squared errors: $${nonZeroSq.map((s) => num(s)).join(' + ')} = ${num(sse)}$` +
-      (nonZeroSq.length < n ? ' (points with zero error add nothing).' : '.') +
-      dm(`\\text{MSE} = \\frac{${num(sse)}}{${n}} = ${num(ans)}`) +
-      `Answer: ${answer}`;
+    const ex = preds.findIndex((p) => p !== 0); // a row whose working has no "- 0" in it
+    const solution = steps(
+      '**MSE** means mean squared error. An **error** is the actual value minus the prediction, $y - \\hat{y}$. We square each error so that negative and positive errors can\'t cancel out, then take the average.',
+      `Get each prediction by putting $x$ into the model. For example, at $x = ${num(xs[ex])}$ the prediction is $\\hat{y} = ${num(w)} \\times ${num(xs[ex])}${b === 0 ? '' : signed(b)} = ${num(preds[ex])}$, so the error is $${num(ys[ex])} - ${paren(preds[ex])} = ${num(es[ex])}$.`,
+      `Do the same for every point:\n\n` +
+        mdTable(
+          ['$x$', 'Actual $y$', 'Predicted $\\hat{y}$', 'Error $y - \\hat{y}$', 'Error squared'],
+          xs.map((x, i) => [num(x), num(ys[i]), m(num(preds[i])), m(num(es[i])), num(sq[i])]),
+        ),
+      `Add up the last column${nonZeroSq.length < n ? ' (a 0 adds nothing)' : ''}: $${nonZeroSq.map((s) => num(s)).join(' + ')} = ${num(sse)}$.`,
+      `The mean divides that total by the number of points, which is ${n}: $\\frac{${num(sse)}}{${n}} = ${num(ans)}$.`,
+    );
     return {
       stem,
       table,
       answer,
       answerValue: ans,
       distractors: ds.map((d) => ({ text: d.text, value: r4(d.v), why: d.why })),
+      asking: `On average, how big is this model's squared error across the ${n} points?`,
       solution,
-      keyIdea: 'MSE: predict each point, square each error $y - \\hat{y}$, add them up and divide by the number of points.',
+      conclusion: `The squared errors add up to ${num(sse)} across ${n} points, so the MSE is ${answer}.`,
+      keyIdea: 'For MSE, draw a table with columns for actual, predicted, error and error squared. Add up the last column, then divide by the number of points.',
     };
   }
 }
@@ -294,20 +302,22 @@ function logisticPredict(rng: Rng): GeneratedCore {
       'A logistic regression model computes' +
       dm(`z = ${lin(w1, 'x_1', 0)}${w2 < 0 ? ` - ${w2 === -1 ? '' : num(-w2)}x_2` : ` + ${w2 === 1 ? '' : num(w2)}x_2`}${signed(b)}, \\qquad p = \\sigma(z) = \\frac{1}{1 + e^{-z}}`) +
       `and predicts "${ctx.c1}" when $p \\ge 0.5$, otherwise "${ctx.c0}". For $x_1 = ${x1}$ and $x_2 = ${x2}$, what are $p$ (to 2 decimal places) and the prediction?`;
-    const solution =
-      `Step 1, the linear part: $z = ${zTerms} = ${num(z)}$.\n\n` +
-      `Step 2, the sigmoid: $e^{-z} = ${expTex(-z)} \\approx ${num(ez, 4)}$, so` +
-      dm(`p = \\frac{1}{1 + ${num(ez, 4)}} \\approx ${num(sigmoid(z), 4)} \\approx ${p2s(p)}`) +
-      `Step 3, the threshold: $${p2s(p)} ${p >= 0.5 ? '\\ge' : '<'} 0.5$, so the prediction is "${cls(z)}".\n\n` +
-      `Quick check: $z$ is ${z > 0 ? 'positive, and a positive $z$ always gives $p > 0.5$' : 'negative, and a negative $z$ always gives $p < 0.5$'}.\n\n` +
-      `Answer: ${answer}`;
+    const solution = steps(
+      'The model works in two stages. It calculates a score $z$, then the **sigmoid** $\\sigma$ squashes $z$ into a probability $p$ between 0 and 1.',
+      `Put the inputs into the score: $z = ${zTerms} = ${num(w1 * x1)} + ${num(w2 * x2)}${signed(b)} = ${num(z)}$.`,
+      `Now find the power in the sigmoid. $e$ is a fixed number, about 2.718. With $z = ${num(z)}$${z < 0 ? ', which is negative, $-z$ is positive and' : ','} $e^{-z} = ${expTex(-z)} \\approx ${num(ez, 4)}$.`,
+      `Substitute: $p = \\frac{1}{1 + ${num(ez, 4)}} = \\frac{1}{${num(1 + ez, 4)}} \\approx ${num(sigmoid(z), 4)}$, which is ${p2s(p)} to 2 decimal places.`,
+      `The model predicts "${ctx.c1}" only when $p \\ge 0.5$. Here ${p2s(p)} is ${p >= 0.5 ? 'above' : 'below'} 0.5, so the prediction is "${cls(z)}".`,
+    );
     return {
       stem,
       answer,
       answerValue: `${p2s(p)}|${cls(z)}`,
       distractors: ds.map((d) => ({ text: d.text, value: d.v, why: d.why })),
+      asking: 'What probability does the model give for these inputs, and what does it predict?',
       solution,
-      keyIdea: 'Logistic regression: compute $z = w_1x_1 + w_2x_2 + b$, squash it with the sigmoid into a probability, then compare with $0.5$ (equivalently, check the sign of $z$).',
+      conclusion: `The score $z$ is ${z > 0 ? 'positive, which puts $p$ above' : 'negative, which puts $p$ below'} 0.5, so the answer is ${answer}.`,
+      keyIdea: 'For a logistic prediction: calculate $z$, then $p = \\frac{1}{1 + e^{-z}}$, then compare $p$ with 0.5. A shortcut for the class: positive $z$ always gives $p > 0.5$, and negative $z$ gives $p < 0.5$.',
     };
   }
 }

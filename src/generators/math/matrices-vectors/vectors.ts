@@ -1,7 +1,8 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
-import { dm, m, num, paren, signed, sqrtTex, sum, term } from '../../../lib/tex';
+import { m, num, paren, signed, sqrtTex, sum, term } from '../../../lib/tex';
 import { dot, round } from '../../../lib/mathx';
 
 /** Column vector (pmatrix) from numbers or LaTeX strings. */
@@ -86,30 +87,28 @@ export const generators: Generator[] = [
 
         const uShown = u.map((x, j) => (j === pos ? 'k' : x));
         const products = [0, 1, 2]
-          .map((j) => (j === pos ? `k \\times ${paren(c)}` : `${paren(u[j])} \\times ${paren(v[j])}`))
-          .join(' + ');
+          .map((j) => (j === pos ? `k \\times ${paren(c)} = ${term(c, 'k', true)}` : `${paren(u[j])} \\times ${paren(v[j])} = ${num(u[j] * v[j])}`))
+          .join(',\\quad ');
         const expanded = sum([0, 1, 2].map((j) => (j === pos ? [c, 'k'] : [u[j] * v[j], '']) as [number, string]));
-        const collected = `${term(c, 'k', true)}${signed(S)} = 0`;
+        const kTerm = term(c, 'k', true);
         const answer = kText(ans);
-        const steps =
-          'Perpendicular vectors have a dot product of **zero**, so multiply matching components, add, and set the total equal to 0.' +
-          dm(`\\mathbf{u} \\cdot \\mathbf{v} = ${products} = 0`) +
-          'Multiply out:' +
-          dm(`${expanded} = 0`) +
-          'Collect the numbers:' +
-          dm(collected) +
-          (c === 1
-            ? `So ${m(`k = ${num(-S)}`)}.`
-            : `So ${m(`${term(c, 'k', true)} = ${num(-S)}`)}, and dividing by ${m(num(c))} gives ${m(`k = ${ans.tex()}`)}.`) +
-          `\n\nAnswer: ${answer}`;
 
         return {
           stem: `Find the value of $k$ for which $\\mathbf{u} = ${col(uShown)}$ and $\\mathbf{v} = ${col(v)}$ are perpendicular.`,
           answer,
           answerValue: ans.value(),
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution: steps,
-          keyIdea: 'Two vectors are perpendicular exactly when their dot product is zero: set it equal to 0 and solve for the unknown.',
+          asking: 'What value of $k$ puts these two vectors at right angles?',
+          solution: steps(
+            '**Perpendicular** means at right angles. Two vectors are perpendicular exactly when their **dot product** is 0. The dot product multiplies matching components (the numbers in the same position) and adds the results.',
+            `Multiply each matching pair: ${m(products)}.`,
+            `Add them and set the total to 0: ${m(`${expanded} = 0`)}.`,
+            `Collect the plain numbers: ${m(`${num(u[j1] * v[j1])}${signed(u[j2] * v[j2])} = ${num(S)}`)}. That leaves ${m(`${kTerm}${signed(S)} = 0`)}.`,
+            `${S > 0 ? `Take ${m(num(S))} from` : `Add ${m(num(-S))} to`} both sides to get ${m(`${kTerm} = ${num(-S)}`)}.` +
+              (c === 1 ? '' : ` Divide both sides by ${m(num(c))} to get ${m('k')} on its own: ${m(`k = ${ans.tex()}`)}.`),
+          ),
+          conclusion: `With ${answer} the dot product is 0, so the vectors are perpendicular.`,
+          keyIdea: 'When you see perpendicular with an unknown: write the dot product with the unknown in it, set it equal to 0 and solve the equation.',
         };
       }
     },
@@ -164,24 +163,36 @@ export const generators: Generator[] = [
 
         const pa = a.map((x) => p * x);
         const qbAbs = b.map((x) => Math.abs(q) * x);
-        const simplified = sqrtTex(S) !== `\\sqrt{${S}}`;
-        const solution =
-          `First build the vector ${m(combo)} component by component.` +
-          dm(`${combo} = ${col(pa)} ${q < 0 ? '-' : '+'} ${col(qbAbs)} = ${col(w)}`) +
-          'Then use Pythagoras: square each component, add, and take the square root.' +
-          dm(
-            `|${combo}| = \\sqrt{${w.map((x) => `${paren(x)}^2`).join(' + ')}} = \\sqrt{${w.map((x) => x * x).join(' + ')}} = \\sqrt{${S}}` +
-              (simplified ? ` = ${sqrtTex(S)}` : ''),
-          ) +
-          `Answer: ${answer}`;
+        const op = q < 0 ? '-' : '+';
+        const qbName = term(Math.abs(q), '\\mathbf{b}', true);
+        // A zero component needs brackets, so that "+ 0" never appears in the working.
+        const working = col(pa.map((x, i) => `${num(x)} ${op} ${qbAbs[i] === 0 ? '(0)' : paren(qbAbs[i])}`));
+        // How sqrt(S) simplifies: 12 is 4 x 3, so it becomes 2 sqrt(3).
+        let outer = 1;
+        let inner = S;
+        for (let f = 2; f * f <= inner; f++) {
+          while (inner % (f * f) === 0) {
+            inner /= f * f;
+            outer *= f;
+          }
+        }
+        const simplify = outer === 1 ? '' : inner === 1 ? ` = ${sqrtTex(S)}` : ` = \\sqrt{${outer * outer} \\times ${inner}} = ${sqrtTex(S)}`;
 
         return {
           stem: `Given $\\mathbf{a} = ${col(a)}$ and $\\mathbf{b} = ${col(b)}$, find $|${combo}|$.`,
           answer,
           answerValue: Math.sqrt(S),
           distractors: ds.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution,
-          keyIdea: 'Combine the vectors component by component first, then find the magnitude with the square root of the sum of squares.',
+          asking: `How long is the vector ${m(combo)}?`,
+          solution: steps(
+            `The bars in ${m(`|${combo}|`)} mean **magnitude**, which is the length of a vector. So first build the single vector ${m(combo)}, then find its length.`,
+            `Multiplying a vector by a number multiplies every component: ${m(`${term(p, '\\mathbf{a}', true)} = ${col(a.map((x) => `${p} \\times ${paren(x)}`))} = ${col(pa)}`)}` +
+              (Math.abs(q) === 1 ? `, and ${m('\\mathbf{b}')} stays as it is.` : ` and ${m(`${qbName} = ${col(b.map((x) => `${Math.abs(q)} \\times ${paren(x)}`))} = ${col(qbAbs)}`)}.`),
+            `${q < 0 ? 'Take away' : 'Add'} matching components:\n\n$$${combo} = ${working} = ${col(w)}$$`,
+            `Now find the length with Pythagoras' theorem: square each component, add the squares, then take the square root.\n\n$$|${combo}| = \\sqrt{${w.map((x) => `${paren(x)}^{2}`).join(' + ')}} = \\sqrt{${w.map((x) => x * x).join(' + ')}} = \\sqrt{${S}}${simplify}$$`,
+          ),
+          conclusion: `The squares of the components add to ${m(num(S))}, so ${m(`|${combo}|`)} is ${answer}.`,
+          keyIdea: 'Combine the vectors first, one component at a time. Then find the magnitude: square each component, add the squares and take the square root. Never find the two magnitudes separately and add them.',
         };
       }
     },
@@ -240,22 +251,26 @@ export const generators: Generator[] = [
 
         const products = a.map((x, i) => `${paren(x)} \\times ${paren(b[i])}`).join(' + ');
         const prodVals = a.map((x, i) => x * b[i]);
-        const solution =
-          `Use ${m('\\cos\\theta = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{|\\mathbf{a}|\\,|\\mathbf{b}|}')}.\n\n` +
-          `1. Dot product: ${m(`\\mathbf{a} \\cdot \\mathbf{b} = ${products} = ${prodVals[0]}${signed(prodVals[1])}${signed(prodVals[2])} = ${d}`)}.\n` +
-          `2. Magnitudes: ${m(`|\\mathbf{a}| = \\sqrt{${a.map((x) => x * x).join(' + ')}} = ${sqrtTex(A)}`)} and ${m(`|\\mathbf{b}| = \\sqrt{${b.map((x) => x * x).join(' + ')}} = ${sqrtTex(B)}`)}.\n` +
-          `3. ${m(`\\cos\\theta = \\frac{${num(d)}}{${sqrtTex(A)} \\times ${sqrtTex(B)}} \\approx ${num(cosT, 4)}`)}.\n` +
-          `4. ${m(`\\theta = \\cos^{-1}\\left(${num(cosT, 4)}\\right)`)}, which is about ${answer} (calculator in degree mode).\n\n` +
-          (d < 0 ? 'The dot product is negative, so the angle is obtuse, as expected.' : 'The dot product is positive, so the angle is acute, as expected.') +
-          `\n\nAnswer: ${answer}`;
+        // A length written so a calculator can take it: "sqrt(14)", or "3" when it is a whole number.
+        const root = (n: number) => (Number.isInteger(Math.sqrt(n)) ? num(Math.sqrt(n)) : `\\sqrt{${n}}`);
+        const lengthOf = (name: string, xs: number[], n: number) =>
+          m(`|\\mathbf{${name}}| = \\sqrt{${xs.map((x) => x * x).join(' + ')}} = \\sqrt{${n}}${root(n) === `\\sqrt{${n}}` ? '' : ` = ${root(n)}`}`);
 
         return {
           stem: `Find the angle between $\\mathbf{a} = ${col(a)}$ and $\\mathbf{b} = ${col(b)}$, in degrees to 1 decimal place.`,
           answer,
           answerValue: ansV,
           distractors: ds.map((x) => ({ text: x.text, value: x.value, why: x.why })),
-          solution,
-          keyIdea: 'The angle between two vectors comes from the dot product divided by the product of the magnitudes, then inverse cosine.',
+          asking: 'What is the angle between these two vectors, in degrees?',
+          solution: steps(
+            `The **dot product** links two vectors to the angle ${m('\\theta')} between them: ${m('\\cos\\theta = \\frac{\\mathbf{a} \\cdot \\mathbf{b}}{|\\mathbf{a}|\\,|\\mathbf{b}|}')}. Here ${m('\\mathbf{a} \\cdot \\mathbf{b}')} means multiply matching components and add, and ${m('|\\mathbf{a}|')} means the length of ${m('\\mathbf{a}')}.`,
+            `Find the dot product: ${m(`${products} = ${prodVals[0]}${signed(prodVals[1])}${signed(prodVals[2])} = ${d}`)}.`,
+            `Find each length by squaring the components, adding and taking the square root: ${lengthOf('a', a, A)} and ${lengthOf('b', b, B)}.`,
+            `Substitute into the formula: ${m(`\\cos\\theta = \\frac{${num(d)}}{${root(A)} \\times ${root(B)}} \\approx ${num(cosT, 4)}`)}.`,
+            `Undo the cosine with ${m('\\cos^{-1}')} on a calculator in degree mode, using the full value rather than the rounded one: ${m(`\\theta \\approx ${fmt1(theta)}^\\circ`)}.`,
+          ),
+          conclusion: `The dot product is ${d < 0 ? 'negative' : 'positive'}, which fits an angle ${d < 0 ? 'above' : 'below'} ${m('90^\\circ')}, and the calculator gives ${answer}.`,
+          keyIdea: 'Angle between vectors: find the dot product and both lengths, then $\\cos\\theta$ = dot product $\\div$ (length $\\times$ length), then $\\cos^{-1}$. A negative dot product means an angle above $90^\\circ$.',
         };
       }
     },

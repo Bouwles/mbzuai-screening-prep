@@ -75,23 +75,19 @@ export const questions: StaticQuestion[] = [
     options: ['$2$', '$6$', '$4$', '$8$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many edges touch vertex C?',
       solution:
-        'The **degree** of a vertex is the number of edges that touch it (its number of "ends").\n\n' +
-        'Go through the list and pick out every edge that has C at one end, whichever way round it is written:\n\n' +
-        '- A–C: yes\n' +
-        '- B–C: yes\n' +
-        '- C–D: yes\n' +
-        '- C–E: yes\n' +
-        '- A–B: no\n' +
-        '- D–E: no\n\n' +
-        'Four edges touch C, so $\\deg(C) = 4$.',
+        'A graph is a set of points, called **vertices**, joined by lines, called **edges**. The **degree** of a vertex is the number of edges touching it.\n\n' +
+        'An edge has no direction, so A–C and C–A are the same edge. That means C can appear at either end. Go through the list: A–C, B–C, C–D and C–E contain C, while A–B and D–E do not.\n\n' +
+        'Count the edges containing C: there are 4.',
+      conclusion: 'Four of the edges contain C, so its degree is $4$.',
       whyWrong: [
         'This counts only the edges written with C first (C–D and C–E). An edge is the same whichever way round it is written, so A–C and B–C touch C too.',
         'This is the total number of edges in the whole graph, not the number of edges that touch C.',
         null,
         'This doubles the degree. The "each edge counts twice" rule applies to the **sum of all the degrees**; each edge at C adds just 1 to the degree of C.',
       ],
-      keyIdea: 'The degree of a vertex is the number of edges with that vertex at one end.',
+      keyIdea: 'To find a vertex\'s degree, scan the edge list and count each edge containing that letter, whichever way round it is written. As a check, all the degrees should add up to twice the number of edges.',
     },
     check: {
       optionValues: [2, 6, 4, 8],
@@ -114,18 +110,20 @@ export const questions: StaticQuestion[] = [
     options: ['$7$', '$14$', '$5$', '$28$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Given the degrees, how many edges are in the graph?',
       solution:
-        'Use the **handshake lemma**: every edge has two ends, and each end adds 1 to the degree of a vertex. So\n\n' +
-        '$$\\text{sum of degrees} = 2 \\times \\text{number of edges}$$\n\n' +
-        'Sum of degrees: $3 + 3 + 2 + 2 + 4 = 14$.\n\n' +
-        'Number of edges: $E = \\frac{14}{2} = 7$.',
+        'A graph is made of points, called **vertices**, joined by lines, called **edges**. The **degree** of a vertex is how many edges touch it. Each edge has two ends, so it adds 1 to the degree of two vertices.\n\n' +
+        'So if you add all the degrees, each edge has been counted exactly twice. This is the **handshake lemma**: sum of degrees $= 2 \\times$ number of edges.\n\n' +
+        'Add the degrees: $3 + 3 + 2 + 2 + 4 = 14$.\n\n' +
+        'Halve that total to undo the double counting: $14 \\div 2 = 7$.',
+      conclusion: 'The degrees total 14 and each edge was counted twice, so there are $7$ edges.',
       whyWrong: [
         null,
         'This is the sum of the degrees. Every edge is counted twice in that sum (once from each end), so you must halve it.',
         'This is the number of vertices, not the number of edges.',
         'This multiplies the degree sum by 2 instead of dividing: the rule is sum of degrees $= 2E$, so $E = 14 \\div 2$.',
       ],
-      keyIdea: 'Handshake lemma: the degrees add up to twice the number of edges.',
+      keyIdea: 'Whenever degrees and edges appear together, use: sum of degrees $= 2E$, where $E$ is the number of edges. This also means the degree sum must be even.',
     },
     check: { optionValues: [7, 14, 5, 28], compute: () => sumOf([3, 3, 2, 2, 4]) / 2 },
   },
@@ -137,18 +135,19 @@ export const questions: StaticQuestion[] = [
     options: ['$30$', '$36$', '$21$', '$15$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How many edges are needed to join every pair of 6 vertices?',
       solution:
-        '$K_6$ has 6 vertices and every vertex is joined to each of the other 5.\n\n' +
-        'Counting from every vertex gives $6 \\times 5 = 30$ edge-ends, but each edge has been counted **twice** (once from each end).\n\n' +
-        '$$E = \\frac{n(n-1)}{2} = \\frac{6 \\times 5}{2} = 15$$\n\n' +
-        'Check by choosing pairs: $\\binom{6}{2} = 15$.',
+        'In $K_6$, each of the 6 points, called **vertices**, is joined to all the others by a line, called an **edge**. The $K$ stands for complete, and the 6 is the number of vertices.\n\n' +
+        'Each vertex joins to the other 5, so 5 edges meet at each vertex. Counting from every vertex gives $6 \\times 5 = 30$.\n\n' +
+        'Each edge has two ends, so it was counted twice: once from each end. Halve the count: $30 \\div 2 = 15$.',
+      conclusion: 'Counting from each vertex gives 30, and that counts every edge twice, so $K_6$ has $15$ edges.',
       whyWrong: [
         'This is $6 \\times 5 = 30$: it counts every edge from both of its ends, so each edge is counted twice. Divide by 2.',
         'This is $6^2 = 36$: it pairs every vertex with every vertex, including itself, and also counts each edge twice.',
         'This is $\\frac{6 \\times 7}{2} = 21$, which uses $n + 1$ instead of $n - 1$. Each vertex joins to the **other** 5 vertices, not 7.',
         null,
       ],
-      keyIdea: 'The complete graph $K_n$ has $\\frac{n(n-1)}{2}$ edges: one for every pair of vertices.',
+      keyIdea: 'A complete graph $K_n$ has $\\frac{n(n-1)}{2}$ edges, where $n$ is the number of vertices. Each vertex joins $n - 1$ others, then you halve because each edge has two ends.',
     },
     check: { optionValues: [30, 36, 21, 15], compute: () => nCr(6, 2) },
   },
@@ -160,18 +159,19 @@ export const questions: StaticQuestion[] = [
     options: ['$12$', '$11$', '$13$', '$66$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many edges does a tree with 12 vertices have?',
       solution:
-        'A tree is a connected graph with no cycles. Every tree with $V$ vertices has exactly\n\n' +
-        '$$E = V - 1$$\n\n' +
-        'edges. (Start with one vertex; each new edge brings in exactly one new vertex.)\n\n' +
-        'So $E = 12 - 1 = 11$.',
+        'A graph is made of points, called **vertices**, joined by lines, called **edges**. A **tree** is a connected graph with no cycles. Connected means you can get from any vertex to any other. A cycle is a closed loop.\n\n' +
+        'Build a tree one vertex at a time. Start with 1 vertex and 0 edges. Each new vertex must connect to what is there with exactly 1 edge, because a second edge would create a cycle.\n\n' +
+        'So the edges are always one fewer than the vertices: a tree with $V$ vertices has $V - 1$ edges. With 12 vertices that is $12 - 1 = 11$.',
+      conclusion: 'Every vertex after the first adds one edge, so 12 vertices give $11$ edges.',
       whyWrong: [
         'This assumes $E = V$. A connected graph with as many edges as vertices always contains a cycle, so it cannot be a tree.',
         null,
         'This uses $E = V + 1$; a tree has one edge **fewer** than vertices, not one more.',
         'This is $\\frac{12 \\times 11}{2} = 66$, the number of edges of the complete graph $K_{12}$, which has the **most** edges possible, not the fewest.',
       ],
-      keyIdea: 'A tree with $V$ vertices always has $V - 1$ edges.',
+      keyIdea: 'Whenever a question says "tree", or "connected with no cycles", use $E = V - 1$, where $E$ is edges and $V$ is vertices. A quick example to anchor it: 2 vertices joined by 1 edge.',
     },
     check: { optionValues: [12, 11, 13, 66], compute: () => 12 - 1 },
   },
@@ -188,17 +188,18 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which sentence correctly describes a tree in a graph?',
       solution:
-        'The definition of a **tree** is a graph that is **connected** (you can get from any vertex to any other) and has **no cycles** (no closed loops).\n\n' +
-        'Consequences: a tree with $n$ vertices has $n - 1$ edges, and there is exactly one path between any two vertices.\n\n' +
-        'Check the other statements against a star (one centre joined to 4 leaves): it is a tree, its centre has degree 4, it has 5 vertices and 4 edges, and it has no cycle.',
+        'In graph theory, a **tree** is defined by two properties. **Connected** means you can travel from any point (**vertex**) to any other along the lines (**edges**). **No cycles** means no route goes round in a closed loop.\n\n' +
+        'Draw a tiny tree: one centre vertex with edges to 4 outer vertices. It has 5 vertices and 4 edges, its centre has degree 4 (4 edges touching it), and it has no closed loop. This rules out "$n$ edges", "degree at most 2" and "exactly one cycle".',
+      conclusion: 'The definition itself is the true statement: A tree is connected and contains no cycles.',
       whyWrong: [
         'A tree with $n$ vertices has $n - 1$ edges. Adding one more edge to a tree always creates a cycle.',
         'That describes a **path**, which is only one kind of tree. A star with one centre and 4 leaves is a tree whose centre has degree 4.',
         'A tree has **no** cycles at all. A connected graph with exactly one cycle is a tree plus one extra edge.',
         null,
       ],
-      keyIdea: 'Tree = connected + no cycles (and then automatically $E = V - 1$).',
+      keyIdea: 'Know the tree facts: connected, no cycles, and exactly $n - 1$ edges for $n$ vertices. A star (one centre with many outer vertices) is a handy test example, because it breaks false claims about degrees.',
     },
   },
 
@@ -220,18 +221,20 @@ export const questions: StaticQuestion[] = [
     options: ['$10$', '$16$', '$5$', '$3$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many edges does the graph in this matrix have?',
       solution:
-        'In an undirected graph the matrix is symmetric: the edge A–B appears as a 1 in row A (column B) **and** in row B (column A).\n\n' +
-        'Row sums give the degrees: A: $2$, B: $3$, C: $3$, D: $2$.\n\n' +
-        'Total of all entries $= 2 + 3 + 3 + 2 = 10$, which is the sum of degrees $= 2E$.\n\n' +
-        'So $E = \\frac{10}{2} = 5$. Listing them confirms it: A–B, A–C, B–C, B–D, C–D.',
+        'An **adjacency matrix** is a table with a row and a column for each point (**vertex**) of a graph. A 1 in row A, column B means a line (**edge**) joins A and B.\n\n' +
+        'The graph is undirected, meaning edges have no direction, so edge A–B shows up twice: in row A, column B and in row B, column A.\n\n' +
+        'Count the 1s in each row: A has 2, B has 3, C has 3 and D has 2. The total is $2 + 3 + 3 + 2 = 10$.\n\n' +
+        'Each edge was counted twice, so halve the total: $10 \\div 2 = 5$. Listing them confirms it: A–B, A–C, B–C, B–D, C–D.',
+      conclusion: 'There are ten 1s and each edge appears twice, so the graph has $5$ edges.',
       whyWrong: [
         'This is the number of 1s in the matrix. Each edge appears twice (row A column B and row B column A), so the count must be halved.',
         'This is the number of entries in a $4 \\times 4$ matrix, including the 0s.',
         null,
         'This is the degree of vertex B (or C): the sum of a single row, not the number of edges in the whole graph.',
       ],
-      keyIdea: 'For an undirected graph, the 1s in the adjacency matrix add up to twice the number of edges.',
+      keyIdea: 'For an undirected adjacency matrix, edges $=$ number of 1s $\\div 2$. Or count only the 1s above the diagonal, the line of cells from top left to bottom right. A row\'s sum gives that vertex\'s degree (how many edges touch it). In a directed graph, where edges are one-way arrows, don\'t halve.',
     },
     check: { optionValues: [10, 16, 5, 3], compute: () => sumOf(ADJ_4.flat()) / 2 },
   },
@@ -246,18 +249,19 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$2$', '$5$', '$7$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many arrows point into vertex C?',
       solution:
-        'In a directed graph each edge has a direction. The **in-degree** of a vertex is the number of edges **arriving** at it (arrow pointing into it); the **out-degree** is the number **leaving** it.\n\n' +
-        'Edges arriving at C (of the form $\\square \\to C$): $A \\to C$, $B \\to C$, $D \\to C$. That is 3.\n\n' +
-        'For comparison, edges leaving C: $C \\to A$, $C \\to D$, so the out-degree is 2.\n\n' +
-        'In-degree of C $= 3$.',
+        'A graph is made of points, called **vertices**, joined by lines, called **edges**. In a **directed** graph, each edge is an arrow with a start and an end. $A \\to B$ goes from A into B.\n\n' +
+        'The **in-degree** of a vertex is the number of arrows coming into it. So we want the edges with C on the right-hand side of the arrow.\n\n' +
+        'Scan the list. $A \\to C$, $B \\to C$ and $D \\to C$ end at C, which makes 3. $C \\to A$ and $C \\to D$ start at C, so they don\'t count.',
+      conclusion: 'Three arrows end at C, so its in-degree is $3$.',
       whyWrong: [
         null,
         'This is the **out-degree** of C: the edges $C \\to A$ and $C \\to D$ leave C rather than arrive at it.',
         'This is the total number of edges touching C ($3$ in $+ 2$ out). The question asks only for the edges coming in.',
         'This is the total number of edges in the graph.',
       ],
-      keyIdea: 'In-degree counts arrows into a vertex; out-degree counts arrows out of it.',
+      keyIdea: 'In a directed graph, in-degree counts arrows ending at the vertex, and out-degree counts arrows starting from it. Look for the letter on the right of the arrow for in, and on the left for out.',
     },
     check: {
       optionValues: [3, 2, 5, 7],
@@ -283,26 +287,20 @@ export const questions: StaticQuestion[] = [
     options: ['$2, 2, 2, 2$', '$3, 3, 2, 2$', '$3, 3, 3, 3$', '$3, 1, 1, 1$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which list of degrees allows a route using every edge once, but ending somewhere else?',
       solution:
-        'For a connected graph, count the vertices of **odd** degree:\n\n' +
-        '- 0 odd vertices: Euler circuit (and so also an Euler path).\n' +
-        '- exactly 2 odd vertices: Euler path, but no circuit. The path must start at one odd vertex and end at the other.\n' +
-        '- 4 or more odd vertices: no Euler path at all.\n\n' +
-        'Count the odd degrees in each option:\n\n' +
-        '| Degrees | Odd vertices | Result |\n' +
-        '|---|---|---|\n' +
-        '| $2, 2, 2, 2$ | 0 | circuit |\n' +
-        '| $3, 3, 2, 2$ | 2 | path only |\n' +
-        '| $3, 3, 3, 3$ | 4 | neither |\n' +
-        '| $3, 1, 1, 1$ | 4 | neither |\n\n' +
-        'So the answer is $3, 3, 2, 2$ (for example, a square with one diagonal).',
+        'A graph is points (**vertices**) joined by lines (**edges**), and **connected** means you can get from any vertex to any other. An **Euler path** travels along every edge exactly once. An **Euler circuit** does the same but ends where it started. The **degree** of a vertex is the number of edges touching it.\n\n' +
+        'Whenever a route passes through a vertex, it uses two edges: one in and one out. So a vertex that isn\'t a start or end must have an even degree.\n\n' +
+        'A vertex with an odd degree has an edge left over, so the route must start or end there. A path has only 2 ends. So a path that isn\'t a circuit needs **exactly 2** odd vertices, and a circuit needs 0.\n\n' +
+        'Count the odd degrees in each list:\n\n| Degrees | Odd degrees | Result |\n|---|---|---|\n| $2, 2, 2, 2$ | 0 | Euler circuit |\n| $3, 3, 3, 3$ | 4 | Neither |\n| $3, 1, 1, 1$ | 4 | Neither |\n| $3, 3, 2, 2$ | 2 | Euler path, no circuit |',
+      conclusion: 'Exactly two vertices are odd in $3, 3, 2, 2$, so those two are the ends of an Euler path that is not a circuit.',
       whyWrong: [
         'Every degree is even (0 odd vertices), so this graph has an Euler **circuit**. The question asks for a path that is **not** a circuit.',
         null,
         'All four degrees are odd. Every odd vertex must be the start or the end of an Euler path, and a path only has two ends, so there is no Euler path.',
         'The degrees $3, 1, 1, 1$ are **all** odd (1 is odd too), giving 4 odd vertices, so there is no Euler path.',
       ],
-      keyIdea: 'Connected graph: 0 odd vertices gives an Euler circuit, exactly 2 odd vertices gives an Euler path only, more than 2 gives neither.',
+      keyIdea: 'For a connected graph, count the odd-degree vertices. 0 odd: Euler circuit. 2 odd: Euler path that starts and ends at those two. Any other number: neither. Don\'t forget that 1 is odd too.',
     },
     check: {
       optionValues: ['2222', '3322', '3333', '3111'],
@@ -338,24 +336,21 @@ export const questions: StaticQuestion[] = [
     options: ['$11$ km', '$12$ km', '$13$ km', '$10$ km'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is the smallest total distance from A to E?',
       solution:
-        'List the sensible routes from A to E and add up the lengths:\n\n' +
-        '| Route | Total (km) |\n' +
-        '|---|---|\n' +
-        '| A–C–E | $2 + 10 = 12$ |\n' +
-        '| A–B–D–E | $4 + 5 + 2 = 11$ |\n' +
-        '| A–C–D–E | $2 + 9 + 2 = 13$ |\n' +
-        '| A–C–B–D–E | $2 + 1 + 5 + 2 = 10$ |\n' +
-        '| A–B–C–E | $4 + 1 + 10 = 15$ |\n\n' +
-        'The trick: going A–C–B ($2 + 1 = 3$) reaches B more cheaply than the direct road A–B ($4$).\n\n' +
-        'Shortest route: A–C–B–D–E, length $10$ km.',
+        'The shortest route means the smallest total km, not the fewest roads. So work outwards from A, keeping the shortest distance found so far to each place.\n\n' +
+        'From A, the roads reach B in 4 km and C in 2 km. C is the closest, so its shortest distance is settled at 2 km.\n\n' +
+        'Now try the roads out of C. B via C costs $2 + 1 = 3$, which beats 4. D via C costs $2 + 9 = 11$. E via C costs $2 + 10 = 12$.\n\n' +
+        'B is now the closest unsettled place, at 3 km. Try its road to D: $3 + 5 = 8$, which beats 11.\n\n' +
+        'D is next, at 8 km. Try its road to E: $8 + 2 = 10$, which beats 12.',
+      conclusion: 'The best route is A–C–B–D–E, with lengths $2 + 1 + 5 + 2$, so the shortest route is $10$ km.',
       whyWrong: [
         'This is the route A–B–D–E. It misses the cheaper way of reaching B: A–C–B costs $3$, less than the direct road A–B at $4$.',
         'This is the route A–C–E, which uses the **fewest roads** (2). Shortest means the smallest total length, not the fewest edges.',
         'This is the route A–C–D–E, which uses the long road C–D ($9$ km).',
         null,
       ],
-      keyIdea: 'Shortest path means the smallest total weight; a route with more edges can still be shorter.',
+      keyIdea: 'For shortest routes, repeatedly take the closest unsettled place and update the places next to it using distance so far $+$ road length. Keep a table of best distances. The route with the fewest roads is often not the shortest.',
     },
     check: {
       optionValues: [11, 12, 13, 10],
@@ -383,18 +378,20 @@ export const questions: StaticQuestion[] = [
     options: ['$11$', '$12$', '$33$', '$132$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many vertices does a complete graph with 66 edges have?',
       solution:
-        '$K_n$ has $\\frac{n(n-1)}{2}$ edges, so\n\n' +
-        '$$\\frac{n(n-1)}{2} = 66 \\quad\\Rightarrow\\quad n(n-1) = 132$$\n\n' +
-        'Look for two consecutive whole numbers that multiply to 132: $12 \\times 11 = 132$.\n\n' +
-        'So $n = 12$. (Check: $\\frac{12 \\times 11}{2} = 66$.)',
+        'In the complete graph $K_n$, every pair of the $n$ points, called **vertices**, is joined by a line, called an **edge**. Each vertex joins $n - 1$ others, which counts $n(n-1)$ edge ends. Each edge has two ends, so the number of edges is $\\frac{n(n-1)}{2}$.\n\n' +
+        'Set this equal to 66: $\\frac{n(n-1)}{2} = 66$.\n\n' +
+        'Multiply both sides by 2 to remove the fraction: $n(n-1) = 132$.\n\n' +
+        'We need two whole numbers in a row that multiply to 132. Since $11^2 = 121$ is close, try 11 and 12: $12 \\times 11 = 132$. So the larger number, $n$, is 12.',
+      conclusion: '$K_{12}$ has $\\frac{12 \\times 11}{2} = 66$ edges, so $n$ is $12$.',
       whyWrong: [
         'This comes from solving $\\frac{n(n+1)}{2} = 66$. Each vertex joins the **other** $n - 1$ vertices, so the formula is $\\frac{n(n-1)}{2}$; $K_{11}$ has only $55$ edges.',
         null,
         'This is $66 \\div 2$. Halving the number of edges does not give the number of vertices.',
         'This is $2 \\times 66 = 132$, which equals $n(n-1)$. You still need to find $n$: $12 \\times 11 = 132$.',
       ],
-      keyIdea: 'Everyone-plays-everyone problems are complete graphs: $K_n$ has $\\frac{n(n-1)}{2}$ edges.',
+      keyIdea: 'To reverse the edge formula, double the edges, then find two neighbouring whole numbers whose product is that value. The larger one is $n$. Start from a number whose square is close.',
     },
     check: {
       optionValues: [11, 12, 33, 132],
@@ -414,23 +411,21 @@ export const questions: StaticQuestion[] = [
     options: ['$1$', '$3$', '$4$', '$7$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which value of $x$ could make these degrees belong to a real graph?',
       solution:
-        'Two facts limit $x$:\n\n' +
-        '1. **Handshake lemma:** the sum of the degrees is $2E$, so it must be **even**.\n' +
-        '2. In a **simple** graph (no loops, no repeated edges) a vertex can join at most the other $7 - 1 = 6$ vertices, so $x \\le 6$.\n\n' +
-        'The six known degrees add to $1 + 2 + 2 + 3 + 3 + 3 = 14$, which is even, so $x$ must be even.\n\n' +
-        '- $x = 1$: total $15$, odd. Impossible.\n' +
-        '- $x = 3$: total $17$, odd. Impossible.\n' +
-        '- $x = 7$: odd total, and $7 > 6$. Impossible.\n' +
-        '- $x = 4$: total $18$, so $E = 9$. Such a graph can be drawn.\n\n' +
-        'So $x = 4$.',
+        'A graph is made of points, called **vertices**, joined by lines, called **edges**. The **degree** of a vertex is how many edges touch it. Two rules limit the possible degrees.\n\n' +
+        'First rule, called the **handshake lemma**: each edge adds 2 to the total of all the degrees, one for each end. So the degree total must be even.\n\n' +
+        'Second rule: in a **simple** graph, no edge joins a vertex to itself and no pair is joined twice. With 7 vertices, a vertex can join at most the other 6, so $x \\le 6$.\n\n' +
+        'Add the known degrees: $1 + 2 + 2 + 3 + 3 + 3 = 14$. This is even, so $x$ must be even to keep the total even.\n\n' +
+        'Test the options:\n\n| $x$ | Total | Problem |\n|---|---|---|\n| 1 | 15 | Odd total |\n| 3 | 17 | Odd total |\n| 7 | 21 | Odd total, and above 6 |\n| 4 | 18 | None |',
+      conclusion: 'Only 4 gives an even total and stays at or below 6, so $x$ could be $4$.',
       whyWrong: [
         'With $x = 1$ the degrees add to $15$, an odd number. The sum of degrees is always $2E$, so it must be even.',
         'With $x = 3$ the degrees add to $17$, which is odd, so this breaks the handshake lemma.',
         null,
         'In a simple graph with 7 vertices a vertex can be joined to at most the other 6, so degree 7 is impossible (and the total $21$ would be odd too).',
       ],
-      keyIdea: 'The sum of the degrees must be even, so a graph always has an even number of odd-degree vertices.',
+      keyIdea: 'To test a list of degrees, use two checks: the total must be even, and no degree can exceed the number of vertices minus 1. These rule out most options quickly.',
     },
     check: {
       optionValues: [1, 3, 4, 7],
@@ -450,18 +445,20 @@ export const questions: StaticQuestion[] = [
     options: ['$5$', '$4$', '$9$', '$7$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many edges must go to leave a tree on all 10 vertices?',
       solution:
-        'A tree that contains all 10 vertices (a **spanning tree**) has $V - 1 = 10 - 1 = 9$ edges.\n\n' +
-        'The graph has 14 edges now, so you remove\n\n' +
-        '$$14 - 9 = 5$$\n\n' +
-        'edges (choosing edges that lie on cycles, so the graph stays connected).',
+        'A graph is points (**vertices**) joined by lines (**edges**). A **tree** is connected, meaning every vertex can be reached from any other, and has no cycles (closed loops). A tree on $V$ vertices always has exactly $V - 1$ edges, because each vertex after the first joins on with exactly one edge.\n\n' +
+        'So the tree we want has $10 - 1 = 9$ edges.\n\n' +
+        'Removing an edge from a cycle never disconnects the graph, because you can still go the other way round. So we can keep removing such edges until only 9 remain.\n\n' +
+        'The graph has 14 edges now. Keep 9 and remove the rest: $14 - 9 = 5$.',
+      conclusion: 'A tree on 10 vertices keeps 9 edges, so $5$ of the 14 must go.',
       whyWrong: [
         null,
         'This is $14 - 10$: it assumes a tree on 10 vertices has 10 edges. A tree has $V - 1 = 9$ edges.',
         'This is the number of edges that **remain** in the tree, not the number removed.',
         'This is $14 \\div 2$: halving the edges is the handshake-lemma step for degrees, and has nothing to do with this question.',
       ],
-      keyIdea: 'A spanning tree keeps exactly $V - 1$ edges, so remove $E - (V - 1)$.',
+      keyIdea: 'To reduce a connected graph to a tree using all its vertices, remove $E - (V - 1)$ edges, where $E$ is edges and $V$ is vertices. This counts edges removed, not edges kept.',
     },
     check: { optionValues: [5, 4, 9, 7], compute: () => 14 - (10 - 1) },
   },
@@ -476,23 +473,18 @@ export const questions: StaticQuestion[] = [
     options: ['A–B–D–A', 'A–C–D–E–A', 'A–B–C–B–A', 'A–B–C–A'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which closed route is a genuine cycle in this graph?',
       solution:
-        'A **cycle** is a closed route that:\n\n' +
-        '- uses only edges that exist,\n' +
-        '- starts and ends at the same vertex,\n' +
-        '- never repeats an edge or any other vertex (and has at least 3 edges).\n\n' +
-        'Check each option:\n\n' +
-        '- A–B–D–A: there is no edge B–D. Not valid.\n' +
-        '- A–C–D–E–A: there is no edge E–A (E is only joined to D). Not valid.\n' +
-        '- A–B–C–B–A: goes back along B–C and B–A, repeating edges and vertex B. This is a closed walk, not a cycle.\n' +
-        '- A–B–C–A: edges A–B, B–C and C–A all exist, and no vertex repeats except the start/end. **This is a cycle** (a triangle).',
+        'In a graph, the letters are points called **vertices**, and each listed pair is a line called an **edge**. A **cycle** is a closed route that starts and ends at the same vertex. It uses only edges in the graph, and it doesn\'t repeat an edge or any vertex other than the start.\n\n' +
+        'Test each route by checking every hop against the edge list:\n\n| Route | Problem |\n|---|---|\n| A–B–D–A | No edge B–D |\n| A–C–D–E–A | No edge E–A |\n| A–B–C–B–A | Repeats vertex B and its edges |\n| A–B–C–A | None: A–B, B–C and A–C all exist |',
+      conclusion: 'It uses three real edges and returns to the start with no repeats, so the cycle is A–B–C–A.',
       whyWrong: [
         'There is no edge between B and D, so this route cannot be followed in the graph.',
         'There is no edge between E and A: E is only joined to D, so the route cannot get back to A.',
         'This goes back along the same edges (B–C then C–B, B–A after A–B). A cycle may not repeat edges or vertices; this is only a closed walk.',
         null,
       ],
-      keyIdea: 'A cycle is a closed path: every edge must exist and no edge or vertex (other than the start) may repeat.',
+      keyIdea: 'To test a route as a cycle, check each hop is an edge (either way round), then check no vertex or edge repeats except the start and end. A cycle in a simple graph needs at least 3 edges.',
     },
     check: {
       optionValues: ['ABDA', 'ACDEA', 'ABCBA', 'ABCA'],
@@ -527,25 +519,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 1,
     markScheme: {
+      asking: 'Where must a route using every edge exactly once start and finish?',
       solution:
-        'Find the degree of every vertex:\n\n' +
-        '| Vertex | Edges | Degree |\n' +
-        '|---|---|---|\n' +
-        '| A | A–B, A–C | 2 |\n' +
-        '| B | A–B, B–C, B–D | 3 |\n' +
-        '| C | A–C, B–C, C–D, C–E | 4 |\n' +
-        '| D | B–D, C–D, D–E | 3 |\n' +
-        '| E | C–E, D–E | 2 |\n\n' +
-        'Check: $2 + 3 + 4 + 3 + 2 = 14 = 2 \\times 7$.\n\n' +
-        'Exactly two vertices, B and D, have odd degree. Every time the pen passes **through** a vertex it uses 2 edges there, so an odd vertex must be a start or an end. Hence an Euler path exists, and it must start at B and finish at D (or start at D and finish at B).\n\n' +
-        'Example: B–A–C–B–D–C–E–D.',
+        'A graph is points (**vertices**) joined by lines (**edges**), and **connected** means you can get from any vertex to any other. The **degree** of a vertex is the number of edges touching it. Each time a route passes through a vertex, it uses one edge in and one edge out, which takes 2 from its degree.\n\n' +
+        'So a vertex in the middle of the route needs an even degree. A vertex with an odd degree always has one edge left over, so the route must start or finish there.\n\n' +
+        'Count each vertex\'s degree from the list of edges:\n\n| Vertex | Edges | Degree |\n|---|---|---|\n| A | A–B, A–C | 2 |\n| B | A–B, B–C, B–D | 3 |\n| C | A–C, B–C, C–D, C–E | 4 |\n| D | B–D, C–D, D–E | 3 |\n| E | C–E, D–E | 2 |\n\n' +
+        'Only B and D have an odd degree, so they are the two ends. One such route is B–A–C–B–D–C–E–D, which uses all 7 edges.',
+      conclusion: 'B and D are the only odd-degree vertices, so the correct statement is: Its two ends must be B and D.',
       whyWrong: [
         'A and E have the smallest degrees, but they are **even** (2). An Euler path must start and end at the odd-degree vertices, which are B and D.',
         null,
         'Starting and finishing at the same vertex would be an Euler **circuit**, which needs every degree to be even. Here B and D are odd.',
         'Being connected is needed but is not enough: because B and D have odd degree, a route starting anywhere else gets stuck before using every edge.',
       ],
-      keyIdea: 'An Euler path with exactly two odd vertices must start at one odd vertex and end at the other.',
+      keyIdea: 'For an Euler path in a connected graph, work out every degree from the edge list. With exactly two odd vertices, those two are the ends. With none, the path can start anywhere and returns to its start.',
     },
     check: {
       optionValues: ['A,E', 'B,D', 'C', null],
@@ -575,19 +562,20 @@ export const questions: StaticQuestion[] = [
     options: ['$44$', '$10$', '$36$', '$9$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How few edges can keep these vertices all connected?',
       solution:
-        '**Step 1: find the number of vertices.** A complete graph $K_n$ has $\\frac{n(n-1)}{2}$ edges:\n\n' +
-        '$$\\frac{n(n-1)}{2} = 45 \\quad\\Rightarrow\\quad n(n-1) = 90 = 10 \\times 9$$\n\n' +
-        'so $n = 10$ vertices.\n\n' +
-        '**Step 2: the smallest connected graph.** The smallest connected graph on $n$ vertices is a **tree**, which has $n - 1$ edges.\n\n' +
-        'Minimum edges $= 10 - 1 = 9$.',
+        'A graph is points (**vertices**) joined by lines (**edges**). A **complete graph** joins every pair of vertices. Each of the $n$ vertices joins $n - 1$ others, and each edge has two ends, so it has $\\frac{n(n-1)}{2}$ edges. First we need $n$ from the 45 edges.\n\n' +
+        'Set $\\frac{n(n-1)}{2} = 45$. Multiply both sides by 2: $n(n-1) = 90$. The two whole numbers in a row that multiply to 90 are 10 and 9, so $n = 10$.\n\n' +
+        '**Connected** means you can get from any vertex to any other. A connected graph with the fewest edges has no cycles (closed loops), because an edge in a cycle could be removed without disconnecting anything. A connected graph with no cycles is a **tree**.\n\n' +
+        'Each vertex after the first joins a tree with exactly one edge, so a tree has one edge fewer than it has vertices. With 10 vertices that is $10 - 1 = 9$.',
+      conclusion: '45 edges means 10 vertices, and connecting 10 vertices takes at least $9$ edges.',
       whyWrong: [
         'This subtracts 1 from the number of **edges** (45). The tree rule $E = V - 1$ uses the number of **vertices**, which is 10.',
         'This is the number of vertices. A connected graph on 10 vertices needs only $10 - 1 = 9$ edges (a tree).',
         'This is $45 - 9 = 36$, the number of edges **removed**, not the number kept.',
         null,
       ],
-      keyIdea: 'Use $\\frac{n(n-1)}{2}$ to find $n$, then the smallest connected graph is a tree with $n - 1$ edges.',
+      keyIdea: 'Two formulas: a complete graph has $\\frac{n(n-1)}{2}$ edges (the most possible), and a tree has $n - 1$ edges (the fewest that keep it connected). Find $n$ first, then use the one you need.',
     },
     check: {
       optionValues: [44, 10, 36, 9],
@@ -615,19 +603,19 @@ export const questions: StaticQuestion[] = [
     options: ['$2$', '$0$', '$1$', '$4$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many two-step routes go from P to S, following the arrows?',
       solution:
-        'A walk of length 2 from P to S is $P \\to X \\to S$ for some middle vertex $X$. We need an edge $P \\to X$ **and** an edge $X \\to S$.\n\n' +
-        'Row P tells us where P can go: $P \\to Q$ and $P \\to R$.\n\n' +
-        '- $X = Q$: is there $Q \\to S$? Row Q, column S is 1. Yes.\n' +
-        '- $X = R$: is there $R \\to S$? Row R, column S is 1. Yes.\n\n' +
-        'So the walks are $P \\to Q \\to S$ and $P \\to R \\to S$: **2** walks. This is the entry in row P, column S of $M^2$: row P is $(0,1,1,0)$ and column S is $(0,1,1,0)$; only the Q and R positions have a 1 in both, giving $1 \\cdot 1 + 1 \\cdot 1 = 2$.',
+        'A **walk of length 2** is a route along two arrows in a row: P to some middle point (a **vertex**), then on to S. In this table, the row is where an arrow starts and the column is where it ends.\n\n' +
+        'Read row P. The 1s are under Q and R, so P\'s arrows go to Q and R. These are the only possible middle vertices.\n\n' +
+        'Now check whether each middle vertex has an arrow to S. Row Q, column S is 1, so $P \\to Q \\to S$ works. Row R, column S is 1, so $P \\to R \\to S$ works.',
+      conclusion: 'Both middle vertices connect on to S, so there are $2$ walks.',
       whyWrong: [
         null,
         'This is the entry in row P, column S of $M$ itself, which counts direct edges $P \\to S$ (walks of length 1). There are none, but there are 2-step walks.',
         'This counts walks from S to P (only $S \\to R \\to P$), going against the direction asked. In a directed graph the order matters.',
         'This counts **all** walks of length 2 starting at P ($P \\to Q \\to R$, $P \\to Q \\to S$, $P \\to R \\to P$, $P \\to R \\to S$), not just those ending at S.',
       ],
-      keyIdea: 'Walks of length 2 from $X$ to $Y$ are counted by $(M^2)_{XY}$: sum over middle vertices of (edge in) times (edge out).',
+      keyIdea: 'To count 2-step walks from X to Y, list the 1s in row X, then count how many of those vertices have a 1 in column Y. This equals the X, Y entry of the matrix multiplied by itself.',
     },
     check: {
       optionValues: [2, 0, 1, 4],
@@ -651,18 +639,20 @@ export const questions: StaticQuestion[] = [
     options: ['$19$', '$20$', '$17$', '$23$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many edges are in a graph made of 3 separate trees on 20 vertices?',
       solution:
-        'A graph with no cycles is a **forest**: each connected piece is a tree.\n\n' +
-        'Suppose the 3 trees have $a$, $b$ and $c$ vertices, with $a + b + c = 20$. Each tree has one edge fewer than its vertices:\n\n' +
-        '$$E = (a - 1) + (b - 1) + (c - 1) = (a + b + c) - 3 = 20 - 3 = 17$$\n\n' +
-        'In general, a forest with $V$ vertices and $k$ trees has $V - k$ edges.',
+        'A graph is points (**vertices**) joined by lines (**edges**). A connected piece with no cycles (closed loops) is a **tree**. So this graph is 3 separate trees. We don\'t know their sizes, but they have 20 vertices in total.\n\n' +
+        'Each vertex after the first joins a tree with exactly one edge, so each tree has one edge fewer than it has vertices. Say the trees have $a$, $b$ and $c$ vertices, where $a + b + c = 20$. Their edges are $a - 1$, $b - 1$ and $c - 1$.\n\n' +
+        'Add the three edge counts: $(a - 1) + (b - 1) + (c - 1) = (a + b + c) - 3$.\n\n' +
+        'Substitute $a + b + c = 20$: $20 - 3 = 17$.',
+      conclusion: 'Each of the 3 trees has one edge fewer than vertices, so there are $17$ edges.',
       whyWrong: [
         'This is $20 - 1$, the edge count for a **single** tree. With 3 separate trees, you lose one edge per tree: $20 - 3$.',
         'This assumes $E = V$, but every tree has one edge fewer than vertices, and here there are 3 trees.',
         null,
         'This adds the number of components ($20 + 3$) instead of subtracting it. Splitting a tree into more pieces means **fewer** edges, not more.',
       ],
-      keyIdea: 'A forest with $V$ vertices and $k$ trees has $V - k$ edges (each tree has one fewer edge than vertices).',
+      keyIdea: 'For a graph with no cycles, use $E = V - C$, where $E$ is edges, $V$ is vertices and $C$ is the number of separate pieces. The sizes of the pieces make no difference.',
     },
     check: {
       optionValues: [19, 20, 17, 23],
@@ -681,16 +671,18 @@ export const questions: StaticQuestion[] = [
     options: ['$n - 1$', '$n$', '$2n$', '$\\frac{n(n-1)}{2}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many edges can touch one vertex in a simple graph with $n$ vertices?',
       solution:
-        'The **order** of a graph is its number of vertices.\n\n' +
-        'A simple graph has no loops and no repeated edges, so a vertex can be joined at most once to each of the other $n - 1$ vertices.',
+        'A graph is points (**vertices**) joined by lines (**edges**). **Order** means the number of vertices, so there are $n$ vertices. The **degree** of a vertex is how many edges touch it. In a **simple** graph, no edge joins a vertex to itself and no pair has two edges.\n\n' +
+        'So one vertex can be joined to each other vertex at most once. It can\'t join to itself, which leaves $n - 1$ others.',
+      conclusion: 'A vertex joined to every other vertex has the largest degree possible, which is $n - 1$.',
       whyWrong: [
         null,
         'This counts the vertex itself, but a simple graph has no edge from a vertex to itself.',
         'This doubles the vertex count. No vertex can be joined to any other more than once in a simple graph.',
         'This is the number of edges of the complete graph $K_n$, not the degree of one vertex.',
       ],
-      keyIdea: 'In a simple graph of order $n$, the degree of a vertex is at most $n - 1$.',
+      keyIdea: 'In a simple graph, degrees run from 0 up to the number of vertices minus 1. Use this limit to rule out impossible lists of degrees.',
     },
   },
   {
@@ -701,16 +693,18 @@ export const questions: StaticQuestion[] = [
     options: ['an edge from a vertex to itself', 'a vertex of degree 1', 'two edges joining the same pair', 'a route visiting every vertex'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is meant by a loop in a graph?',
       solution:
-        'A **loop** is an edge whose two ends are the same vertex.\n\n' +
-        'A simple graph has no loops and no repeated edges.',
+        'An **edge** is a line in a graph, and it normally joins two different points, called **vertices**.\n\n' +
+        'A **loop** is the special case in which both ends are the same vertex. Picture a small circle drawn from vertex A back to A.',
+      conclusion: 'A loop has both ends at one vertex, so it is an edge from a vertex to itself.',
       whyWrong: [
         null,
         'A vertex of degree 1 is called a leaf when the graph is a tree. It is a vertex, not an edge.',
         'These are repeated (multiple) edges. They join two different vertices.',
         'This describes a route through the graph, not a single edge.',
       ],
-      keyIdea: 'A loop joins a vertex to itself; a simple graph has none.',
+      keyIdea: 'Keep the words apart: a loop is one edge with both ends at one vertex, multiple edges join the same pair more than once, and a simple graph has neither. A loop adds 2 to its vertex\'s degree, the count of edge ends there.',
     },
   },
   {
@@ -721,14 +715,18 @@ export const questions: StaticQuestion[] = [
     options: ['leaf', 'root', 'cycle', 'bridge'],
     correctIndex: 0,
     markScheme: {
-      solution: 'A vertex of a tree with degree 1 is called a **leaf**: it is joined to just one other vertex, like a leaf at the end of a branch.',
+      asking: 'What do we call a vertex with only one edge in a tree?',
+      solution:
+        'A **tree** is a connected graph with no closed loops, made of points (**vertices**) joined by lines (**edges**). The **degree** of a vertex is the number of edges touching it. So a vertex of degree 1 has only one edge, and it sits at the end of a branch.\n\n' +
+        'As in a real tree, the ends of the branches are called **leaves**.',
+      conclusion: 'A vertex of degree 1 sits at the end of a branch, so it is called a leaf.',
       whyWrong: [
         null,
         'A root is a vertex chosen as the top of the tree, and it can have any degree.',
         'A cycle is a closed route, not a vertex. A tree contains no cycles.',
         'A bridge is an edge whose removal disconnects the graph, not a vertex.',
       ],
-      keyIdea: 'Vertices of degree 1 in a tree are called leaves.',
+      keyIdea: 'Match the tree words: a leaf has degree 1, a root is the vertex chosen as the top, and a bridge is an edge whose removal disconnects the graph. A cycle is a closed route, which a tree never has.',
     },
   },
   {
@@ -739,15 +737,19 @@ export const questions: StaticQuestion[] = [
     options: ['symmetric', 'invertible', 'the identity matrix', 'non-zero on its diagonal'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What pattern must the adjacency matrix of an undirected graph always show?',
       solution:
-        'In an undirected graph, an edge between $i$ and $j$ gives a 1 in row $i$, column $j$ **and** in row $j$, column $i$. So the matrix equals its transpose, which means it is **symmetric**.',
+        'An **adjacency matrix** is a table with a row and a column for each point (**vertex**) of a graph. It has a 1 in row X, column Y when a line (**edge**) joins X and Y. **Undirected** means an edge works both ways.\n\n' +
+        'So if A is joined to B, then B is joined to A. The entry in row A, column B must equal the entry in row B, column A.\n\n' +
+        'A matrix in which row X, column Y always equals row Y, column X is called **symmetric**: it mirrors across the diagonal from top left to bottom right.',
+      conclusion: 'An undirected edge appears twice, mirrored across the diagonal, so the matrix is always symmetric.',
       whyWrong: [
         null,
         'A graph with no edges has the zero matrix as its adjacency matrix, and that is not invertible.',
         'The identity has 1s on the diagonal, which would mean every vertex has a loop. A simple graph has no loops.',
         'The diagonal is all 0s, because a simple graph has no loops.',
       ],
-      keyIdea: 'An undirected simple graph has a symmetric adjacency matrix with 0s on the diagonal.',
+      keyIdea: 'Undirected means symmetric, and a simple graph also has all 0s on the diagonal because it has no loops (edges from a vertex to itself). A directed graph, with one-way edges, need not be symmetric. Test a matrix by comparing each entry with its mirror image.',
     },
   },
 ];

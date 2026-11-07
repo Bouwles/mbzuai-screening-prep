@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { matMul, type Mat } from '../../../lib/mathx';
 import { m, matrix, num, paren, signed } from '../../../lib/tex';
 
@@ -27,7 +28,6 @@ function pickDistractors(answerText: string, answerValue: number | string, pool:
 }
 
 const ord = (r: number, c: number) => m(`${r} \\times ${c}`);
-const ordinal = (k: number) => ['first', 'second', 'third', 'fourth'][k - 1];
 
 export const generators: Generator[] = [
   // ------------------------------------------------------------------ 1. one entry of a product
@@ -108,7 +108,7 @@ export const generators: Generator[] = [
         const distractors = pickDistractors(answer, ans, pool);
         if (distractors.length < 3) continue;
 
-        const expansion = rowI.map((a, k) => `${paren(a)} \\times ${paren(colJ[k])}`).join(' + ');
+        const products = rowI.map((a, k) => `${paren(a)} \\times ${paren(colJ[k])} = ${num(prods[k])}`).join(',\\quad ');
         const prodSum = prods.map((p, k) => (k === 0 ? num(p) : signed(p))).join('');
         return {
           stem:
@@ -117,15 +117,15 @@ export const generators: Generator[] = [
           answer,
           answerValue: ans,
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution:
-            `$A$ is ${ord(rowsA, inner)} and $B$ is ${ord(inner, colsB)}. The inner numbers match, so $AB$ is defined (it is ${ord(rowsA, colsB)}).\n\n` +
-            `The entry in row ${i}, column ${j} uses the ${ordinal(i)} row of $A$ and the ${ordinal(j)} column of $B$:\n\n` +
-            `- Row ${i} of $A$: ${m(rowI.map(num).join(',\\ '))}\n` +
-            `- Column ${j} of $B$: ${m(colJ.map(num).join(',\\ '))}\n\n` +
-            `Multiply matching entries and add:\n\n` +
-            `$$(AB)_{${i}${j}} = ${expansion} = ${prodSum} = ${num(ans)}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Entry $(i, j)$ of $AB$ is row $i$ of $A$ times column $j$ of $B$: multiply matching entries and add.',
+          asking: `Which single number sits in row ${i}, column ${j} of $AB$?`,
+          solution: steps(
+            `You don't need the whole product. Each entry of $AB$ comes from one row of $A$ and one column of $B$. Row ${i}, column ${j} uses **row ${i} of $A$** and **column ${j} of $B$**.`,
+            `Read them off. Row ${i} of $A$ is ${m(rowI.map((x) => num(x)).join(', '))}. Column ${j} of $B$, reading downwards, is ${m(colJ.map((x) => num(x)).join(', '))}.`,
+            `Multiply matching numbers: ${m(products)}.`,
+            `Add the products, keeping their signs: ${m(`${prodSum} = ${num(ans)}`)}.`,
+          ),
+          conclusion: `Row ${i} of $A$ with column ${j} of $B$ gives ${m(prodSum)}, so the entry is ${answer}.`,
+          keyIdea: 'The entry in row $i$, column $j$ of $AB$ needs only row $i$ of $A$ and column $j$ of $B$. Pair them up, multiply each pair and add. Skip the rest of the product.',
         };
       }
     },
@@ -199,19 +199,23 @@ export const generators: Generator[] = [
         const kA = A.map((r) => r.map((v) => k * v));
         const lBm = B.map((r) => r.map((v) => l * v));
         const work = kA.map((r, x) => r.map((v, y) => `${num(v)} ${op} ${paren(lBm[x][y])}`));
+        const verb = s === 1 ? 'add' : 'subtract';
+        // The first position where a negative entry is taken away, to show that this means adding.
+        const negative = s === -1 ? kA.flatMap((r, x) => r.map((v, y) => [v, lBm[x][y]])).find(([, w]) => w < 0) : undefined;
         return {
           stem: `Let $A = ${matrix(A)}$ and $B = ${matrix(B)}$. Find ${m(expr)}.`,
           answer,
           answerValue: J(res),
           distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-          solution:
-            'Scalar multiplication multiplies **every** entry; adding or subtracting matrices works entry by entry.\n\n' +
-            `First, ${m(`${k}A = ${matrix(kA)}`)}` +
-            (l === 1 ? '.\n\n' : ` and ${m(`${l}B = ${matrix(lBm)}`)}.\n\n`) +
-            `Now ${s === 1 ? 'add' : 'subtract'} entry by entry:\n\n` +
-            `$$${expr} = ${matrix(work)} = ${matrix(res)}$$\n\n` +
-            `Answer: ${answer}`,
-          keyIdea: 'Multiply every entry by the scalar, then add or subtract matching entries.',
+          asking: `Multiply $A$ by ${k}, then ${s === 1 ? 'add' : 'take away'} ${l === 1 ? '$B$' : `${l} times $B$`}. What matrix do you get?`,
+          solution: steps(
+            `The ${k} in ${m(`${k}A`)} is a **scalar** (an ordinary number multiplying a matrix). It multiplies every entry: ${m(`${k}A = ${matrix(A.map((r) => r.map((v) => `${k} \\times ${paren(v)}`)))} = ${matrix(kA)}`)}.`,
+            l === 1 ? '$B$ has no number in front of it, so it stays as it is.' : `In the same way, ${m(`${l}B = ${matrix(B.map((r) => r.map((v) => `${l} \\times ${paren(v)}`)))} = ${matrix(lBm)}`)}.`,
+            negative && `Watch the signs when subtracting: taking away a negative means adding. For example, ${m(`${num(negative[0])} - ${paren(negative[1])} = ${num(negative[0])} + ${num(-negative[1])}`)}.`,
+            `To ${verb} matrices, ${verb} the entries in matching positions:\n\n$$${expr} = ${matrix(work)} = ${matrix(res)}$$`,
+          ),
+          conclusion: `Putting each result back in its position gives ${answer}.`,
+          keyIdea: 'For $pA + qB$: multiply every entry of $A$ by $p$ and every entry of $B$ by $q$, then add or subtract position by position. Bracket negative entries so you keep their signs.',
         };
       }
     },
@@ -297,23 +301,27 @@ export const generators: Generator[] = [
       });
       const distractors = pickDistractors(answer, key(res), pool);
 
-      const steps: string[] = [];
-      if (kind === 'ATB') steps.push(`Transposing swaps rows and columns, so ${m('A^{T}')} is ${ord(p, q)}.`);
-      if (kind === 'ABT') steps.push(`Transposing swaps rows and columns, so ${m('B^{T}')} is ${ord(q, r)}.`);
       const lName = kind === 'ATB' ? 'A^{T}' : 'A';
       const rName = kind === 'ABT' ? 'B^{T}' : 'B';
-      steps.push(
-        `Write the orders side by side: ${m(`${lName}${rName}`)} is ${m(`(${left[0]} \\times ${left[1]})(${right[0]} \\times ${right[1]})`)}. ` +
-          `The inner numbers (${left[1]} and ${right[0]}) match, so the product is defined, and the outer numbers give ${ord(prod[0], prod[1])}.`,
-      );
-      if (finalT) steps.push(`Finally, transposing swaps rows and columns, so ${m('(AB)^{T}')} is ${ord(res[0], res[1])}. (This matches ${m('B^{T}A^{T}')}: ${m(`(${r} \\times ${q})(${q} \\times ${p})`)}.)`);
+      const product = m(`${lName}${rName}`);
       return {
         stem: `$A$ is a ${ord(sa[0], sa[1])} matrix and $B$ is a ${ord(sb[0], sb[1])} matrix. What is the order of ${m(expr)}?`,
         answer,
         answerValue: key(res),
         distractors: distractors.map((d) => ({ text: d.text, value: d.value, why: d.why })),
-        solution: steps.join('\n\n') + `\n\nAnswer: ${answer}`,
-        keyIdea: '$(m \\times n)(n \\times p)$ gives $m \\times p$, and a transpose swaps the two numbers of an order.',
+        asking: `How many rows and columns does ${m(expr)} have?`,
+        solution: steps(
+          kind === 'ATB' && `${m('A^{T}')} is the **transpose** of $A$: its rows and columns swap. $A$ is ${ord(q, p)}, so ${m('A^{T}')} is ${ord(p, q)}.`,
+          kind === 'ABT' && `${m('B^{T}')} is the **transpose** of $B$: its rows and columns swap. $B$ is ${ord(r, q)}, so ${m('B^{T}')} is ${ord(q, r)}.`,
+          `Write the orders (rows $\\times$ columns) side by side: ${product} is ${m(`(${left[0]} \\times ${left[1]})(${right[0]} \\times ${right[1]})`)}.`,
+          `The two middle numbers, the **inner numbers**, are ${left[1]} and ${right[0]}. They match, so the product exists.`,
+          `The two end numbers, the **outer numbers**, give the size of the product. They are ${left[0]} and ${right[1]}, so ${product} is ${ord(prod[0], prod[1])}.`,
+          finalT && `The $T$ means **transpose**, which swaps rows and columns. So ${ord(prod[0], prod[1])} becomes ${ord(res[0], res[1])}.`,
+        ),
+        conclusion: finalT
+          ? `$AB$ is ${ord(prod[0], prod[1])} and the transpose swaps those numbers, so ${m(expr)} has order ${answer}.`
+          : `The inner numbers match and the outer numbers are ${left[0]} and ${right[1]}, so ${m(expr)} has order ${answer}.`,
+        keyIdea: 'A transpose swaps the two numbers in an order. For a product, $(m \\times n)(n \\times p)$ gives $m \\times p$: the inner numbers must match and the outer numbers give the size.',
       };
     },
   },
@@ -325,7 +333,8 @@ export const generators: Generator[] = [
     title: 'Which matrix product is defined, and what size is it?',
     generate(rng) {
       const DIMS = [1, 2, 3, 4, 5, 6];
-      const rule = 'Inner dimensions must match; outer dimensions give the size.';
+      const rule = 'Write the two orders side by side and compare the middle two numbers. Equal means the product exists, and the outer two numbers give its size.';
+      const orders = (a: number, b: number, c: number, d: number) => `Write the orders (rows $\\times$ columns) side by side, in the same order as the product: ${m(`(${a} \\times ${b})(${c} \\times ${d})`)}.`;
       const kind = rng.pick(['not-defined', 'size', 'size-not-defined'] as const);
 
       if (kind === 'not-defined') {
@@ -343,7 +352,7 @@ export const generators: Generator[] = [
         }
         const answer = optionText(...bad);
         const seen = new Set<string>([answer]);
-        const good: { text: string; working: string; why: string }[] = [];
+        const good: { text: string; row: string[]; why: string }[] = [];
         while (good.length < 3) {
           const [p, q, r] = [rng.pick(DIMS), rng.pick(DIMS), rng.pick(DIMS)];
           const text = optionText(p, q, q, r);
@@ -351,7 +360,7 @@ export const generators: Generator[] = [
           seen.add(text);
           good.push({
             text,
-            working: `- ${m(`(${p} \\times ${q})(${q} \\times ${r})`)}: inner dimensions ${q} and ${q} match, so it is defined and gives ${ord(p, r)}.`,
+            row: [m(`(${p} \\times ${q})(${q} \\times ${r})`), `${q} and ${q}`, 'Yes'],
             why: `This product is defined: the inner dimensions ${q} and ${q} match, and the outer dimensions give ${ord(p, r)}.`,
           });
         }
@@ -360,11 +369,13 @@ export const generators: Generator[] = [
           answer,
           answerValue: answer,
           distractors: good.map((g) => ({ text: g.text, value: g.text, why: g.why })),
-          solution:
-            `${rule}\n\n` +
-            good.map((g) => g.working).join('\n') +
-            `\n- ${m(`(${bad[0]} \\times ${bad[1]})(${bad[2]} \\times ${bad[3]})`)}: inner dimensions ${bad[1]} and ${bad[2]} do not match, so it is **not defined**.\n\n` +
-            `Answer: ${answer}`,
+          asking: "Which pair of matrix sizes can't be multiplied together?",
+          solution: steps(
+            'Each entry of a product pairs a row of the first matrix with a column of the second, number by number. So a row of the first must be as long as a column of the second.',
+            'A row has one number per column, and a column has one number per row. So the **columns of the first must equal the rows of the second**. These are the **inner numbers** when you write the orders side by side.',
+            `Compare the inner numbers for each pair:\n\n${table(['Product', 'Inner numbers', 'Match?'], [...good.map((g) => g.row), [m(`(${bad[0]} \\times ${bad[1]})(${bad[2]} \\times ${bad[3]})`), `${bad[1]} and ${bad[2]}`, 'No']])}`,
+          ),
+          conclusion: `Only one pair has inner numbers that differ, ${bad[1]} and ${bad[2]}, so the product that is not defined is ${answer}.`,
           keyIdea: rule,
         };
       }
@@ -382,10 +393,13 @@ export const generators: Generator[] = [
             { text: ord(q, q), value: `${q}x${q}`, why: 'This uses the **inner** dimensions. They only have to match; the outer dimensions give the size.' },
             { text: notDefined, value: 'not defined', why: `The product is defined: $A$ has ${q} columns and $B$ has ${q} rows, and those are the numbers that must match.` },
           ],
-          solution:
-            `${rule}\n\n` +
-            `Write the orders side by side: ${m(`(${p} \\times ${q})(${q} \\times ${r})`)}. The inner dimensions ${q} and ${q} match, and the outer dimensions give the size.\n\n` +
-            `Answer: ${answer}`,
+          asking: `What size is the result when a ${ord(p, q)} matrix multiplies a ${ord(q, r)} matrix?`,
+          solution: steps(
+            orders(p, q, q, r),
+            `The two middle numbers are the **inner numbers**, here ${q} and ${q}. They must be equal or the product doesn't exist. They are equal, so $AB$ exists.`,
+            `The two end numbers are the **outer numbers**, here ${p} and ${r}. They give the size of the product: ${p} rows from $A$ and ${r} columns from $B$, so ${answer}.`,
+          ),
+          conclusion: `The inner numbers match and the outer numbers are ${p} and ${r}, so $AB$ has order ${answer}.`,
           keyIdea: rule,
         };
       }
@@ -400,10 +414,13 @@ export const generators: Generator[] = [
           { text: ord(q, r), value: `${q}x${r}`, why: `This uses the inner dimensions as the size. They are ${q} and ${r}, and because they differ the product does not exist.` },
           { text: ord(s, p), value: `${s}x${p}`, why: `This writes the outer dimensions backwards, and it misses that the inner dimensions ${q} and ${r} do not match.` },
         ],
-        solution:
-          `${rule}\n\n` +
-          `Write the orders side by side: ${m(`(${p} \\times ${q})(${r} \\times ${s})`)}. The inner dimensions ${q} and ${r} do not match, so the product does not exist.\n\n` +
-          `Answer: ${notDefined}`,
+        asking: `Can a ${ord(p, q)} matrix multiply a ${ord(r, s)} matrix and, if so, what size is the result?`,
+        solution: steps(
+          orders(p, q, r, s),
+          'A product only exists when the two middle numbers, the **inner numbers**, are equal. That is because each row of $A$ has to pair up, number by number, with each column of $B$.',
+          `A row of $A$ has length ${q}, and a column of $B$ has length ${r}. These lengths differ, so the numbers can't pair up and there is no product.`,
+        ),
+        conclusion: `The inner numbers ${q} and ${r} differ, so ${notDefined}.`,
         keyIdea: rule,
       };
     },

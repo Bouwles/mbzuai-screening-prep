@@ -16,17 +16,20 @@ export const questions: StaticQuestion[] = [
     options: ['$87$', '$76$', '$83$', '$900$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What is the 20th number in this list, which goes up by the same amount each time?',
       solution:
-        'The first term is $a = 7$ and each term goes up by the same amount, so the common difference is $d = 11 - 7 = 4$.\n\n' +
-        'The $n$th term of an arithmetic sequence is $u_n = a + (n-1)d$. To reach the 20th term you start at the 1st term and add $d$ **19 times** (not 20 times).\n\n' +
-        '$$u_{20} = 7 + (20-1) \\times 4 = 7 + 19 \\times 4 = 7 + 76 = 83$$',
+        'An **arithmetic sequence** goes up or down by the same amount each time. That amount is the **common difference**, $d$. Here $11 - 7 = 4$, so $d = 4$. The first term is $a = 7$.\n\n' +
+        'The formula for the $n$th term is $u_n = a + (n - 1)d$. Why $n - 1$? To reach the 2nd term you add $d$ once, and to reach the 3rd you add it twice. So to reach the 20th term you add it 19 times.\n\n' +
+        'Substitute $a = 7$, $n = 20$ and $d = 4$: $u_{20} = 7 + (20 - 1) \\times 4 = 7 + 19 \\times 4$.\n\n' +
+        'Multiply first: $19 \\times 4 = 76$. Then add: $7 + 76 = 83$.',
+      conclusion: 'Starting at 7 and adding 4 nineteen times reaches 83, so the answer is $83$.',
       whyWrong: [
         'This is $7 + 20 \\times 4$: it uses $n$ instead of $n - 1$. Going from the 1st term to the 20th term takes only 19 steps of $+4$.',
         'This is $19 \\times 4$: the 19 steps are right, but the starting value $a = 7$ was never added on.',
         null,
         'This is the **sum** of the first 20 terms, $\\frac{20}{2}(7 + 83) = 900$, not the 20th term itself.',
       ],
-      keyIdea: 'The $n$th term of an arithmetic sequence is $u_n = a + (n-1)d$: start at the first term and add the difference $n - 1$ times.',
+      keyIdea: 'For a term in an arithmetic sequence (equal gaps between numbers), find $a$ and $d$, then use $u_n = a + (n - 1)d$. Count gaps, not terms: the $n$th term is $n - 1$ gaps from the start.',
     },
     check: {
       optionValues: [87, 76, 83, 900],
@@ -41,19 +44,21 @@ export const questions: StaticQuestion[] = [
     options: ['$192$', '$-192$', '$-384$', '$-96$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What is the 7th number in this list, where each number is multiplied by the same amount?',
       solution:
-        'The first term is $a = 3$. Each term is the previous one multiplied by the same number, the common ratio:\n\n' +
-        '$$r = \\frac{-6}{3} = -2$$\n\n' +
-        'The $n$th term of a geometric sequence is $u_n = ar^{n-1}$, so\n\n' +
-        '$$u_7 = 3 \\times (-2)^{6} = 3 \\times 64 = 192$$\n\n' +
-        'Sign check: $-2$ raised to an **even** power is positive. The terms in odd positions (1st, 3rd, 5th, 7th) are all positive, which matches $3, 12, \\dots$',
+        'A **geometric sequence** multiplies by the same number each time, called the **common ratio**, $r$. Divide any term by the one before: $-6 \\div 3 = -2$. So $r = -2$, and the first term is $a = 3$.\n\n' +
+        'The formula is $u_n = ar^{n-1}$. Why $n - 1$? To reach the 2nd term you multiply by $r$ once, so to reach the 7th you multiply by it 6 times.\n\n' +
+        'Substitute $a = 3$, $r = -2$ and $n = 7$: $u_7 = 3 \\times (-2)^{6}$.\n\n' +
+        'A negative number to an even power is positive, because the minus signs pair up and cancel. So $(-2)^6 = 2^6 = 64$.\n\n' +
+        'Multiply: $3 \\times 64 = 192$.',
+      conclusion: 'The power is even, so the result is positive, and the answer is $192$.',
       whyWrong: [
         null,
         'The size is right but the sign is wrong. $(-2)^{6}$ is positive because the power is even; in this sequence every odd-numbered term is positive.',
         'This is $3 \\times (-2)^{7}$: it uses the power $n$ instead of $n - 1$, which gives the 8th term.',
         'This is $3 \\times (-2)^{5}$, the 6th term: the power is one too small, so you have stopped one term early.',
       ],
-      keyIdea: 'The $n$th term of a geometric sequence is $u_n = ar^{n-1}$; with a negative ratio, even powers give positive terms.',
+      keyIdea: 'For a term in a geometric sequence (a fixed multiplier), find $a$ and $r$, then use $u_n = ar^{n-1}$. If $r$ is negative, an even power gives a positive result and an odd power a negative one.',
     },
     check: {
       optionValues: [192, -192, -384, -96],
@@ -68,18 +73,19 @@ export const questions: StaticQuestion[] = [
     options: ['$21$', '$24$', '$16$', '$9$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What do you get by adding $2k + 1$ for $k = 1, 2, 3, 4$?',
       solution:
-        'The sigma sign means: put $k = 1, 2, 3, 4$ into the bracket one at a time and add up the results.\n\n' +
-        '| $k$ | term $2k + 1$ |\n|---|---|\n| $1$ | $3$ |\n| $2$ | $5$ |\n| $3$ | $7$ |\n| $4$ | $9$ |\n\n' +
-        'Sum: $3 + 5 + 7 + 9 = 24$.\n\n' +
-        'Check with the arithmetic series formula: 4 terms, first $3$, last $9$, so $\\frac{4}{2}(3 + 9) = 24$.',
+        'The symbol $\\sum$ (sigma) means add up. The numbers on it tell you to start at $k = 1$ and finish at $k = 4$. For each $k$, work out $2k + 1$, then add the results.\n\n' +
+        'Work out each term:\n\n| $k$ | $2k + 1$ | Value |\n|---|---|---|\n| 1 | $2 \\times 1 + 1$ | 3 |\n| 2 | $2 \\times 2 + 1$ | 5 |\n| 3 | $2 \\times 3 + 1$ | 7 |\n| 4 | $2 \\times 4 + 1$ | 9 |\n\n' +
+        'Add the values: $3 + 5 + 7 + 9 = 24$.',
+      conclusion: 'The four terms 3, 5, 7 and 9 total 24, so the answer is $24$.',
       whyWrong: [
         'This is $2(1 + 2 + 3 + 4) + 1 = 21$: the $+1$ belongs to **every** term, so it must be added 4 times, not once.',
         null,
         'This is $1 + 3 + 5 + 7$, the values for $k = 0, 1, 2, 3$: the counting has been started one place too early. The bottom number says start at $k = 1$, so the terms are $3, 5, 7, 9$.',
         'This is only the last term ($k = 4$). Sigma means add up the terms for every value of $k$ from 1 to 4.',
       ],
-      keyIdea: 'In sigma notation, substitute every value of the counter from the bottom number to the top number and add all the results.',
+      keyIdea: 'For sigma notation, put each value of $k$ from the bottom number to the top number into the expression, in a small table, then add the results. Every term gets the whole expression, including any added number.',
     },
     check: {
       optionValues: [21, 24, 16, 9],
@@ -94,18 +100,20 @@ export const questions: StaticQuestion[] = [
     options: ['$8$', '$21$', 'The sum to infinity does not exist', '$24$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What total do these endlessly shrinking terms settle towards?',
       solution:
-        'First term $a = 12$. Common ratio $r = \\frac{6}{12} = \\frac{1}{2}$.\n\n' +
-        'Because $|r| = \\frac{1}{2} < 1$, the terms keep halving towards 0, so the sum to infinity exists:\n\n' +
-        '$$S_\\infty = \\frac{a}{1 - r} = \\frac{12}{1 - \\frac{1}{2}} = \\frac{12}{\\frac{1}{2}} = 24$$\n\n' +
-        'Sense check: $12 + 6 + 3 + 1.5 + 0.75 + \\dots$ gets closer and closer to 24 without passing it.',
+        'This is a **geometric series**: each term is the previous one multiplied by the same number, the **common ratio** $r$. Here $6 \\div 12 = \\frac{1}{2}$, so $r = \\frac{1}{2}$. The first term is $a = 12$.\n\n' +
+        'The terms keep halving and get closer and closer to 0. So the total settles at a fixed value, called the **sum to infinity**. This happens only when $r$ is between $-1$ and 1.\n\n' +
+        'The formula is $S_\\infty = \\frac{a}{1 - r}$. Substitute: $S_\\infty = \\frac{12}{1 - \\frac{1}{2}} = \\frac{12}{\\frac{1}{2}}$.\n\n' +
+        'Dividing by $\\frac{1}{2}$ is the same as multiplying by 2: $12 \\times 2 = 24$.',
+      conclusion: 'Adding more and more terms gets closer and closer to 24, so the answer is $24$.',
       whyWrong: [
         'This is $\\frac{12}{1 + \\frac{1}{2}}$: the formula has $1 - r$ in the denominator, not $1 + r$.',
         'This is only $12 + 6 + 3$, the three terms that are shown. The series continues forever and those extra terms add another 3.',
         'A sum to infinity exists whenever $|r| < 1$. Here $r = \\frac{1}{2}$, so the terms shrink to 0 and the total settles at a finite value.',
         null,
       ],
-      keyIdea: 'If $|r| < 1$, a geometric series has a sum to infinity $S_\\infty = \\frac{a}{1-r}$.',
+      keyIdea: 'To spot this type, look for a geometric series with shrinking terms. Find $a$ and $r$, make sure $r$ is between $-1$ and 1, then use $S_\\infty = \\frac{a}{1 - r}$.',
     },
     check: {
       optionValues: [8, 21, null, 24],
@@ -124,20 +132,18 @@ export const questions: StaticQuestion[] = [
     options: ['$2 + 3 + 4.5 + \\dots$', '$5 - 10 + 20 - \\dots$', '$8 - 4 + 2 - 1 + \\dots$', '$3 + 3 + 3 + \\dots$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'In which series do the terms shrink towards 0, so the total can settle?',
       solution:
-        'A geometric series has a sum to infinity only when the common ratio satisfies $|r| < 1$ (that is, $-1 < r < 1$). Find $r$ for each one by dividing a term by the term before it:\n\n' +
-        '- $2 + 3 + 4.5 + \\dots$: $r = \\frac{3}{2} = 1.5$. Not allowed, $|r| > 1$.\n' +
-        '- $5 - 10 + 20 - \\dots$: $r = \\frac{-10}{5} = -2$. Not allowed, $|r| = 2 > 1$.\n' +
-        '- $8 - 4 + 2 - 1 + \\dots$: $r = \\frac{-4}{8} = -\\frac{1}{2}$. Allowed, $|r| = \\frac{1}{2} < 1$.\n' +
-        '- $3 + 3 + 3 + \\dots$: $r = 1$. Not allowed, the sum is $3n$, which grows forever.\n\n' +
-        'Only $8 - 4 + 2 - 1 + \\dots$ converges. Its sum is $\\frac{8}{1 - \\left(-\\frac{1}{2}\\right)} = \\frac{8}{\\frac{3}{2}} = \\frac{16}{3}$.',
+        'The total of an endless geometric series settles only if the terms shrink towards 0. That happens when the size of the **common ratio** $r$, ignoring its sign, is less than 1. We write this as $|r| < 1$.\n\n' +
+        'Find $r$ for each series by dividing a term by the one before:\n\n| Series | $r$ | Size below 1? |\n|---|---|---|\n| $2 + 3 + 4.5 + \\dots$ | $1.5$ | No |\n| $5 - 10 + 20 - \\dots$ | $-2$ | No |\n| $8 - 4 + 2 - 1 + \\dots$ | $-\\frac{1}{2}$ | Yes |\n| $3 + 3 + 3 + \\dots$ | $1$ | No |',
+      conclusion: 'Only $r = -\\frac{1}{2}$ has a size below 1, so the answer is $8 - 4 + 2 - 1 + \\dots$',
       whyWrong: [
         'Here $r = 1.5$. The terms get **bigger**, so the total grows without limit.',
         'Here $r = -2$. The signs alternate, but the size of the terms doubles each time, so the total swings further and further and never settles.',
         null,
         'Here $r = 1$. The terms never shrink, so after $n$ terms the total is $3n$, which grows forever. The condition is strictly $|r| < 1$.',
       ],
-      keyIdea: 'A geometric series converges (has a sum to infinity) exactly when $-1 < r < 1$; a negative ratio is fine as long as its size is less than 1.',
+      keyIdea: 'To test for a sum to infinity: find $r$ by dividing a term by the one before, then see whether $|r| < 1$. A negative $r$ is fine, because only its size matters.',
     },
   },
   {
@@ -148,16 +154,18 @@ export const questions: StaticQuestion[] = [
     options: ['$a + (n-1)d$', '$a + nd$', '$ar^{n-1}$', '$\\frac{n}{2}\\left(2a + (n-1)d\\right)$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which formula gives any term of a sequence that adds $d$ each time?',
       solution:
-        'Start at the first term $a$. To reach the $n$th term you add $d$ exactly $n - 1$ times.\n\n' +
-        'So $u_n = a + (n-1)d$. For example, the 2nd term is $a + d$.',
+        'An **arithmetic sequence** starts at $a$ and adds the **common difference** $d$ each time. Write out the start: $a$, then $a + d$, then $a + 2d$, then $a + 3d$.\n\n' +
+        'Compare the term number with how many $d$s it has: the 1st has 0, the 2nd has 1, the 3rd has 2. The count of $d$s is always one less than the term number, so the $n$th term has $n - 1$ of them: $a + (n-1)d$.',
+      conclusion: 'Putting $n = 1$ gives just $a$, the first term, as it should. So the answer is $a + (n-1)d$.',
       whyWrong: [
         null,
         'This adds $d$ one time too many: with $n = 1$ it gives $a + d$, not the first term $a$.',
         'This is the $n$th term of a **geometric** sequence, with common ratio $r$.',
         'This is the **sum** of the first $n$ terms, not the $n$th term.',
       ],
-      keyIdea: 'The $n$th term of an arithmetic sequence is $a + (n-1)d$.',
+      keyIdea: 'Use $u_n = a + (n-1)d$ for arithmetic and $u_n = ar^{n-1}$ for geometric. Test any formula with $n = 1$: it must give the first term.',
     },
     check: {
       // each option evaluated at a = 5, d = 3, n = 4 (and r = 3 for the geometric form)
@@ -173,16 +181,18 @@ export const questions: StaticQuestion[] = [
     options: ['$3$', '$4$', '$2$', '$\\frac{1}{3}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What number does each term get multiplied by to reach the next?',
       solution:
-        'The **common ratio** is what each term is multiplied by to give the next one. Find it by dividing a term by the one before it:\n\n' +
-        '$$r = \\frac{6}{2} = 3$$',
+        'In a **geometric sequence**, each term is the one before multiplied by a fixed number, the **common ratio**. To find it, divide a term by the term before it.\n\n' +
+        '$6 \\div 2 = 3$. Test on the next pairs to be sure: $18 \\div 6 = 3$ and $54 \\div 18 = 3$.',
+      conclusion: 'Every pair gives 3, so the common ratio is $3$.',
       whyWrong: [
         null,
         '$4$ is the difference $6 - 2$. In a geometric sequence you divide, not subtract.',
         '$2$ is the first term, not the ratio.',
         'This divides a term by the one **after** it. The ratio is the next term divided by the previous one.',
       ],
-      keyIdea: 'Common ratio $=$ a term divided by the term before it.',
+      keyIdea: 'Common ratio $=$ any term $\\div$ the term before it. Test on two different pairs: a fixed result means geometric. If instead the gaps are equal, the sequence is arithmetic.',
     },
     check: {
       optionValues: [3, 4, 2, 1 / 3],
@@ -197,17 +207,18 @@ export const questions: StaticQuestion[] = [
     options: ['$-3$', '$3$', '$-4$', '$\\frac{2}{5}$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How much is added to each term to get the next one?',
       solution:
-        'The **common difference** is what is added to each term to give the next one. Subtract a term from the one after it:\n\n' +
-        '$$d = 2 - 5 = -3$$\n\n' +
-        'The sequence is falling, so $d$ is negative.',
+        'In an **arithmetic sequence**, the same amount is added each time. That amount is the **common difference**. To find it, take a term and subtract the term before it.\n\n' +
+        '$2 - 5 = -3$. Test on the next pairs to be sure: $-1 - 2 = -3$ and $-4 - (-1) = -4 + 1 = -3$.',
+      conclusion: 'Every pair gives the same result, because the sequence falls by 3 each time. So the answer is $-3$.',
       whyWrong: [
         null,
         'This subtracts the wrong way round, $5 - 2$. The sequence falls, so the difference is negative.',
         '$-4$ is the 4th term, not the difference.',
-        'This divides $\\frac{2}{5}$, which is how you would look for a ratio in a geometric sequence.',
+        'This divides the second term by the first, $2 \\div 5$. Dividing is how you look for a ratio in a geometric sequence, but this sequence adds the same amount each time.',
       ],
-      keyIdea: 'Common difference $=$ a term minus the term before it; it is negative for a falling sequence.',
+      keyIdea: 'Common difference $=$ any term minus the term before it, in that order. A sequence that falls has a negative difference. Test on two pairs to confirm the gaps are equal.',
     },
     check: {
       optionValues: [-3, 3, -4, 2 / 5],
@@ -222,16 +233,19 @@ export const questions: StaticQuestion[] = [
     options: ['$|r| < 1$', '$r < 1$', '$r > 1$', '$|r| \\le 1$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'For which values of $r$ does the total of an endless geometric series settle at a fixed value?',
       solution:
-        'A sum to infinity exists only if the terms shrink towards 0, which happens exactly when $|r| < 1$, that is, $-1 < r < 1$.\n\n' +
-        'Then $S_\\infty = \\frac{a}{1 - r}$.',
+        'The **sum to infinity** exists only if the terms shrink towards 0. Otherwise the total keeps growing or keeps swinging.\n\n' +
+        'Each term is the last one times $r$. The terms shrink only if the size of $r$, ignoring its sign, is less than 1. For example, $r = -\\frac{1}{2}$ gives $1, -\\frac{1}{2}, \\frac{1}{4}$ and so on, which shrinks.\n\n' +
+        '$r = 1$ and $r = -1$ do not work, because the terms stay the same size. And $r = -3$ gives $1, -3, 9$ and so on, which grows. We write "size of $r$ below 1" as $|r| < 1$.',
+      conclusion: 'Only a ratio whose size is below 1 makes the terms shrink, so the answer is $|r| < 1$.',
       whyWrong: [
         null,
         'This also allows values such as $r = -3$, where the terms grow in size: $1, -3, 9, -27, \\dots$',
         'Here the terms keep growing, so the total grows without limit.',
         'This includes $r = 1$ and $r = -1$, where the terms never shrink. The inequality must be strict.',
       ],
-      keyIdea: 'A geometric series has a sum to infinity exactly when $|r| < 1$.',
+      keyIdea: 'The bars mean size, ignoring the sign. $|r| < 1$ means $-1 < r < 1$. Use this to test any series, and to find unknowns when $r$ contains a letter.',
     },
   },
   {
@@ -242,16 +256,18 @@ export const questions: StaticQuestion[] = [
     options: ['The difference of consecutive terms', 'The ratio of consecutive terms', 'The sum of consecutive terms', 'The product of consecutive terms'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What stays the same from one term to the next in an arithmetic progression?',
       solution:
-        'An **arithmetic progression** (AP) is another name for an arithmetic sequence. Each term is the one before it plus a fixed number $d$, so the difference of consecutive terms is constant.\n\n' +
-        'For example, in $4, 7, 10, 13, \\dots$ the difference is always 3.',
+        'An **arithmetic progression** is another name for an arithmetic sequence: a list made by adding the same number each time.\n\n' +
+        'Take $4, 7, 10, 13$. The differences are $7 - 4 = 3$, $10 - 7 = 3$ and $13 - 10 = 3$, always the same. The ratios, sums and products of neighbouring terms all change.',
+      conclusion: 'Adding the same number every time keeps the gap fixed, so the answer is the difference of consecutive terms.',
       whyWrong: [
         null,
         'A constant ratio defines a **geometric** progression.',
         'The sums change: in $4, 7, 10, \\dots$ they are 11, then 17.',
         'The products change: in $4, 7, 10, \\dots$ they are 28, then 70.',
       ],
-      keyIdea: 'Arithmetic: constant difference. Geometric: constant ratio.',
+      keyIdea: 'Arithmetic means a constant difference, from adding. Geometric means a constant ratio, from multiplying. To classify a list, subtract neighbours, then divide neighbours, and see which result stays the same.',
     },
   },
   // ------------------------------------------------------------------ exam
@@ -263,18 +279,21 @@ export const questions: StaticQuestion[] = [
     options: ['$1000$', '$2000$', '$1037.5$', '$76$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What do the first 25 numbers in this list add up to?',
       solution:
-        'Here $a = 4$, $d = 7 - 4 = 3$ and $n = 25$.\n\n' +
-        'Use $S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)$:\n\n' +
-        '$$S_{25} = \\frac{25}{2}\\left(2 \\times 4 + 24 \\times 3\\right) = \\frac{25}{2} \\times 80 = 1000$$\n\n' +
-        'Check with the other form $S_n = \\frac{n}{2}(a + l)$: the last term is $l = 4 + 24 \\times 3 = 76$, so $S_{25} = \\frac{25}{2}(4 + 76) = \\frac{25}{2} \\times 80 = 1000$.',
+        'This is an **arithmetic sequence**: it goes up by the same amount each time. The first term is $a = 4$ and the **common difference** is $d = 7 - 4 = 3$. We want $n = 25$ terms.\n\n' +
+        'Adding 25 terms by hand is slow, so use the sum formula: $S_n = \\frac{n}{2}(2a + (n - 1)d)$. It is the number of terms times the average of the first and last terms.\n\n' +
+        'Substitute: $S_{25} = \\frac{25}{2}(2 \\times 4 + 24 \\times 3)$.\n\n' +
+        'Work out the bracket: $2 \\times 4 = 8$ and $24 \\times 3 = 72$, so $8 + 72 = 80$.\n\n' +
+        'Finish: $\\frac{25}{2} \\times 80 = 25 \\times 40 = 1000$.',
+      conclusion: 'The bracket is 80, and half of 25 lots of 80 is the total, so the answer is $1000$.',
       whyWrong: [
         null,
         'This is $25 \\times (4 + 76)$: the formula is $\\frac{n}{2}(a + l)$, and the division by 2 was forgotten.',
         'This is $\\frac{25}{2}(8 + 25 \\times 3)$: it uses $nd$ instead of $(n-1)d$ inside the bracket.',
         'This is the 25th **term** $4 + 24 \\times 3$, not the sum of the first 25 terms.',
       ],
-      keyIdea: 'The sum of an arithmetic series is $S_n = \\frac{n}{2}\\left(2a + (n-1)d\\right)$, which is the number of terms times the average of the first and last terms.',
+      keyIdea: 'To add up an arithmetic sequence, find $a$, $d$ and $n$, then use $S_n = \\frac{n}{2}(2a + (n - 1)d)$. If you already know the last term $l$, use $S_n = \\frac{n}{2}(a + l)$.',
     },
     check: {
       optionValues: [1000, 2000, 1037.5, 76],
@@ -289,20 +308,21 @@ export const questions: StaticQuestion[] = [
     options: ['$a = 2,\\ d = 5$', '$a = 1,\\ d = 6$', '$a = -5,\\ d = 6$', '$a = 7,\\ d = 6$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'What are the first term and the step size of this sequence?',
       solution:
-        'Write both facts using $u_n = a + (n-1)d$:\n\n' +
-        '- $u_2 = a + d = 7$\n' +
-        '- $u_7 = a + 6d = 37$\n\n' +
-        'Subtract the first equation from the second: $5d = 30$, so $d = 6$.\n\n' +
-        'Substitute back: $a + 6 = 7$, so $a = 1$.\n\n' +
-        'Check: $1, 7, 13, 19, 25, 31, 37$. The 2nd term is 7 and the 7th term is 37.',
+        'An arithmetic sequence has $n$th term $u_n = a + (n - 1)d$, where $a$ is the first term and $d$ is the **common difference**. Apply this to both facts.\n\n' +
+        'The 2nd term gives $a + d = 7$. The 7th term gives $a + 6d = 37$.\n\n' +
+        'Subtract the first equation from the second to remove $a$: $(a + 6d) - (a + d) = 37 - 7$, so $5d = 30$.\n\n' +
+        'Divide both sides by 5: $d = 6$.\n\n' +
+        'Put $d = 6$ into $a + d = 7$: $a + 6 = 7$, so $a = 1$.',
+      conclusion: 'The sequence runs $1, 7, 13, 19, 25, 31, 37$, so its 2nd term is 7 and its 7th is 37. The answer is $a = 1,\\ d = 6$.',
       whyWrong: [
         'This divides the jump of 30 by 6. From the 2nd term to the 7th term there are only $7 - 2 = 5$ steps of $d$ (count the gaps, not the terms).',
         null,
         'The difference is right but the first term is wrong: this treats the 2nd term as $a + 2d$. In fact $u_2 = a + d$, so $a = 7 - 6 = 1$.',
         'This takes the 2nd term, 7, as the first term. The first term comes one step **before** it: $7 - 6 = 1$.',
       ],
-      keyIdea: 'Turn each given term into an equation $a + (n-1)d = \\text{value}$ and subtract: the number of gaps between the $p$th and $q$th terms is $q - p$.',
+      keyIdea: 'Given two terms of an arithmetic sequence, write each as $a + (n - 1)d$ and subtract to remove $a$. Divide by the number of gaps to find $d$, then substitute back to find $a$.',
     },
     check: {
       optionValues: ['2,5', '1,6', '-5,6', '7,6'],
@@ -321,18 +341,21 @@ export const questions: StaticQuestion[] = [
     options: ['$486$', '$1456$', '$728$', '$2186$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What do the first 6 terms of this series add up to?',
       solution:
-        'Here $a = 2$, $r = \\frac{6}{2} = 3$ and $n = 6$.\n\n' +
-        'Use $S_n = \\frac{a(r^{n} - 1)}{r - 1}$ (the handy form when $r > 1$):\n\n' +
-        '$$S_6 = \\frac{2(3^{6} - 1)}{3 - 1} = \\frac{2 \\times 728}{2} = 728$$\n\n' +
-        'Check by listing: $2 + 6 + 18 + 54 + 162 + 486 = 728$.',
+        'This is a **geometric series**: each term is the last one multiplied by the same number, the **common ratio**. Here $a = 2$ is the first term and $r = 6 \\div 2 = 3$ is the ratio. We want $n = 6$ terms.\n\n' +
+        'The formula for the sum of $n$ terms is $S_n = \\frac{a(r^n - 1)}{r - 1}$. This form is the neatest when $r$ is bigger than 1.\n\n' +
+        'Substitute: $S_6 = \\frac{2(3^6 - 1)}{3 - 1}$.\n\n' +
+        'Work out the power: $3^6 = 729$. So the top is $2 \\times (729 - 1) = 2 \\times 728$, and the bottom is 2.\n\n' +
+        'The 2s cancel, leaving 728. Adding by hand agrees: $2 + 6 + 18 + 54 + 162 + 486 = 728$.',
+      conclusion: 'Both the formula and the direct sum agree, so the answer is $728$.',
       whyWrong: [
         'This is $2 \\times 3^{5}$, the 6th **term**, not the sum of the first six terms.',
         'This is $2(3^{6} - 1)$: the division by $r - 1 = 2$ was forgotten.',
         null,
         'This is $\\frac{2(3^{7} - 1)}{2}$: using the power 7 adds one term too many (it is the sum of the first 7 terms).',
       ],
-      keyIdea: 'The sum of the first $n$ terms of a geometric series is $S_n = \\frac{a(r^n - 1)}{r - 1}$, with power exactly $n$.',
+      keyIdea: 'To add up a geometric series, find $a$, $r$ and $n$, then use $S_n = \\frac{a(r^n - 1)}{r - 1}$. With only a few terms, you can also list them and add them.',
     },
     check: {
       optionValues: [486, 1456, 728, 2186],
@@ -347,20 +370,21 @@ export const questions: StaticQuestion[] = [
     options: ['$\\frac{2}{3}$', '$-\\frac{1}{3}$', '$\\frac{3}{2}$', '$\\frac{1}{3}$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What common ratio gives a first term of 18 and an endless total of 27?',
       solution:
-        'Use $S_\\infty = \\frac{a}{1 - r}$ with $a = 18$ and $S_\\infty = 27$:\n\n' +
-        '$$27 = \\frac{18}{1 - r}$$\n\n' +
-        'Multiply both sides by $1 - r$: $27(1 - r) = 18$.\n\n' +
-        'Divide by 27: $1 - r = \\frac{18}{27} = \\frac{2}{3}$.\n\n' +
-        'So $r = 1 - \\frac{2}{3} = \\frac{1}{3}$.\n\n' +
-        'Check: $\\frac{18}{1 - \\frac{1}{3}} = \\frac{18}{\\frac{2}{3}} = 27$. Also $|r| < 1$, so the sum to infinity really exists.',
+        'The **sum to infinity** of a geometric series is $S_\\infty = \\frac{a}{1 - r}$, where $a$ is the first term and $r$ is the common ratio. We know $a$ and $S_\\infty$, so we solve for $r$.\n\n' +
+        'Substitute: $27 = \\frac{18}{1 - r}$.\n\n' +
+        'Multiply both sides by $1 - r$ to clear the fraction: $27(1 - r) = 18$.\n\n' +
+        'Divide both sides by 27: $1 - r = \\frac{18}{27} = \\frac{2}{3}$.\n\n' +
+        'Subtract from 1 to find $r$: $r = 1 - \\frac{2}{3} = \\frac{1}{3}$.',
+      conclusion: 'Putting it back gives $18 \\div \\frac{2}{3} = 27$, which matches. So the answer is $\\frac{1}{3}$.',
       whyWrong: [
         'This is the value of $1 - r$, not $r$. The last step, $r = 1 - \\frac{2}{3}$, was skipped.',
         'This comes from using $\\frac{a}{1 + r}$: then $1 + r = \\frac{2}{3}$ and $r = -\\frac{1}{3}$. The formula has $1 - r$.',
         'This is $\\frac{27}{18}$, the sum divided by the first term. A ratio of $\\frac{3}{2}$ is bigger than 1, so the series could not have a sum to infinity at all.',
         null,
       ],
-      keyIdea: 'Substitute into $S_\\infty = \\frac{a}{1-r}$ and solve for $1 - r$ first, then for $r$.',
+      keyIdea: 'When the sum to infinity is given and $r$ is unknown, put the values into $S_\\infty = \\frac{a}{1 - r}$ and rearrange for $r$. Your result must be between $-1$ and 1.',
     },
     check: {
       optionValues: [2 / 3, -1 / 3, 3 / 2, 1 / 3],
@@ -375,19 +399,19 @@ export const questions: StaticQuestion[] = [
     options: ['$186$', '$93$', '$96$', '$378$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'What do you get by adding $3 \\cdot 2^k$ for $k = 1$ to $5$?',
       solution:
-        'Write out the terms by putting $k = 1, 2, 3, 4, 5$ into $3 \\cdot 2^{k}$:\n\n' +
-        '$$6 + 12 + 24 + 48 + 96$$\n\n' +
-        'This is a geometric series with first term $a = 6$ (the $k = 1$ term, **not** 3), ratio $r = 2$ and $n = 5$ terms:\n\n' +
-        '$$S_5 = \\frac{6(2^{5} - 1)}{2 - 1} = 6 \\times 31 = 186$$\n\n' +
-        'Adding directly gives the same: $6 + 12 + 24 + 48 + 96 = 186$.',
+        'The symbol $\\sum$ means add up. Start at $k = 1$, finish at $k = 5$, and for each $k$ work out $3 \\cdot 2^k$, where the dot means multiply.\n\n' +
+        'Work out each term:\n\n| $k$ | Working | Value |\n|---|---|---|\n| 1 | $3 \\times 2$ | 6 |\n| 2 | $3 \\times 4$ | 12 |\n| 3 | $3 \\times 8$ | 24 |\n| 4 | $3 \\times 16$ | 48 |\n| 5 | $3 \\times 32$ | 96 |\n\n' +
+        'Add them in stages: $6 + 12 = 18$, then $18 + 24 = 42$, then $42 + 48 = 90$, then $90 + 96 = 186$.',
+      conclusion: 'The five terms total 186, so the answer is $186$.',
       whyWrong: [
         null,
         'This is $\\frac{3(2^{5} - 1)}{2 - 1}$: it takes the first term as 3, which would be the $k = 0$ term. The sum starts at $k = 1$, so the first term is $3 \\cdot 2 = 6$.',
         'This is only the last term ($k = 5$), not the sum of all five terms.',
         'This is $6(2^{6} - 1)$: it counts 6 terms. From $k = 1$ to $k = 5$ there are exactly 5 terms.',
       ],
-      keyIdea: 'Before using a series formula on a sigma sum, find the first term by substituting the bottom value of $k$, and count the terms as top minus bottom plus 1.',
+      keyIdea: 'With only a few terms, write them out in a table and add them. For many terms of a geometric sigma, find $a$ from the first term and $r$ from the ratio, count the terms, and use the sum formula.',
     },
     check: {
       optionValues: [186, 93, 96, 378],
@@ -402,20 +426,21 @@ export const questions: StaticQuestion[] = [
     options: ['$49$', '$50$', '$51$', '$196$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many numbers are in this list from 9 up to 205?',
       solution:
-        'Here $a = 9$ and $d = 4$. Let the last term $205$ be the $n$th term:\n\n' +
-        '$$9 + (n-1) \\times 4 = 205$$\n\n' +
-        'Subtract 9: $(n-1) \\times 4 = 196$.\n\n' +
-        'Divide by 4: $n - 1 = 49$.\n\n' +
-        'Add 1: $n = 50$.\n\n' +
-        'In words: there are 49 jumps of 4 from 9 up to 205, and 49 jumps join up **50** terms (like 49 gaps between 50 fence posts).',
+        'This is an arithmetic sequence: it goes up by 4 each time. We want $n$, the position of 205. The $n$th term is $u_n = a + (n - 1)d$, with first term $a = 9$ and common difference $d = 4$.\n\n' +
+        'The last term is 205, so $205 = 9 + (n - 1) \\times 4$.\n\n' +
+        'Subtract 9 from both sides: $196 = (n - 1) \\times 4$.\n\n' +
+        'Divide both sides by 4: $n - 1 = 49$. This means there are 49 gaps of 4 between the first and last terms.\n\n' +
+        'A list has one more term than it has gaps, so $n = 49 + 1 = 50$.',
+      conclusion: '49 gaps of 4 take us from 9 to 205, and 49 gaps means one more term. So the answer is $50$.',
       whyWrong: [
         'This is the number of **gaps** (jumps of 4). The number of terms is one more than the number of gaps.',
         null,
         'This is $\\frac{205}{4} = 51.25$ rounded down: it ignores the fact that the sequence starts at 9, not at 0.',
         'This is $205 - 9$, the total increase. It still needs dividing by the step size 4 (and then adding 1).',
       ],
-      keyIdea: 'To count terms, solve $a + (n-1)d = \\text{last term}$: number of terms $= \\frac{\\text{last} - \\text{first}}{d} + 1$.',
+      keyIdea: 'Number of terms $= \\frac{\\text{last} - \\text{first}}{d} + 1$. The fraction counts the gaps, and the $+1$ turns gaps into terms. A small test: $3, 5, 7$ has 2 gaps and 3 terms.',
     },
     check: {
       optionValues: [49, 50, 51, 196],
@@ -438,18 +463,20 @@ export const questions: StaticQuestion[] = [
     options: ['`726`', '`80`', '`242`', '`486`'],
     correctIndex: 2,
     markScheme: {
+      asking: 'What number is in `total` when the loop ends and it gets printed?',
       solution:
-        'The loop adds the current term to `total`, then multiplies the term by 3. So it adds the first 5 terms of the geometric series $2 + 6 + 18 + \\dots$\n\n' +
-        '`for i = 1 to 5` includes both end values, so the body runs 5 times:\n\n' +
-        '| `i` | `total` after adding | `term` after multiplying |\n|---|---|---|\n| 1 | 2 | 6 |\n| 2 | 8 | 18 |\n| 3 | 26 | 54 |\n| 4 | 80 | 162 |\n| 5 | 242 | 486 |\n\n' +
-        'It prints `242`. Check with the formula: $\\frac{2(3^{5} - 1)}{3 - 1} = 3^{5} - 1 = 242$.',
+        'Line 1 sets `total` to 0, and line 2 sets `term` to 2. Line 3, `for i = 1 to 5`, repeats lines 4 and 5 five times, with `i` taking the values 1, 2, 3, 4, 5.\n\n' +
+        'In each pass, line 4 adds the current `term` to `total`. Then line 5 multiplies `term` by 3. The order matters: the term is added **before** it is multiplied.\n\n' +
+        'Trace each pass:\n\n| `i` | `term` at start | `total` becomes | `term` becomes |\n|---|---|---|---|\n| 1 | 2 | 2 | 6 |\n| 2 | 6 | 8 | 18 |\n| 3 | 18 | 26 | 54 |\n| 4 | 54 | 80 | 162 |\n| 5 | 162 | 242 | 486 |\n\n' +
+        'After the loop, line 7 prints `total`, which holds 242. `term` is 486 at this point, but it is not printed.',
+      conclusion: 'The code adds 2, 6, 18, 54 and 162, then prints the total, so the answer is `242`.',
       whyWrong: [
         'This is $6 + 18 + 54 + 162 + 486$: it multiplies the term by 3 **before** adding it. In the code the line `total = total + term` comes first, so 2 is added.',
         'This stops after 4 passes. `for i = 1 to 5` includes `i = 5`, so the body runs 5 times.',
         null,
         'This is the final value of `term`, not `total`. The code prints `total`.',
       ],
-      keyIdea: 'A loop that adds a term and then multiplies it by $r$ is computing a geometric series; `for i = 1 to n` runs exactly $n$ times.',
+      keyIdea: 'To trace a loop, draw a table with one row per pass and a column for each variable. Update in the same order as the code. This loop builds a geometric series: `term` holds each term, `total` the running sum.',
     },
     check: {
       optionValues: [726, 80, 242, 486],
@@ -472,21 +499,21 @@ export const questions: StaticQuestion[] = [
     options: ['$4.5$', '$-16$', '$24$', '$6$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What is the first term of this geometric sequence?',
       solution:
-        'Using $u_n = ar^{n-1}$:\n\n' +
-        '- $u_2 = ar = 12$\n' +
-        '- $u_5 = ar^{4} = 96$\n\n' +
-        'Divide the second equation by the first (the $a$ cancels): $r^{3} = \\frac{96}{12} = 8$.\n\n' +
-        'Take the cube root: $r = 2$.\n\n' +
-        'Then $a = \\frac{12}{r} = \\frac{12}{2} = 6$.\n\n' +
-        'Check: $6, 12, 24, 48, 96$. The 2nd term is 12 and the 5th is 96.',
+        'A geometric sequence multiplies by the same number each time, the **common ratio** $r$. Its $n$th term is $u_n = ar^{n-1}$, where $a$ is the first term.\n\n' +
+        'The 2nd term gives $ar = 12$. The 5th term gives $ar^4 = 96$.\n\n' +
+        'Divide the second equation by the first to remove $a$: $\\frac{ar^4}{ar} = \\frac{96}{12}$. This gives $r^3 = 8$.\n\n' +
+        'Take the cube root of both sides: $r = 2$, because $2 \\times 2 \\times 2 = 8$.\n\n' +
+        'Put $r = 2$ into $ar = 12$: $2a = 12$, so $a = 6$.',
+      conclusion: 'The sequence runs $6, 12, 24, 48, 96$, so its 2nd term is 12 and its 5th is 96. The answer is $6$.',
       whyWrong: [
         'This divides 8 by 3 to get $r = \\frac{8}{3}$. But $r^{3} = 8$ needs a **cube root**, $r = 2$, then $a = 12 \\div 2 = 6$.',
         'This treats the sequence as arithmetic: $d = \\frac{96 - 12}{3} = 28$ and $a = 12 - 28$. In a geometric sequence you divide, not subtract.',
         'This multiplies by $r$ instead of dividing. The first term comes **before** the 2nd term, so $a = \\frac{12}{r}$.',
         null,
       ],
-      keyIdea: 'For a geometric sequence, divide one term by another so that $a$ cancels and you get a power of $r$; then take the root.',
+      keyIdea: 'Given two terms of a geometric sequence, write both as $ar^{n-1}$ and divide to remove $a$. Take a root to find $r$, then substitute back. With two terms of an arithmetic sequence, subtract instead.',
     },
     check: {
       optionValues: [4.5, -16, 24, 6],
@@ -504,18 +531,20 @@ export const questions: StaticQuestion[] = [
     options: ['$-\\frac{1}{2} < x < \\frac{1}{2}$', '$-1 < x < 1$', '$x < \\frac{1}{2}$', '$-2 < x < 2$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'Which values of $x$ make this endless series settle to a fixed total?',
       solution:
-        'Find the common ratio by dividing a term by the one before it: $r = \\frac{4x^{2}}{2x} = 2x$ (and $2x \\div 1 = 2x$ too). So each term is the one before times $2x$.\n\n' +
-        'A sum to infinity exists when $|r| < 1$:\n\n' +
-        '$$|2x| < 1 \\quad\\Longleftrightarrow\\quad -1 < 2x < 1$$\n\n' +
-        'Divide every part by 2: $-\\frac{1}{2} < x < \\frac{1}{2}$.',
+        'This is a **geometric series**. Find the **common ratio** by dividing a term by the one before: $2x \\div 1 = 2x$. The next pair agrees: $4x^2 \\div 2x = 2x$. So $r = 2x$.\n\n' +
+        'A sum to infinity exists only if the terms shrink, which needs the size of $r$ to be less than 1. So $|r| < 1$, which means $|2x| < 1$.\n\n' +
+        'Less than 1 in size means between $-1$ and 1: $-1 < 2x < 1$.\n\n' +
+        'Divide all three parts by 2: $-\\frac{1}{2} < x < \\frac{1}{2}$.',
+      conclusion: 'In this range the ratio $2x$ has a size below 1, so the answer is $-\\frac{1}{2} < x < \\frac{1}{2}$.',
       whyWrong: [
         null,
         'This applies the condition to $x$ instead of to the ratio. The ratio is $2x$, so it is $|2x| < 1$ that is needed.',
         'This forgets the lower limit. For example $x = -3$ gives $r = -6$, and the terms $1, -6, 36, \\dots$ grow without limit.',
         'This multiplies by 2 instead of dividing: from $-1 < 2x < 1$ you divide every part by 2.',
       ],
-      keyIdea: 'Find the ratio as an expression in $x$, then solve $-1 < r < 1$.',
+      keyIdea: 'When the ratio contains a letter, find $r$ by dividing neighbouring terms, then solve $-1 < r < 1$ for the letter. Do the same to all three parts.',
     },
   },
   {
@@ -526,21 +555,20 @@ export const questions: StaticQuestion[] = [
     options: ['$1335$', '$1130.5$', '$1159$', '$1190$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'What do you get by adding $3k - 2$ for every $k$ from 11 to 30?',
       solution:
-        'The terms go up by 3 each time, so this is an arithmetic series.\n\n' +
-        '- First term ($k = 11$): $3 \\times 11 - 2 = 31$\n' +
-        '- Last term ($k = 30$): $3 \\times 30 - 2 = 88$\n' +
-        '- Number of terms: $30 - 11 + 1 = 20$\n\n' +
-        'Use $S = \\frac{n}{2}(\\text{first} + \\text{last})$:\n\n' +
-        '$$S = \\frac{20}{2}(31 + 88) = 10 \\times 119 = 1190$$\n\n' +
-        'Another way: (sum from 1 to 30) minus (sum from 1 to **10**) $= \\frac{30}{2}(1 + 88) - \\frac{10}{2}(1 + 28) = 1335 - 145 = 1190$.',
+        'The symbol $\\sum$ means add up. As $k$ goes up by 1, $3k - 2$ goes up by 3. So the terms form an **arithmetic sequence**, and we can use the quick formula: sum $= \\frac{n}{2}(\\text{first} + \\text{last})$, where $n$ is the number of terms.\n\n' +
+        'Find the first term, with $k = 11$: $3 \\times 11 - 2 = 31$. Find the last term, with $k = 30$: $3 \\times 30 - 2 = 88$.\n\n' +
+        'Count the terms. From 11 to 30, including both ends: $30 - 11 + 1 = 20$ terms.\n\n' +
+        'Substitute: $\\frac{20}{2}(31 + 88) = 10 \\times 119 = 1190$.',
+      conclusion: '20 terms averaging 59.5 total 1190, so the answer is $1190$.',
       whyWrong: [
         'This is the sum from $k = 1$ to $k = 30$. The sum starts at $k = 11$, so the first 10 terms must not be included.',
         'This counts $30 - 11 = 19$ terms. Counting from 11 to 30 **inclusive** gives $30 - 11 + 1 = 20$ terms.',
         'This subtracts the sum from 1 to 11, which removes the $k = 11$ term as well. To keep $k = 11$ you subtract only the sum from 1 to 10.',
         null,
       ],
-      keyIdea: 'When a sigma sum does not start at 1, find the first and last terms by substitution and count terms as top $-$ bottom $+ 1$.',
+      keyIdea: 'A sigma of a linear term such as $3k - 2$ is arithmetic. Find the first and last values, count the terms with top $-$ bottom $+ 1$, then use $\\frac{n}{2}(\\text{first} + \\text{last})$.',
     },
     check: {
       optionValues: [1335, 1130.5, 1159, 1190],

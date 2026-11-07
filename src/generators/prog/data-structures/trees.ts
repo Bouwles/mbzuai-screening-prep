@@ -1,5 +1,6 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { m } from '../../../lib/tex';
 
 // ---------------------------------------------------------------- tiny tree toolkit
@@ -114,9 +115,9 @@ function bst(keys: number[]): T {
   return root;
 }
 
-/** Plain-English insertion steps for a BST. */
-function insertionSteps(keys: number[]): string {
-  const lines = [`- ${keys[0]} becomes the root.`];
+/** One row per key, in insertion order: its route down the tree, where it lands and how many edges that is. */
+function insertionRows(keys: number[]): string[][] {
+  const rows = [[String(keys[0]), 'the tree is empty', 'root', '0']];
   const root = N(keys[0]);
   for (const k of keys.slice(1)) {
     let cur = root;
@@ -124,17 +125,17 @@ function insertionSteps(keys: number[]): string {
     for (;;) {
       const cv = cur.v as number;
       const side = k < cv ? 'l' : 'r';
-      moves.push(k < cv ? `${m(`${k} < ${cv}`)} so left` : `${m(`${k} > ${cv}`)} so right`);
+      moves.push(k < cv ? `${m(`${k} < ${cv}`)} left` : `${m(`${k} > ${cv}`)} right`);
       const next = cur[side];
       if (!next) {
         cur[side] = N(k);
-        lines.push(`- ${k}: ${moves.join(', ')}. It becomes the ${side === 'l' ? 'left' : 'right'} child of ${cv}.`);
+        rows.push([String(k), moves.join(', '), `${side === 'l' ? 'left' : 'right'} child of ${cv}`, String(moves.length)]);
         break;
       }
       cur = next;
     }
   }
-  return lines.join('\n');
+  return rows;
 }
 
 type Cand = { text: string; value: number | string; why: string };
@@ -156,9 +157,11 @@ type Order = 'pre' | 'in' | 'post';
 const ORDER_NAME: Record<Order, string> = { pre: 'pre-order', in: 'in-order', post: 'post-order' };
 const ORDER_RULE: Record<Order, string> = {
   pre: 'visit the **node first**, then its left subtree, then its right subtree',
-  in: 'traverse the **left subtree**, then visit the node, then traverse the right subtree',
-  post: 'traverse the left subtree, then the right subtree, and visit the **node last**',
+  in: 'visit the **left subtree** first, then the node, then the right subtree',
+  post: 'visit the left subtree, then the right subtree, and the **node last**',
 };
+/** The order to join the pieces in, as a short phrase. */
+const ORDER_WORDS: Record<Order, string> = { pre: 'node, left, right', in: 'left, node, right', post: 'left, right, node' };
 
 export const generators: Generator[] = [
   // ------------------------------------------------------------ traversal of a drawn tree
@@ -226,39 +229,42 @@ export const generators: Generator[] = [
         const distractors = pickDistinct(answer, answer, pool);
         if (distractors.length < 3) continue; // shape too simple: re-roll
 
-        // bottom-up working: every internal node, children before parents
+        // bottom-up working: every internal node below the root, children before parents
         const res = new Map<T, string>();
-        const lines: string[] = [];
+        const rows: string[][] = [];
         const visit = (t?: T): void => {
           if (!t) return;
           visit(t.l);
           visit(t.r);
-          const own = order === 'pre' ? pre(t) : order === 'in' ? ino(t) : post(t);
-          res.set(t, seq(own));
-          if (t.l || t.r) {
-            const lp = t.l ? `left subtree gives ${res.get(t.l)}` : 'no left subtree';
-            const rp = t.r ? `right subtree gives ${res.get(t.r)}` : 'no right subtree';
-            lines.push(`- Subtree rooted at **${t.v}**: ${lp}; ${rp}. So this subtree gives ${seq(own)}.`);
-          }
+          const own = seq(order === 'pre' ? pre(t) : order === 'in' ? ino(t) : post(t));
+          res.set(t, own);
+          if ((t.l || t.r) && t !== tree) rows.push([String(t.v), t.l ? res.get(t.l)! : 'nothing', t.r ? res.get(t.r)! : 'nothing', own]);
         };
         visit(tree);
+        const words = ORDER_WORDS[order];
+        const leftPart = tree.l ? `Its left subtree gives ${res.get(tree.l)}` : 'It has no left subtree';
+        const rightPart = tree.r ? `its right subtree gives ${res.get(tree.r)}` : 'it has no right subtree';
 
         return {
           stem: `What is the **${ORDER_NAME[order]}** traversal of the binary tree below?\n\n${fence(draw(tree))}`,
           answer,
           answerValue: answer,
           distractors,
-          solution:
-            `${ORDER_NAME[order].charAt(0).toUpperCase() + ORDER_NAME[order].slice(1)} means: ${ORDER_RULE[order]}. A leaf on its own just gives itself.\n\n` +
-            'Work up from the bottom, finishing each subtree before its parent:\n\n' +
-            lines.join('\n') +
-            `\n\nAnswer: ${answer}`,
+          asking: `In what order does a ${ORDER_NAME[order]} walk visit the nodes of this tree?`,
+          solution: steps(
+            'A **node** is one item in the tree, and the **root** is the node at the top. A **traversal** visits every node once. A **subtree** is a child and everything below it. A **leaf** is a node with no children, so on its own it just gives itself.',
+            `${ORDER_NAME[order].charAt(0).toUpperCase() + ORDER_NAME[order].slice(1)} means: ${ORDER_RULE[order]}. The same rule applies inside every subtree.`,
+            `Work from the bottom of the tree upwards, so each subtree is finished before the node above it. Each row joins its pieces in the order ${words}:`,
+            table(['Node', 'Left gives', 'Right gives', 'Subtree gives'], rows),
+            `Last comes the root, ${root}. ${leftPart}, and ${rightPart}. Joining them as ${words} gives ${answer}.`,
+          ),
+          conclusion: `Joining the pieces as ${words} at every node gives ${answer}.`,
           keyIdea:
             order === 'pre'
-              ? 'Pre-order = node, left, right: the root comes first.'
+              ? 'Pre-order is node, left, right at every node, so the root comes first. Solve the small subtrees, then join the pieces. A list that does not start with the root is wrong.'
               : order === 'in'
-                ? 'In-order = left, node, right: the root sits between its two subtrees.'
-                : 'Post-order = left, right, node: the root comes last.',
+                ? 'In-order is left, node, right at every node, so the root sits between its two subtrees. Solve the small subtrees, then join the pieces.'
+                : 'Post-order is left, right, node at every node, so the root comes last. Solve the small subtrees, then join the pieces. A list that does not end with the root is wrong.',
         };
       }
     },
@@ -280,7 +286,8 @@ export const generators: Generator[] = [
         const h = height(tree);
         const kind = rng.pick(['height', 'search'] as const);
         const intro = `The keys ${keys.join(', ')} are inserted in that order into an empty binary search tree.`;
-        const build = `Insert each key by starting at the root and going left if it is smaller, right if it is larger:\n\n${insertionSteps(keys)}\n\n${fence(draw(tree))}`;
+        const bstRule = 'In a **binary search tree** (BST), each new key starts at the top node, the root. If it is smaller than a node, it goes left. If it is larger, it goes right. It lands in the first empty spot.';
+        const insertion = insertionRows(keys);
 
         if (kind === 'height') {
           const path = longestPath(tree);
@@ -299,8 +306,15 @@ export const generators: Generator[] = [
             answer: String(h),
             answerValue: h,
             distractors,
-            solution: `${build}\n\nThe longest root-to-leaf path is ${path.join(', ')}, which has ${path.length} nodes and therefore ${h} edges.\n\nAnswer: ${h}`,
-            keyIdea: 'A BST\'s shape depends on the insertion order; build it key by key, then measure the longest root-to-leaf path in edges.',
+            asking: 'How many edges are on the longest route down the tree built from these keys?',
+            solution: steps(
+              bstRule,
+              'Insert the keys in the given order. Each move down one line is one **edge**, so the moves in a route tell us how deep that key sits:',
+              table(['Key', 'Route from the root', 'Placed as', 'Edges from the root'], insertion),
+              `The largest number in the last column is ${h}, reached by key ${path[path.length - 1]}. Nothing sits below that key, which makes it a **leaf**. Its route is ${path.join(', ')}, which is ${path.length} nodes joined by ${h} edges.`,
+            ),
+            conclusion: `The longest route from the root to a leaf has ${h} edges, so the height is ${h}.`,
+            keyIdea: 'The insertion order sets a BST\'s shape, so build it key by key in a table and count the moves each key makes. The largest count is the height in edges. Never assume the tree is balanced.',
           };
         }
 
@@ -329,19 +343,25 @@ export const generators: Generator[] = [
         const distractors = pickDistinct(String(comps), comps, pool);
         if (distractors.length < 3) continue;
         const rows = target.path.map((v, i) => {
-          const res = v === target.key ? 'found' : target.key < v ? 'go left' : 'go right';
+          const res = v === target.key ? 'found, so stop' : target.key < v ? 'go left' : 'go right';
           const rel = v === target.key ? '=' : target.key < v ? '<' : '>';
-          return `| ${i + 1} | ${v} | ${m(`${target.key} ${rel} ${v}`)} | ${res} |`;
+          return [i + 1, v, m(`${target.key} ${rel} ${v}`), res];
         });
         return {
           stem: `${intro} How many nodes are compared when searching for **${target.key}**, including ${target.key} itself?`,
           answer: String(comps),
           answerValue: comps,
           distractors,
-          solution:
-            `${build}\n\nNow search for ${target.key}, starting at the root:\n\n| Step | Node | Comparison | Action |\n| --- | --- | --- | --- |\n${rows.join('\n')}\n\n` +
-            `${target.key} is at depth ${comps - 1}, so the search compares ${comps} nodes.\n\nAnswer: ${comps}`,
-          keyIdea: 'A BST search compares one node per level along a single path: a key at depth $d$ costs $d + 1$ comparisons.',
+          asking: `How many nodes does a search for ${target.key} look at on its way down the tree?`,
+          solution: steps(
+            bstRule,
+            'Build the tree by inserting the keys in the given order:',
+            table(['Key', 'Route from the root', 'Placed as'], insertion.map((r) => r.slice(0, 3))),
+            `A search follows the same rule from the root, comparing ${target.key} with one node at a time. Each row of this table is one comparison:`,
+            table(['Comparison', 'Node', 'Result', 'Next'], rows),
+          ),
+          conclusion: `The search only looked at ${target.path.join(', ')}. That is ${comps} nodes, so the answer is ${comps}.`,
+          keyIdea: 'A BST search compares one node per level along a single route, so build the tree first and then walk down it. A key at depth $d$ (edges from the root) costs $d + 1$ comparisons.',
         };
       }
     },
@@ -368,20 +388,21 @@ export const generators: Generator[] = [
           ];
           const distractors = pickDistinct(String(ans), ans, pool);
           if (distractors.length < 3) continue;
-          const rows = [0, 1, 2, k - 1, k]
-            .filter((x, i, a) => a.indexOf(x) === i)
-            .map((x) => (x === 0 ? '- Level 0: 1 node (the root)' : x === 1 ? '- Level 1: at most 2 nodes' : `- Level ${x}: at most ${m(`2^{${x}} = ${2 ** x}`)} nodes`));
-          if (k - 1 > 3) rows.splice(3, 0, '- (the count keeps doubling on every level in between)');
+          const rows = Array.from({ length: k }, (_, x) => [x, 2 ** x]);
           return {
             stem: `In a binary tree the root is at **level 0**, its children are at level 1, and so on. What is the **maximum** number of nodes that can be at level ${k}?`,
             answer: String(ans),
             answerValue: ans,
             distractors,
-            solution:
-              'Every node has at most 2 children, so the maximum number of nodes **doubles** from each level to the next: level 0 has 1 node, level 1 has 2, level 2 has 4, and so on.\n\n' +
-              rows.join('\n') +
-              `\n\nSo level ${k} holds at most ${m(`2^{${k}} = ${ans}`)} nodes.\n\nAnswer: ${ans}`,
-            keyIdea: 'With the root at level 0, level $k$ of a binary tree holds at most $2^k$ nodes.',
+            asking: `How many nodes fit on level ${k} if every level above it is completely full?`,
+            solution: steps(
+              '**Level** says how many rows a node is below the root. The root is at level 0, its children are at level 1, and so on.',
+              'Each node can have at most 2 children, so each level can hold at most double the level above:',
+              table(['Level', 'Most nodes'], rows),
+              `Level ${k} is one more doubling: ${m(`${2 ** (k - 1)} \\times 2 = ${ans}`)}. That is the same as ${m(`2^{${k}}`)}, because we start from 1 node and double ${k} times.`,
+            ),
+            conclusion: `Doubling ${k} times from the single root gives ${m(`2^{${k}}`)}, so the answer is ${ans}.`,
+            keyIdea: 'With the root at level 0, level $k$ holds at most $2^k$ nodes, because the count doubles each level. See how the question numbers the root: starting at level 1 shifts the power by one.',
           };
         }
         if (kind === 'total') {
@@ -396,17 +417,26 @@ export const generators: Generator[] = [
           const distractors = pickDistinct(String(ans), ans, pool);
           if (distractors.length < 3) continue;
           const terms: string[] = [];
-          for (let x = 0; x <= h; x++) terms.push(String(2 ** x));
+          const rows: number[][] = [];
+          for (let x = 0; x <= h; x++) {
+            terms.push(String(2 ** x));
+            rows.push([x, 2 ** x]);
+          }
           return {
             stem: `${heightDef} what is the **maximum** number of nodes in a binary tree of height ${h}?`,
             answer: String(ans),
             answerValue: ans,
             distractors,
-            solution:
-              `A tree of height ${h} has levels 0 to ${h}, which is ${h + 1} levels. The most nodes fit when every level is full, and level ${m('k')} holds at most ${m('2^k')} nodes:\n\n` +
-              `$$${terms.join(' + ')} = ${ans}$$\n\n` +
-              `Using the formula: ${m(`2^{h+1} - 1 = 2^{${h + 1}} - 1 = ${2 ** (h + 1)} - 1 = ${ans}`)}.\n\nAnswer: ${ans}`,
-            keyIdea: 'A binary tree of height $h$ has at most $2^{h+1} - 1$ nodes.',
+            asking: `How many nodes fit in a binary tree of height ${h} if every level is full?`,
+            solution: steps(
+              `Height counts the edges (lines between nodes) on the longest route. Height ${h} means the levels run from 0 to ${h}, which is ${h + 1} levels, not ${h}.`,
+              'The most nodes fit when every level is full. Each node can have 2 children, so each level holds double the level above:',
+              table(['Level', 'Most nodes'], rows),
+              'Add all the levels together:',
+              `$$${terms.join(' + ')} = ${ans}$$`,
+            ),
+            conclusion: `${h + 1} full levels hold ${ans} nodes in total, so the answer is ${ans}.`,
+            keyIdea: 'A binary tree of height $h$ (in edges) has $h + 1$ levels and at most $2^{h+1} - 1$ nodes. See whether height is given in edges, because that decides the number of levels.',
           };
         }
         // minimum height for n nodes
@@ -422,17 +452,22 @@ export const generators: Generator[] = [
         ];
         const distractors = pickDistinct(String(h), h, pool);
         if (distractors.length < 3) continue;
+        const tooShort = Array.from({ length: h }, (_, x) => [x, 2 ** (x + 1) - 1, 'no']);
         return {
           stem: `${heightDef} what is the **smallest possible height** of a binary tree with ${n} nodes?`,
           answer: String(h),
           answerValue: h,
           distractors,
-          solution:
-            `To make the tree as short as possible, fill every level before starting the next. A tree of height ${m('h')} holds at most ${m('2^{h+1} - 1')} nodes.\n\n` +
-            `- Height ${h - 1}: at most ${m(`2^{${h}} - 1 = ${2 ** h - 1}`)} nodes, which is less than ${n}, so it is too short.\n` +
-            `- Height ${h}: at most ${m(`2^{${h + 1}} - 1 = ${2 ** (h + 1) - 1}`)} nodes, which is at least ${n}, so it is enough.\n\n` +
-            `Shortcut: the minimum height is ${m(`\\lfloor \\log_2 ${n} \\rfloor = ${h}`)}, since ${Number.isInteger(Math.log2(n)) ? m(`\\log_2 ${n} = ${Math.log2(n)}`) : m(`\\log_2 ${n} \\approx ${Math.log2(n).toFixed(2)}`)}.\n\nAnswer: ${h}`,
-          keyIdea: 'The shortest binary tree with $n$ nodes has height $\\lfloor \\log_2 n \\rfloor$; the tallest is a chain of height $n - 1$.',
+          asking: `How short can a binary tree with ${n} nodes be?`,
+          solution: steps(
+            'A tree is as short as possible when every level is filled before a new one starts. So we want the first height with enough room.',
+            'Height counts the edges (lines between nodes) on the longest route, so a tree of height $h$ has $h + 1$ levels. When all of them are full, the total $1 + 2 + 4 + \\dots$ comes to $2^{h+1} - 1$ nodes.',
+            `Try the heights in turn, looking for room for ${n} nodes:`,
+            table(['Height', 'Most nodes', `Room for ${n}?`], tooShort),
+            `Height ${h} holds at most ${m(`2^{${h + 1}} - 1 = ${2 ** (h + 1) - 1}`)} nodes. That is at least ${n}, so it is the first height with enough room.`,
+          ),
+          conclusion: `Height ${h - 1} holds only ${2 ** h - 1} nodes and height ${h} holds ${2 ** (h + 1) - 1}, so the smallest possible height is ${h}.`,
+          keyIdea: 'For smallest height, find the first $h$ where $2^{h+1} - 1$ is at least the number of nodes. As a shortcut, that is $\\lfloor \\log_2 n \\rfloor$. The tallest possible tree is a chain of height $n - 1$.',
         };
       }
     },

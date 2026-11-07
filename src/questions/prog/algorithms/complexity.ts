@@ -28,19 +28,19 @@ export const questions: StaticQuestion[] = [
     options: ['$O(1)$', '$O(\\log n)$', '$O(n)$', '$O(n^2)$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How does the work grow for a one-by-one search in the unluckiest case?',
       solution:
-        'This is **linear search**.\n\n' +
-        '- In the worst case the target is the **last** item, or not in the list at all.\n' +
-        '- Then the program has to look at every one of the $n$ items: $n$ comparisons.\n' +
-        '- The number of steps grows in direct proportion to $n$ (double the list, double the work).\n\n' +
-        'So the worst-case time complexity is $O(n)$.',
+        'Big-O describes how the number of steps grows as the input size $n$ grows. So count the checks.\n\n' +
+        'A linear search looks at items one at a time. In the worst case the target is last, or missing altogether, so every item gets checked.\n\n' +
+        'That is 10 checks for 10 items and 1,000 checks for 1,000 items, so $n$ checks for $n$ items. Work that grows in step with $n$ is written $O(n)$.',
+      conclusion: 'The worst case checks each of the $n$ items once, so the answer is $O(n)$.',
       whyWrong: [
         '$O(1)$ is the **best** case (the target happens to be first). The question asks for the worst case.',
         '$O(\\log n)$ is binary search, which halves the list each step. That only works on a **sorted** list; this list is unsorted and is checked item by item.',
         null,
         '$O(n^2)$ would need a loop inside a loop (comparing every item with every other item). Linear search makes a single pass, so the work is proportional to $n$, not $n^2$.',
       ],
-      keyIdea: 'Linear search may have to check every item, so its worst case is $O(n)$.',
+      keyIdea: 'Count how many times the main action runs as $n$ grows. One pass over the items is $O(n)$. Halving each time is $O(\\log n)$. A loop inside a loop is $O(n^2)$.',
     },
   },
   {
@@ -51,18 +51,20 @@ export const questions: StaticQuestion[] = [
     options: ['$O(n)$', '$O(n^2)$', '$O(1)$', '$O(n^3)$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which part of $3n^2 + 5n + 7$ controls the growth when $n$ is huge?',
       solution:
-        'Two rules turn a step count into Big-O:\n\n' +
-        '1. Keep only the **fastest-growing term**. Of $3n^2$, $5n$ and $7$, the term $3n^2$ grows fastest: for $n = 1000$ it is $3\\,000\\,000$, while $5n = 5000$ and $7$ stays $7$.\n' +
-        '2. **Drop the constant multiplier**: $3n^2 \\to n^2$.\n\n' +
-        'So $T(n) = O(n^2)$, which is also read as "of the order of $n^2$".',
+        '$T(n)$ counts the steps for an input of size $n$. Big-O asks how that count grows when $n$ gets very large.\n\n' +
+        'Try a large value, $n = 1000$:\n\n| Term | Value at $n = 1000$ |\n|---|---|\n| $3n^2$ | $3\\,000\\,000$ |\n| $5n$ | $5000$ |\n| $7$ | $7$ |\n\n' +
+        'The $3n^2$ term makes up almost all of the total, and the gap keeps widening as $n$ grows. So the other two terms can be ignored.\n\n' +
+        'Big-O also drops the 3 in front, because multiplying by a fixed number does not change how the term grows. That leaves $n^2$, which is written $O(n^2)$.',
+      conclusion: 'The $n^2$ term dominates for large $n$, and its coefficient is dropped, so the answer is $O(n^2)$.',
       whyWrong: [
         'This keeps the $5n$ term. For large $n$ the $n^2$ term is far bigger than $5n$, so $n^2$ is the dominant term.',
         null,
         'This treats the running time as fixed because the expression contains fixed numbers. Big-O describes how $T(n)$ grows as $n$ grows, and $3n^2$ grows without limit.',
         'This adds the powers of the terms ($2 + 1 = 3$). In Big-O you keep the **largest** power, you do not add the powers together.',
       ],
-      keyIdea: 'For Big-O, keep the dominant (fastest-growing) term and drop its constant coefficient.',
+      keyIdea: 'To get Big-O from a formula, keep the fastest-growing term and drop the number in front of it. The order is $1 < \\log n < n < n\\log n < n^2 < n^3 < 2^n$.',
     },
   },
   {
@@ -73,23 +75,20 @@ export const questions: StaticQuestion[] = [
     options: ['$100n$', '$n^2$', '$n\\log_2 n$', '$2^n$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which of these four formulas ends up the largest once $n$ is very big?',
       solution:
-        'Compare the functions at a large value, say $n = 1000$:\n\n' +
-        '| Function | Value at $n = 1000$ |\n' +
-        '| --- | --- |\n' +
-        '| $100n$ | $100\\,000$ |\n' +
-        '| $n\\log_2 n$ | about $9966$ |\n' +
-        '| $n^2$ | $1\\,000\\,000$ |\n' +
-        '| $2^n$ | about $1.07 \\times 10^{301}$ |\n\n' +
-        'The exponential $2^n$ **doubles** every time $n$ goes up by 1, so it overtakes every polynomial. The growth ladder is $n\\log n < n^2 < 2^n$, and $100n$ is just $O(n)$.\n\n' +
-        'So $2^n$ grows fastest.',
+        'To compare growth, try a big value of $n$. Small values can mislead, because the 100 in $100n$ makes it look large at first.\n\n' +
+        'Take $n = 64$. $\\log_2 64$ asks how many 2s multiply together to make 64. The answer is 6, because $2^6 = 64$.\n\n' +
+        'Work out each formula at $n = 64$:\n\n| Formula | Value at $n = 64$ |\n|---|---|\n| $100n$ | $6400$ |\n| $n\\log_2 n$ | $64 \\times 6 = 384$ |\n| $n^2$ | $64 \\times 64 = 4096$ |\n| $2^n$ | about $1.8 \\times 10^{19}$ |\n\n' +
+        '$2^n$ is far ahead of the rest. $100n$ is still above $n^2$ here only because of the 100: once $n$ passes 100, $n^2$ overtakes it.',
+      conclusion: 'Adding 1 to $n$ doubles $2^n$, which none of the others do, so the fastest-growing is $2^n$.',
       whyWrong: [
         'The big coefficient 100 makes $100n$ larger for small $n$, but coefficients do not change the growth rate: $100n$ is still linear, $O(n)$.',
         '$n^2$ is a polynomial. Any exponential like $2^n$ eventually beats every polynomial (already at $n = 5$, $2^5 = 32 > 25$, and the gap explodes after that).',
         '$n\\log_2 n$ grows only slightly faster than $n$; it is much slower than $n^2$ and $2^n$.',
         null,
       ],
-      keyIdea: 'Exponential growth ($2^n$) beats any polynomial, which beats $n\\log n$, which beats linear.',
+      keyIdea: 'Use the order $\\log n < n < n\\log n < n^2 < 2^n$. A number in front, such as 100, does not change a formula\'s place in that order. To check by trying a value, make $n$ much bigger than that number, because at $n = 64$ the 100 still puts $100n$ above $n^2$.',
     },
     check: {
       optionValues: [100 * 1000, 1000 ** 2, 1000 * log2(1000), 2 ** 1000],
@@ -108,18 +107,20 @@ export const questions: StaticQuestion[] = [
     options: ['$O(\\log n)$', '$O(1)$', '$O(n)$', '$O(n\\log n)$'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How does the number of checks grow for binary search on a sorted list?',
       solution:
-        'Binary search looks at the **middle** item. If that is not the target, it throws away the half that cannot contain the target.\n\n' +
-        '- After 1 step about $\\frac{n}{2}$ items remain, after 2 steps $\\frac{n}{4}$, after $k$ steps $\\frac{n}{2^k}$.\n' +
-        '- It stops when about 1 item is left: $\\frac{n}{2^k} = 1$, so $2^k = n$, so $k = \\log_2 n$.\n\n' +
-        'The number of steps is about $\\log_2 n$, so binary search is $O(\\log n)$.',
+        'Binary search checks the middle item, then throws away half of what is left. So count how many times it can halve the list.\n\n' +
+        'In the worst case it keeps halving until one item remains. Start with 16 items: $16 \\to 8 \\to 4 \\to 2 \\to 1$. That is 4 halvings.\n\n' +
+        'Doubling the list to 32 items adds only 1 more halving. So the checks go up by just one each time $n$ doubles.\n\n' +
+        'The number of halvings to get from $n$ down to 1 is called $\\log_2 n$. So the growth is written $O(\\log n)$.',
+      conclusion: 'The checks equal the number of halvings, which is about $\\log_2 n$, so the answer is $O(\\log n)$.',
       whyWrong: [
         null,
         '$O(1)$ is only the best case (the middle item happens to be the target). In the worst case the search keeps halving until one item is left.',
         '$O(n)$ is linear search, which checks items one by one. Binary search discards half of the remaining items every step, which is much faster.',
         '$O(n\\log n)$ is the cost of a good **sort** such as merge sort, not of searching an already sorted list.',
       ],
-      keyIdea: 'Halving the search space each step gives about $\\log_2 n$ steps: $O(\\log n)$.',
+      keyIdea: 'If each step cuts the remaining work in half, the number of steps is about $\\log_2 n$, which is $O(\\log n)$. To test it, ask whether doubling $n$ adds just one step.',
     },
   },
   {
@@ -130,22 +131,19 @@ export const questions: StaticQuestion[] = [
     options: ['Bubble sort', 'Insertion sort', 'Merge sort', 'Selection sort'],
     correctIndex: 2,
     markScheme: {
+      asking: 'Which of these sorts stays at about $n\\log n$ steps even on its worst input?',
       solution:
-        'Worst-case complexities of the standard sorts:\n\n' +
-        '| Algorithm | Worst case | Why |\n' +
-        '| --- | --- | --- |\n' +
-        '| Bubble sort | $O(n^2)$ | up to $n - 1$ passes, each comparing up to $n - 1$ neighbouring pairs |\n' +
-        '| Insertion sort | $O(n^2)$ | a reversed list makes every item shift past all earlier items |\n' +
-        '| Selection sort | $O(n^2)$ | always scans the whole unsorted part to find the minimum |\n' +
-        '| Merge sort | $O(n\\log n)$ | about $\\log_2 n$ levels of halving, and $O(n)$ merging work per level |\n\n' +
-        'Only merge sort is $O(n\\log n)$ in the worst case.',
+        '$\\log_2 n$ is the number of times $n$ can be halved before reaching 1. So $n\\log n$ means about $\\log_2 n$ rounds of halving, with about $n$ steps of work in each round.\n\n' +
+        'Bubble, insertion and selection sort work by passes inside passes. On a bad input that is about $n$ passes of up to $n$ steps each, so about $n \\times n$ steps.\n\n' +
+        'Merge sort splits the list in half again and again, which gives about $\\log_2 n$ rounds. Each round of merging touches all $n$ items once. That holds for every input.',
+      conclusion: 'With $n$ steps per round and $\\log_2 n$ rounds on any input, the sort that is $O(n\\log n)$ is Merge sort.',
       whyWrong: [
         'Bubble sort uses nested passes over the list, so its worst case (a reversed list) is $O(n^2)$. Its best case can be $O(n)$ with an early-exit check, but that is the best case, not the worst.',
         'Insertion sort is $O(n)$ on an already sorted list, but on a reversed list each item moves past all earlier ones, giving $O(n^2)$.',
         null,
         'Selection sort always scans the whole unsorted part to find the smallest item, so it is $O(n^2)$ in every case.',
       ],
-      keyIdea: 'Merge sort splits the list in half repeatedly ($\\log_2 n$ levels) and does $O(n)$ merging per level: $O(n\\log n)$.',
+      keyIdea: 'Worst-case sort costs: bubble, insertion and selection are $O(n^2)$, because they run passes inside passes. Merge sort is $O(n\\log n)$, from halving levels times $n$ work per level.',
     },
   },
   {
@@ -156,16 +154,19 @@ export const questions: StaticQuestion[] = [
     options: ['An unsorted array of key-value pairs', 'A hash table', 'A stack', 'A queue'],
     correctIndex: 1,
     markScheme: {
+      asking: 'Which structure finds a value from its key in the fewest steps on average?',
       solution:
-        'A **hash table** (also called a key-value map or dictionary) turns the key into a number that points straight to where the value is stored, so a lookup takes $O(1)$ time on average, however many items there are.\n\n' +
-        'The other structures have to look through their items, which takes $O(n)$ time.',
+        'A **key** is what you look up by, like a name in a phone book. The **value** is what you get back, like the phone number.\n\n' +
+        'An array of pairs has to be checked one by one, up to $n$ checks. A stack or a queue only gives access to one item, so you would have to remove items to look further.\n\n' +
+        'A **hash table** runs the key through a function that works out a slot number, then jumps straight to that slot. On average the number of steps does not depend on how many items are stored, which is $O(1)$.',
+      conclusion: 'Jumping straight to the slot beats checking items one by one, so the answer is A hash table.',
       whyWrong: [
         'This works, but each lookup is a linear search through the pairs: $O(n)$.',
         null,
         'A stack only gives access to its top item, so finding a key means removing items one by one.',
         'A queue only gives access to its front item, so finding a key means removing items one by one.',
       ],
-      keyIdea: 'To look up a value by its key, use a hash table: $O(1)$ on average.',
+      keyIdea: 'Lookup by key with no order needed points to a hash table, at $O(1)$ on average. Compare the others by counting checks: an unsorted array is $O(n)$, and stacks and queues must remove items.',
     },
   },
   {
@@ -176,19 +177,18 @@ export const questions: StaticQuestion[] = [
     options: ['Reading the item at index $i$', 'Reading the stored length', 'Adding at the end, with space free', 'Inserting at the front'],
     correctIndex: 3,
     markScheme: {
+      asking: 'Which array action gets slower as the array gets longer?',
       solution:
-        'An array stores its items in one block of memory, in order, and remembers its length.\n\n' +
-        '- Reading index $i$ jumps straight to that position: $O(1)$.\n' +
-        '- The length is stored, so reading it is one step: $O(1)$.\n' +
-        '- Adding at the end moves nothing: $O(1)$.\n' +
-        '- Inserting at the **front** forces all $n$ items to shift one place to the right first: $O(n)$.',
+        '$O(1)$ means the work stays the same however big the array is. $O(n)$ means the work grows in step with its size.\n\n' +
+        'Count the items each action has to touch on an array of $n$ items:\n\n| Action | Items touched | Why |\n|---|---|---|\n| Read index $i$ | 1 | jumps straight to that slot |\n| Read the stored length | 1 | it is one stored number |\n| Add at the end, space free | 1 | fills the free slot |\n| Insert at the front | $n$ | every item shifts one slot right |',
+      conclusion: 'Only one action has to move all $n$ items, and that is Inserting at the front.',
       whyWrong: [
         'Indexing jumps straight to a position in memory, so it does not walk through the array.',
         'The length is stored as one number, so reading it does not count the items.',
         'Adding at the end moves nothing, because the free slot is already there.',
         null,
       ],
-      keyIdea: 'Changing the front of an array shifts every item ($O(n)$); working at the end or indexing is $O(1)$.',
+      keyIdea: 'To compare array operations, count the items that must move or be read. A known position with nothing shifted is $O(1)$. Anything that shifts or scans the whole array is $O(n)$.',
     },
   },
   {
@@ -199,14 +199,18 @@ export const questions: StaticQuestion[] = [
     options: ['The exact running time in seconds', 'How the work grows with input size', 'The number of lines of code', 'The speed of the computer'],
     correctIndex: 1,
     markScheme: {
-      solution: 'Big-O describes how the amount of work grows as the input size $n$ grows. It ignores constant factors and fixed details such as the speed of the computer.',
+      asking: 'What is Big-O notation actually telling you?',
+      solution:
+        'Big-O counts steps, not seconds. One loop over $n$ items does $n$ steps, so doubling the items doubles the steps. We write that as $O(n)$.\n\n' +
+        'A loop inside a loop does $n \\times n$ steps, so doubling the items makes 4 times the steps. We write that as $O(n^2)$. Each Big-O names a pattern of growth as the input gets bigger.',
+      conclusion: 'Big-O compares those growth patterns, not clock time or code length, so the answer is How the work grows with input size.',
       whyWrong: [
         'Exact seconds depend on the computer. Big-O only describes the shape of the growth.',
         null,
         'A short program can do a huge amount of work, so the number of lines tells you little about growth.',
         'Big-O does not depend on the machine, since it ignores constant factors.',
       ],
-      keyIdea: 'Big-O describes how work grows with input size, ignoring constants.',
+      keyIdea: 'Big-O answers one question: if the input gets bigger, how much more work is there? It ignores the computer\'s speed, fixed multipliers and how long the code looks.',
     },
   },
   {
@@ -217,14 +221,18 @@ export const questions: StaticQuestion[] = [
     options: ['$O(n)$', '$O(1)$', '$O(\\log n)$', '$O(n^2)$'],
     correctIndex: 1,
     markScheme: {
-      solution: 'An array stores its items side by side in memory, so the position of `A[i]` can be calculated directly. That takes the same time whatever the size of the array: $O(1)$, called constant time.',
+      asking: 'How much work does it take to read one array item when you know its index?',
+      solution:
+        'An array stores items side by side in memory. So the computer can work out where item $i$ is with one sum, using the array\'s start position and the size of each item.\n\n' +
+        'It then jumps straight there, with no searching. The step count is the same whether the array has 10 items or 10 million. Work that does not grow with $n$ is written $O(1)$.',
+      conclusion: 'Reading a known index takes the same work at any size, so the answer is $O(1)$.',
       whyWrong: [
         'This is the cost of searching for a **value**. Reading a known index needs no search.',
         null,
         'This is the cost of binary search, which looks for a value in a sorted list.',
         'This would need nested loops. Reading one item needs no loop at all.',
       ],
-      keyIdea: 'Reading an array item by index is $O(1)$.',
+      keyIdea: 'Ask whether the work grows with $n$. Reading a known index never does, so it is $O(1)$. Searching for a value without knowing where it is does, so that is $O(n)$.',
     },
   },
   {
@@ -235,14 +243,20 @@ export const questions: StaticQuestion[] = [
     options: ['$O(n)$', '$O(\\log n)$', '$O(n\\log n)$', '$O(n^2)$'],
     correctIndex: 3,
     markScheme: {
-      solution: 'Bubble sort makes up to $n - 1$ passes. They compare $n-1, n-2, \\dots, 1$ neighbouring pairs, so $\\frac{n(n-1)}{2} \\approx \\frac{n^2}{2}$ comparisons in total, which is $O(n^2)$.',
+      asking: 'How does bubble sort\'s work grow when the list is in the worst order?',
+      solution:
+        'Bubble sort compares neighbouring pairs in passes. Its worst case is a list in reverse order, which needs the most passes.\n\n' +
+        'Count the comparisons. For $n$ items, pass 1 makes $n - 1$, pass 2 makes $n - 2$, and so on down to 1. With 5 items that is $4 + 3 + 2 + 1 = 10$.\n\n' +
+        'In general the sum is $\\frac{n(n - 1)}{2}$ (with 5 items, $\\frac{5 \\times 4}{2} = 10$), which is about $\\frac{n^2}{2}$ comparisons.\n\n' +
+        'Big-O drops the fixed $\\frac{1}{2}$ and keeps the $n^2$, which gives $O(n^2)$.',
+      conclusion: 'A reversed list needs about $\\frac{n^2}{2}$ comparisons, so the answer is $O(n^2)$.',
       whyWrong: [
         'This is the **best** case with an early-exit check, on a list that is already sorted.',
         'Sorting has to look at every item at least once, so it cannot be faster than $O(n)$.',
         'This is the cost of merge sort, which splits the list in half.',
         null,
       ],
-      keyIdea: 'Bubble sort uses nested passes over the list, so its worst case is $O(n^2)$.',
+      keyIdea: 'When passes shrink by one each time, add them up: $(n - 1) + \\dots + 1 = \\frac{n(n - 1)}{2}$. That still grows like $n^2$. Bubble, insertion and selection sort all have this worst case.',
     },
   },
   {
@@ -253,14 +267,19 @@ export const questions: StaticQuestion[] = [
     options: ['$O(n)$', '$O(n^2)$', '$O(2n)$', '$O(\\log n)$'],
     correctIndex: 1,
     markScheme: {
-      solution: 'The inner loop runs $n$ times for each of the $n$ passes of the outer loop. Nested loops multiply: $n \\times n = n^2$, so the complexity is $O(n^2)$.',
+      asking: 'How many times does the inside of two nested $n$-sized loops run?',
+      solution:
+        'The inner loop runs all the way through every time the outer loop takes one pass. So the counts multiply.\n\n' +
+        'Try $n = 3$. Outer pass 1 has 3 inner runs, and so do passes 2 and 3. That is $3 + 3 + 3 = 9$ runs, which is $3 \\times 3$.\n\n' +
+        'With $n$ in place of 3, there are $n$ outer passes with $n$ inner runs each. That is $n \\times n = n^2$ runs, which is written $O(n^2)$.',
+      conclusion: '$n$ passes of $n$ runs make $n^2$ runs, so the answer is $O(n^2)$.',
       whyWrong: [
         'This is the cost of a single loop. Here the inner loop repeats on every outer pass.',
         null,
         'This adds the two loops, which is right only when one follows the other. Nested loops multiply.',
         'A logarithmic loop halves or doubles its counter. These loops each run $n$ times.',
       ],
-      keyIdea: 'Nested loops multiply; loops one after another add.',
+      keyIdea: 'Loops one inside the other multiply, and loops one after the other add. So a loop of $n$ inside a loop of $n$ is $O(n^2)$, while two loops of $n$ in a row are $O(n)$.',
     },
   },
 
@@ -277,24 +296,21 @@ export const questions: StaticQuestion[] = [
     options: ['400', '190', '210', '20'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How many times in total does line 5 run?',
       solution:
-        'The inner loop runs from $j = i$ up to $j = n$, so it runs $n - i + 1$ times (both ends included).\n\n' +
-        '| $i$ | inner loop runs |\n' +
-        '| --- | --- |\n' +
-        '| 1 | 20 |\n' +
-        '| 2 | 19 |\n' +
-        '| 3 | 18 |\n' +
-        '| ... | ... |\n' +
-        '| 20 | 1 |\n\n' +
-        'Total $= 20 + 19 + \\dots + 1 = \\frac{20 \\times 21}{2} = 210$.\n\n' +
-        'In general this is $\\frac{n(n+1)}{2}$, which is $O(n^2)$, but the exact count asked for is $210$.',
+        'The inner loop on line 4 starts at `j = i`, so its length depends on `i`. Both ends of a `for` loop are included.\n\n' +
+        'Count the runs of line 5 for each value of `i`:\n\n| `i` | `j` goes | Runs of line 5 |\n|---|---|---|\n| 1 | 1 to 20 | 20 |\n| 2 | 2 to 20 | 19 |\n| 3 | 3 to 20 | 18 |\n| ... | ... | ... |\n| 20 | 20 to 20 | 1 |\n\n' +
+        'So the total is $20 + 19 + 18 + \\dots + 1$.\n\n' +
+        'Pair the numbers from the two ends: $20 + 1 = 21$, $19 + 2 = 21$, and so on. The 20 numbers make 10 such pairs.\n\n' +
+        'So the total is $10 \\times 21 = 210$.',
+      conclusion: 'The runs are $20 + 19 + \\dots + 1$, which adds up to 210.',
       whyWrong: [
         'This is $n^2 = 400$: it assumes the inner loop always runs $n$ times. It starts at $j = i$, so it gets shorter each time.',
         'This is $\\frac{20 \\times 19}{2}$, which is what you get if the inner loop started at $j = i + 1$. Starting at $j = i$ includes one extra run for every $i$.',
         null,
         'This counts only the outer loop. The counted line is inside the inner loop, which runs many times for each value of $i$.',
       ],
-      keyIdea: 'A triangular nested loop runs $1 + 2 + \\dots + n = \\frac{n(n+1)}{2}$ times, which is still $O(n^2)$.',
+      keyIdea: 'An inner loop from `i` to `n` gives $n + (n - 1) + \\dots + 1 = \\frac{n(n + 1)}{2}$ runs. Starting from `i + 1` gives $\\frac{n(n - 1)}{2}$. Both grow like $n^2$, so both are $O(n^2)$.',
     },
     check: {
       optionValues: [400, 190, 210, 20],
@@ -318,26 +334,19 @@ export const questions: StaticQuestion[] = [
     options: ['8', '7', '199', 'Infinite loop'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many times can 200 be halved, rounding down, before it reaches 1?',
       solution:
-        '`div(n,2)` is integer division, so it rounds down. Trace the loop:\n\n' +
-        '| pass | `n` after the pass | `steps` |\n' +
-        '| --- | --- | --- |\n' +
-        '| 1 | 100 | 1 |\n' +
-        '| 2 | 50 | 2 |\n' +
-        '| 3 | 25 | 3 |\n' +
-        '| 4 | 12 | 4 |\n' +
-        '| 5 | 6 | 5 |\n' +
-        '| 6 | 3 | 6 |\n' +
-        '| 7 | 1 | 7 |\n\n' +
-        'Now `n > 1` is false ($1 > 1$ is false), so the loop stops and 7 is printed.\n\n' +
-        'Check: $2^7 = 128 \\le 200 < 256 = 2^8$, so the number of halvings is $\\lfloor \\log_2 200 \\rfloor = 7$. A loop that halves is $O(\\log n)$.',
+        '`div(n,2)` divides by 2 and drops any remainder, so `div(25,2)` is 12. Line 5 adds 1 to `steps` on each pass, so `steps` counts the passes.\n\n' +
+        'The loop on line 3 runs while `n > 1`. Here is each pass up to the last:\n\n| Pass | `n` at the start | `n` after line 4 | `steps` |\n|---|---|---|---|\n| 1 | 200 | 100 | 1 |\n| 2 | 100 | 50 | 2 |\n| 3 | 50 | 25 | 3 |\n| 4 | 25 | 12 | 4 |\n| 5 | 12 | 6 | 5 |\n| 6 | 6 | 3 | 6 |\n\n' +
+        'Now `n` is 3, so the test is still true. Line 4 sets `n` to `div(3,2)`, which is 1, and `steps` becomes 7. Now $1 > 1$ is false, so the loop stops and line 7 prints 7.',
+      conclusion: 'Halving 200 and rounding down reaches 1 after 7 passes, so the answer is 7.',
       whyWrong: [
         'This rounds $\\log_2 200 \\approx 7.6$ **up** to 8. Integer division rounds down at each step, and the loop stops as soon as `n` reaches 1, after 7 passes.',
         null,
         'This assumes `n` goes down by 1 each pass, as in `n = n - 1`. Halving shrinks `n` much faster.',
         '`n` is halved on every pass, so it reaches 1 and the test `n > 1` fails.',
       ],
-      keyIdea: 'A loop that halves $n$ until it reaches 1 runs about $\\log_2 n$ times: $O(\\log n)$.',
+      keyIdea: 'A loop that halves runs about $\\log_2 n$ times, so it is $O(\\log n)$. For the exact count, find the largest power of 2 up to $n$: $2^7 = 128$ gives 7 here.',
     },
     check: {
       optionValues: [8, 7, 199, 'Infinite loop'],
@@ -379,19 +388,19 @@ export const questions: StaticQuestion[] = [
     options: ['$O(n^2)$', '$O(1)$', '$O(\\log n)$', '$O(n)$'],
     correctIndex: 3,
     markScheme: {
+      asking: 'How does the work in `stats` grow with the length of `A`?',
       solution:
-        'Count the work line by line:\n\n' +
-        '- `total = 0`, `biggest = A[1]` and the `return`: a fixed number of steps, $O(1)$.\n' +
-        '- The first `for` loop runs $n$ times with $O(1)$ work each time: $O(n)$.\n' +
-        '- The second `for` loop is **after** the first one (not inside it): another $O(n)$.\n\n' +
-        'Loops one after another **add**: $O(1) + O(n) + O(n) = O(2n + 1)$. Drop the constants: $O(n)$.',
+        'Count how many times each part runs when `A` has $n$ items:\n\n| Lines | What they do | Runs |\n|---|---|---|\n| 2 | set `total` | 1 |\n| 3 to 5 | first loop | $n$ |\n| 6 | set `biggest` | 1 |\n| 7 to 11 | second loop | $n$ |\n| 12 | return | 1 |\n\n' +
+        'The two loops come one after the other, and neither is inside the other. So their counts add, and the total is $n + n + 3 = 2n + 3$ steps.\n\n' +
+        'Big-O keeps the fastest-growing term and drops the number in front of it. So $2n + 3$ becomes $O(n)$.',
+      conclusion: 'Two separate loops add up to about $2n$ steps, which grows in step with $n$, so the answer is $O(n)$.',
       whyWrong: [
         'This multiplies the two loops. Loops only multiply when one is **inside** the other. These loops run one after the other, so their costs add: $n + n = 2n$, which is $O(n)$.',
         'This assumes the function is constant time because it only returns one number. It still has to visit all $n$ items (twice) to compute it.',
         '$O(\\log n)$ needs the remaining work to be halved each step. Here every item is visited, so the work grows in proportion to $n$.',
         null,
       ],
-      keyIdea: 'Sequential loops add ($n + n = 2n$, so $O(n)$); only nested loops multiply.',
+      keyIdea: 'Look at how the loops are arranged. One after the other, their counts add, so it stays $O(n)$. One inside the other, their counts multiply, which gives $O(n^2)$.',
     },
   },
   {
@@ -407,18 +416,18 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 2,
     markScheme: {
+      asking: 'How much checking does it take to see if a value is present in each structure?',
       solution:
-        'Think about how each structure finds a value: does it have to look through the items one by one, or can it jump straight to the right place?\n\n' +
-        '- **Unsorted array:** there is no shortcut, so the value is compared with the items one by one. On average that checks about half the array, and in the worst case all of it: $O(n)$.\n' +
-        '- **Hash table:** the value is turned into a number (its **hash**) that points straight to where it would be stored, so only that place is checked: $O(1)$ on average, whatever the size.\n\n' +
-        'So: array $O(n)$, hash table $O(1)$. This is why a hash table is the right choice when you need many fast "is this already there?" checks.',
+        '**Unsorted array.** You do not know where the value is, so you check items one by one. On average that is about half of them, $\\frac{n}{2}$ checks. Big-O drops the fixed $\\frac{1}{2}$, leaving $O(n)$.\n\n' +
+        '**Hash table.** A function turns the value into a slot number, and you jump straight to that slot. On average this takes the same small number of steps however many items are stored, which is $O(1)$.',
+      conclusion: 'One has to scan and the other can jump, so the answer is Array: $O(n)$; hash table: $O(1)$.',
       whyWrong: [
         'Reading an array by position is $O(1)$, but searching for a **value** is not: the items have to be checked one by one.',
         'This treats a hash table like an array. Hashing jumps straight to where the item would be, so it does not scan.',
         null,
         '$O(\\log n)$ would need binary search, which requires sorted data. This array is unsorted, so it needs a plain linear scan.',
       ],
-      keyIdea: 'Membership tests are $O(n)$ for an unsorted array (linear scan) but $O(1)$ on average for a hash table.',
+      keyIdea: 'Ask how the structure finds an item. Scanning one by one is $O(n)$. Halving a sorted list is $O(\\log n)$. Hashing straight to a slot is $O(1)$ on average.',
     },
   },
   {
@@ -429,18 +438,20 @@ export const questions: StaticQuestion[] = [
     options: ['12 seconds', '36 seconds', '108 seconds', '16 seconds'],
     correctIndex: 1,
     markScheme: {
+      asking: 'If the input is 3 times bigger, how long will this $n^2$ sort take?',
       solution:
-        'If time is proportional to $n^2$, multiplying $n$ by $k$ multiplies the time by $k^2$.\n\n' +
-        '1. Scale factor for $n$: $k = \\frac{3000}{1000} = 3$.\n' +
-        '2. Scale factor for the time: $k^2 = 3^2 = 9$.\n' +
-        '3. New time $= 4 \\times 9 = 36$ seconds.',
+        'Time proportional to $n^2$ means the steps are about $n \\times n$, and the time follows the number of steps.\n\n' +
+        'Find how many times bigger $n$ gets: $\\frac{3000}{1000} = 3$.\n\n' +
+        'Both $n$s in $n \\times n$ get 3 times bigger, so the steps are multiplied by $3 \\times 3 = 9$.\n\n' +
+        'The time grows by the same factor: $4 \\times 9 = 36$ seconds.',
+      conclusion: 'Tripling $n$ multiplies the work by 9, so 4 seconds becomes 36 seconds.',
       whyWrong: [
         'This multiplies the time by 3, which would be right for an $O(n)$ algorithm. For $O(n^2)$ tripling $n$ multiplies the time by $3^2 = 9$.',
         null,
         'This multiplies the time by $3^3 = 27$, which would be right for an $O(n^3)$ algorithm.',
         'This squares the **time** ($4^2 = 16$) instead of squaring the scale factor of $n$. The square applies to how much bigger $n$ got, which is 3.',
       ],
-      keyIdea: 'For $O(n^p)$, multiplying $n$ by $k$ multiplies the running time by $k^p$.',
+      keyIdea: 'For time proportional to $n^p$, find $k$, the new size divided by the old size. Then multiply the old time by $k^p$. So $O(n)$ multiplies by $k$, and $O(n^2)$ by $k^2$.',
     },
     check: {
       optionValues: [12, 36, 108, 16],
@@ -476,19 +487,20 @@ export const questions: StaticQuestion[] = [
     options: ['$O(n^2)$', '$O(\\log n)$', '$O(n\\log n)$', '$O(n)$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How does the number of times `count` goes up grow with $n$?',
       solution:
-        'Work from the inside out.\n\n' +
-        '1. **Inner loop:** `j` starts at $n$ and is halved each pass until it reaches 1, so it runs about $\\log_2 n$ times. That is $O(\\log n)$.\n' +
-        '2. **Outer loop:** `for i = 1 to n` runs $n$ times, and each time the inner loop starts again from `j = n`.\n' +
-        '3. Nested loops **multiply**: $n \\times \\log_2 n$.\n\n' +
-        'So the complexity is $O(n\\log n)$. For example, with $n = 1024$ the inner loop runs 10 times, so `count` ends at $1024 \\times 10 = 10\\,240$, far fewer than $1024^2 \\approx 1$ million.',
+        'The outer loop on line 3 takes one pass for each `i` from 1 to `n`, which is $n$ passes.\n\n' +
+        'Line 4 sets `j` back to `n` on every pass, so the inner `while` loop does the same work each time.\n\n' +
+        'The inner loop halves `j` until it reaches 1. For $n = 16$ that goes $16 \\to 8 \\to 4 \\to 2 \\to 1$, which is 4 passes. The number of halvings is called $\\log_2 n$, and here $2^4 = 16$.\n\n' +
+        'One loop is inside the other, so the counts multiply: line 7 runs $n \\times \\log_2 n$ times. For $n = 16$ that is $16 \\times 4 = 64$ times. Big-O writes this growth as $O(n\\log n)$.',
+      conclusion: '$n$ outer passes with about $\\log_2 n$ inner passes each give the answer $O(n\\log n)$.',
       whyWrong: [
         'This assumes the inner loop runs $n$ times. It halves `j` each pass, so it runs only about $\\log_2 n$ times.',
         'This is the cost of the inner loop alone. It forgets that the outer loop repeats it $n$ times.',
         null,
         'This treats the inner loop as constant time. Its number of passes grows (slowly) with $n$: about $\\log_2 n$ passes.',
       ],
-      keyIdea: 'A halving loop inside an $n$-times loop gives $n \\times \\log_2 n$ steps: $O(n\\log n)$.',
+      keyIdea: 'Find each loop\'s growth separately. Adding 1 each pass gives $n$ passes, and halving gives $\\log_2 n$ passes. Then multiply if one loop is inside the other, and add if they are one after the other.',
     },
   },
   {
@@ -499,18 +511,20 @@ export const questions: StaticQuestion[] = [
     options: ['$1\\,000\\,000$', '$20$', '$500\\,000$', '$1000$'],
     correctIndex: 1,
     markScheme: {
+      asking: 'About how many checks does binary search need at most for a million items?',
       solution:
-        'Each inspection of the middle item removes at least half of the remaining items. Count the halvings:\n\n' +
-        '$1\\,000\\,000 \\to 500\\,000 \\to 250\\,000 \\to 125\\,000 \\to 62\\,500 \\to 31\\,250 \\to 15\\,625 \\to 7812 \\to 3906 \\to 1953 \\to 976 \\to 488 \\to 244 \\to 122 \\to 61 \\to 30 \\to 15 \\to 7 \\to 3 \\to 1$\n\n' +
-        'That is 19 halvings to get down to 1 item, plus 1 inspection of that last item: $20$.\n\n' +
-        'Shortcut: the worst case is $\\lfloor \\log_2 n \\rfloor + 1$. Since $2^{19} = 524\\,288 \\le 1\\,000\\,000 < 1\\,048\\,576 = 2^{20}$, $\\lfloor \\log_2 1\\,000\\,000 \\rfloor = 19$, so the answer is $19 + 1 = 20$.',
+        'Binary search checks the middle, then keeps only half. So the number of checks is about the number of halvings.\n\n' +
+        'Use a handy fact: $2^{10} = 1024$, which is about 1000. So 10 halvings shrink a list about 1000 times.\n\n' +
+        '10 halvings take 1,000,000 down to about 1000. Another 10 halvings take 1000 down to about 1.\n\n' +
+        'That makes $10 + 10 = 20$ halvings. As a test, $2^{20} = 1\\,048\\,576$, which is just above a million.',
+      conclusion: 'A million items need about 20 halvings, so the answer is $20$.',
       whyWrong: [
         'This is the worst case for **linear** search, which checks every item. Binary search halves the list each time.',
         null,
         'This is the average number of checks for linear search ($\\frac{n}{2}$), not binary search.',
         'This is $\\sqrt{1\\,000\\,000}$. Binary search is logarithmic, not square-root: the number of steps is about $\\log_2 n$.',
       ],
-      keyIdea: 'Binary search needs at most $\\lfloor \\log_2 n \\rfloor + 1$ inspections: only about 20 for a million items.',
+      keyIdea: 'Use $2^{10} \\approx 1000$, so each factor of 1000 costs about 10 comparisons. A thousand items take about 10, a million about 20 and a billion about 30.',
     },
     check: {
       optionValues: [1000000, 20, 500000, 1000],
@@ -525,19 +539,19 @@ export const questions: StaticQuestion[] = [
     options: ['$21$', '$34$', '$35$', '$23$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'From what size $n$ does $20n + 500$ become smaller than $n^2$?',
       solution:
-        'We need $20n + 500 < n^2$, that is $n^2 - 20n - 500 > 0$.\n\n' +
-        '1. Solve $n^2 - 20n - 500 = 0$ with the quadratic formula: $n = \\frac{20 + \\sqrt{400 + 2000}}{2} = \\frac{20 + \\sqrt{2400}}{2} \\approx \\frac{20 + 48.99}{2} \\approx 34.49$ (the other root is negative).\n' +
-        '2. The inequality holds for $n > 34.49$, so the smallest whole number is $35$.\n' +
-        '3. Check: at $n = 34$, A takes $20 \\times 34 + 500 = 1180$ and B takes $34^2 = 1156$, so B is still faster. At $n = 35$, A takes $1200$ and B takes $1225$, so A is faster.\n\n' +
-        'Answer: $35$. (This is why Big-O matters: for large inputs the $O(n)$ algorithm wins, even though it is slower for small inputs.)',
+        'We want the first $n$ where $20n + 500 < n^2$. For small $n$ the extra 500 keeps A bigger. For large $n$ the $n^2$ pulls ahead, so there is one crossing point to find.\n\n' +
+        'Try round values to trap the crossing:\n\n| $n$ | A: $20n + 500$ | B: $n^2$ | A fewer? |\n|---|---|---|---|\n| 30 | 1100 | 900 | no |\n| 40 | 1300 | 1600 | yes |\n\n' +
+        'So the crossing is between 30 and 40. Testing upwards, the first change comes here:\n\n| $n$ | A: $20n + 500$ | B: $n^2$ | A fewer? |\n|---|---|---|---|\n| 34 | 1180 | 1156 | no |\n| 35 | 1200 | 1225 | yes |',
+      conclusion: 'At $n = 34$ A still takes more steps, and at the next whole number it takes fewer, so the answer is $35$.',
       whyWrong: [
         'This ignores the $+ 500$ and solves $20n < n^2$, giving $n > 20$. The 500 extra steps keep A slower for longer.',
-        'This rounds the root $34.49$ **down**. At $n = 34$ A takes 1180 steps and B takes 1156, so A is not yet faster.',
+        'At $n = 34$ A takes 1180 steps and B takes 1156, so A is not yet faster. A only takes fewer from the next whole number.',
         null,
         'This ignores the $20n$ term and solves $500 < n^2$, giving $n > \\sqrt{500} \\approx 22.4$. Both terms of A must be included.',
       ],
-      keyIdea: 'A lower-order algorithm can be slower for small $n$ but always wins beyond a crossover point; find it by solving the inequality and checking whole numbers.',
+      keyIdea: 'To find where one formula beats another, try round values to trap the crossing between two numbers, then test whole numbers near it. Test both sides, because the answer must be a whole number.',
     },
     check: {
       optionValues: [21, 34, 35, 23],
@@ -574,25 +588,20 @@ export const questions: StaticQuestion[] = [
     options: ['64', '80', '256', '31'],
     correctIndex: 1,
     markScheme: {
+      asking: 'How many times does `ops` go up when `n` is 16?',
       solution:
-        'The outer `while` loop halves `i` (rounding down) until it reaches 0. The inner `for` loop always runs from 1 to `n`, which is 16 times.\n\n' +
-        '| `i` at start of pass | inner loop runs | `ops` after the pass |\n' +
-        '| --- | --- | --- |\n' +
-        '| 16 | 16 | 16 |\n' +
-        '| 8 | 16 | 32 |\n' +
-        '| 4 | 16 | 48 |\n' +
-        '| 2 | 16 | 64 |\n' +
-        '| 1 | 16 | 80 |\n\n' +
-        'After the pass with `i = 1`, `div(i,2)` makes `i` equal to 0, and `0 > 0` is false, so the loop stops.\n\n' +
-        'There are 5 outer passes ($\\lfloor \\log_2 16 \\rfloor + 1 = 5$), each doing 16 operations: $5 \\times 16 = 80$. In general this is about $n\\log_2 n$, so $O(n\\log n)$.\n\n' +
-        'It prints 80.',
+        '`div(i,2)` divides by 2 and drops any remainder, so `div(5,2)` is 2 and `div(1,2)` is 0.\n\n' +
+        'The inner loop `for j = 1 to n` uses `n`, not `i`. So it always makes 16 runs, whatever `i` is.\n\n' +
+        'The outer loop runs while `i > 0`, and line 8 halves `i` at the end of each pass:\n\n| Pass | `i` at the start | Runs of line 6 | `ops` after |\n|---|---|---|---|\n| 1 | 16 | 16 | 16 |\n| 2 | 8 | 16 | 32 |\n| 3 | 4 | 16 | 48 |\n| 4 | 2 | 16 | 64 |\n\n' +
+        'Now `i` is 1, and $1 > 0$ is true, so there is one more pass: `ops` becomes $64 + 16 = 80$. Then `i` becomes `div(1,2)`, which is 0, so the loop stops. The function returns 80, and line 13 prints it.',
+      conclusion: 'There are 5 outer passes of 16 runs each, and $5 \\times 16 = 80$, so the answer is 80.',
       whyWrong: [
         'This stops the outer loop when `i` reaches 1, as if the condition were `i > 1`. The condition is `i > 0`, so the pass with `i = 1` also runs, adding another 16.',
         null,
         'This is $16^2$: it assumes the outer loop also runs 16 times. The outer loop halves `i`, so it runs only 5 times.',
         'This is $16 + 8 + 4 + 2 + 1$, what you get if the inner loop ran from 1 to `i`. It runs from 1 to `n`, so it always runs 16 times.',
       ],
-      keyIdea: 'Halving outer loop ($\\log_2 n + 1$ passes) times a full inner loop ($n$) gives about $n\\log_2 n$ operations.',
+      keyIdea: 'For a halving loop around another loop, list the values of `i` to count the outer passes, then multiply by the inner runs. See whether the inner loop uses the fixed `n` or the shrinking `i`.',
     },
     check: {
       optionValues: [64, 80, 256, 31],
@@ -617,18 +626,20 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 0,
     markScheme: {
+      asking: 'How do the two methods\' step counts grow as the list gets longer?',
       solution:
-        'The worst case is when no pair adds up to the target, so neither method stops early.\n\n' +
-        '**Method 1:** the number of pairs checked is $(n - 1) + (n - 2) + \\dots + 2 + 1 = \\frac{n(n-1)}{2}$. That is about $\\frac{n^2}{2}$, so $O(n^2)$.\n\n' +
-        '**Method 2:** one pass over the $n$ items, with an $O(1)$ lookup and an $O(1)$ insert for each. So the total is $n \\times O(1) = O(n)$.\n\n' +
-        'So method 1 is $O(n^2)$ and method 2 is $O(n)$: a hash table trades a little extra memory for a big speed-up.',
+        '**Method 1** compares each item with every later item. For $n$ items that is $(n - 1) + (n - 2) + \\dots + 1$ pairs. With 5 items it is $4 + 3 + 2 + 1 = 10$ pairs.\n\n' +
+        'That sum is $\\frac{n(n - 1)}{2}$ (with 5 items, $\\frac{5 \\times 4}{2} = 10$), which is about $\\frac{n^2}{2}$ pairs. Big-O drops the fixed $\\frac{1}{2}$, leaving $O(n^2)$.\n\n' +
+        '**Method 2** goes through the items once. For each item $x$, it asks the hash table whether target $- x$ has already been seen, because that value would complete the pair.\n\n' +
+        'One hash table lookup is $O(1)$, a fixed amount of work. So $n$ items cost $n$ lots of fixed work, which is $O(n)$.',
+      conclusion: 'Checking every pair grows like $n^2$ and one pass with lookups grows like $n$, so the answer is Method 1: $O(n^2)$; method 2: $O(n)$.',
       whyWrong: [
         null,
         'This treats each lookup as a linear scan, which would be true for an array. A hash table lookup is $O(1)$ on average, so method 2 is $O(n)$.',
         'The number of pairs to check shrinks by one each time, but the total is still $\\frac{n(n-1)}{2}$, which is $O(n^2)$. Shrinking by one each time is not the same as halving.',
         'Each lookup is $O(1)$, but method 2 still loops over all $n$ items in the worst case, so the total is $O(n)$, not $O(1)$.',
       ],
-      keyIdea: 'Replacing an inner search loop with an $O(1)$ hash table lookup turns an $O(n^2)$ algorithm into an $O(n)$ one.',
+      keyIdea: 'Count how many times the main action runs, then multiply by the cost of one action. Every pair means about $\\frac{n^2}{2}$ actions. One pass means $n$ actions, each costing $O(1)$ with a hash table.',
     },
   },
   {
@@ -643,17 +654,19 @@ export const questions: StaticQuestion[] = [
     options: ['$O(1)$', '$O(n)$', '$O(\\log n)$', '$O(n^2)$'],
     correctIndex: 2,
     markScheme: {
+      asking: 'How does the number of loop passes grow with $n$?',
       solution:
-        '`i` takes the values $1, 2, 4, 8, \\dots$ and the loop stops once $i \\ge n$.\n\n' +
-        'After $k$ passes $i = 2^k$, so the loop ends when $2^k \\ge n$, which is after about $\\log_2 n$ passes.\n\n' +
-        'Each pass does constant work, so the complexity is $O(\\log n)$.',
+        'Line 4 doubles `i` on each pass, and the loop on line 3 stops once `i` reaches `n`. So count the doublings.\n\n' +
+        'Try some sizes:\n\n| $n$ | Values of `i` | Passes |\n|---|---|---|\n| 16 | 1, 2, 4, 8, 16 | 4 |\n| 32 | 1, 2, 4, 8, 16, 32 | 5 |\n| 64 | 1, 2, 4, 8, 16, 32, 64 | 6 |\n\n' +
+        'Doubling $n$ only adds 1 pass. The number of doublings from 1 to $n$ is called $\\log_2 n$, and this growth is written $O(\\log n)$.',
+      conclusion: 'The passes equal the number of doublings needed to reach $n$, so the answer is $O(\\log n)$.',
       whyWrong: [
         'The number of passes grows with $n$, although slowly, so the time is not constant.',
         'This assumes `i` goes up by 1 on each pass. Doubling reaches $n$ much faster.',
         null,
         'This would need a loop nested inside another loop, or a counter that takes $n^2$ steps. There is one doubling loop here.',
       ],
-      keyIdea: 'A loop that doubles its counter up to $n$ runs about $\\log_2 n$ times: $O(\\log n)$.',
+      keyIdea: 'Look at the line that changes the loop variable. Multiplying or dividing by a fixed number gives $O(\\log n)$. Adding or subtracting a fixed number gives $O(n)$.',
     },
   },
   {
@@ -679,16 +692,20 @@ export const questions: StaticQuestion[] = [
     options: ['26', '120', '15', '20'],
     correctIndex: 0,
     markScheme: {
+      asking: 'How many times does `count` go up across all three loops?',
       solution:
-        'The first two loops are nested, so they multiply: $4 \\times 5 = 20$.\n\n' +
-        'The third loop comes **after** them, so it adds: $20 + 6 = 26$.',
+        'Line 4 sits inside two loops. The `j` loop is inside the `i` loop, so it runs all the way through on each pass.\n\n' +
+        '`for i = 1 to 4` makes 4 passes, and `for j = 1 to 5` makes 5 runs on each one. So line 4 runs $4 \\times 5 = 20$ times.\n\n' +
+        'The `k` loop on line 7 starts after the others have ended, so it is not inside them. Line 8 runs 6 times.\n\n' +
+        'Loops one after the other add: $20 + 6 = 26$.',
+      conclusion: 'The nested part gives 20 and the separate loop gives 6, so the answer is 26.',
       whyWrong: [
         null,
         'This multiplies all three loops, $4 \\times 5 \\times 6$. The third loop is not inside the others.',
         'This adds all three loops, $4 + 5 + 6$. The first two are nested, so they multiply.',
         'This counts only the nested loops and misses the 6 passes of the third loop.',
       ],
-      keyIdea: 'Multiply the counts of nested loops; add the counts of loops that follow one another.',
+      keyIdea: 'Use the indentation. A loop inside another multiplies, and a loop after another adds. Work out each separate block first, then add the blocks together.',
     },
     check: {
       optionValues: [26, 120, 15, 20],
@@ -713,21 +730,18 @@ export const questions: StaticQuestion[] = [
     ],
     correctIndex: 0,
     markScheme: {
+      asking: 'Put these four growth rates in order, slowest-growing first.',
       solution:
-        'Compare at $n = 1024$, where $\\log_2 n = 10$:\n\n' +
-        '| Function | Value |\n| --- | --- |\n' +
-        '| $\\log_2 n$ | 10 |\n' +
-        '| $n$ | 1024 |\n' +
-        '| $n\\log_2 n$ | 10 240 |\n' +
-        '| $n^2$ | 1 048 576 |\n\n' +
-        'So the order is $\\log n$, $n$, $n\\log n$, $n^2$.',
+        'To compare growth rates, try one large value of $n$. Take $\\log n$ as $\\log_2 n$, which asks how many 2s multiply together to make $n$. Choose $n = 1024$, because $2^{10} = 1024$, so $\\log_2 1024 = 10$.\n\n' +
+        'Work out each one at $n = 1024$:\n\n| Growth rate | Working | Value |\n|---|---|---|\n| $\\log n$ | $\\log_2 1024$ | $10$ |\n| $n$ | | $1024$ |\n| $n\\log n$ | $1024 \\times 10$ | $10\\,240$ |\n| $n^2$ | $1024 \\times 1024$ | $1\\,048\\,576$ |',
+      conclusion: 'Reading the values from smallest to largest gives $\\log n,\\ n,\\ n\\log n,\\ n^2$.',
       whyWrong: [
         null,
         'This puts $n$ below $\\log n$. A logarithm grows far more slowly than $n$.',
         'This puts $n\\log n$ below $n$. Multiplying $n$ by $\\log n$ makes it bigger once $\\log n > 1$.',
         'This puts $n^2$ below $n\\log n$. Since $n$ is much bigger than $\\log n$, $n \\times n$ is bigger than $n \\times \\log n$.',
       ],
-      keyIdea: 'Growth ladder: $\\log n < n < n\\log n < n^2$.',
+      keyIdea: 'Test with $n = 1024$, where $\\log_2 n = 10$. To place $n\\log n$, compare it as a product: $n \\times \\log n$ beats $n$ but loses to $n \\times n$, since $\\log n$ is far smaller than $n$.',
     },
     check: {
       optionValues: ['a', 'b', 'c', 'd'],

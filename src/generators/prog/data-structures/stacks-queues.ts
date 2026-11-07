@@ -1,5 +1,6 @@
 import type { Generator, GeneratedCore } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { m, num } from '../../../lib/tex';
 
 type Cand = { v: number; why: string };
@@ -39,10 +40,13 @@ function opLines(ops: Op[], lifo: boolean, printLast: boolean): string[] {
   });
 }
 
-function simulate(ops: Op[], lifo: boolean, lines: string[] = opLines(ops, lifo, false)): { items: number[]; removed: number[]; rows: string[] } {
+/** The items as text, in the order they are written. */
+const listed = (xs: number[]) => (xs.length ? xs.join(', ') : '(empty)');
+
+function simulate(ops: Op[], lifo: boolean, lines: string[] = opLines(ops, lifo, false)): { items: number[]; removed: number[]; rows: string[][] } {
   const items: number[] = [];
   const removed: number[] = [];
-  const rows: string[] = [];
+  const rows: string[][] = [];
   ops.forEach((op, i) => {
     let out = '';
     if (op.kind === 'add') items.push(op.v);
@@ -51,7 +55,7 @@ function simulate(ops: Op[], lifo: boolean, lines: string[] = opLines(ops, lifo,
       removed.push(x);
       out = String(x);
     }
-    rows.push(`| \`${lines[i]}\` | ${items.length ? items.join(', ') : '(empty)'} | ${out} |`);
+    rows.push([`\`${lines[i]}\``, listed(items), out]);
   });
   return { items, removed, rows };
 }
@@ -138,27 +142,41 @@ function traceAttempt(rng: Rng): GeneratedCore | null {
   if (ds.length < 3) return null;
 
   const ans = String(answer);
-  const header = lifo ? '| Operation | Stack (bottom to top) | Returned |' : '| Operation | Queue (front to rear) | Removed |';
-  const solution =
-    (lifo
-      ? 'A stack is **last in, first out**: `push` adds on top, `pop` removes the top item.\n\n'
-      : 'A queue is **first in, first out**: `enqueue` adds at the rear, `dequeue` removes the front item.\n\n') +
-    `Trace the ${S} after every operation:\n\n` +
-    `${header}\n|---|---|---|\n${real.rows.join('\n')}\n\n` +
-    (ask === 'next'
-      ? `At the end the ${S} holds ${real.items.join(', ')} (${lifo ? 'bottom to top' : 'front to rear'}), so the ${end} value is ${ans}.\n\n`
-      : `The last removal returns ${ans}, and that is what is printed.\n\n`) +
-    `Answer: ${ans}`;
+  const lastLine = lines[lines.length - 1];
+  const lastOut = real.removed[real.removed.length - 1];
+  // The structure just before the final removal: the removed value goes back where it came from.
+  const before = lifo ? [...real.items, lastOut] : [lastOut, ...real.items];
+  const fromWhere = lifo ? 'off the top' : 'from the front';
+  const solution = steps(
+    lifo
+      ? 'A **stack** works like a pile of plates. `push(S, x)` puts `x` on top. `pop(S)` takes the top item off and gives it back.'
+      : 'A **queue** works like a line of people. `enqueue(Q, x)` adds `x` at the rear (the back). `dequeue(Q)` removes the item at the front and gives it back.',
+    lifo
+      ? 'So the newest item always leaves first. This rule is called last in, first out.'
+      : 'So the oldest item always leaves first. This rule is called first in, first out.',
+    `Line 1 starts with an empty ${S}. Follow each line after it, writing the whole ${S} every time. We write it ${
+      lifo ? 'from bottom to top, so the rightmost value is the top' : 'from front to rear, so the leftmost value is the front'
+    }:`,
+    table(['Line of code', lifo ? 'Stack (bottom to top)' : 'Queue (front to rear)', 'Removed'], real.rows.slice(0, -1)),
+    ask === 'next'
+      ? `The last line is \`${lastLine}\`. The ${S} holds ${listed(before)}, so ${lastOut} comes ${fromWhere}. That leaves ${listed(real.items)}, and the value at the ${end} is now ${ans}.`
+      : `The last line is \`${lastLine}\`. The ${S} holds ${listed(before)}, so ${lastOut} comes ${fromWhere}, and \`print\` shows it.`,
+  );
   return {
     stem: ask === 'next' ? question : `This code uses a **${S}**. ${question}`,
     code: { lang: 'pseudocode', source: [lifo ? 'S = []' : 'Q = []', ...lines].join('\n') },
     answer: ans,
     answerValue: answer,
     distractors: ds.map((d) => ({ text: String(d.v), value: d.v, why: d.why })),
+    asking: ask === 'next' ? `Once every line has run, which value is at the ${end} of the ${S}?` : `Which value does the last ${removeWord} take out?`,
     solution,
+    conclusion:
+      ask === 'next'
+        ? `After the last removal the ${S} holds ${listed(real.items)}, so the value at the ${end} is ${ans}.`
+        : `The final ${removeWord} takes ${ans} ${fromWhere}, and \`print\` shows it, so the answer is ${ans}.`,
     keyIdea: lifo
-      ? 'A stack is LIFO: every pop removes the most recently pushed item that is still there.'
-      : 'A queue is FIFO: every dequeue removes the item that has waited longest.',
+      ? 'For stack code, write the stack as a row after every line, with the bottom on the left. `push` adds on the right and `pop` removes from the right.'
+      : 'For queue code, write the queue as a row after every line, with the front on the left. `enqueue` adds on the right and `dequeue` removes from the left.',
   };
 }
 
@@ -168,26 +186,33 @@ const OPS = ['+', '-', '*'] as const;
 const opTex = (o: string) => (o === '*' ? '\\times' : o);
 const apply = (a: number, o: string, b: number) => (o === '+' ? a + b : o === '-' ? a - b : a * b);
 
-function evalStack(tokens: Tok[], swap: boolean): { value: number; rows: string[]; beforeLast: number; hasZero: boolean } {
+/** The sum an operator works out, as maths: the value popped second goes on the left. */
+const sumTex = (a: number, o: string, b: number, r: number) => m(`${num(a)} ${opTex(o)} ${b < 0 ? `(${num(b)})` : num(b)} = ${num(r)}`);
+
+function evalStack(tokens: Tok[], swap: boolean): { value: number; rows: string[][]; beforeLast: number; lastA: number; hasZero: boolean } {
   const s: number[] = [];
   let hasZero = false;
-  const rows: string[] = [];
+  const rows: string[][] = [];
   let beforeLast = NaN;
+  let lastA = NaN;
   tokens.forEach((t, i) => {
     if (typeof t === 'number') {
       s.push(t);
-      rows.push(`| \`${t}\` | push | ${s.join(', ')} |`);
+      rows.push([`\`${t}\``, 'push', s.join(', ')]);
     } else {
       const b = s.pop() as number;
       const a = s.pop() as number;
-      if (i === tokens.length - 1) beforeLast = b;
+      if (i === tokens.length - 1) {
+        beforeLast = b;
+        lastA = a;
+      }
       const r = swap ? apply(b, t, a) : apply(a, t, b);
       if (r === 0) hasZero = true;
       s.push(r);
-      rows.push(`| \`${t}\` | pop ${b} then ${a}, push ${m(`${num(a)} ${opTex(t)} ${b < 0 ? `(${num(b)})` : num(b)} = ${num(r)}`)} | ${s.join(', ')} |`);
+      rows.push([`\`${t}\``, `pop ${b} then ${a}, push ${sumTex(a, t, b, r)}`, s.join(', ')]);
     }
   });
-  return { value: s[0], rows, beforeLast, hasZero };
+  return { value: s[0], rows, beforeLast, lastA, hasZero };
 }
 
 function evalLeftToRight(tokens: Tok[]): number {
@@ -264,19 +289,25 @@ function postfixAttempt(rng: Rng): GeneratedCore | null {
   if (ds.length < 3) return null;
   const expr = tokens.map(String).join(' ');
   const ans = m(num(answer));
-  const solution =
-    'A **number** is pushed. An **operator** pops the top value $b$, then the next value $a$, and pushes $a \\text{ op } b$.\n\n' +
-    '| Token | Action | Stack (bottom to top) |\n|---|---|---|\n' +
-    real.rows.join('\n') +
-    `\n\nCheck in ordinary notation: ${m(`${infix} = ${num(answer)}`)}.\n\n` +
-    `Answer: ${ans}`;
+  const lastOp = tokens[tokens.length - 1] as string;
+  const solution = steps(
+    '**Postfix** (also called Reverse Polish) writes each operator after the two values it uses. So `3 4 +` means $3 + 4$.',
+    'A stack is a pile where you can only add to the top (**push**) or remove from the top (**pop**). Read the tokens (the numbers and operators) from left to right, and push each number onto the top.',
+    'Each operator pops the top value, called $b$, then pops the next value, called $a$. It works out $a$ op $b$, where op is that operator, and pushes the result.',
+    'The value popped second goes on the left. This matters for subtraction, because $a - b$ is not the same as $b - a$.',
+    'Here is every token before the last one, with the stack written bottom to top, so the rightmost value is the top:',
+    table(['Token', 'Action', 'Stack'], real.rows.slice(0, -1)),
+    `The last token is \`${lastOp}\`. Pop ${real.beforeLast}, then pop ${real.lastA}. The one popped second goes on the left, so ${sumTex(real.lastA, lastOp, real.beforeLast, answer)}. That is the only value left on the stack.`,
+  );
   return {
     stem: `Evaluate the postfix (Reverse Polish) expression below using a stack. (\`*\` means multiply.)\n\n\`${expr}\``,
     answer: ans,
     answerValue: answer,
     distractors: ds.map((d) => ({ text: m(num(d.v)), value: d.v, why: d.why })),
+    asking: 'What single number does this postfix expression work out to?',
     solution,
-    keyIdea: 'In postfix evaluation, each operator pops b then a and pushes a op b, so operand order matters for subtraction.',
+    conclusion: `In ordinary maths this is ${m(`${infix} = ${num(answer)}`)}, so the answer is ${ans}.`,
+    keyIdea: 'For postfix, keep a stack table. Push each number. Each operator pops $b$, then $a$, and pushes $a$ op $b$. The one value left at the end is the answer.',
   };
 }
 
@@ -296,8 +327,13 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
     `After ${d} dequeue${d === 1 ? '' : 's'} and ${e} enqueue${e === 1 ? '' : 's'},`;
   let answer: number;
   let pool: Cand[];
-  let steps: string;
+  let working: string[];
+  let asking: string;
+  let conclusion: string;
   let stem: string;
+  const plural = (x: number, word: string) => `${x} ${word}${x === 1 ? '' : 's'}`;
+  /** Index by index, moving forward and wrapping after the last slot. */
+  const walk = (from: number, moves: number) => m(Array.from({ length: moves + 1 }, (_, i) => mod(from + i)).join(' \\to '));
   if (ask === 'rear') {
     const raw = f + k + e - 1;
     answer = mod(raw);
@@ -308,10 +344,15 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
       { v: mod(f + k - d + e - 1), why: 'This lets the dequeues pull the rear back. Dequeuing only moves the front; new items still go after the old rear.' },
       { v: k - d + e - 1, why: 'This assumes the items shift down to start at index 0 after dequeuing. In a circular queue items never move; only the indices change.' },
     ];
-    steps =
-      `Dequeuing only moves the **front**; it does not change where new items go. Before the dequeues the rear item is at ${m(`(${f} + ${k} - 1) \\bmod ${N} = ${mod(f + k - 1)}`)}.\n\n` +
-      `Each enqueue puts the new item one slot after the current rear, so after ${e} enqueue${e === 1 ? '' : 's'} the last one is at` +
-      `\n\n$$(${f} + ${k} + ${e} - 1) \\bmod ${N} = ${raw} \\bmod ${N} = ${answer}$$\n\n`;
+    const rearNow = mod(f + k - 1);
+    const rawNow = f + k - 1;
+    asking = 'In which slot does the last new item land?';
+    working = [
+      `Items never move in a circular queue. A dequeue only moves the front marker forward, so the ${d === 1 ? 'dequeue does' : `${d} dequeues do`} not change where new items go.`,
+      `Find the current last item. The ${k} items fill neighbouring slots starting at index ${f}. The front item is the first of them, so the last is ${plural(k - 1, 'slot')} further on: ${m(`(${f} + ${k} - 1) \\bmod ${N} = ${rawNow === rearNow ? '' : `${rawNow} \\bmod ${N} = `}${rearNow}`)}.`,
+      `Each enqueue uses the next slot along, wrapping after slot ${N - 1}. Count on ${plural(e, 'slot')} from index ${rearNow}: ${walk(rearNow, e)}.`,
+    ];
+    conclusion = `As one sum this is ${m(`(${f} + ${k} + ${e} - 1) \\bmod ${N} = ${raw} \\bmod ${N} = ${answer}`)}, so the last item enqueued is at index ${m(num(answer))}.`;
   } else {
     const raw = f + d;
     answer = mod(raw);
@@ -323,11 +364,13 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
       { v: mod(f - d), why: 'This moves the front the wrong way. Each dequeue moves the front forwards (towards higher indices, wrapping round).' },
       { v: mod(f + d + e), why: 'This lets the enqueues move the front too. Enqueuing only moves the rear.' },
     ];
-    steps =
-      `Each dequeue removes the front item and moves the front one slot forward (wrapping round). Enqueues only affect the rear, so they do not change the front.\n\n` +
-      (raw >= N
-        ? `$$\\text{front} = (${f} + ${d}) \\bmod ${N} = ${raw} \\bmod ${N} = ${answer}$$\n\n`
-        : `$$\\text{front} = (${f} + ${d}) \\bmod ${N} = ${answer}$$\n\n(No wrap-around is needed here, because ${raw} is still a valid index.)\n\n`);
+    asking = 'Which slot holds the front item once the dequeues and enqueues are done?';
+    working = [
+      `Items never move in a circular queue. Each dequeue removes the front item and moves the front marker one slot forward.`,
+      `An enqueue only adds at the rear, so the ${e === 1 ? 'enqueue does' : `${e} enqueues do`} not change the front.`,
+      `The front starts at index ${f}. Move it forward ${plural(d, 'slot')}, wrapping after slot ${N - 1}: ${walk(f, d)}.`,
+    ];
+    conclusion = `As one sum this is ${m(`(${f} + ${d}) \\bmod ${N} = ${raw >= N ? `${raw} \\bmod ${N} = ` : ''}${answer}`)}, so the front item is at index ${m(num(answer))}.`;
   }
   if (ask === 'rear' && f + k + e - 1 < N) return null; // make sure wrap-around is involved
   if (ask === 'front' && f + d < N && rng.bool(0.7)) return null; // mostly wrap-around cases
@@ -339,8 +382,15 @@ function circularAttempt(rng: Rng): GeneratedCore | null {
     answer: ans,
     answerValue: answer,
     distractors: ds.map((x) => ({ text: m(num(x.v)), value: x.v, why: x.why })),
-    solution: `${steps}Answer: ${ans}`,
-    keyIdea: 'In a circular queue the front and rear indices move forward and wrap with mod capacity; the items themselves never move.',
+    asking,
+    solution: steps(
+      `A **circular queue** keeps its items in a fixed row of ${N} slots, numbered 0 to ${N - 1}. After slot ${N - 1} the next slot is 0, as if the row were bent into a ring. An **enqueue** adds an item at the rear (the back), and a **dequeue** removes the item at the front.`,
+      `That wrap-around uses mod, which means the remainder after dividing. For example, ${m(`${N + 2} \\bmod ${N} = 2`)}, because ${N + 2} divided by ${N} leaves 2 over.`,
+      ...working,
+    ),
+    conclusion,
+    keyIdea:
+      'Track two markers. A dequeue moves the front on by 1 and an enqueue moves the rear on by 1, both wrapping with mod capacity. The last item is at $(\\text{front} + \\text{count} - 1) \\bmod \\text{capacity}$.',
   };
 }
 

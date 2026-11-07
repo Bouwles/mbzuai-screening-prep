@@ -1,7 +1,8 @@
 import type { Generator } from '../../../types';
 import type { Rng } from '../../../lib/rng';
+import { steps, table } from '../../../lib/explanation';
 import { Frac } from '../../../lib/frac';
-import { m, matrix, num, paren } from '../../../lib/tex';
+import { m, matrix, num, paren, signed } from '../../../lib/tex';
 import { det3 } from '../../../lib/mathx';
 
 type FM = Frac[][];
@@ -54,26 +55,25 @@ function inverse2(rng: Rng) {
     // Shuffle so that every kind of mistake (not just the first three) appears across variants.
     const ds = pickDistinct(ans, rng.shuffle(pool));
     if (ds.length < 3) continue;
-    const scaleStep =
-      D === 1
-        ? `Divide by the determinant $1$, which changes nothing.`
-        : D === -1
-          ? `Divide by the determinant $-1$, which changes the sign of every entry:`
-          : `Divide every entry by the determinant $${D}$:`;
-    const factor = D === 1 ? '' : D === -1 ? '-' : `\\frac{1}{${D}}`.replace('\\frac{1}{-', '-\\frac{1}{');
+    const swapSentence = `Swap $${a}$ and $${d}$. Change the signs of $${b}$ and $${c}$, leaving them where they are.`;
+    const factor = `\\frac{1}{${D}}`.replace('\\frac{1}{-', '-\\frac{1}{');
     return {
       stem: `Find the inverse of $A = ${matrix(A)}$.`,
       answer: ans.text,
       answerValue: ans.key,
       distractors: ds.map((x) => ({ text: x.text, value: x.key, why: x.why })),
-      solution:
-        `For $A = ${matrix([['a', 'b'], ['c', 'd']])}$, $A^{-1} = \\frac{1}{ad - bc}${matrix([['d', '-b'], ['-c', 'a']])}$.\n\n` +
-        `1. Determinant: $${num(a)} \\times ${paren(d)} - ${paren(b)} \\times ${paren(c)} = ${num(a * d)} - ${paren(b * c)} = ${D}$. It is not $0$, so $A^{-1}$ exists.\n` +
-        `2. Swap $${a}$ and $${d}$, and change the signs of $${b}$ and $${c}$: $${matrix(adj)}$.\n` +
-        `3. ${scaleStep}\n\n` +
-        (D === 1 ? `$$A^{-1} = ${matrix(inv)}$$\n\n` : `$$A^{-1} = ${factor}${matrix(adj)} = ${matrix(inv)}$$\n\n`) +
-        `Answer: ${ans.text}`,
-      keyIdea: 'Inverse of a 2 by 2 matrix: swap a and d, change the signs of b and c, then divide every entry by ad minus bc.',
+      asking: 'Which matrix undoes $A$, so that multiplying the two together gives the identity matrix?',
+      solution: steps(
+        `The **inverse** $A^{-1}$ is the matrix that multiplies with $A$ to give the identity matrix $I$ (1s on the main diagonal, 0s elsewhere). For a $2 \\times 2$ matrix the formula is:\n\n$$${matrix([['a', 'b'], ['c', 'd']])}^{-1} = \\frac{1}{ad - bc}${matrix([['d', '-b'], ['-c', 'a']])}$$`,
+        `First find $ad - bc$, called the **determinant**. Here $a = ${a}$, $b = ${b}$, $c = ${c}$ and $d = ${d}$. So it is $${num(a)} \\times ${paren(d)} - ${paren(b)} \\times ${paren(c)} = ${num(a * d)} - ${paren(b * c)} = ${D}$.`,
+        // Dividing by 1 changes nothing, so swapping already gives the inverse and both go in the last step.
+        D === 1 && `${swapSentence} Dividing by the determinant, 1, changes nothing. So $A^{-1} = ${matrix(inv)}$.`,
+        D !== 1 && `${swapSentence} That gives $${matrix(adj)}$.`,
+        D === -1 && `Divide every entry by the determinant, $-1$. That flips every sign, so $A^{-1} = ${matrix(inv)}$.`,
+        D !== 1 && D !== -1 && `Divide every entry by the determinant, $${D}$:\n\n$$A^{-1} = ${factor}${matrix(adj)} = ${matrix(inv)}$$`,
+      ),
+      conclusion: `Multiplying this by $A$ gives $I$, so $A^{-1}$ is ${ans.text}.`,
+      keyIdea: 'For a $2 \\times 2$ inverse: find $ad - bc$, swap $a$ and $d$, change the signs of $b$ and $c$, then divide every entry by $ad - bc$. If $ad - bc$ is 0, there is no inverse.',
     };
   }
 }
@@ -111,24 +111,28 @@ function determinant3(rng: Rng) {
     ];
     const ds = pickDistinct(ans, pool);
     if (ds.length < 3) continue;
-    const minor = (p: number, q: number, r: number, s: number, v: number) =>
-      `${paren(p)} \\times ${paren(q)} - ${paren(r)} \\times ${paren(s)} = ${num(v)}`;
+    // One table row: the entry, the four numbers left after covering its row and column, and their determinant.
+    const row = (entry: number, p: number, q: number, r: number, s: number, v: number) => [
+      m(num(entry)),
+      m(`\\begin{vmatrix} ${p} & ${q} \\\\ ${r} & ${s} \\end{vmatrix}`),
+      m(`${paren(p)} \\times ${paren(s)} - ${paren(q)} \\times ${paren(r)} = ${num(v)}`),
+    ];
+    const terms = `${num(t1)}${signed(-t2)}${signed(t3)}`;
     return {
       stem: `Find $\\det(A)$ for $A = ${matrix(A)}$.`,
       answer: ans.text,
       answerValue: D,
       distractors: ds.map((x) => ({ text: x.text, value: x.v, why: x.why })),
-      solution:
-        `Expand along the first row with the sign pattern $+\\;-\\;+$:\n\n` +
-        `$$\\det(A) = ${num(a)}\\begin{vmatrix} ${f} & ${g} \\\\ ${i} & ${j} \\end{vmatrix} - ${paren(b)}\\begin{vmatrix} ${d} & ${g} \\\\ ${hh} & ${j} \\end{vmatrix} + ${paren(c)}\\begin{vmatrix} ${d} & ${f} \\\\ ${hh} & ${i} \\end{vmatrix}$$\n\n` +
-        `Work out each $2 \\times 2$ minor (cover the row and column of the entry, then $ad - bc$):\n\n` +
-        `- $${minor(f, j, g, i, m1)}$\n` +
-        `- $${minor(d, j, g, hh, m2)}$\n` +
-        `- $${minor(d, i, f, hh, m3)}$\n\n` +
-        `Combine:\n\n` +
-        `$$\\det(A) = ${num(a)} \\times ${paren(m1)} - ${paren(b)} \\times ${paren(m2)} + ${paren(c)} \\times ${paren(m3)} = ${num(t1)} - ${paren(t2)} + ${paren(t3)} = ${num(D)}$$\n\n` +
-        `Answer: ${ans.text}`,
-      keyIdea: 'A 3 by 3 determinant is found by expanding along a row with signs plus, minus, plus, each entry times its 2 by 2 minor.',
+      asking: 'What is the determinant of this $3 \\times 3$ matrix?',
+      solution: steps(
+        'The **determinant** is a single number worked out from a square matrix. For a $3 \\times 3$ matrix, use the first row: each entry multiplies a small $2 \\times 2$ determinant, and the signs go $+\\;-\\;+$.',
+        "To find the small determinant for an entry, cover that entry's row and column. Four numbers are left, and $\\begin{vmatrix} p & q \\\\ r & s \\end{vmatrix} = ps - qr$.",
+        `The first row is $${a}, ${b}, ${c}$. Here is the small determinant for each entry:\n\n${table(['Entry', 'Numbers left', 'Small determinant'], [row(a, f, g, i, j, m1), row(b, d, g, hh, j, m2), row(c, d, f, hh, i, m3)])}`,
+        `Combine them with the signs $+\\;-\\;+$: $${num(a)} \\times ${paren(m1)} - ${paren(b)} \\times ${paren(m2)} + ${paren(c)} \\times ${paren(m3)}$.`,
+        `Multiply each term, then add, keeping the signs: $${terms} = ${num(D)}$.`,
+      ),
+      conclusion: `The three terms combine as $${terms}$, so the determinant is ${ans.text}.`,
+      keyIdea: "For a $3 \\times 3$ determinant: go along the first row, cover each entry's row and column, find the $2 \\times 2$ determinant left, and combine as first $-$ second $+$ third.",
     };
   }
 }
