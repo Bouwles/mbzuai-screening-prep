@@ -182,7 +182,7 @@ export function Home() {
           <li>
             <Link to="/mock?start=full">
               <strong>Full-length mock</strong>
-              <span>60 minutes, the real exam length (question count estimated)</span>
+              <span>50 questions in 60 minutes, the real exam length</span>
             </Link>
           </li>
           <li>

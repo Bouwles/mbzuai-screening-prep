@@ -144,7 +144,7 @@ export const lesson: Lesson = {
     'Thinking that deleting a sensitive column, or removing names, solves bias or privacy. Proxy features and quasi-identifiers can bring the problem straight back.',
   ],
   examTip:
-    'These questions are mostly **quick concept questions**, so aim to answer them in well under the 67 seconds and bank time for harder maths.\n\n' +
+    'These questions are mostly **quick concept questions**, so aim to answer them in well under the 72 seconds and bank time for harder maths.\n\n' +
     '- For "which type of learning / task" questions, run the three-question check: rewards? labels? number or category? Underline the words that give it away: "labelled", "marked by", "known prices" (supervised); "no groups given in advance" (clustering); "reward", "points", "trial and error" (reinforcement).\n' +
     '- Remember that **regression and classification are both supervised**. If one option says "Both A and B" and A and B are a regression and a classification example with labels, it is very likely correct.\n' +
     '- In fairness tables, the distractors are usually the **count difference**, the rate using the **combined total**, the **ratio** of rates, and the **overall** rate when the question asks about qualified people only. Compute each group\'s own rate on your calculator and subtract.\n' +

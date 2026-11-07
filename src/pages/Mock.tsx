@@ -130,8 +130,8 @@ export function MockHome() {
         <h1>Mock exams</h1>
         <p className="lede">Timed, exam-style papers drawn from all four areas. No feedback until you submit.</p>
         <p className="muted small-print">
-          The real BSc exam lasts 60 minutes. MBZUAI does not publish the number of questions, the topic weights or the difficulty mix, so
-          the question counts here, the topic mix (about {Math.round(EXAM.areaWeights.math * 100)}% Math, {Math.round(EXAM.areaWeights.data * 100)}% Data & AI,{' '}
+          The full-length mock is 50 questions in 60 minutes, the length of the real BSc exam. MBZUAI does not publish the topic weights or the difficulty mix, so
+          the topic mix here (about {Math.round(EXAM.areaWeights.math * 100)}% Math, {Math.round(EXAM.areaWeights.data * 100)}% Data & AI,{' '}
           {Math.round(EXAM.areaWeights.prog * 100)}% Programming, {Math.round(EXAM.areaWeights.ctl * 100)}% CT & Logic) and the Foundation/Exam split are
           estimates. {EXAM.targetPercent}% is the score that
           waives the application fee, not an official pass mark.

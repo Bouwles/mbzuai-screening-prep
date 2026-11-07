@@ -16,6 +16,14 @@ describe('config', () => {
   });
 });
 
+describe('full-length mock', () => {
+  it('is 50 questions in 60 minutes', () => {
+    const full = EXAM.mockFormats.find((f) => f.id === 'full')!;
+    expect([full.questions, full.minutes]).toEqual([50, 60]);
+    expect(EXAM.secondsPerQuestion).toBe(72);
+  });
+});
+
 describe('apportion', () => {
   it('splits a total exactly', () => {
     const r = apportion(13, { a: 0.45, b: 0.25, c: 0.15, d: 0.15 });
@@ -129,6 +137,6 @@ describe('learning flow', () => {
   });
 
   it('mock exams contain only Foundation and Exam questions', () => {
-    for (let seed = 1; seed <= 10; seed++) expect(buildMock(53, seed).map((r) => serve(r)!).filter((q) => !['foundation', 'exam'].includes(q.difficulty))).toEqual([]);
+    for (let seed = 1; seed <= 10; seed++) expect(buildMock(50, seed).map((r) => serve(r)!).filter((q) => !['foundation', 'exam'].includes(q.difficulty))).toEqual([]);
   });
 });

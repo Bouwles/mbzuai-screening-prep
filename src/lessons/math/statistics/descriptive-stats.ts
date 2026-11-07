@@ -117,7 +117,7 @@ export const lesson: Lesson = {
     'Thinking a longer section of a box plot contains more data. Each section holds about a quarter of the data; length shows spread, not quantity.',
   ],
   examTip:
-    'These questions are quick marks if you work with **totals**. When a mean changes because a value is added, removed or missing, write total $=$ mean $\\times$ count for each stage and subtract. With about a minute per question, use these checks to cut options:\n\n' +
+    'These questions are quick marks if you work with **totals**. When a mean changes because a value is added, removed or missing, write total $=$ mean $\\times$ count for each stage and subtract. With about 72 seconds per question, use these checks to cut options:\n\n' +
     '- **Direction check**: adding a value above the mean must raise it; removing one above the mean must lower it. Any option moving the wrong way is out.\n' +
     '- **Plug back in**: for a missing value, put each option back and see which gives the stated mean. Your calculator does this in seconds.\n' +
     '- **Spot the trap options**: the distractors are usually the median instead of the mean, the range instead of the IQR, the median position instead of its value, or a total divided by the wrong count. If your answer matches one of these "nearly right" numbers, re-read what is asked.\n' +

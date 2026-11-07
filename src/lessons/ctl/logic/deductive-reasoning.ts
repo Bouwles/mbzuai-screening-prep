@@ -174,5 +174,5 @@ For "who owns what" puzzles, make a small table of what each person **could** ha
 3. For "which must be true", try to build a counterexample to each option (a picture or story where all premises hold but the option fails). Any option you can break is out.
 4. Watch the words "must", "could" and "cannot": "must be true" means true in **every** case, not just possible.
 
-Do not spend long on one puzzle: about a minute per question. In a "which must be true" or "which is equivalent" question, if two options say the same thing in different words (for example the converse and the inverse), both must be wrong, because only one option can be correct. (This does not apply when the question asks you to *name* the converse or the inverse.)`,
+Do not spend long on one puzzle: about 72 seconds per question. In a "which must be true" or "which is equivalent" question, if two options say the same thing in different words (for example the converse and the inverse), both must be wrong, because only one option can be correct. (This does not apply when the question asks you to *name* the converse or the inverse.)`,
 };

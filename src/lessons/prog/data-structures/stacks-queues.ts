@@ -124,7 +124,7 @@ export const lesson: Lesson = {
     'Changing linked-list pointers in the wrong order. When inserting after `P`, set `N.next = P.next` **before** `P.next = N`, or the rest of the list is lost.',
   ],
   examTip:
-    'These questions are about careful tracing, so spend your 67 seconds on a quick table rather than in your head: one line per operation, writing the whole stack or queue each time. Then eliminate:\n\n' +
+    'These questions are about careful tracing, so spend your 72 seconds on a quick table rather than in your head: one line per operation, writing the whole stack or queue each time. Then eliminate:\n\n' +
     '- Options that are the "other" structure\'s answer (the FIFO answer to a stack question, or vice versa) are the most common distractor; check which end you are removing from.\n' +
     '- Options that are a value already removed earlier cannot be on top/at the front.\n' +
     '- For postfix, check your answer by rewriting it in ordinary notation with brackets, and watch the order of subtraction.\n' +

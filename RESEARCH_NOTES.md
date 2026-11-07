@@ -142,6 +142,8 @@ Overall: there is no reliable public evidence on difficulty or question count. T
 
 **Applied 2026-11-02:** the full mock is now 60 min (53 questions, an estimate at ~67 s each); 40 Q / 45 min is kept only as a labelled "graduate-format drill". Area weights changed to Math 40 / Data & AI 25 / Programming 20 / CT & Logic 15 (estimate). Mocks use Foundation 30% / Exam 70% and no Challenge questions (estimate; Challenge is optional enrichment). 75% is labelled everywhere as the fee-waiver score, not a pass mark. The question bank's difficulty labels were re-checked against the 4 official UG samples: Exam = sample-like 2–4 step questions, Foundation = one idea, Challenge = clearly harder than the samples.
 
+**Applied 2026-11-07:** the full mock is 50 questions in 60 min (72 s each). The 15 and 30 minute mocks follow the same pace (13 and 25 questions).
+
 ---
 
 ## UI research: how popular revision tools look (Oct 2026)
