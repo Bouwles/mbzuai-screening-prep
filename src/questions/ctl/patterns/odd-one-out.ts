@@ -630,25 +630,25 @@ export const questions: StaticQuestion[] = [
     subtopic: 'odd-one-out',
     difficulty: 'foundation',
     stem: 'Which number is the odd one out?',
-    options: ['$2$', '$3$', '$5$', '$9$'],
+    options: ['$7$', '$3$', '$5$', '$9$'],
     correctIndex: 3,
     markScheme: {
       asking: 'Which number does not share a property with the other three?',
       solution:
         'All four are small whole numbers, so test whether each one is **prime**. A prime has exactly two factors, 1 and itself. A factor is a whole number that divides it exactly.\n\n' +
-        'Write the ways to make each number by multiplying. 9 has an extra way, $3 \\times 3$, so it is not prime:\n\n| Number | Ways to multiply | Prime? |\n|---|---|---|\n| 2 | $1 \\times 2$ | Yes |\n| 3 | $1 \\times 3$ | Yes |\n| 5 | $1 \\times 5$ | Yes |\n| 9 | $1 \\times 9$ and $3 \\times 3$ | No |',
+        'Write the ways to make each number by multiplying. 9 has an extra way, $3 \\times 3$, so it is not prime:\n\n| Number | Ways to multiply | Prime? |\n|---|---|---|\n| 3 | $1 \\times 3$ | Yes |\n| 5 | $1 \\times 5$ | Yes |\n| 7 | $1 \\times 7$ | Yes |\n| 9 | $1 \\times 9$ and $3 \\times 3$ | No |',
       conclusion: 'Three of the numbers are prime, and the one that is not is $9$.',
       whyWrong: [
-        '$2$ is the only even number, but being even is a one-off fact here. It is prime, like $3$ and $5$.',
-        '$3$ is prime, like $2$ and $5$. It is a factor of $9$, but that does not separate it from the rest.',
-        '$5$ is prime, like $2$ and $3$.',
+        '$7$ is prime, like $3$ and $5$, so it fits with them.',
+        '$3$ is prime, like $5$ and $7$. It is a factor of $9$, but that does not separate it from the rest.',
+        '$5$ is prime, like $3$ and $7$, so it fits with them.',
         null,
       ],
       keyIdea: 'With small numbers, test prime first: a prime has exactly two factors. Also try even or odd, square, and multiple of 3. Look for a property shared by three of the items and missing from the fourth.',
     },
     check: {
-      optionValues: [2, 3, 5, 9],
-      compute: () => oddByKey([2, 3, 5, 9], (n) => String(isPrime(n))),
+      optionValues: [7, 3, 5, 9],
+      compute: () => oddByKey([7, 3, 5, 9], (n) => String(isPrime(n))),
     },
   },
   {
