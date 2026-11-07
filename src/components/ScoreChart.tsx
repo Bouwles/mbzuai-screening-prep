@@ -6,13 +6,21 @@ export function ScoreChart({ mocks, compact = false }: { mocks: MockRecord[]; co
   const done = mocks.filter((m) => m.submittedAt !== undefined && m.score !== undefined);
   const W = 640;
   const H = compact ? 170 : 260;
-  const M = { l: 44, r: 16, t: 16, b: 30 };
+  // The top margin leaves room for the label above a score of 100%.
+  const M = { l: 44, r: 16, t: 26, b: 30 };
   const PW = W - M.l - M.r;
   const PH = H - M.t - M.b;
   const y = (p: number) => M.t + PH - (p / 100) * PH;
   const n = done.length;
   const x = (i: number) => M.l + (n <= 1 ? PW / 2 : (i / (n - 1)) * PW);
   const target = EXAM.targetPercent;
+  // The first and last labels stay inside the plot, clear of the axis labels on the left.
+  const labelAt = (i: number) =>
+    n > 1 && i === 0
+      ? { x: x(i) - 5, textAnchor: 'start' as const }
+      : n > 1 && i === n - 1
+        ? { x: x(i) + 5, textAnchor: 'end' as const }
+        : { x: x(i), textAnchor: 'middle' as const };
   if (!n)
     return (
       <div className="chart-empty">
@@ -30,9 +38,6 @@ export function ScoreChart({ mocks, compact = false }: { mocks: MockRecord[]; co
         </g>
       ))}
       <line x1={M.l} x2={W - M.r} y1={y(target)} y2={y(target)} className="target-line" />
-      <text x={W - M.r} y={y(target) - 6} className="target-label" textAnchor="end">
-        {target}% fee waiver
-      </text>
       {n > 1 && <polyline points={done.map((m, i) => `${x(i)},${y(m.score!)}`).join(' ')} className="score-line" fill="none" />}
       {done.map((m, i) => (
         <g key={m.id}>
@@ -42,7 +47,7 @@ export function ScoreChart({ mocks, compact = false }: { mocks: MockRecord[]; co
             </title>
           </circle>
           {(!compact || i === n - 1) && (
-            <text x={x(i)} y={y(m.score!) - 11} className="tick pt-label" textAnchor="middle">
+            <text {...labelAt(i)} y={y(m.score!) - 11} className="tick pt-label">
               {m.score}%
             </text>
           )}
@@ -50,6 +55,11 @@ export function ScoreChart({ mocks, compact = false }: { mocks: MockRecord[]; co
       ))}
       <text x={M.l} y={H - 8} className="tick">
         {new Date(done[0].startedAt).toLocaleDateString()}
+      </text>
+      {/* The key sits below the plot, where no score label can run into it. */}
+      <line x1={M.l + PW / 2 - 60} x2={M.l + PW / 2 - 34} y1={H - 12} y2={H - 12} className="target-line" />
+      <text x={M.l + PW / 2 - 28} y={H - 8} className="target-label">
+        {target}% fee waiver
       </text>
       {n > 1 && (
         <text x={W - M.r} y={H - 8} className="tick" textAnchor="end">

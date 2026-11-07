@@ -712,6 +712,11 @@ input[type='checkbox'] {
 .score-chart .pt-label {
   fill: var(--text);
   font-weight: 650;
+  /* A halo keeps the number readable where the target line or a grid line runs behind it. */
+  paint-order: stroke;
+  stroke: var(--surface);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }
 .chart-empty {
   border: 1.5px dashed var(--line-strong);
