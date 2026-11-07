@@ -826,85 +826,12 @@ input[type='checkbox'] {
   color: var(--bad);
 }
 
-.markscheme {
-  margin-top: 32px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 24px 28px;
-  box-shadow: var(--shadow);
-}
-.markscheme h3 {
-  font-size: 1.25rem;
-}
-.markscheme h4 {
-  margin-top: 24px;
-  font-size: 1rem;
-}
 .ms-label {
   display: block;
   font-size: 0.82rem;
   font-weight: 650;
   color: var(--muted);
   margin-bottom: 2px;
-}
-.ms-answer {
-  background: var(--ok-soft);
-  border-radius: 10px;
-  padding: 12px 16px;
-}
-.ms-answer .ms-label {
-  color: var(--ok);
-}
-.ms-answer-text {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  font-size: 1.05rem;
-}
-.ms-answer-text strong {
-  color: var(--ok);
-}
-.ms-solution {
-  font-size: 1.02rem;
-  line-height: 1.7;
-}
-.why-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.why-list li {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 12px 16px;
-}
-.why-list li.chosen {
-  border-color: var(--bad);
-  background: var(--bad-soft);
-}
-.why-head {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 4px;
-}
-.key-idea {
-  margin-top: 24px;
-  background: var(--accent-soft);
-  border-radius: 10px;
-  padding: 12px 16px;
-}
-.key-idea .ms-label {
-  color: var(--accent);
-}
-.ms-lesson {
-  margin: 20px 0 0;
-  font-weight: 600;
 }
 
 /* session summary */
@@ -1963,18 +1890,6 @@ input[type='checkbox'] {
   font-weight: 650;
   color: var(--accent);
 }
-.ms-mistake {
-  background: var(--bad-soft);
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
-}
-.ms-mistake .ms-label {
-  color: var(--bad);
-}
-.ms-mistake + .key-idea {
-  margin: 0 0 16px;
-}
 @media (max-width: 700px) {
   .step-label {
     display: none;
@@ -1993,7 +1908,7 @@ input[type='checkbox'] {
 
 /* keep scrolled-to blocks clear of the sticky top bar */
 .session.is-inline,
-.markscheme {
+.xp {
   scroll-margin-top: 80px;
 }
 @media (max-width: 700px) {
@@ -2015,4 +1930,149 @@ input[type='checkbox'] {
 }
 .picker-topic-name input {
   margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------- explanations after answering */
+.xp {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px 28px;
+  box-shadow: var(--shadow);
+}
+.xp .rich p,
+.xp .rich li {
+  line-height: 1.6;
+}
+.xp-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 650;
+  margin-bottom: 2px;
+}
+.xp-answer {
+  background: var(--ok-soft);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.xp-answer .xp-label {
+  color: var(--ok);
+}
+.xp-answer-text {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+.xp-yours {
+  margin-top: 10px;
+  background: var(--bad-soft);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.xp-yours .xp-label {
+  color: var(--bad);
+}
+.xp-yours-text {
+  display: block;
+  font-weight: 600;
+}
+.xp-yours-why {
+  margin-top: 4px;
+}
+.xp-part {
+  margin-top: 24px;
+}
+.xp-part > h4 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.xp-part .code-block {
+  margin: 0 0 14px;
+}
+.xp-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: xp-step;
+  display: grid;
+  gap: 12px;
+}
+.xp-steps > li {
+  counter-increment: xp-step;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+}
+.xp-steps > li::before {
+  content: counter(xp-step);
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+/* A one-step explanation doesn't need a number. */
+.xp-steps > li:only-child {
+  grid-template-columns: minmax(0, 1fr);
+}
+.xp-steps > li:only-child::before {
+  content: none;
+}
+.xp-steps .table-wrap {
+  margin: 8px 0;
+}
+.xp-steps .code-block {
+  margin: 8px 0;
+}
+.xp .rich .data-table {
+  min-width: 0;
+  font-size: 0.92rem;
+}
+.xp .rich .data-table th,
+.xp .rich .data-table td {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+}
+.xp .tex-display {
+  margin: 4px 0;
+}
+.xp-method {
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+.xp-method > h4 {
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.xp-others {
+  margin-top: 20px;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.xp-others summary {
+  font-weight: 600;
+  cursor: pointer;
+}
+.xp-others ul {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.xp-other-option {
+  font-weight: 600;
+}
+.xp-lesson {
+  margin: 16px 0 0;
+  font-weight: 600;
+}
+.xp-fallback {
+  margin: 12px 0 0;
+}
+@media (max-width: 700px) {
+  .xp {
+    padding: 16px;
+  }
 }

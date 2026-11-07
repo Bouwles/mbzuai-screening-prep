@@ -79,7 +79,9 @@ function staticProblems(q: StaticQuestion, path: string): string[] {
   const fields: [string, string][] = [
     ['stem', q.stem],
     ...q.options.map((o, i) => [`option ${i}`, o] as [string, string]),
+    ['asking', ms.asking ?? ''],
     ['solution', ms.solution],
+    ['conclusion', ms.conclusion ?? ''],
     ['keyIdea', ms.keyIdea],
     ...(ms.whyWrong ?? []).filter((w): w is string => typeof w === 'string').map((w, i) => [`whyWrong ${i}`, w] as [string, string]),
   ];
@@ -126,8 +128,8 @@ function generatedProblems(core: GeneratedCore, seed: number): string[] {
     });
   }
   if (!core.solution || core.solution.length < 40) p.push(`${at}: solution too short`);
-  else if (!core.solution.replace(/\s+/g, ' ').includes(core.answer.replace(/\s+/g, ' ')))
-    p.push(`${at}: solution must state the final answer exactly as the correct option: ${core.answer}`);
+  else if (!`${core.solution} ${core.conclusion ?? ''}`.replace(/\s+/g, ' ').includes(core.answer.replace(/\s+/g, ' ')))
+    p.push(`${at}: the explanation must state the final answer exactly as the correct option: ${core.answer}`);
   if (!core.keyIdea || core.keyIdea.length < 10) p.push(`${at}: keyIdea missing`);
   core.distractors.forEach((d, i) => {
     if (!d.why || d.why.length < 15) p.push(`${at}: distractor ${i} needs a real explanation`);
@@ -135,7 +137,9 @@ function generatedProblems(core: GeneratedCore, seed: number): string[] {
   const fields: [string, string][] = [
     ['stem', core.stem],
     ['answer', core.answer],
+    ['asking', core.asking ?? ''],
     ['solution', core.solution],
+    ['conclusion', core.conclusion ?? ''],
     ['keyIdea', core.keyIdea],
     ...core.distractors.flatMap((d, i) => [
       [`distractor ${i}`, d.text] as [string, string],

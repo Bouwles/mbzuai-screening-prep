@@ -63,6 +63,6 @@ export function serveGenerated(g: Generator, seed: number): ServedQuestion {
     table: core.table,
     options: items.map((x) => x.text),
     correctIndex: items.findIndex((x) => x.why === null),
-    markScheme: { solution: core.solution, whyWrong: items.map((x) => x.why), keyIdea: core.keyIdea },
+    markScheme: { asking: core.asking, solution: core.solution, conclusion: core.conclusion, whyWrong: items.map((x) => x.why), keyIdea: core.keyIdea },
   };
 }

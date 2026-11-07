@@ -6,7 +6,8 @@ import { refKey, serve } from '../engine/bank';
 import { getState, recordAttempt, update, useStore, type MockRecord } from '../store/progress';
 import { SYLLABUS, subtopicInfo } from '../syllabus';
 import { freshSeed } from '../lib/rng';
-import { MarkScheme, QuestionMeta } from '../components/QuestionView';
+import { Explanation } from '../components/Explanation';
+import { QuestionMeta } from '../components/QuestionView';
 import { ExamNavStrip } from '../components/exam/ExamNavStrip';
 import { ExamQuestion } from '../components/exam/ExamQuestion';
 import { ExamSubmitDialog } from '../components/exam/ExamSubmitDialog';
@@ -468,8 +469,8 @@ export function MockResults() {
                 <ExamQuestion number={x.i + 1} q={x.q} selected={x.chosen} marked={rec.flags[x.i]} mode="review" reveal={{ correctIndex: x.q.correctIndex }} locked />
               </div>
               <details open={!x.ok}>
-                <summary>Mark scheme</summary>
-                <MarkScheme q={x.q} selected={x.chosen} />
+                <summary>Explanation</summary>
+                <Explanation q={x.q} selected={x.chosen} />
               </details>
             </article>
           ))}

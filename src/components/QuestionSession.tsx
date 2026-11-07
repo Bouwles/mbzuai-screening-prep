@@ -9,7 +9,8 @@ import { refKey, serve } from '../engine/bank';
 import { recordAttempt, toggleFlag, useStore, type Mode } from '../store/progress';
 import type { QRef, ServedQuestion } from '../types';
 import { useKeys } from './useKeys';
-import { MarkScheme, QuestionMeta } from './QuestionView';
+import { Explanation } from './Explanation';
+import { QuestionMeta } from './QuestionView';
 import { ExamQuestion } from './exam/ExamQuestion';
 
 interface Props {
@@ -251,7 +252,7 @@ export function QuestionSession({ mode, title, next, limit, onExit, onDone, show
               </div>
             )}
           </div>
-          {answered && <MarkScheme q={q} selected={selected} />}
+          {answered && <Explanation q={q} selected={selected} />}
         </div>
         <div className="ex-actions">
           {!answered && (

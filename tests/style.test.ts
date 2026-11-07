@@ -19,12 +19,18 @@ const GEN_N = Number(process.env.STYLE_GEN_N ?? 300);
 const baseName = (p: string) => p.split('/').pop()!.replace(/\.ts$/, '');
 const wanted = (p: string) => FILTER.length === 0 || FILTER.includes(baseName(p));
 
-const qMods = import.meta.glob<{ questions: StaticQuestion[] }>('../src/questions/**/*.ts', { eager: true });
-const gMods = import.meta.glob<{ generators: Generator[] }>('../src/generators/**/*.ts', { eager: true });
-const lMods = import.meta.glob<{ lesson: Lesson }>('../src/lessons/**/*.ts', { eager: true });
-const STATIC = Object.entries(qMods).filter(([p]) => wanted(p)).flatMap(([, m]) => m.questions ?? []);
-const GENS = Object.entries(gMods).filter(([p]) => wanted(p)).flatMap(([, m]) => m.generators ?? []);
-const LESSONS = Object.entries(lMods).filter(([p]) => wanted(p)).map(([p, m]) => ({ path: p, lesson: m.lesson }));
+// Loaded one file at a time, so a run for some subtopics only reads those subtopics' files.
+const qLoaders = import.meta.glob<{ questions: StaticQuestion[] }>('../src/questions/**/*.ts');
+const gLoaders = import.meta.glob<{ generators: Generator[] }>('../src/generators/**/*.ts');
+const lLoaders = import.meta.glob<{ lesson: Lesson }>('../src/lessons/**/*.ts');
+async function loadAll<T>(loaders: Record<string, () => Promise<T>>) {
+  const out: [string, T][] = [];
+  for (const [path, load] of Object.entries(loaders)) if (wanted(path)) out.push([path, await load()]);
+  return out;
+}
+const STATIC = (await loadAll(qLoaders)).flatMap(([, m]) => m.questions ?? []);
+const GENS = (await loadAll(gLoaders)).flatMap(([, m]) => m.generators ?? []);
+const LESSONS = (await loadAll(lLoaders)).map(([p, m]) => ({ path: p, lesson: m.lesson }));
 
 /** Words in a stem, counting each piece of maths and each inline code span as one word. */
 export function stemWords(stem: string): number {

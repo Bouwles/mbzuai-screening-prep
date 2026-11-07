@@ -573,9 +573,8 @@
 .ex .ex-panel .hint-panel {
   margin: 0 0 16px;
 }
-.ex .ex-panel .markscheme {
+.ex .ex-panel .xp {
   margin-top: 16px;
-  scroll-margin-top: 80px;
 }
 .ex .ex-answer-note {
   scroll-margin-top: 80px;

@@ -4,8 +4,19 @@ import { memo, useMemo } from 'react';
 import type { CodeBlock } from '../types';
 
 hljs.registerLanguage('python', python);
-
-const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+hljs.registerLanguage('pseudocode', () => ({
+  name: 'pseudocode',
+  keywords: {
+    keyword: 'while if else for to end break return function',
+    literal: 'true false',
+    built_in: 'print mod div length push pop enqueue dequeue and or not',
+  },
+  contains: [
+    { scope: 'comment', begin: '//', end: '$' },
+    { scope: 'string', begin: '"', end: '"' },
+    { scope: 'number', begin: /\b\d+(\.\d+)?\b/ },
+  ],
+}));
 
 /** Plain, unboxed code as it appears on the exam screen. Used for all pseudocode and for all code in mocks. */
 function ExamCode({ source }: { source: string }) {
@@ -18,7 +29,7 @@ function ExamCode({ source }: { source: string }) {
 
 /**
  * 'exam' is plain Courier with no box. 'study' adds syntax highlighting and line numbers, for Python
- * outside mocks. By default pseudocode is 'exam' and Python is 'study'.
+ * outside mocks and for code in explanations. By default pseudocode is 'exam' and Python is 'study'.
  */
 export const CodeView = memo(function CodeView({ code, variant }: { code: CodeBlock; variant?: 'exam' | 'study' }) {
   if ((variant ?? (code.lang === 'python' ? 'study' : 'exam')) === 'exam') return <ExamCode source={code.source} />;
@@ -28,8 +39,8 @@ export const CodeView = memo(function CodeView({ code, variant }: { code: CodeBl
 /** Highlighted code with line numbers. */
 function StudyCode({ code }: { code: CodeBlock }) {
   const lines = useMemo(() => {
-    const html = code.lang === 'python' ? hljs.highlight(code.source, { language: 'python' }).value : escapeHtml(code.source);
-    // hljs spans never cross lines for python, so splitting on \n keeps tags balanced
+    const html = hljs.highlight(code.source, { language: code.lang }).value;
+    // hljs spans never cross lines for these languages, so splitting on \n keeps tags balanced
     return html.split('\n');
   }, [code]);
   return (

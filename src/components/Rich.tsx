@@ -42,7 +42,7 @@ function renderInline(xs: Inline[], big = false): ReactNode[] {
   });
 }
 
-function renderBlock(b: Block, i: number): ReactNode {
+function renderBlock(b: Block, i: number, codeVariant?: 'exam' | 'study'): ReactNode {
   switch (b.t) {
     case 'p':
       return <p key={i}>{renderInline(b.c)}</p>;
@@ -67,7 +67,7 @@ function renderBlock(b: Block, i: number): ReactNode {
     case 'mathblock':
       return <Tex key={i} src={b.v} display />;
     case 'code':
-      return <CodeView key={i} code={{ lang: b.lang === 'python' ? 'python' : 'pseudocode', source: b.v }} />;
+      return <CodeView key={i} code={{ lang: b.lang === 'python' ? 'python' : 'pseudocode', source: b.v }} variant={codeVariant} />;
     case 'table':
       return (
         <div className="table-wrap" key={i}>
@@ -95,8 +95,8 @@ function renderBlock(b: Block, i: number): ReactNode {
 }
 
 /** Block-level rich text (paragraphs, lists, display maths...). */
-export const Rich = memo(function Rich({ text, className }: { text: string; className?: string }) {
-  return <div className={`rich ${className ?? ''}`}>{parseBlocks(text).map(renderBlock)}</div>;
+export const Rich = memo(function Rich({ text, className, codeVariant }: { text: string; className?: string; codeVariant?: 'exam' | 'study' }) {
+  return <div className={`rich ${className ?? ''}`}>{parseBlocks(text).map((b, i) => renderBlock(b, i, codeVariant))}</div>;
 });
 
 /** Inline rich text (for options, labels): no paragraphs. */

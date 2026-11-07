@@ -75,8 +75,15 @@ export type ChartSpec =
     };
 
 export interface MarkScheme {
-  /** Full worked solution, step by step (rich text). For code: trace line by line with variable values. */
+  /** "What is it asking?": the question in one very simple sentence (rich text). */
+  asking?: string;
+  /**
+   * "How to solve it": the worked solution for a complete beginner (rich text). Each blank-line-separated
+   * block is one numbered step. A table, display maths or code block belongs to the step before it.
+   */
   solution: string;
+  /** "Why this is the answer": a short conclusion that links the working to the correct option. */
+  conclusion?: string;
   /**
    * One entry per option, same order as `options`. The entry at `correctIndex` must be null;
    * every other entry names the specific mistake that produces that option
@@ -84,7 +91,7 @@ export interface MarkScheme {
    * Never refer to options by letter (A-D) here: options are shuffled when displayed.
    */
   whyWrong: (string | null)[];
-  /** The key idea in one sentence. */
+  /** "For similar questions": a reusable technique for this type of question. Never generic advice. */
   keyIdea: string;
 }
 
@@ -138,8 +145,13 @@ export interface GeneratedCore {
   answerValue?: number | string;
   /** Exactly 3 distractors, each from a genuine mistake, with the explanation of that mistake. */
   distractors: { text: string; value?: number | string; why: string }[];
-  /** Full worked solution built from the same numbers. Should end by stating the final answer. */
+  /** The question in one very simple sentence. */
+  asking?: string;
+  /** Worked solution built from the same numbers. Each blank-line-separated block is one step. */
   solution: string;
+  /** Short conclusion that links the working to the correct option, stating it exactly. */
+  conclusion?: string;
+  /** A reusable technique for this type of question. */
   keyIdea: string;
   /** Optional: generated Python snippet whose stdout must equal `answer` (tests run it). */
   python?: PythonCheck;
